@@ -16,8 +16,10 @@
     1. Create django application
     2. Create and upload data tables (MySQL)
     3. Start coding the data access layer for informational retrieval
-    4. Programming of the login/logout logic
-    5. Programming of forget password & password manager functionality
+    4. Programming of the Login/Logout Logic
+        * Forget Password (Good-To-Have)
+    5. Password Manager Functionality
+        * Prompts user at the start to change password
 
 * Joel:
     1. Start programming the business logic layer (Bootstrap)
