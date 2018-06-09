@@ -1,11 +1,11 @@
 # Thunderhead Monkeys
-_**Cloud Learning Environment**_
+### _**Cloud Learning Environment**_
 
 **Collaborative Tasks List:**
 * Frontend:
     1. Create logical diagram
     2. Create entity relationship diagram (Relational Data Tables)
-    3. Plan out a rough sketch of the use case and sequence diagram 
+    3. Plan out a rough sketch of the use case and sequence diagram
 
 **Individual Tasks List:**
 * Faried:
