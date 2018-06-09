@@ -3,7 +3,7 @@
 
 --------------------------------------------------------------------------------
 
-|**Collaborative Tasks List:**
+**Collaborative Tasks List:**
 * Frontend:
     1. Create logical diagram
     2. Create entity relationship diagram (Relational Data Tables)
@@ -11,7 +11,7 @@
 
 --------------------------------------------------------------------------------
 
-|**Individual Tasks List:**
+**Individual Tasks List:**
 * Faried:
     1. Create django application
     2. Create and upload data tables (MySQL)
