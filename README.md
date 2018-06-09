@@ -7,6 +7,8 @@
     2. Create entity relationship diagram (Relational Data Tables)
     3. Plan out a rough sketch of the use case and sequence diagram
 
+--------------------------------------------------------------------------------
+
 **Individual Tasks List:**
 * Faried:
     1. Create django application
