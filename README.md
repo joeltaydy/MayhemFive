@@ -1,2 +1,2 @@
-# MayhemFive
-Cloud learning environment
+# Thunderhead Monkeys
+Cloud Learning Environment
