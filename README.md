@@ -3,7 +3,15 @@
 
 --------------------------------------------------------------------------------
 
-**Collaborative Tasks List:**
+For the time being, since there is no proper task management tool utilized to keep track of what we're doing every sprint, we will just utilize the README file within this Git repo. As such, everyone is able to gain access to it and maintain transparency within all the group member.
+
+#### **Regulations:**
+    * Insert a _**'(Completed)'**_ tag beside the task that you have completed
+        Example: 1. (Completed) Assigned task to respective members for upcoming sprint
+
+--------------------------------------------------------------------------------
+
+#### **Collaborative Tasks List:**
 * Frontend:
     1. Create logical diagram
     2. Create entity relationship diagram (Relational Data Tables)
@@ -11,7 +19,7 @@
 
 --------------------------------------------------------------------------------
 
-**Individual Tasks List:**
+#### **Individual Tasks List:**
 * Faried:
     1. Create django application
     2. Create and upload data tables (MySQL)
