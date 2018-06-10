@@ -7,7 +7,8 @@ For the time being, since there is no proper task management tool utilized to ke
 
 #### **Regulations:**
 * Insert a _**'(Completed)'**_ tag beside the task that you have completed  
-    Example: 1. _**'(Completed)'**_ Assigned task to respective members for upcoming sprint
+    Example:  
+        1. _**'(Completed)'**_ Assigned task to respective members for upcoming sprint
 
 --------------------------------------------------------------------------------
 
