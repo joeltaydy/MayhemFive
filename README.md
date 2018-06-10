@@ -3,11 +3,11 @@
 
 --------------------------------------------------------------------------------
 
-For the time being, since there is no proper task management tool utilized to keep track of what we're doing every sprint, we will just utilize the README file within this Git repo. As such, everyone is able to gain access to it and maintain transparency within all the group member.
+For the time being, since there is no proper task management tool utilized to keep track of what we're doing every sprint, we will just utilize the README file within this Git repo. As such, everyone is able to gain access to it and maintain transparency within all the group members.
 
 #### **Regulations:**
-    * Insert a _**'(Completed)'**_ tag beside the task that you have completed
-        Example: 1. (Completed) Assigned task to respective members for upcoming sprint
+* Insert a _**'(Completed)'**_ tag beside the task that you have completed
+    Example: 1. (Completed) Assigned task to respective members for upcoming sprint
 
 --------------------------------------------------------------------------------
 
