@@ -15,8 +15,8 @@ For the time being, since there is no proper task management tool utilized to ke
 ###### **Collaborative Tasks List:**
 * Frontend:
     1. Create logical diagram
-    2. Create entity relationship diagram (Relational Data Tables)
-    3. _**'(Completed)'**_ Create initial use case  diagram 
+    2. _**'(Completed)'**_ Create entity relationship diagram (Relational Data Tables)
+    3. _**'(Completed)'**_ Create initial use case  diagram
     4. Create initial sequence diagram
 
 --------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ For the time being, since there is no proper task management tool utilized to ke
 ###### **Individual Tasks List:**
 * Faried:
     1. Create django application
-    2. Create and upload data tables (MySQL)
+    2. _**'(Completed)'**_ Create and upload data tables (MySQL)
     3. Start coding the data access layer for informational retrieval
     4. Programming of the Login/Logout Logic
         * Forget Password (Good-To-Have)
