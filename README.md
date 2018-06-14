@@ -44,10 +44,6 @@ For the time being, since there is no proper task management tool utilized to ke
     - Example:  
         1. _**'(Completed)'**_ Assigned task to respective members for upcoming sprint
 
-
---------------------------------------------------------------------------------
-
-
 # **Collaborative Tasks List:**
 * Frontend:
     1. Create logical diagram
