@@ -17,6 +17,8 @@
 2. Run command “python manage.py runserver” to run local server on your own machine
 3. Go to a web browser and type: “localhost:8000” to see whether you've deployed correctly  
 
+__To get rid of unapplied migration, type command “python manage.py migrate”__  
+  
 
 ###### Creating Django admin (omit this part as your accounts have already been created)
 1.	Run local server “python manage.py runserver” if you have not done so
@@ -32,7 +34,6 @@
 * martin.admin : temp12345  
 
 
---------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 
