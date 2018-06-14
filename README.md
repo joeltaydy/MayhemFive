@@ -55,10 +55,6 @@ For the time being, since there is no proper task management tool utilized to ke
     3. _**'(Completed)'**_ Create initial use case  diagram
     4. Create initial sequence diagram
 
-
---------------------------------------------------------------------------------
-
-
 # **Individual Tasks List:**
 * Faried:
     1. _**'(Completed)'**_ Create django application
