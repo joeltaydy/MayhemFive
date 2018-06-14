@@ -17,7 +17,7 @@
 2. Run command `python manage.py runserver` to run local server on your own machine
 3. Go to a web browser and type: `localhost:8000` to see whether you've deployed correctly  
 
-_To get rid of unapplied migration, type command `python manage.py migrate`_
+_*To get rid of unapplied migration, type command `python manage.py migrate`_
 
 
 ###### Creating Django admin (omit this part as your accounts have already been created)
@@ -41,7 +41,7 @@ For the time being, since there is no proper task management tool utilized to ke
 
 ###### **Regulations:**
 * Insert a _**'(Completed)'**_ tag beside the task that you have completed  
-    Example:  
+    - Example:  
         1. _**'(Completed)'**_ Assigned task to respective members for upcoming sprint
 
 
