@@ -23,7 +23,7 @@ For the time being, since there is no proper task management tool utilized to ke
 
 ###### **Individual Tasks List:**
 * Faried:
-    1. Create django application
+    1. _**'(Completed)'**_ Create django application
     2. _**'(Completed)'**_ Create and upload data tables (MySQL)
     3. Start coding the data access layer for informational retrieval
     4. Programming of the Login/Logout Logic
