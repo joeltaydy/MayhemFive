@@ -9,7 +9,7 @@ import MySQLdb
 
 def getConnection():
     host = "localhost"
-    database = "FYP"
+    database = "fyp"
 
     # check if operating system is windows
     if os.name == "nt":

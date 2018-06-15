@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+######### Add any newly created app folders in to list below ######
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,10 +74,25 @@ WSGI_APPLICATION = 'CLE.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+
+#This is default sqlite3
+''' 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+'''
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'CLEdb', #Name of database table, aka need to change
+        'USER': 'root',
+        'PASSWORD': '', # need to configure if local or not
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 

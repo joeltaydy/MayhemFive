@@ -1,6 +1,17 @@
 import xlrd
 import time
 import csv
+import os,sys
+
+parentpath = os.path.abspath("..")
+if parentpath not in sys.path:
+    sys.path.insert(0, parentpath)
+
+from DataAccess import ValidateDAL
+
+#-----------------------------------------------------------------------------#
+#-------------------------- Bootstrap Function -------------------------------#
+#-----------------------------------------------------------------------------#
 
 classFile = "../../SampleData/SampleData2_Class_Roster.xlsx"
 
@@ -36,4 +47,10 @@ with open('../../SampleData/studentProcessed.csv','wb') as csvFile:
     writer.writerow(["EMAIL", "USERNAME", "FIRST NAME", "LAST NAME", "PASSWORD", "SECT NO"," TEAM NO"])
     for row in studentData:
         writer.writerow(row)
+
+cnx = ValidateDAL.getConnection()
+cursor = cnx.cursor()
+cursor.execute("LOAD DATA LOCAL INFILE '../../SampleData/studentProcessed.csv' INTO TABLE Student FIELDS TERMINATED BY ',' IGNORE 1 LINES")
+
+
 print "done"
