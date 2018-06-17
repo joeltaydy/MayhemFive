@@ -46,7 +46,7 @@ For the time being, since there is no proper task management tool utilized to ke
 
 # **Collaborative Tasks List:**
 * Frontend:
-    1. Create logical diagram
+    1. _**'(Completed)'**_ Create logical diagram
     2. _**'(Completed)'**_ Create entity relationship diagram (Relational Data Tables)
     3. _**'(Completed)'**_ Create initial use case  diagram
     4. Create initial sequence diagram
