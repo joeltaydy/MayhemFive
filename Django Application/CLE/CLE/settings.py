@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'CLE.wsgi.application'
 
 
 #This is default sqlite3
-''' 
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -85,12 +85,18 @@ DATABASES = {
 }
 '''
 
+# check if operating system is windows
+if os.name == 'nt':
+    password = ''
+else:
+    password = 'root'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'CLEdb', #Name of database table, aka need to change
         'USER': 'root',
-        'PASSWORD': '', # need to configure if local or not
+        'PASSWORD': password, # need to configure if local or not
         'HOST': 'localhost',
         'PORT': '3306',
     }
