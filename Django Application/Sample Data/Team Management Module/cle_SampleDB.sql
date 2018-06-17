@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS CLEdb;
 USE CLEdb;
 
 -- ***************************************************************************************
--- 1. Create Tables;
+-- Create Tables;
 
     CREATE TABLE `Instructor` (
       `Email` varchar(255) NOT NULL,
@@ -47,5 +47,5 @@ USE CLEdb;
       FOREIGN KEY (`Section_Number`,`Team_Number`) REFERENCES `Team`(`Section_Number`,`Team_Number`)
     );
 
-    
+
 -- DROP TABLE CLEdb;
