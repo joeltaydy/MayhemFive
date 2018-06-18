@@ -6,16 +6,18 @@
 
 **Setup**
 ###### Environments to run django:
+* WAMP OR MAMP(for Mac)
 * Python 2.7.x
 * Django 1.11.x (install via `pip install django`)    
 
 
 **Instructions**
 ###### Deploy webpage on local server
-1. Open command prompt/terminal
-1. Traverse directory to where the `manage.py` file is
-2. Run command `python manage.py runserver` to run local server on your own machine
-3. Go to a web browser and type: `localhost:8000` to see whether you've deployed correctly  
+1. Start WAMP/MAMP Server
+2. Open command prompt/terminal
+3. Traverse directory to where the `manage.py` file is
+4. Run command `python manage.py runserver` to run local server on your own machine
+5. Go to a web browser and type: `localhost:8000` to see whether you've deployed correctly  
 
 _*To get rid of unapplied migration, type command `python manage.py migrate`_
 
@@ -46,7 +48,7 @@ For the time being, since there is no proper task management tool utilized to ke
 
 # **Collaborative Tasks List:**
 * Frontend:
-    1. Create logical diagram
+    1. _**'(Completed)'**_ Create logical diagram
     2. _**'(Completed)'**_ Create entity relationship diagram (Relational Data Tables)
     3. _**'(Completed)'**_ Create initial use case  diagram
     4. Create initial sequence diagram
