@@ -11,7 +11,7 @@ def login(requests):
     return render(requests,"login.html",{})
 
 def home(requests):
-    return render(requests,"home.html",{})
+    return render(requests,"studentHome.html",{})
 
 def uploadcsv(requests):
     return render(requests, "uploadcsv.html",{})
@@ -22,7 +22,7 @@ def upload_csv(request):
     from src import bootstrap
     data = {}
     if "GET" == request.method:
-        return render(request, "TMmod/uploadcsv.html", data)
+        return render(request, "uploadcsv.html", data)
     # if not GET, then proceed
     try:
         csv_file = request.FILES.get("csv_file", False)

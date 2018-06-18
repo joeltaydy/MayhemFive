@@ -5,5 +5,6 @@ urlpatterns = [
     url(r'^login/', views.login, name='login'),
     url(r'^home/', views.home, name='home'),
     url(r'^upload/csv/', views.uploadcsv, name='uploadcsv'),
-    url(r'^upload/csv/uploading',views.upload_csv,name='upload_csv')
+    url(r'^upload/csv/loading',views.upload_csv,name='upload_csv'),
+    url(r'^$', views.home, name ="index" )
 ]
