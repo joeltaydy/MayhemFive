@@ -48,7 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
 ]
 
 ROOT_URLCONF = 'CLE.urls'
@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'CLE.wsgi.application'
 
 
 #This is default sqlite3
-''' 
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -85,13 +85,17 @@ DATABASES = {
     }
 }
 '''
+password = ''
+
+if 'posix' in os.name:
+    password = 'root'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'CLEdb', #Name of database table, aka need to change
         'USER': 'root',
-        'PASSWORD': '', # need to configure if local or not
+        'PASSWORD': password, # need to configure if local or not
         'HOST': 'localhost',
         'PORT': '3306',
     }
