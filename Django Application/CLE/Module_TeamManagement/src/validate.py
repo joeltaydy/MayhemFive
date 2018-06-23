@@ -6,7 +6,7 @@ def validate(username,password):
     user = "admin"
     pwd = "admin"
 
-    if user == username.stip() and pwd = password.strip():
+    if user == username.strip() and pwd = password.strip():
         return True
 
     return False
