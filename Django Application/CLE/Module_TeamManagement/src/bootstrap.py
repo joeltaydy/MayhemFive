@@ -51,6 +51,7 @@ def bootstrapData(classFile):
         writer.writerow(["EMAIL", "USERNAME", "FIRST NAME", "LAST NAME", "PASSWORD", "SECT NO"," TEAM NO"])
         for row in studentData:
             writer.writerow(row)
+            
 
 
     cursor = connection.cursor()
