@@ -20,7 +20,7 @@ class Student(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'Student'        
+        db_table = 'Student'
 
 class Instructor(models.Model):
     email = models.EmailField(db_column='Instructor_Email', primary_key=True)
@@ -35,7 +35,7 @@ class Instructor(models.Model):
         db_table = 'Instructor'
 
 class Assigned_Team(models.Model):
-    student_email = models.ForeignKey(Student, on_delete=models.CASCADE, db_column='Student_Email', primary_key=True)
+    student_email = models.OneToOneField(Student, on_delete=models.CASCADE, db_column='Student_Email', primary_key=True)
     team_number = models.CharField(db_column='Team_Number', max_length=2)
     section_number = models.ForeignKey(Section, on_delete=models.CASCADE, db_column='Section_Number')
 
