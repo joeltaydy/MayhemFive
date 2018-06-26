@@ -19,6 +19,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include('Module_TeamManagement.urls', namespace="TMmod")) #indicate name space for subsequent usage
-  
+    url(r'', include('Module_TeamManagement.urls', namespace="TMmod")),
+    url(r'', include('Module_Account.urls', namespace="Amod"))
 ]
