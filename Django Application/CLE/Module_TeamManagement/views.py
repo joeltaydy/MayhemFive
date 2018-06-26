@@ -4,74 +4,31 @@ from django.shortcuts import render
 from  django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
-
-
-# ------------------- Routing ---------------------#
-def login(requests):
-    return render(requests,"login.html",{})
+from Module_TeamManagement.src import bootstrap
+import traceback
 
 def home(requests):
+    print "DEBUG HOME"
     return render(requests,"studentHome.html",{})
 
 def uploadcsv(requests):
-    return render(requests, "uploadcsv.html",{})
+    if requests.method == "GET":
+        return render(requests, "uploadcsv.html", {})
 
-
-# ------------------- Form parsing ---------------------#
-def login_validation(request):
-    from src import validate
-
-    data = {}
-
-    if "GET" == request.methoh:
-        return render(request, "login.html", data)
-
-    # if not GET, then proceed
+    # If not GET, then proceed
     try:
-        username = request.get("username", False)
-        password = request.get("password", False)
+        csv_file = requests.FILES.get("csv_file", False)
 
-        if username == "" or password == "":
-            messages.error(request,"Please enter credentials")
-            return HttpResponseRedirect(reverse("TMmod:login.html"))
-
-        if validate.validate(username,password):
-            messages.error(request,"Incorrect username or password")
-            return HttpResponseRedirect(reverse("TMmod:login.html"))
-            
-    except Exception as e:
-        return
-
-    return HttpResponseRedirect(reverse("TMmod:studentHome.html"))
-
-def upload_csv(request):
-    from src import bootstrap
-
-    data = {}
-
-    if "GET" == request.method:
-        return render(request, "uploadcsv.html", data)
-
-    # if not GET, then proceed
-    try:
-        csv_file = request.FILES.get("csv_file", False)
+        # Checks if file is NOT xlsx
         if not csv_file.name.endswith('.xlsx'):
-            messages.error(request,'File is not CSV type')
-            return HttpResponseRedirect(reverse("TMmod:uploadcsv"))
+            messages.error(requests,'File is not CSV type')
+            return HttpResponseRedirect("upload/csv/")
 
-        #if file is too large, return
-        #if csv_file.multiple_chunks():
-        #    messages.error(request,"Uploaded file is too big (%.2f MB)." % (csv_file.size/(1000*1000),))
-        #    return HttpResponseRedirect(reverse("TMmod:uploadcsv"))
-
-
-        bootstrap.bootstrapData(csv_file)
-
+        # If file is xlsx then proceed with processing
+        bootstrap.bootstrap(csv_file)
 
     except Exception as e:
-        #logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
-        messages.error(request,"Unable to upload file. "+repr(e))
+        messages.error(requests,"Unable to upload file. " + repr(e))
+        traceback.print_exc()
 
-
-
-    return HttpResponseRedirect(reverse("TMmod:uploadcsv"))
+    return render(requests, "uploadcsv.html", {})
