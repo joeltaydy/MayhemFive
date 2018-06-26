@@ -4,19 +4,11 @@ from django.shortcuts import render
 from  django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
+from Module_Account.src import validate
 
-# ------------------- Routing ---------------------#
 def login(requests):
-    return render(requests,"login.html",{})
-
-# ------------------- Form parsing ---------------------#
-def login_validation(request):
-    from src import validate
-
-    data = {}
-
-    if "GET" == request.methoh:
-        return render(request, "login.html", data)
+    if request.method = "GET":
+        return render(request, "login.html", {})
 
     # if not GET, then proceed
     try:
@@ -34,4 +26,4 @@ def login_validation(request):
     except Exception as e:
         return
 
-    return HttpResponseRedirect(reverse("TMmod:studentHome.html"))
+    return render(requests,"login.html",{})

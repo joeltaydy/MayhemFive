@@ -28,6 +28,6 @@ def uploadcsv(requests):
 
     except Exception as e:
         messages.error(requests,"Unable to upload file. " + repr(e))
-        traceback.print_exc()
+        #traceback.print_exc()
 
     return render(requests, "uploadcsv.html", {})
