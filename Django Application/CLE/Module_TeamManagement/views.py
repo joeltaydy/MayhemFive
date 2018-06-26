@@ -8,7 +8,6 @@ from Module_TeamManagement.src import bootstrap
 import traceback
 
 def home(requests):
-    print "DEBUG HOME"
     return render(requests,"studentHome.html",{})
 
 def uploadcsv(requests):
