@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form action="{% url 'Amod:login_validation' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+<form action="{% url 'Amod:login' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
 
@@ -20,4 +20,5 @@
     </div>
 
 </form>
+
 {% endblock %}

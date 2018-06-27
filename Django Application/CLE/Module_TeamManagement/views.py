@@ -20,14 +20,14 @@ def uploadcsv(requests):
 
         # Checks if file is NOT xlsx
         if not csv_file.name.endswith('.xlsx'):
-            messages.error(requests,'File is not CSV type')
-            return HttpResponseRedirect("upload/csv/")
+            error = "File is not CSV type"
+            return render(requests, "uploadcsv.html", {"error":error})
 
         # If file is xlsx then proceed with processing
         bootstrap.bootstrap(csv_file)
 
     except Exception as e:
-        messages.error(requests,"Unable to upload file. " + repr(e))
-        #traceback.print_exc()
+        error = "Unable to upload file. " + repr(e)
+        return render(requests, "uploadcsv.html", {"error":error})
 
     return render(requests, "uploadcsv.html", {})

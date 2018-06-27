@@ -5,25 +5,21 @@ from  django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 from Module_Account.src import validate
+import traceback
 
 def login(requests):
-    if request.method = "GET":
-        return render(request, "login.html", {})
+    if requests.method == "GET":
+        return render(requests, "login.html", {})
 
-    # if not GET, then proceed
+    # If not GET, then proceed
     try:
-        username = request.get("username", False)
-        password = request.get("password", False)
+        username = requests.POST.get("username")
+        password = requests.POST.get("password")
 
-        if username == "" or password == "":
-            messages.error(request,"Please enter credentials")
-            return HttpResponseRedirect(reverse("TMmod:login.html"))
-
-        if validate.validate(username,password):
-            messages.error(request,"Incorrect username or password")
-            return HttpResponseRedirect(reverse("TMmod:login.html"))
+        # Proceed to validating of username and password
+        result = validate.validate(username,password)
 
     except Exception as e:
-        return
+        return render(requests, "login.html", {"error" : str(e)})
 
-    return render(requests,"login.html",{})
+    return render(requests, "login.html", result)

@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Module_TeamManagement',
-    'Module_Account'
+    'Module_Account',
 ]
 
 MIDDLEWARE = [
@@ -53,10 +53,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'CLE.urls'
 
+TEMPLATES_DIRS = [
+    os.path.join(BASE_DIR,"Module_Account","templates"),
+    os.path.join(BASE_DIR,"Module_TeamManagement","templates"),
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': TEMPLATES_DIRS,
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
