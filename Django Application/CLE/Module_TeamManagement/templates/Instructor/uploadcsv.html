@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'Instructor/instructorBase.html' %}
 
 {% block content %}
 
@@ -18,5 +18,8 @@
         </div>
     </div>
 </form>
+
+{% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
+{% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
 
 {% endblock %}
