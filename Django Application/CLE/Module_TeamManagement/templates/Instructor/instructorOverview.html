@@ -1,0 +1,24 @@
+{% extends 'Instructor/instructorBase.html' %}
+
+{% block content %}
+
+
+
+{% if teamList %}
+    <div class='imp_message'> <h1> Student Managment </h1></div>
+    <table border="1" >
+        {% for team in teamList %}
+            <tr>
+                <td> {{ team.section.section_number }}</td>
+                <td> {{ team.team_number }}</td>
+                <td> {{ team.student.email}}</td>
+                <td> {{ team.student.firstname }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+{% endif %}
+
+
+{% endblock %}
