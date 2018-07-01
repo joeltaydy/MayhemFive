@@ -13,15 +13,10 @@ def validate(username,password):
 
     # Validates username and password. Else raise exception
     try:
-        student = Student.objects.get(username=username)
-
-        if password != student.password:
-            raise Exception("Invalid password")
-
+        student = Student.objects.get(username=username, password = password)
         status = "smustu"
-        user = student.firstname + " " + student.lastname
 
-    except Student.DoesNotExist:
-        raise Exception("Invalid username")
+    except :
+        raise Exception("Invalid Username/Password")
 
-    return {"status" : status, "user" : user}
+    return {"status" : status, "user" : student}
