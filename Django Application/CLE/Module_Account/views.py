@@ -37,7 +37,7 @@ def login(requests):
     else:
         return redirect("/student/team/")
 
-def passwordMgmt(requests):
+def password_reset(requests):
     if requests.method == "GET":
         return redirect("/login/")
 
