@@ -5,7 +5,7 @@ from  django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import redirect
-from Module_Account.src import validate
+from Module_Account.src import processLogin
 import traceback
 
 def login(requests):
@@ -24,16 +24,39 @@ def login(requests):
             return redirect('/home/')
 
         # Proceed to validating of username and password
-        result = validate.validate(username,password)
+        result = processLogin.validate(username,password)
 
     except Exception as e:
         return render(requests, "login.html", {"error" : str(e)})
 
     if result["status"] == "admin":
         return render(requests, "Instructor/instructorOverview.html", result)
+
+    if result["first_time"]:
+        return render(requests, "passwordMgmt.html", result)
     else:
-        #HttpResponseRedirect(('TMmod:home'))
-        return render(requests, "Student/studentHome.html", result)
+        return redirect("/student/team/")
+
+def passwordMgmt(requests):
+    if requests.method == "GET":
+        return redirect("/login/")
+
+    try:
+        student = requests.POST.get("login_details")
+        oldPwd = requests.POST.get("old_password")
+        newPwd = requests.POST.get("new_password")
+
+        if student.password == oldPwd:
+            # Change password for first time login
+            processLogin.changePassword(oldPwd,newPwd,student)
+
+        else:
+            raise Exception("Old password deos not match. Please re-enter.")
+
+    except Exception as e:
+        return render(requests, "passwordMgmt.html", {"error" : str(e)})
+
+    return redirect("/student/team/")
 
 def logout(requests):
-    return redirect('/login/')
+    return redirect("/login/")
