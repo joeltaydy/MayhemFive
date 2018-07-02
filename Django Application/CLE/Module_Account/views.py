@@ -8,11 +8,12 @@ from django.shortcuts import redirect
 from Module_Account.src import processLogin
 import traceback
 
+# LOGIN VALIDATION -----------------------------------------------------------#
 def login(requests):
     result = {}
 
     if requests.method == "GET":
-        return render(requests, "login.html", result)
+        return render(requests, "Registration/login.html", result)
 
     # If not GET, then proceed
     try:
@@ -27,7 +28,7 @@ def login(requests):
         result = processLogin.validate(username,password)
 
     except Exception as e:
-        return render(requests, "login.html", {"error" : str(e)})
+        return render(requests, "Registration/login.html", {"error" : str(e)})
 
     if result["status"] == "admin":
         return render(requests, "Instructor/instructorOverview.html", result)
@@ -37,9 +38,10 @@ def login(requests):
     else:
         return redirect("/student/team/")
 
+# PASSWORD RESET --- {for first time login} ----------------------------------#
 def password_reset(requests):
     if requests.method == "GET":
-        return redirect("/login/")
+        return redirect("/accounts/login/")
 
     try:
         student = requests.POST.get("login_details")
@@ -58,5 +60,6 @@ def password_reset(requests):
 
     return redirect("/student/team/")
 
+# LOGOUT ---------------------------------------------------------------------#
 def logout(requests):
-    return redirect("/login/")
+    return redirect("/accounts/login/")
