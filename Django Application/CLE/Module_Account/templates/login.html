@@ -1,6 +1,5 @@
-<!-- {% extends 'base.html' %} -->
+{% load staticfiles %} <!-- to load the css -->
 
-<!-- {% block content %} -->
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -12,7 +11,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
   <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
-      <link rel="stylesheet" href="login.css">
+      <link rel="stylesheet" href="{% static 'css/login.css' %}">
   </head>
   <body>
     <div class="modal-dialog text-center">
@@ -20,11 +19,11 @@
         <div class="modal-content">
 
           <div class="col-12 user-img">
-            <img src="img/face.png">
+            <img src="{% static 'css/img/face.png' %} ">
           </div>
 
           <form action="{% url 'Amod:login' %}" method="POST" enctype="multipart/form-data" class="col-12">
-              <!-- {% csrf_token %} -->
+              {% csrf_token %} <!-- required for form submission-->
               <div class="form-group">
                   <input type="text" name="username" id="username" required="True" class="form-control" placeholder="Enter Username">
               </div>
@@ -33,6 +32,9 @@
               </div>
               <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i>Login</button>
           </form>
+
+          {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}  <!-- if error msg-->
+       
 
           <div class="col-12 forgot">
               <a href="#">Forgot Password?</a>
@@ -46,11 +48,4 @@
 
 
 
-<<<<<<< HEAD
 
-<!-- {% endblock %} -->
-=======
-</form>
-{% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
-{% endblock %}
->>>>>>> 1404f5017ee42b1ae42bc3f27db0c50216eca011
