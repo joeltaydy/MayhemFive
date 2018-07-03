@@ -1,5 +1,5 @@
 from django.conf.urls import url
-import views
+from Module_TeamManagement import views
 
 urlpatterns = [
     url(r'^home/', views.home, name='home'),

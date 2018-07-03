@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+{% load staticfiles %} <!-- to load the css -->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %} Cloud learning environment {% endblock %} </title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="{% static 'css/base.css' %}"/>
+</head>
+<body>
+
+
+<!-- Navigation -->
+<!-- <div class="content"> -->
+<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'TMmod:home' %}"><img src=" {% static 'images/download.jpg' %}"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                {% block navBar%}
+
+
+                {% endblock  %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% block content %}
+
+
+{% endblock  %}
+
+<!-- </div> -->
+<footer>
+	<div class="row text-center">
+			<div class="col-12">
+					<hr class="light">
+					<h5>Copyright &copy; CLE - All rights reserved </h5>
+			</div>
+	</div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.3.1.js" charset="utf-8"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js" charset="utf-8"></script>
+<script>
+$(document).ready( function () {
+	$('#studentdata').DataTable();
+} );
+</script>
+</body>
+
+</html>

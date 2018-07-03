@@ -1,0 +1,27 @@
+{% extends 'Module_TeamManagement/base.html' %}
+
+{% block title %}
+    Student page
+{% endblock %}
+
+
+{% block navBar %}
+  <li class="nav-item active">
+      <a class="nav-link" href="{% url 'TMmod:home' %}">Home
+
+      </a>
+  </li>
+  <li class="nav-item">
+      <a class="nav-link" href="{% url 'TMmod:sTeam' %}"> Student Teams </a>
+  </li>
+  <!-- to be removed [Used for easier management]-->
+  <li class="nav-item">
+      <a class="nav-link" href="{% url 'TMmod:instuOverview' %}"> Instructor Home
+      </a>
+  </li>
+  <li class="nav-item">
+          <a class="nav-link" href="{% url 'Amod:logout' %}"> Logout
+
+          </a>
+  </li>
+{% endblock %}

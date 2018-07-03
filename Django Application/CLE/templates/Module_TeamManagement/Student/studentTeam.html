@@ -1,0 +1,44 @@
+{% extends 'Module_TeamManagement/Student/studentBase.html' %}
+
+
+{% block content %}
+
+
+
+{% if teamList %}
+    <div class='imp_message container'>
+      <p> <br> </p>
+      <h1> Your Team </h1>
+    <table class='table table-striped table-bordered table-hover' id='studentdata'>
+      <thead>
+          <tr>
+            <th>Section no.</th>
+            <th>Team no.</th>
+            <th>Email</th>
+            <th>First name</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% for team in teamList %}
+            <tr>
+                <td> {{ team.section.section_number }}</td>
+                <td> {{ team.team_number }}</td>
+                <td> {{ team.student.email}}</td>
+                <td> {{ team.student.firstname }}</td>
+            </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>Section no.</th>
+          <th>Team no.</th>
+          <th>Email</th>
+          <th>First name</th>
+        </tr>
+      </tfoot>
+    </table>
+    </div>
+{% endif %}
+
+
+{% endblock %}
