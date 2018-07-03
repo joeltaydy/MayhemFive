@@ -13,10 +13,7 @@ def home(requests): #student home page
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 def instOverview(requests): #instructor overview page
-
-    from Module_TeamManagement.models import Assigned_Team
     teams = Assigned_Team.objects.all().order_by('section')
-
     context = {"teamList" : teams}
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 

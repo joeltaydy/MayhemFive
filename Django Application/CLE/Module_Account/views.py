@@ -13,11 +13,8 @@ def login(requests):
     result = {}
 
     if requests.method == "GET":
-<<<<<<< HEAD
         return render(requests, "Module_Account/login.html", result)
-=======
         return render(requests, "Registration/login.html", result)
->>>>>>> 7de00fd3f1d2bdd250c828c550ea802a2d5ef083
 
     # If not GET, then proceed
     try:
@@ -32,7 +29,7 @@ def login(requests):
         result = processLogin.validate(username,password)
 
     except Exception as e:
-<<<<<<< HEAD
+
         return render(requests, "Module_Account/login.html", {"error" : str(e)})
 
     if result["status"] == "admin":
@@ -40,7 +37,7 @@ def login(requests):
     else:
         #HttpResponseRedirect(('TMmod:home'))
         return render(requests, "Module_TeamManagement/Student/studentHome.html", result)
-=======
+
         return render(requests, "Registration/login.html", {"error" : str(e)})
 
     if result["status"] == "admin":
@@ -72,7 +69,6 @@ def password_reset(requests):
         return render(requests, "passwordMgmt.html", {"error" : str(e)})
 
     return redirect("/student/team/")
->>>>>>> 7de00fd3f1d2bdd250c828c550ea802a2d5ef083
 
 # LOGOUT ---------------------------------------------------------------------#
 def logout(requests):
