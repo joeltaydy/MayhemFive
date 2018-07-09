@@ -42,33 +42,8 @@ def login(requests):
 
     if result["status"] == "admin":
         return render(requests, "Instructor/instructorOverview.html", result)
-
-    if result["first_time"]:
-        return render(requests, "passwordMgmt.html", result)
     else:
         return redirect("/student/team/")
-
-# PASSWORD RESET --- {for first time login} ----------------------------------#
-def password_reset(requests):
-    if requests.method == "GET":
-        return redirect("/accounts/login/")
-
-    try:
-        student = requests.POST.get("login_details")
-        oldPwd = requests.POST.get("old_password")
-        newPwd = requests.POST.get("new_password")
-
-        if student.password == oldPwd:
-            # Change password for first time login
-            processLogin.changePassword(oldPwd,newPwd,student)
-
-        else:
-            raise Exception("Old password deos not match. Please re-enter.")
-
-    except Exception as e:
-        return render(requests, "passwordMgmt.html", {"error" : str(e)})
-
-    return redirect("/student/team/")
 
 # LOGOUT ---------------------------------------------------------------------#
 def logout(requests):
