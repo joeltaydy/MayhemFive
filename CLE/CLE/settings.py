@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import getpass
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -78,8 +79,8 @@ WSGI_APPLICATION = 'CLE.wsgi.application'
 
 password = ''
 
-if 'posix' in os.name:
-    password = 'root'
+if 'posix' in os.name and 'alfaried' in getpass.getuser():
+    password = 'mysqldb12345'
 
 DATABASES = {
     'default': {
