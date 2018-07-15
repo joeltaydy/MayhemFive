@@ -51,6 +51,19 @@ def clearDB():
     Student.objects.all().delete()
     Assigned_Team.objects.all().delete()
 
+# Format of dictionary:
+# Section
+#   |- Student
+#       |- [email,username,firstname,lastname,password]
+#       |- [email,username,firstname,lastname,password]
+#       |- [email,username,firstname,lastname,password]
+#       |- ...
+#   |- Instructor
+#       |- [email,username,firstname,lastname,password,section]
+#       |- [email,username,firstname,lastname,password,section]
+#       |- [email,username,firstname,lastname,password,section]
+#       |- ...
+#
 def bootstrap(classFile):
     clearDB()
     teamManagementDict = parse_Excel(classFile)
