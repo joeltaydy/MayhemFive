@@ -81,11 +81,13 @@ password = ''
 
 if 'posix' in os.name and 'alfaried' in getpass.getuser():
     password = 'mysqldb12345'
+elif 'posix' in os.name :
+    password = 'cle12345'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'CLEdb', #Name of database table, aka need to change
+        'NAME': 'n', #Name of database table, aka need to change
         'USER': 'root',
         'PASSWORD': password, # need to configure if local or not
         'HOST': 'localhost',
