@@ -81,7 +81,7 @@ password = ''
 
 if 'posix' in os.name and 'alfaried' in getpass.getuser():
     password = 'mysqldb12345'
-elif 'posix' in os.name :
+elif 'posix' in os.name and 'ec2-user' in getpass.getuser():
     password = 'cle12345'
 
 DATABASES = {
