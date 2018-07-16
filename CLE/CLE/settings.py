@@ -87,7 +87,7 @@ elif 'posix' in os.name :
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'n', #Name of database table, aka need to change
+        'NAME': 'CLEdb', #Name of database table, aka need to change
         'USER': 'root',
         'PASSWORD': password, # need to configure if local or not
         'HOST': 'localhost',
