@@ -16,11 +16,11 @@ def parse_Excel(classFile):
     sheet = workbook.sheet_by_index(0)
 
     # Start with '1' instead of '0' to clear header buffer
-    for rowx in xrange(1,sheet.nrows):
+    for row in range(1,sheet.nrows):
 
         # Row data is in this format:
         # ['Email' , u'Username', u'Last Name', u'First Name', u'Email', u'Section', u'Project G1', u'Project G2', u'Project G3', u'Project G4', u'Project G5', u'Project G6', u'Project G7']
-        rowData = sheet.row_values(rowx)
+        rowData = sheet.row_values(row)
         newList = list(filter(None,rowData[5:]))
 
         # Declare variables
