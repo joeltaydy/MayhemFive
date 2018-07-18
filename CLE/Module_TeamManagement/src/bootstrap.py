@@ -81,7 +81,7 @@ def bootstrap(classFile):
                 lastname=student[3],
                 password=student[4],
             )
-            print(student[5])
+
             team = Assigned_Team.objects.create(
                 student=studentObj,
                 team_number=student[5],
