@@ -46,6 +46,9 @@ def parse_Excel(classFile):
 
     return teamManagementDict
 
+def create_Group(courseInfo):
+    return
+
 def clearDB():
     Section.objects.all().delete()
     Student.objects.all().delete()
@@ -89,3 +92,5 @@ def bootstrap(classFile):
             )
 
             team.save()
+
+    create_Group(teamManagementDict)
