@@ -1,3 +1,4 @@
+from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap
 from Module_TeamManagement.models import Assigned_Team
@@ -25,18 +26,25 @@ def uploadcsv(requests): # instructor bootstrap page
 
     # If not GET, then proceed
     try:
-        csv_file = requests.FILES.get("csv_file", False)
+        file = requests.FILES.get("file", False)
+        bootstrapFile = {}
 
-        # Checks if file is NOT xlsx
-        if not csv_file.name.endswith('.xlsx'):
-            error = "File is not CSV type"
-            return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":error})
+        if file.name.endswith('.zip'):
+            unzipped = ZipFile(file)
+            for fileItem in unzipped.namelist():
+                if fileItem == 'student.xlsx' or 'instructor.xlsx':
+                    bootstrapFile[fileItem.split('.')[0]] = unzipped.read(fileItem)
 
-        # If file is xlsx then proceed with processing
-        bootstrap.bootstrap(csv_file)
+        elif file.name.endswith('.xlsx'):
+            bootstrapFile['file'] = file
+
+        else:
+            raise Exception("File is not .xlsx or .zip type")
+
+        # If file is .xlsx or .zip then proceed with processing
+        bootstrap.bootstrap(bootstrapFile)
 
     except Exception as e:
-        error = "Unable to upload file. " + repr(e)
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":error})
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":e.args[0]})
 
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"message": "Successful Upload"})
