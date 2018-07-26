@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 
-<!-- {% extends 'Module_TeamManagement/Student/studentBase.html' %} -->
+{% extends 'Module_TeamManagement/Student/studentBase.html' %}
 {% load staticfiles %}
+
 {% block title %}
-    Student page
+    Student Page
 {% endblock %}
 
+{% block carouselContent %}
 
-{% block content %}
+
 <div id="slides" class="carousel slide" data-ride="carousel">
     <ul class="carousel-indicators">
         <li data-target="#slides" data-slide-to="0" class="active"></li>
@@ -33,13 +35,4 @@
     </div>
 </div>
 
-
-	<footer>
-		<div class="row text-center">
-				<div class="col-12">
-						<hr class="light">
-						<h5>Copyright &copy; CLE - All rights reserved </h5>
-				</div>
-		</div>
-	</footer>
 {% endblock %}

@@ -1,30 +1,32 @@
-{% extends 'Module_TeamManagement/base.html' %}
+{% extends 'Module_TeamManagement/dashboardbase.html' %}
 
 {% block title %}
 Instructor page
 {% endblock %}
 
-
-{% block navBar %}
-        <li class="nav-item active">
-            <a class="nav-link selected" href="{% url 'TMmod:instuOverview' %}">Home
-                <span class="sr-only">(current)</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">Bootstrap</a>
-        </li>
-
-        <!-- to be removed [Used for easier management]-->
-        <li class="nav-item active">
-                <a class="nav-link" href="{% url 'TMmod:home' %}"> Student Home
-                    <span class="sr-only">(current)</span>
-                </a>
-            </li>
-
-        <li class="nav-item active">
-            <a class="nav-link" href="{% url 'Amod:logout' %}"> Logout
-                <span class="sr-only">(current)</span>
-            </a>
-        </li>
+{% block sidenavBar %}
+<li>
+    <a class="nav-link" href="{% url 'TMmod:instProfile' %}">
+        <i class="fa fa-user-circle-o"></i>
+        <p>User Profile</p>
+    </a>
+</li>
+<li>
+    <a class="nav-link" href="{% url 'TMmod:instuOverview' %}">
+        <i class="fa fa-users"></i>
+        <p>Student Teams</p>
+    </a>
+</li>
+<li>
+    <a class="nav-link" href="{% url 'TMmod:instuOverview' %}">
+        <i class="fa fa-home"></i>
+        <p>Instructor Home</p>
+    </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
+    <i class="fa fa-cloud-upload"></i>
+    <p>Bootstrap</p>
+  </a>
+</li>
 {% endblock %}

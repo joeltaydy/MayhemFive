@@ -5,6 +5,7 @@ from Module_TeamManagement.models import Assigned_Team
 def home(requests): #student home page
     context = {}
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
+    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 def instOverview(requests): #instructor overview page
     teams = Assigned_Team.objects.all().order_by('section')
@@ -18,6 +19,14 @@ def studTeam(requests): # student team view page
     context = {"teamList" : teams}
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
+def studStats(requests):
+    return render(requests,"Module_TeamManagement/Student/studentStatistics.html")
+
+def studProfile(requests):
+        return render(requests,"Module_TeamManagement/Student/studentProfile.html")
+
+def instProfile(requests):
+        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")        
 
 def uploadcsv(requests): # instructor bootstrap page
     if requests.method == "GET":

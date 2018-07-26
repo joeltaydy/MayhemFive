@@ -80,11 +80,24 @@ button{
     font-size:20px;
     margin-right:7px;
 }
-
+/* 
 .forgot{
   padding: 5px 0 25px;
 }
 
 .forgot a{
   color:#c2fbfe;
+} */
+
+.googlesignin{
+  width:150px;
+  height:75px;
+  margin:auto;
+  background: url(../images/btn_google_signin_light_normal_web@2x.png) no-repeat;
+  background-size: contain;
+}
+
+.googlesignin:hover{
+  background: url(../images/btn_google_signin_dark_normal_web@2x.png) no-repeat;
+  background-size: contain;
 }
