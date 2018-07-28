@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Module_TeamManagement',
     'Module_Account',
-
     'django.contrib.sites', # new
     'allauth', # new
     'allauth.account', # new

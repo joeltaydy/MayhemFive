@@ -12,6 +12,22 @@ class Section(models.Model):
         db_table = 'Section'
 
 class Student(models.Model):
+    GRADES_CHOICES = (
+        ('A+','A+'),
+        ('A','A'),
+        ('A-','A-'),
+        ('B+','B+'),
+        ('B','B'),
+        ('B-','B-'),
+        ('C+','C+'),
+        ('C','C'),
+        ('C-','C-'),
+        ('D+','D+'),
+        ('D','D'),
+        ('D-','D-'),
+        ('F','F'),
+    )
+
     email = models.EmailField(
         db_column='Student_Email',
         primary_key=True,
@@ -37,26 +53,10 @@ class Student(models.Model):
         db_column='Student_Grades',
         max_length=2,
         null=True,
-        choices=(
-            ('A+','A+')
-            ('A','A')
-            ('A-','A-')
-            ('B+','B+')
-            ('B','B')
-            ('B-','B-')
-            ('C+','C+')
-            ('C','C')
-            ('C-','C-')
-            ('D+','D+')
-            ('D','D')
-            ('D-','D-')
-            ('F','F')
-        ),
-        default=null
+        choices=GRADES_CHOICES,
     )
     marks = models.IntegerField(
         db_column='Student_Marks',
-        max_length=3,
         null=True,
     )
 
@@ -84,7 +84,6 @@ class Instructor(models.Model):
     section = models.ManyToManyField(
         Section,
         db_column='Section',
-        null=True,
     )
     telegram_username = models.CharField(
         db_column='Instructor_Telegram_Username',
@@ -93,7 +92,7 @@ class Instructor(models.Model):
     )
     phone_number = models.IntegerField(
         db_column='Phone_Number',
-        max_length=11,
+        null=True,
     )
 
     class Meta:
@@ -105,8 +104,7 @@ class Assigned_Team(models.Model):
         Student,
         on_delete=models.CASCADE,
         db_column='Student',
-        primary_key=True,
-        default=null
+        primary_key=True
     )
     team_number = models.CharField(
         db_column='Team_Number',
@@ -143,7 +141,9 @@ class Teaching_Assistant(models.Model):
     )
     section = models.ForeignKey(
         Section,
+        on_delete=models.CASCADE,
         db_column='Section',
+        default='G0'
     )
     telegram_username = models.CharField(
         db_column='TA_Telegram_Username',

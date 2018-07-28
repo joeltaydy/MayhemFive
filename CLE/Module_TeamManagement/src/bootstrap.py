@@ -61,7 +61,7 @@ def parse_Excel_Student(file,courseInfo={}):
     return courseInfo
 
 
-def parse_Excel_Instructor(file,courseInfo={}}):
+def parse_Excel_Instructor(file,courseInfo={}):
 
     # Create a workbook object from the file
     workbook = xlrd.open_workbook(file.temporary_file_path())
@@ -243,7 +243,7 @@ def bootstrap(fileDict):
                         username=instructor[1],
                         firstname=instructor[2],
                         lastname=instructor[3],
-                        phone_numberinstructor[4],
+                        phone_number=instructor[4],
                         section=sectionObj,
                     )
 

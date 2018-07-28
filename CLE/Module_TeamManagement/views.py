@@ -27,7 +27,7 @@ def studProfile(requests):
         return render(requests,"Module_TeamManagement/Student/studentProfile.html")
 
 def instProfile(requests):
-        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")        
+        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")
 
 def uploadcsv(requests): # instructor bootstrap page
     if requests.method == "GET":
@@ -41,8 +41,12 @@ def uploadcsv(requests): # instructor bootstrap page
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
             for fileName in unzipped.namelist():
-                bootstrapFile['file_student'] = unzipped.read(fileName) if fileName == 'student.xlsx' else continue # FILENAME may change. Take note
-                bootstrapFile['file_instructor'] = unzipped.read(fileName) if fileName == 'instructor.xlsx' else continue # FILENAME may change. Take note
+                if fileName == 'student.xlsx':  # FILENAME may change. Take note
+                    bootstrapFile['file_student'] = unzipped.read(fileName)
+                elif fileName == 'instructor.xlsx': # FILENAME may change. Take note
+                     bootstrapFile['file_instructor'] = unzipped.read(fileName)
+                else:
+                    continue
             bootstrapFile['type'] = 'zip'
 
         elif file.name == 'student.xlsx': # FILENAME may change. Take note
