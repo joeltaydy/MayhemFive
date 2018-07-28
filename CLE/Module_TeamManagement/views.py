@@ -31,12 +31,20 @@ def uploadcsv(requests): # instructor bootstrap page
 
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
-            for fileItem in unzipped.namelist():
-                if fileItem == 'student.xlsx' or 'instructor.xlsx':
-                    bootstrapFile[fileItem.split('.')[0]] = unzipped.read(fileItem)
+            for fileName in unzipped.namelist():
+                bootstrapFile['file_student'] = unzipped.read(fileName) if fileName == 'student.xlsx' else continue # FILENAME may change. Take note
+                bootstrapFile['file_instructor'] = unzipped.read(fileName) if fileName == 'instructor.xlsx' else continue # FILENAME may change. Take note
+            bootstrapFile['type'] = 'zip'
 
-        elif file.name.endswith('.xlsx'):
+        elif file.name == 'student.xlsx': # FILENAME may change. Take note
             bootstrapFile['file'] = file
+            bootstrapFile['type'] = 'excel'
+            bootstrapFile['user'] = 'student'
+
+        elif file.name == 'instructor.xlsx': # FILENAME may change. Take note
+            bootstrapFile['file'] = file
+            bootstrapFile['type'] = 'excel'
+            bootstrapFile['user'] = 'instructor'
 
         else:
             raise Exception("File is not .xlsx or .zip type")
