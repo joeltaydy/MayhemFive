@@ -223,6 +223,7 @@ def bootstrap(fileDict):
                         section=sectionObj,
                     )
 
+                    studentObj.save()
                     team.save()
 
             elif userType == 'instructor':

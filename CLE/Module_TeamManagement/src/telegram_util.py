@@ -2,30 +2,36 @@ import os
 from telethon import TelegramClient, sync
 from telethon.tl.functions import messages
 from telethon.errors import PhoneNumberUnoccupiedError, SessionPasswordNeededError
+from Module_TeamManagement.models import Instructor
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
 #-----------------------------------------------------------------------------#
 
-config_file = os.path.join(os.path.abspath('telegram_config'),'telegram_config.py')
+API_ID = '367454'
+API_HASH = '1bf84fb9cec9b739bc9dc2a5fe97ee10'
+SESSION_FOLDER = os.path.abspath('telegram_sessions')
+ADMIN_SESSION = 'admin_login.session'
 
 # TO-DO: Automated group creation
 # Get telethon to create a user bot to create the groups in telegram
-# Concerns:
-#   1. How to create group with students inside if we do not have their telegram username?
 #
-def create_Group(courseInfo):
-    client = TelegramClient(config_file.ADMIN_LOGIN_SESSION, config_file.API_ID, config_file.API_HASH)
+def initialize_Groups(instructor):
+    session_name = ADMIN_SESSION
+
+    if 
+
+    client = TelegramClient(os.path.join(SESSION_FOLDER,session_name), API_ID, API_HASH)
     client.connect()
 
     # If first time login, user will be prompted to give code, sent via telegram
     # For subsequent login, the system will look for admin_login.session file in telegram_sessions
     if not client.is_user_authorized():
-        client.send_code_request(config_file.PHONE_NUMBER)
+        client.send_code_request(<hp>,)
         try:
-            user = client.sign_in(config_file.PHONE_NUMBER, input('Enter code: '))
+            user = client.sign_in(<hp>,, input('Enter code: '))
         except PhoneNumberUnoccupiedError:
-            user = client.sign_up(config_file.PHONE_NUMBER, input('Enter code: '))
+            user = client.sign_up(<hp>, input('Enter code: '))
         except SessionPasswordNeededError:
             client.sign_in(password=getpass.getpass())
 
