@@ -99,9 +99,9 @@ def parse_Excel_Instructor(file,courseInfo={}):
 
         phoneNumber = rowData[index_hp].strip()
         if len(phoneNumber) == 8:
-            phoneNumber = str('+65') + phoneNumber
-        elif '+' not in phoneNumber and len(phoneNumber) == 10:
-            phoneNumber = str('+') + phoneNumber
+            phoneNumber = str('65') + phoneNumber
+        elif '+' in phoneNumber and len(phoneNumber) == 11:
+            phoneNumber = phoneNumber[1:]
 
         # Create instructor : list
         instructor = [email,username,firstname,lastname,phoneNumber]
