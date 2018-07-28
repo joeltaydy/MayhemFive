@@ -27,7 +27,7 @@ SECRET_KEY = '--2$vfi4$(vsdvf_@_(6x%$9^(-ea3h0gkr6p*8j)zf7!_y&je'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["54.254.212.240","localhost","127.0.0.1"]
+ALLOWED_HOSTS = ["54.254.212.240","localhost","127.0.0.1","52.76.46.177.xip.io","52.76.46.177"]
 
 
 # Application definition
@@ -41,6 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Module_TeamManagement',
     'Module_Account',
+
+    'django.contrib.sites', # new
+    'allauth', # new
+    'allauth.account', # new
+    'allauth.socialaccount', # new
+    'allauth.socialaccount.providers.google', # new
 ]
 
 MIDDLEWARE = [
@@ -114,6 +120,31 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SOCIALACCOUNT_ADAPTER = 'Module_Account.adapters.SocialAccountWhitelist'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+            'hd': 'smu.edu.sg'
+        }
+    }
+}
+
+
+SITE_ID = 2
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = '/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -135,6 +166,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
+    '/Thunderhead Monkeys/CLE/static',
 ]
 
 
