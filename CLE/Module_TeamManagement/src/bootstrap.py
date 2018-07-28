@@ -225,7 +225,7 @@ def bootstrap(fileDict):
 
                     team.save()
 
-            else:
+            elif userType == 'instructor':
                 instructorList = courseInfo[section]['instructor']
 
                 for instructor in instructorList:
