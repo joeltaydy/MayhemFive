@@ -77,6 +77,7 @@ def parse_Excel_Instructor(file,courseInfo={}}):
     index_lastname = headers.index('Last Name')
     index_firstname = headers.index('First Name')
     index_email = headers.index('Email')
+    index_hp = headers.index('Phone Number')
     index_section = headers.index('Section') # Assume that there are more than one section and they are seperated by commas
 
     # Start with '1' instead of '0' to clear header buffer
@@ -96,8 +97,14 @@ def parse_Excel_Instructor(file,courseInfo={}}):
         firstname = rowData[index_firstname].strip()
         lastname = rowData[index_lastname].strip()
 
+        phoneNumber = rowData[index_hp].strip()
+        if len(phoneNumber) == 8:
+            phoneNumber = str('+65') + phoneNumber
+        elif '+' not in phoneNumber and len(phoneNumber) == 10:
+            phoneNumber = str('+') + phoneNumber
+
         # Create instructor : list
-        instructor = [email,username,firstname,lastname]
+        instructor = [email,username,firstname,lastname,phoneNumber]
 
         # Store in dict with section_number as key and instructor : list as value
         for section_number in section_number_list:
@@ -232,10 +239,11 @@ def bootstrap(fileDict):
 
                 for instructor in instructorList:
                     instructorObj = Instructor.objects.create(
-                        email=student[0],
-                        username=student[1],
-                        firstname=student[2],
-                        lastname=student[3],
+                        email=instructor[0],
+                        username=instructor[1],
+                        firstname=instructor[2],
+                        lastname=instructor[3],
+                        phone_numberinstructor[4],
                         section=sectionObj,
                     )
 
