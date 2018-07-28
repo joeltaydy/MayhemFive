@@ -185,7 +185,7 @@ def clear_Database():
     Teaching_Assistant.objects.all().delete()
 
 
-# TO-DO: Reconfigure model to accept this format; Currently not configured to accept Teaching_Assistant Model
+# TO-DO: Reconfigure model to accept this format
 # Format of dictionary:
 # Section
 #   |- Student

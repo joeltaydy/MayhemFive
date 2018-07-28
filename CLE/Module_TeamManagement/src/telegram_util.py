@@ -14,9 +14,6 @@ API_HASH = '1bf84fb9cec9b739bc9dc2a5fe97ee10'
 SESSION_FOLDER = os.path.abspath('telegram_sessions')
 ADMIN_SESSION = 'admin_login.session'
 
-# TO-DO: Automated group creation
-# Get telethon to create a user bot to create the groups in telegram
-#
 def initialize_Groups(username=None):
     instructor = Instructor.objects.get(username=username)
     session_name = ADMIN_SESSION
@@ -38,30 +35,46 @@ def initialize_Groups(username=None):
         except SessionPasswordNeededError:
             client.sign_in(password=getpass.getpass())
 
-    section = instructor.section
-    teams = Assigned_Team.objects.all().filter(section=section)
-    assistants = Teaching_Assistant.objects.all().filter(section=section)   # For now, we're not sure where this guys is coming in...
+    sections = instructor.section
 
-    student_contactList = []
-    team_studentDict = {}
-    for team in teams:
-        student = team.student
-        student_contact = InputPhoneContact(
-                                client_id=0,
-                                phone=str(student.phone_number),
-                                first_name=student.firstname,
-                                last_name=student.lastname
-                            )
-        student_contactList.append(student_contact)
+    # Loop through every section that's in-charge by the instructor
+    for section in sections:
+        teams = Assigned_Team.objects.all().filter(section=section)
+        assistants = Teaching_Assistant.objects.all().filter(section=section)
+        assistant_contactList = [assistant.phone_number for assistant in assistants]
+        student_contactList = []
+        team_studentDict = {}
 
-        try:
-            team_studentDict[team.team_number].append(str(student.phone_number))
-        except:
-            team_studentDict[team.team_number] = [str(student.phone_number)]
+        # For all the team within that section, retrieve student's contact number and store is in a list
+        # And categorize the students into their teams
+        # Format of dictionary:
+        # Team_Number
+        # |- [phone_number_1]
+        # |- [phone_number_2]
+        # |- [phone_number_3]
+        # |- ...
+        #
+        for team in teams:
+            student = team.student
+            student_contact = InputPhoneContact(
+                                    client_id=0,
+                                    phone=str(student.phone_number),
+                                    first_name=student.firstname,
+                                    last_name=student.lastname
+                                )
+            student_contactList.append(student_contact)
 
-    client(contacts.ImportContactsRequest(student_contactList))
-    #print('Student contacts added')
+            try:
+                team_studentDict[team.team_number].append(str(student.phone_number))
+            except:
+                team_studentDict[team.team_number] = [str(student.phone_number)]
 
-    for team_number,student_hps in team_studentDict.iteritems():
-        groupName = "CLE " + section.section_number + team_number
-        client(messages.CreateChatRequest(student_hps,groupName))
+        # Add list of student's contacts into the contact list of client (in this case,it's the professors number)
+        client(contacts.ImportContactsRequest(student_contactList))
+
+        # For each team_number, retrieve list of student's number and add assistant's number into list
+        # Subsequently, create telegram group with the list of numbers
+        for team_number,student_hps in team_studentDict.iteritems():
+            groupName = "CLE " + section.section_number + team_number
+            contactList = student_hps + assistant_contactList
+            client(messages.CreateChatRequest(users=contactList,title=groupName))
