@@ -28,9 +28,36 @@ class Student(models.Model):
         db_column='Lastname',
         max_length=255,
     )
-    password = models.CharField(
-        db_column='Password',
+    telegram_username = models.CharField(
+        db_column='Student_Telegram_Username',
         max_length=255,
+        null=True,
+    )
+    grades = models.CharField(
+        db_column='Student_Grades',
+        max_length=2,
+        null=True,
+        choices=(
+            ('A+','A+')
+            ('A','A')
+            ('A-','A-')
+            ('B+','B+')
+            ('B','B')
+            ('B-','B-')
+            ('C+','C+')
+            ('C','C')
+            ('C-','C-')
+            ('D+','D+')
+            ('D','D')
+            ('D-','D-')
+            ('F','F')
+        ),
+        default=null
+    )
+    marks = models.Integer(
+        db_column='Student_Marks',
+        max_length=3,
+        null=True,
     )
 
     class Meta:
@@ -54,13 +81,14 @@ class Instructor(models.Model):
         db_column='Lastname',
         max_length=255,
     )
-    password = models.CharField(
-        db_column='Password',
-        max_length=255,
-    )
     section = models.ManyToManyField(
         Section,
         db_column='Section',
+        null=True,
+    )
+    telegram_username = models.CharField(
+        db_column='Instructor_Telegram_Username',
+        max_length=255,
         null=True,
     )
 
@@ -74,11 +102,12 @@ class Assigned_Team(models.Model):
         on_delete=models.CASCADE,
         db_column='Student',
         primary_key=True,
-        default='NULL'
+        default=null
     )
     team_number = models.CharField(
         db_column='Team_Number',
-        max_length=6,
+        max_length=2,
+        default='T0'
     )
     section = models.ForeignKey(
         Section,
@@ -90,3 +119,34 @@ class Assigned_Team(models.Model):
     class Meta:
         managed = True
         db_table = 'Assigned_Team'
+
+class Teaching_Assistant(models.Model):
+    email = models.EmailField(
+        db_column='Teaching_Assistant_Email',
+        primary_key=True,
+    )
+    username = models.CharField(
+        db_column='Username',
+        max_length=255,
+    )
+    firstname = models.CharField(
+        db_column='Firstname',
+        max_length=255,
+    )
+    lastname = models.CharField(
+        db_column='Lastname',
+        max_length=255,
+    )
+    section = models.ForeignKey(
+        Section,
+        db_column='Section',
+    )
+    telegram_username = models.CharField(
+        db_column='TA_Telegram_Username',
+        max_length=255,
+        null=True,
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Teaching_Assistant'
