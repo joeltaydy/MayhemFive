@@ -59,6 +59,10 @@ class Student(models.Model):
         db_column='Student_Marks',
         null=True,
     )
+    phone_number = models.IntegerField(
+        db_column='Phone_Number',
+        null=True,
+    )
 
     class Meta:
         managed = True
@@ -148,6 +152,10 @@ class Teaching_Assistant(models.Model):
     telegram_username = models.CharField(
         db_column='TA_Telegram_Username',
         max_length=255,
+        null=True,
+    )
+    phone_number = models.IntegerField(
+        db_column='Phone_Number',
         null=True,
     )
 

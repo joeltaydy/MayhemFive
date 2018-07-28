@@ -22,6 +22,7 @@ def parse_Excel_Student(file,courseInfo={}):
     index_lastname = headers.index('Last Name')
     index_firstname = headers.index('First Name')
     index_email = headers.index('Email')
+    index_hp = headers.index('Phone Number')
     index_section = headers.index('Section')
 
     # Start with '1' instead of '0' to clear header buffer
@@ -43,8 +44,14 @@ def parse_Excel_Student(file,courseInfo={}):
         lastname = rowData[index_lastname].strip()
         team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
 
+        phoneNumber = rowData[index_hp].strip()
+        if len(phoneNumber) == 8:
+            phoneNumber = str('65') + phoneNumber
+        elif '+' in phoneNumber and len(phoneNumber) == 11:
+            phoneNumber = phoneNumber[1:]
+
         # Create student : list
-        student = [email,username,firstname,lastname,team_number]
+        student = [email,username,firstname,lastname,team_number,phoneNumber]
 
         # Store in dict with section_number as key and student : list as value
         try:
@@ -129,6 +136,7 @@ def parse_Excel_Assistant(file,courseInfo={}):
     index_lastname = headers.index('Last Name')
     index_firstname = headers.index('First Name')
     index_email = headers.index('Email')
+    index_hp = headers.index('Phone Number')
     index_section = headers.index('Section')
 
     # Start with '1' instead of '0' to clear header buffer
@@ -148,8 +156,14 @@ def parse_Excel_Assistant(file,courseInfo={}):
         firstname = rowData[index_firstname].strip()
         lastname = rowData[index_lastname].strip()
 
+        phoneNumber = rowData[index_hp].strip()
+        if len(phoneNumber) == 8:
+            phoneNumber = str('65') + phoneNumber
+        elif '+' in phoneNumber and len(phoneNumber) == 11:
+            phoneNumber = phoneNumber[1:]
+
         # Create teaching_assistant : list
-        teaching_assistant = [email,username,firstname,lastname]
+        teaching_assistant = [email,username,firstname,lastname,phoneNumber]
 
         # Store in dict with section_number as key and teaching_assistant : list as value
         try:
@@ -215,6 +229,7 @@ def bootstrap(fileDict):
                         username=student[1],
                         firstname=student[2],
                         lastname=student[3],
+                        phone_number=instructor[4],
                     )
 
                     team = Assigned_Team.objects.create(
@@ -240,3 +255,18 @@ def bootstrap(fileDict):
                     )
 
                     instructorObj.save()
+
+            else:
+                assistantList = courseInfo[section]['teaching_assistant']
+
+                for assistant in assistantList:
+                    assistantObj = Teaching_Assistant.objects.create(
+                        email=instructor[0],
+                        username=instructor[1],
+                        firstname=instructor[2],
+                        lastname=instructor[3],
+                        phone_number=instructor[4],
+                        section=sectionObj,
+                    )
+
+                    assistantObj.save()
