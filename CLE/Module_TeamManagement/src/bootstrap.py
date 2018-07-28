@@ -1,6 +1,6 @@
 import xlrd
 from django.core.files import File
-from Module_TeamManagement.models import Section, Student, Instructor, Assigned_Team#, Teaching_Assistant
+from Module_TeamManagement.models import Section, Student, Instructor, Assigned_Team, Teaching_Assistant
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Bootstrap Function -------------------------------#
@@ -26,9 +26,6 @@ def parse_Excel_Student(file,courseInfo={}):
 
     # Start with '1' instead of '0' to clear header buffer
     for row in range(1,sheet.nrows):
-
-        # Row data is in this format:
-        # [u'Username', u'Last Name', u'First Name', u'Email', u'Section', u'Project G1', u'Project G2', u'Project G3', u'Project G4', u'Project G5', u'Project G6', u'Project G7']
         rowData = sheet.row_values(row)
         teamList = rowData[index_section+1:]
 
@@ -82,9 +79,6 @@ def parse_Excel_Instructor(file,courseInfo={}):
 
     # Start with '1' instead of '0' to clear header buffer
     for row in range(1,sheet.nrows):
-
-        # Row data is in this format:
-        # [u'Username', u'Last Name', u'First Name', u'Email', u'Section']
         rowData = sheet.row_values(row)
 
         # Declare variables
@@ -139,9 +133,6 @@ def parse_Excel_Assistant(file,courseInfo={}):
 
     # Start with '1' instead of '0' to clear header buffer
     for row in range(1,sheet.nrows):
-
-        # Row data is in this format:
-        # [u'Username', u'Last Name', u'First Name', u'Email', u'Section']
         rowData = sheet.row_values(row)
 
         # Declare variables
