@@ -54,7 +54,7 @@ class Student(models.Model):
         ),
         default=null
     )
-    marks = models.Integer(
+    marks = models.IntegerField(
         db_column='Student_Marks',
         max_length=3,
         null=True,
@@ -90,6 +90,10 @@ class Instructor(models.Model):
         db_column='Instructor_Telegram_Username',
         max_length=255,
         null=True,
+    )
+    phone_number = models.IntegerField(
+        db_column='Phone_Number',
+        max_length=11,
     )
 
     class Meta:
