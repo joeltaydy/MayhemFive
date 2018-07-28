@@ -1,0 +1,7 @@
+API_ID = '367454'
+API_HASH = '1bf84fb9cec9b739bc9dc2a5fe97ee10'
+PHONE_NUMBER = '6591169096' # To change to admin phone number
+
+ADMIN_LOGIN_SESSION = ''
+INSTRUCTOR_A_SESSION = ''
+INSTRUCTOR_B_SESSION = ''
