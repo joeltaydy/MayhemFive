@@ -1,3 +1,5 @@
+import os
+
 # telethon configuration values
 API_ID = '367454'
 API_HASH = '1bf84fb9cec9b739bc9dc2a5fe97ee10'
@@ -7,5 +9,7 @@ ADMIN_SESSION = 'admin_login.session'
 # telegram-bot configuration values
 BOT_TOKEN = '661877002:AAGwwd3zN0ZLObDAObV6FqRGCQkmphEkrus'
 
+# admin credentials
 ADMIN_PHONE_NUMBER = '6591169096'
 ADMIN_GROUP = 'Thunderhead Monkey'
+ADMIN_CHAT_ID = '-1001296496624'

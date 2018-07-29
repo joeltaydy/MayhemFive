@@ -1,5 +1,5 @@
 import telegram
-from tele_config import BOT_TOKEN
+from tele_config import BOT_TOKEN, ADMIN_CHAT_ID, ADMIN_GROUP
 
 #-----------------------------------------------------------------------------#
 #------------------------ Telegram Bot Functions -----------------------------#
@@ -17,12 +17,13 @@ def send_Message(message=None, group_name=None):
     if message == None:
         raise Exception("Please specify a message.")
 
-    # IF bot is added into a group, it will get an 'update'
-    # This 'update' stores all the information about the group/supergroup,
-    # thus, it can be use to identify said group/supergroup by their 'id' and 'title'
-    for update in bot.getUpdates():
-        if (update.message.chat.type == 'group' or update.message.chat.type == 'supergroup') and update.message.chat.title == group_name:
-            chat_id = update.message.chat.id
+    # Get chat_id of the specified group_name
+    if group_name != ADMIN_GROUP:
+        for update in bot.getUpdates():
+            if update.message.chat.type == 'group' and update.message.chat.title == group_name:
+                chat_id = update.message.chat.id
+    else:
+        chat_id = ADMIN_CHAT_ID
 
     # Raise exception if group is specified but not found
     if chat_id == None:
