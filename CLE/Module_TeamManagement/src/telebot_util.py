@@ -21,7 +21,7 @@ def send_Message(message=None, group_name=None):
     # This 'update' stores all the information about the group/supergroup,
     # thus, it can be use to identify said group/supergroup by their 'id' and 'title'
     for update in bot.getUpdates():
-        if update.message.chat.type == 'group' and update.message.chat.title == group_name:
+        if (update.message.chat.type == 'group' or update.message.chat.type == 'supergroup') and update.message.chat.title == group_name:
             chat_id = update.message.chat.id
 
     # Raise exception if group is specified but not found
