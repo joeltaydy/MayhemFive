@@ -4,34 +4,11 @@ from telethon.tl.functions import messages, contacts
 from telethon.tl.types import InputPhoneContact
 from telethon.errors import PhoneNumberUnoccupiedError, SessionPasswordNeededError
 from Module_TeamManagement.models import Student, Instructor, Assigned_Team, Teaching_Assistant
-from tele_config import API_ID, API_HASH, SESSION_FOLDER, ADMIN_SESSION, ADMIN_PHONE_NUMBER
+from tele_config import API_ID, API_HASH, SESSION_FOLDER, ADMIN_SESSION, ADMIN_PHONE_NUMBER, BOT_TOKEN
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
 #-----------------------------------------------------------------------------#
-
-# TO-DO:
-# Get CLE BOT to send messages
-def send_Message(username=None, message=None, group=None):
-    session_name = ADMIN_SESSION
-    phone_number = ADMIN_PHONE_NUMBER
-
-    client = TelegramClient(os.path.join(SESSION_FOLDER,session_name), API_ID, API_HASH)
-    client.connect()
-
-    # If first time login, user will be prompted to give code, sent via telegram
-    # For subsequent login, the system will look for admin_login.session file in telegram_sessions
-    if not client.is_user_authorized():
-        client.send_code_request(phone_number)
-        try:
-            user = client.sign_in(phone_number), input('Enter code: '))
-        except PhoneNumberUnoccupiedError:
-            user = client.sign_up(phone_number), input('Enter code: '))
-        except SessionPasswordNeededError:
-            client.sign_in(password=getpass.getpass())
-
-    client(messages.SendMessageRequest(peer=group,message=message))
-
 
 def initialize_Groups(username=None):
     session_name = ADMIN_SESSION
@@ -97,7 +74,7 @@ def initialize_Groups(username=None):
             client(contacts.ImportContactsRequest(contactList))
 
             # For each team_number, retrieve list of student's number and add assistant's number into list
-            # Subsequently, create telegram group with the list of numbers
+            # Subsequently, create telegram group, with the given list of numbers
             groupList = []
             for team_number,student_hps in team_studentDict.iteritems():
                 groupName = "CLE " + section.section_number + team_number
@@ -107,16 +84,18 @@ def initialize_Groups(username=None):
                 # Create group with list of contacts, with the associated groupName
                 client(messages.CreateChatRequest(users=contactList,title=groupName))
 
-                # TO-DO:
-                # Add CLE bot into group
-
             # For each group created for that section, make the TA an admin
+            # And add @SMUCLEBot into group
             dialogs = client.get_dialogs()
             for dialog in dialogs:
                 if dialog.name in groupList:
+                    client(messages.AddChatUserRequest(chat_id=dialog.entity.id,user_id='@SMUCLEBot',fwd_limit=10))
+
                     for phone_number in assistant_contactList:
-                        client(messages.EditChatAdminRequest(chat_id=dialog,user_id=phone_number,is_admin=True))
+                        client(messages.EditChatAdminRequest(chat_id=dialog.entity.id,user_id=phone_number,is_admin=True))
 
     # ELSE, will run admin commands
     else:
         # Program admin commands here
+
+    client.disconnect()
