@@ -6,9 +6,15 @@
 
 
 {% block sidenavBar %}
+<li class="nav-item active">
+    <a class="nav-link" href="{% url 'TMmod:home' %}">
+        <i class="fas fa-chart-pie"></i>
+        <p>Dashboard</p>
+    </a>
+</li>
 <li>
     <a class="nav-link" href="{% url 'TMmod:sProfile' %}">
-        <i class="fa fa-user-circle-o"></i>
+        <i class="fas fa-user-graduate"></i>
         <p>User Profile</p>
     </a>
 </li>
@@ -20,7 +26,7 @@
 </li>
 <li>
     <a class="nav-link" href="{% url 'TMmod:sStats' %}">
-        <i class="fa fa-tachometer"></i>
+        <i class="fas fa-tachometer-alt"></i>
         <p>My Statistics</p>
     </a>
 </li>

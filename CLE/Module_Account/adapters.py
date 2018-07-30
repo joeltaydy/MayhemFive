@@ -8,4 +8,4 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         email_address=sociallogin.account.extra_data["email"].split('@')[1]
         if not email_address == "smu.edu.sg":
-            raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))
+            raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL,"non SMU account"))
