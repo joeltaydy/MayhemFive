@@ -1,7 +1,8 @@
 import xlrd
 import traceback
-#import tele_util as tele
-#import telebot_util as telebot
+import Module_TeamManagement.src.tele_util as tele
+import Module_TeamManagement.src.telebot_util as telebot
+from Module_TeamManagement.src.telebot_util import ADMIN_GROUP
 from django.core.files import File
 from Module_TeamManagement.models import Section, Student, Instructor, Assigned_Team, Teaching_Assistant
 
@@ -289,9 +290,11 @@ def bootstrap(fileDict):
                         instructorObj.section.add(sectionObj)
 
     except Exception as e:
-        # message = e.args[0]
-        # telebot.send_Message(message=message,group_name=ADMIN_GROUP)
-        traceback.print_exc()
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        message = 'An Exception as occured during bootstrap. Please look into it.\n\nError Message:\n' + traceback.format_exc()
+        telebot.send_Message(message=message,group_name=ADMIN_GROUP)
+        raise Exception('Unsucccessfull Upload.')
 
     # Create the require groups for telegram chat only if zip file was uploaded
     # if fileDict['type'] = 'zip':

@@ -3,8 +3,8 @@ from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, contacts
 from telethon.tl.types import InputPhoneContact
 from Module_TeamManagement.models import Student, Instructor, Assigned_Team, Teaching_Assistant
-from tele_config import API_ID, API_HASH, SESSION_FOLDER, ADMIN_SESSION, ADMIN_PHONE_NUMBER, BOT_TOKEN, ADMIN_GROUP
-import telebot_util as telebot
+from Module_TeamManagement.src.tele_config import API_ID, API_HASH, SESSION_FOLDER, ADMIN_SESSION, ADMIN_PHONE_NUMBER, BOT_TOKEN, ADMIN_GROUP
+import Module_TeamManagement.src.telebot_util as telebot
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
@@ -126,7 +126,7 @@ def initialize_Groups(username=None):
         # ELSE, will run admin commands
         else:
             raise Exception('An Exception occured in initialize_Groups function of tele_util.py.\
-                A valid instructor\'s username was not specified.\
+                A valid instructor\'s username was not specified.'
             )
 
     except Exception as e:
