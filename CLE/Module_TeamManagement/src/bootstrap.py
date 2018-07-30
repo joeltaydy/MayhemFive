@@ -1,4 +1,7 @@
 import xlrd
+import traceback
+#import tele_util as tele
+#import telebot_util as telebot
 from django.core.files import File
 from Module_TeamManagement.models import Section, Student, Instructor, Assigned_Team, Teaching_Assistant
 
@@ -9,7 +12,7 @@ from Module_TeamManagement.models import Section, Student, Instructor, Assigned_
 def parse_Excel_Student(file,courseInfo={}):
 
     # Create a workbook object from the file
-    workbook = xlrd.open_workbook(file.temporary_file_path())
+    workbook = xlrd.open_workbook(file)
 
     # Get first worksheet
     sheet = workbook.sheet_by_index(0)
@@ -44,7 +47,7 @@ def parse_Excel_Student(file,courseInfo={}):
         lastname = rowData[index_lastname].strip()
         team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
 
-        phoneNumber = rowData[index_hp].strip()
+        phoneNumber = str(int(rowData[index_hp])).strip()
         if len(phoneNumber) == 8:
             phoneNumber = str('65') + phoneNumber
         elif '+' in phoneNumber and len(phoneNumber) == 11:
@@ -68,7 +71,7 @@ def parse_Excel_Student(file,courseInfo={}):
 def parse_Excel_Instructor(file,courseInfo={}):
 
     # Create a workbook object from the file
-    workbook = xlrd.open_workbook(file.temporary_file_path())
+    workbook = xlrd.open_workbook(file)
 
     # Get first worksheet
     sheet = workbook.sheet_by_index(0)
@@ -98,7 +101,7 @@ def parse_Excel_Instructor(file,courseInfo={}):
         firstname = rowData[index_firstname].strip()
         lastname = rowData[index_lastname].strip()
 
-        phoneNumber = rowData[index_hp].strip()
+        phoneNumber = str(int(rowData[index_hp])).strip()
         if len(phoneNumber) == 8:
             phoneNumber = str('65') + phoneNumber
         elif '+' in phoneNumber and len(phoneNumber) == 11:
@@ -123,7 +126,7 @@ def parse_Excel_Instructor(file,courseInfo={}):
 def parse_Excel_Assistant(file,courseInfo={}):
 
     # Create a workbook object from the classFile
-    workbook = xlrd.open_workbook(file.temporary_file_path())
+    workbook = xlrd.open_workbook(file)
 
     # Get first worksheet
     sheet = workbook.sheet_by_index(0)
@@ -156,7 +159,7 @@ def parse_Excel_Assistant(file,courseInfo={}):
         firstname = rowData[index_firstname].strip()
         lastname = rowData[index_lastname].strip()
 
-        phoneNumber = rowData[index_hp].strip()
+        phoneNumber = str(int(rowData[index_hp])).strip()
         if len(phoneNumber) == 8:
             phoneNumber = str('65') + phoneNumber
         elif '+' in phoneNumber and len(phoneNumber) == 11:
@@ -189,84 +192,108 @@ def clear_Database():
 # Format of dictionary:
 # Section
 #   |- Student
-#       |- [email,username,firstname,lastname]
-#       |- [email,username,firstname,lastname]
-#       |- [email,username,firstname,lastname]
+#       |- [email,username,firstname,lastname,team_number,phoneNumber]
+#       |- [email,username,firstname,lastname,team_number,phoneNumber]
+#       |- [email,username,firstname,lastname,team_number,phoneNumber]
 #       |- ...
 #   |- Instructor
-#       |- [email,username,firstname,lastname,section]
-#       |- [email,username,firstname,lastname,section]
-#       |- [email,username,firstname,lastname,section]
+#       |- [email,username,firstname,lastname,phoneNumber]
+#       |- [email,username,firstname,lastname,phoneNumber]
+#       |- [email,username,firstname,lastname,phoneNumber]
 #       |- ...
 #   |- Teaching_Assistant
-#       |- [email,username,firstname,lastname,section]
-#       |- [email,username,firstname,lastname,section]
-#       |- [email,username,firstname,lastname,section]
+#       |- [email,username,firstname,lastname,phoneNumber]
+#       |- [email,username,firstname,lastname,phoneNumber]
+#       |- [email,username,firstname,lastname,phoneNumber]
 #       |- ...
 #
 def bootstrap(fileDict):
+
     if fileDict['type'] == 'excel':
-        courseInfo = parse_Excel_Student(fileDict['file']) if fileDict['user'] == 'student' else parse_Excel_Instructor(fileDict['file'])
+        if fileDict['user'] == 'student':
+            courseInfo = parse_Excel_Student(fileDict['file'])
+            Student.objects.all().delete()
+            Assigned_Team.objects.all().delete()
+
+        elif fileDict['user'] == 'instructor':
+            courseInfo = parse_Excel_Instructor(fileDict['file'])
+            Instructor.objects.all().delete()
+
+        else:
+            courseInfo = parse_Excel_Assistant(fileDict['file'])
+            Teaching_Assistant.objects.all().delete()
+
+        Section.objects.all().delete()
     else:
         try:
             courseInfo = parse_Excel_Student(fileDict['file_student'])
             courseInfo = parse_Excel_Instructor(fileDict['file_instructor'],courseInfo)
+            courseInfo = parse_Excel_Assistant(fileDict['file_assistant'],courseInfo)
+            clear_Database()
         except:
+            # Uncomment for debugging - to print stack trace wihtout halting the process
+            # traceback.print_exc()
             raise Exception(".zip file does not contain the required excel files.")
-        clear_Database()
 
-    # Bootstrap data into database
-    for section,sectionData in courseInfo.iteritems():
-        sectionObj = Section.objects.create(section_number=section)
+    try:
+        # Bootstrap data into database
+        for section,sectionData in courseInfo.items():
+            sectionObj = Section.objects.create(section_number=section)
+            sectionObj.save()
 
-        for userType,data in sectionData.iteritems():
-            if userType == 'student':
-                studentList = courseInfo[section]['student']
+            for userType,data in sectionData.items():
+                if userType == 'student':
+                    for student in data:
+                        studentObj = Student.objects.create(
+                            email=student[0],
+                            username=student[1],
+                            firstname=student[2],
+                            lastname=student[3],
+                            phone_number=student[5],
+                        )
+                        studentObj.save()
 
-                for student in studentList:
-                    studentObj = Student.objects.create(
-                        email=student[0],
-                        username=student[1],
-                        firstname=student[2],
-                        lastname=student[3],
-                        phone_number=instructor[4],
-                    )
+                        teamObj = Assigned_Team.objects.create(
+                            student=studentObj,
+                            team_number=student[4],
+                            section=sectionObj,
+                        )
+                        teamObj.save()
 
-                    team = Assigned_Team.objects.create(
-                        student=studentObj,
-                        team_number=student[5],
-                        section=sectionObj,
-                    )
+                elif userType == 'teaching_assistant':
+                    for assistant in data:
+                        assistanObj = Teaching_Assistant.objects.create(
+                            email=assistant[0],
+                            username=assistant[1],
+                            firstname=assistant[2],
+                            lastname=assistant[3],
+                            phone_number=assistant[4],
+                            section=sectionObj,
+                        )
+                        assistanObj.save()
 
-                    studentObj.save()
-                    team.save()
+                elif userType == 'instructor':
+                    for instructor in data:
+                        try:
+                            instructorObj = Instructor.objects.get(email=instructor[0])
+                        except:
+                            instructorObj = Instructor.objects.create(
+                                email=instructor[0],
+                                username=instructor[1],
+                                firstname=instructor[2],
+                                lastname=instructor[3],
+                                phone_number=instructor[4],
+                            )
+                            instructorObj.save()
 
-            elif userType == 'instructor':
-                instructorList = courseInfo[section]['instructor']
+                        instructorObj.section.add(sectionObj)
 
-                for instructor in instructorList:
-                    instructorObj = Instructor.objects.create(
-                        email=instructor[0],
-                        username=instructor[1],
-                        firstname=instructor[2],
-                        lastname=instructor[3],
-                        phone_number=instructor[4],
-                        section=sectionObj,
-                    )
+    except Exception as e:
+        # message = e.args[0]
+        # telebot.send_Message(message=message,group_name=ADMIN_GROUP)
+        traceback.print_exc()
 
-                    instructorObj.save()
-
-            else:
-                assistantList = courseInfo[section]['teaching_assistant']
-
-                for assistant in assistantList:
-                    assistantObj = Teaching_Assistant.objects.create(
-                        email=instructor[0],
-                        username=instructor[1],
-                        firstname=instructor[2],
-                        lastname=instructor[3],
-                        phone_number=instructor[4],
-                        section=sectionObj,
-                    )
-
-                    assistantObj.save()
+    # Create the require groups for telegram chat only if zip file was uploaded
+    # if fileDict['type'] = 'zip':
+    #     for instructor in courseInfo[section][instructor]:
+    #         tele.initialize_Groups(instructor[1])

@@ -59,8 +59,9 @@ class Student(models.Model):
         db_column='Student_Marks',
         null=True,
     )
-    phone_number = models.IntegerField(
+    phone_number = models.CharField(
         db_column='Phone_Number',
+        max_length=10,
         null=True,
     )
 
@@ -94,8 +95,9 @@ class Instructor(models.Model):
         max_length=255,
         null=True,
     )
-    phone_number = models.IntegerField(
+    phone_number = models.CharField(
         db_column='Phone_Number',
+        max_length=10,
         null=True,
     )
 
@@ -154,8 +156,9 @@ class Teaching_Assistant(models.Model):
         max_length=255,
         null=True,
     )
-    phone_number = models.IntegerField(
+    phone_number = models.CharField(
         db_column='Phone_Number',
+        max_length=10,
         null=True,
     )
 

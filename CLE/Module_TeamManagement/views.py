@@ -1,3 +1,5 @@
+import os
+import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap
@@ -40,24 +42,32 @@ def uploadcsv(requests): # instructor bootstrap page
 
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
+            unzipped.extractall(os.path.abspath('bootstrap_files'))
+
             for fileName in unzipped.namelist():
-                if fileName == 'student.xlsx':  # FILENAME may change. Take note
-                    bootstrapFile['file_student'] = unzipped.read(fileName)
-                elif fileName == 'instructor.xlsx': # FILENAME may change. Take note
-                     bootstrapFile['file_instructor'] = unzipped.read(fileName)
-                else:
-                    continue
+                if fileName.lower() == 'student.xlsx':
+                    bootstrapFile['file_student'] = os.path.abspath('bootstrap_files/' + fileName)
+                elif fileName.lower() == 'instructor.xlsx':
+                    bootstrapFile['file_instructor'] = os.path.abspath('bootstrap_files/' + fileName)
+                elif fileName.lower() == 'teaching_assistant.xlsx':
+                    bootstrapFile['file_assistant'] = os.path.abspath('bootstrap_files/' + fileName)
+
             bootstrapFile['type'] = 'zip'
 
-        elif file.name == 'student.xlsx': # FILENAME may change. Take note
+        elif file.name.lower() == 'student.xlsx': # FILENAME may change. Take note
             bootstrapFile['file'] = file
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'student'
 
-        elif file.name == 'instructor.xlsx': # FILENAME may change. Take note
+        elif file.name.lower() == 'instructor.xlsx': # FILENAME may change. Take note
             bootstrapFile['file'] = file
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'instructor'
+
+        elif file.name.lower() == 'teaching_assistant.xlsx': # FILENAME may change. Take note
+            bootstrapFile['file'] = file
+            bootstrapFile['type'] = 'excel'
+            bootstrapFile['user'] = 'assistant'
 
         else:
             raise Exception("File is not .xlsx or .zip type")
@@ -66,6 +76,8 @@ def uploadcsv(requests): # instructor bootstrap page
         bootstrap.bootstrap(bootstrapFile)
 
     except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":e.args[0]})
 
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"message": "Successful Upload"})
