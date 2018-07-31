@@ -1,5 +1,5 @@
 import telegram
-from tele_config import BOT_TOKEN, ADMIN_CHAT_ID, ADMIN_GROUP
+from Module_TeamManagement.src.tele_config import BOT_TOKEN, ADMIN_CHAT_ID, ADMIN_GROUP
 
 #-----------------------------------------------------------------------------#
 #------------------------ Telegram Bot Functions -----------------------------#
