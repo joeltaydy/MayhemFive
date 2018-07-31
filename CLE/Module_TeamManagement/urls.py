@@ -8,6 +8,6 @@ urlpatterns = [
     path('student/team/', views.studTeam, name='sTeam'),
     path('student/stats/', views.studStats, name='sStats'),
     path('student/profile/', views.studProfile, name='sProfile'),
-    path('instructor/team/', views.instOverview, name='instuOverview'),
+    path('instructor/team/', views.instOverview, name='instOverview'),
     path('instructor/profile/', views.instProfile, name='instProfile'),
 ]
