@@ -8,14 +8,19 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/')
 def home(requests): #student home page
-    context = {}
+    context = {"home_page" : "active"}
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 @login_required(login_url='/')
+def instHome(requests): #instructor home page
+    context = {"home_page" : "active"}
+    return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
+
+@login_required(login_url='/')
 def instOverview(requests): #instructor overview page
     teams = Assigned_Team.objects.all().order_by('section')
-    context = {"teamList" : teams}
+    context = {"teamList" : teams, "team_list" : "active"}
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 @login_required(login_url='/')
@@ -23,24 +28,29 @@ def studTeam(requests): # student team view page
     sectionNo = 'G2'
     teams = teams = Assigned_Team.objects.filter(section = sectionNo)
 
-    context = {"teamList" : teams}
+    context = {"teamList" : teams, "team_list" : "active"}
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
+
 @login_required(login_url='/')
 def studStats(requests):
-    return render(requests,"Module_TeamManagement/Student/studentStatistics.html")
+    context = {"stud_stats" : "active"}
+    return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
 @login_required(login_url='/')
 def studProfile(requests):
-        return render(requests,"Module_TeamManagement/Student/studentProfile.html")
+    context = {"stud_profile" : "active"}
+    return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
 
 @login_required(login_url='/')
 def instProfile(requests):
-        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")
+    context = {"inst_profile" : "active"}
+    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
 @login_required(login_url='/')
 def uploadcsv(requests): # instructor bootstrap page
+    context = {"upload_csv" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {})
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", context)
 
     # If not GET, then proceed
     try:

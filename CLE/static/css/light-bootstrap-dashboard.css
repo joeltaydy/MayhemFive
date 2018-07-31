@@ -624,13 +624,13 @@ body>.navbar-collapse.has-image:after {
 
 .sidebar[data-color="black"]:after,
 body>.navbar-collapse[data-color="black"]:after {
-    background: #777777;
-    background: -moz-linear-gradient(top, #777777 0%, #777777 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #777777), color-stop(100%, #777777));
-    background: -webkit-linear-gradient(top, #777777 0%, #777777 100%);
-    background: -o-linear-gradient(top, #777777 0%, #777777 100%);
-    background: -ms-linear-gradient(top, #777777 0%, #777777 100%);
-    background: linear-gradient(to bottom, #777777 0%, #777777 100%);
+    background: #000000;
+    background: -moz-linear-gradient(top, #000000 0%, #000000 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #000000), color-stop(100%, #000000));
+    background: -webkit-linear-gradient(top, #000000 0%, #000000 100%);
+    background: -o-linear-gradient(top, #000000 0%, #000000 100%);
+    background: -ms-linear-gradient(top, #000000 0%, #000000 100%);
+    background: linear-gradient(to bottom, #000000 0%, #000000 100%);
     background-size: 150% 150%;
 }
 
@@ -5328,6 +5328,13 @@ License - nucleoapp.com/license/
 
 .nc-zoom-split::before {
     content: "\ea64";
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
 /* all icon font classes list here */

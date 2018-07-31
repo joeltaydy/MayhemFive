@@ -16,6 +16,6 @@ from allauth.account.signals import user_signed_up
 class SocialAccountWhitelist(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         email_address=sociallogin.account.extra_data["email"].split('@')[1]
-        messages.error(request, "Please use a SMU account")
+        messages.error(request, "Please use an SMU account")
         if not email_address == "smu.edu.sg":
             raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))

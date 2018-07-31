@@ -31,7 +31,7 @@ def login(requests):
         return render(requests, "Module_Account/login.html", {"error" : str(e)})
 
     if result["status"] == "admin":
-        
+
         return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", result)
     else:
         #HttpResponseRedirect(('TMmod:home'))

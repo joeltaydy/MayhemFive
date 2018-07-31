@@ -18,7 +18,7 @@
     <!-- <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" /> -->
     <link href="{% static 'css/light-bootstrap-dashboard.css' %}" rel="stylesheet" />
     <!-- carousel slider CSS -->
-    <link rel="stylesheet" href="{% static 'css/carousel.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/carousel.css' %}" rel="stylesheet" />
     <!-- data table -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
@@ -27,7 +27,7 @@
 
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-color="blue" data-image="{% static 'images/sidebar-5.jpg' %}">
+        <div class="sidebar" data-color="black" data-image="{% static 'images/sidebar-5.jpg' %}">
             <!--
         Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
@@ -36,7 +36,7 @@
             <div class="sidebar-wrapper">
                 <div class="logo">
                     <a href="{% url 'TMmod:home' %}" class="simple-text">
-                        Thunderhead Monkeys
+                        <img class="d-block w-25 center" src="{% static 'images/thunderhead monkeys.png' %}">
                     </a>
                 </div>
                 <ul class="nav">
@@ -87,17 +87,13 @@
                     <div class="collapse navbar-collapse justify-content-end" id="navigation">
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'TMmod:instuOverview' %}">
+                                <a class="nav-link" href="{% url 'TMmod:instOverview' %}">
                                     <span class="no-icon">Account</span>
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="http://fillers.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<<<<<<< HEAD
                                     <span class="no-icon">Hola, {{ user.first_name }} </span>
-=======
-                                    <span class="no-icon">Hola, {{ user.username }} </span>
->>>>>>> 5ec23ee3de174afa7c7e2fd592dc3e484cfe9e99
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <a class="dropdown-item" href="#">Action</a>
@@ -151,34 +147,12 @@
             <footer class="footer">
                 <div class="container">
                     <nav>
-                        <ul class="footer-menu">
-                            <li>
-                                <a href="#">
-                                    Home
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Company
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Portfolio
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Blog
-                                </a>
-                            </li>
-                        </ul>
                         <p class="copyright text-center">
                             ©
                             <script>
                                 document.write(new Date().getFullYear())
                             </script>
-                            <a href="#">Thunderhead Monkeys</a>, future of learning
+                            Thunderhead Monkeys, future of learning
                         </p>
                     </nav>
                 </div>
