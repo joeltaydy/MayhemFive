@@ -19,10 +19,6 @@ def login(requests):
         username = requests.POST.get("username")
         password = requests.POST.get("password")
 
-        # Default login for testing purpose
-        if(username == "admin" and password == "admin123"):
-            return redirect('/home/')
-
         # Proceed to validating of username and password
         result = processLogin.validate(username,password)
 
@@ -31,7 +27,7 @@ def login(requests):
         return render(requests, "Module_Account/login.html", {"error" : str(e)})
 
     if result["status"] == "admin":
-        
+
         return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", result)
     else:
         #HttpResponseRedirect(('TMmod:home'))
