@@ -8,7 +8,7 @@ def validate(username,password):
     status = ""
     user = ""
 
-    if "admin" in username and "admin" in password:
+    if username == "admin" and password == "admin":
         return {"status" : "admin", "user" : username}
 
     # Validates username and password. Else raise exception
