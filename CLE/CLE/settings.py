@@ -120,6 +120,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+#social authentications
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
