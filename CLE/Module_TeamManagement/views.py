@@ -4,33 +4,40 @@ from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap
 from Module_TeamManagement.models import Assigned_Team
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='/')
 def home(requests): #student home page
     context = {}
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
+@login_required(login_url='/')
 def instOverview(requests): #instructor overview page
     teams = Assigned_Team.objects.all().order_by('section')
     context = {"teamList" : teams}
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
+@login_required(login_url='/')
 def studTeam(requests): # student team view page
     sectionNo = 'G2'
     teams = teams = Assigned_Team.objects.filter(section = sectionNo)
 
     context = {"teamList" : teams}
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
-
+@login_required(login_url='/')
 def studStats(requests):
     return render(requests,"Module_TeamManagement/Student/studentStatistics.html")
 
+@login_required(login_url='/')
 def studProfile(requests):
         return render(requests,"Module_TeamManagement/Student/studentProfile.html")
 
+@login_required(login_url='/')
 def instProfile(requests):
         return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")
 
+@login_required(login_url='/')
 def uploadcsv(requests): # instructor bootstrap page
     if requests.method == "GET":
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {})
