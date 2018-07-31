@@ -18,29 +18,21 @@ def instOverview(requests): #instructor overview page
     # email = requests.GET.get('email')
     email = 'sample.instructor.1@smu.edu.sg'
 
-    if email == 'admin':
-        sections = Section.objects.all()
-        students = Student.objects.all()
-        instructors = Instructor.objects.all()
-        teams = Assigned_Team.objects.all()
-        assistant = Teaching_Assistant.objects.all()
+    instructor = Instructor.objects.get(email=email)
+    sections = instructor.section.all()
 
-    else:
-        instructor = Instructor.objects.get(email=email)
-        sections = instructor.section.all()
+    for section in sections:
+        assistant = Teaching_Assistant.objects.get(section=section)
+        teams = Assigned_Team.objects.all().filter(section=section)
+        context[section.section_number] = {'TA':assistant}
 
-        for section in sections:
-            assistant = Teaching_Assistant.objects.get(section=section)
-            teams = Assigned_Team.objects.all().filter(section=section)
-            context[section.section_number] = {'TA':assistant}
+        for team in teams:
+            try:
+                context[section.section_number][team.team_number].append(team.student)
+            except:
+                context[section.section_number][team.team_number] = [team.student]
 
-            for team in teams:
-                try:
-                    context[section.section_number][team.team_number].append(team.student)
-                except:
-                    context[section.section_number][team.team_number] = [team.student]
-
-    print(context)                
+    print(context)
 
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
