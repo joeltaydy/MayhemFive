@@ -1,4 +1,5 @@
 import xlrd
+import time
 import traceback
 import Module_TeamManagement.src.tele_util as tele
 import Module_TeamManagement.src.telebot_util as telebot
@@ -182,11 +183,11 @@ def parse_Excel_Assistant(file,courseInfo={}):
 
 
 def clear_Database():
-    Section.objects.all().delete()
-    Student.objects.all().delete()
-    Assigned_Team.objects.all().delete()
     Instructor.objects.all().delete()
     Teaching_Assistant.objects.all().delete()
+    Assigned_Team.objects.all().delete()
+    Student.objects.all().delete()
+    Section.objects.all().delete()
 
 
 # TO-DO: Reconfigure model to accept this format
@@ -209,12 +210,13 @@ def clear_Database():
 #       |- ...
 #
 def bootstrap(fileDict):
+    courseInfo = {}
 
     if fileDict['type'] == 'excel':
         if fileDict['user'] == 'student':
             courseInfo = parse_Excel_Student(fileDict['file'])
-            Student.objects.all().delete()
             Assigned_Team.objects.all().delete()
+            Student.objects.all().delete()
 
         elif fileDict['user'] == 'instructor':
             courseInfo = parse_Excel_Instructor(fileDict['file'])
@@ -245,33 +247,39 @@ def bootstrap(fileDict):
             for userType,data in sectionData.items():
                 if userType == 'student':
                     for student in data:
-                        studentObj = Student.objects.create(
-                            email=student[0],
-                            username=student[1],
-                            firstname=student[2],
-                            lastname=student[3],
-                            phone_number=student[5],
-                        )
-                        studentObj.save()
+                        try:
+                            studentObj = Student.objects.get(email=student[0])
+                        except:
+                            studentObj = Student.objects.create(
+                                email=student[0],
+                                username=student[1],
+                                firstname=student[2],
+                                lastname=student[3],
+                                phone_number=student[5],
+                            )
+                            studentObj.save()
 
-                        teamObj = Assigned_Team.objects.create(
-                            student=studentObj,
-                            team_number=student[4],
-                            section=sectionObj,
-                        )
-                        teamObj.save()
+                            teamObj = Assigned_Team.objects.create(
+                                student=studentObj,
+                                team_number=student[4],
+                                section=sectionObj,
+                            )
+                            teamObj.save()
 
                 elif userType == 'teaching_assistant':
                     for assistant in data:
-                        assistanObj = Teaching_Assistant.objects.create(
-                            email=assistant[0],
-                            username=assistant[1],
-                            firstname=assistant[2],
-                            lastname=assistant[3],
-                            phone_number=assistant[4],
-                            section=sectionObj,
-                        )
-                        assistanObj.save()
+                        try:
+                            assistanObj = Teaching_Assistant.objects.get(email=assistant[0])
+                        except:
+                            assistanObj = Teaching_Assistant.objects.create(
+                                email=assistant[0],
+                                username=assistant[1],
+                                firstname=assistant[2],
+                                lastname=assistant[3],
+                                phone_number=assistant[4],
+                                section=sectionObj,
+                            )
+                            assistanObj.save()
 
                 elif userType == 'instructor':
                     for instructor in data:
@@ -291,9 +299,9 @@ def bootstrap(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
-        message = 'An Exception as occured during bootstrap. Please look into it.\n\nError Message:\n' + traceback.format_exc()
-        telebot.send_Message(message=message,group_name=ADMIN_GROUP)
+        traceback.print_exc()
+        # message = 'An Exception as occured during bootstrap. Please look into it.\n\nError Message:\n' + traceback.format_exc()
+        # telebot.send_Message(message=message,group_name=ADMIN_GROUP)
         raise Exception('Unsucccessfull Upload.')
 
     # Create the require groups for telegram chat only if zip file was uploaded

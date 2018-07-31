@@ -12,7 +12,7 @@ def home(requests): #student home page
 
 def instOverview(requests): #instructor overview page
     teams = Assigned_Team.objects.all().order_by('section')
-    context = {"teamList" : teams}
+    context = {}
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 def studTeam(requests): # student team view page
@@ -26,10 +26,10 @@ def studStats(requests):
     return render(requests,"Module_TeamManagement/Student/studentStatistics.html")
 
 def studProfile(requests):
-        return render(requests,"Module_TeamManagement/Student/studentProfile.html")
+    return render(requests,"Module_TeamManagement/Student/studentProfile.html")
 
 def instProfile(requests):
-        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")
+    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html")
 
 def uploadcsv(requests): # instructor bootstrap page
     if requests.method == "GET":
@@ -55,17 +55,17 @@ def uploadcsv(requests): # instructor bootstrap page
             bootstrapFile['type'] = 'zip'
 
         elif file.name.lower() == 'student.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
+            bootstrapFile['file'] = file.temporary_file_path()
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'student'
 
         elif file.name.lower() == 'instructor.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
+            bootstrapFile['file'] = file.temporary_file_path()
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'instructor'
 
         elif file.name.lower() == 'teaching_assistant.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
+            bootstrapFile['file'] = file.temporary_file_path()
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'assistant'
 
