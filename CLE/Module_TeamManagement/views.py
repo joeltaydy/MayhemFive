@@ -22,7 +22,7 @@ def instHome(requests): #student home page
 def instOverview(requests): #instructor overview page
     context = {}
     results = {}
-    assistanList = []
+    assistantList = []
 
     email = requests.GET.get('email')
 
@@ -34,7 +34,7 @@ def instOverview(requests): #instructor overview page
 
     for section in sections:
         teams = Assigned_Team.objects.all().filter(section=section)
-        assistanList.append(Teaching_Assistant.objects.get(section=section))
+        assistantList.append(Teaching_Assistant.objects.get(section=section))
         results[section.section_number] = {}
 
         for team in teams:
@@ -43,21 +43,37 @@ def instOverview(requests): #instructor overview page
             except:
                 results[section.section_number][team.team_number] = [team.student]
 
-    context['team_list'] = 'active'
-    context['assistants'] = assistanList
+    context['section_list'] = 'active'
+    context['assistants'] = assistantList
     context['results'] = results
 
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 #@login_required(login_url='/')
 def studTeam(requests): # student team view page
-    sectionNo = 'G2'
-    teams = teams = Assigned_Team.objects.filter(section = sectionNo)
+    context = {}
+    studentList = []
 
-    context = {"teamList" : teams, "team_list" : "active"}
+    email = requests.GET.get('email')
+
+    if email == None:
+        email = 'sample.1@smu.edu.sg'
+
+    team_number = Assigned_Team.objects.get(student=email).team_number
+    section = Assigned_Team.objects.get(student=email).section
+    team = Assigned_Team.objects.all().filter(team_number=team_number).filter(section=section)
+
+    for member in team:
+        studentList.append(member.student)
+
+    context['team_list'] = 'active'
+    context['results'] = studentList
+    context['section_number'] = section.section_number
+    context['team_number'] = team_number
+
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def studStats(requests):
     context = {"stud_stats" : "active"}
     return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
@@ -65,11 +81,32 @@ def studStats(requests):
 #@login_required(login_url='/')
 def studProfile(requests):
     context = {"stud_profile" : "active"}
+
+    username = requests.GET.get('username')
+
+    if username == None:
+        username = 'sample.1'
+
+    student = Student.objects.get(username=username)
+    assigned_team = Assigned_Team.objects.get(student=student)
+
+    context['user'] = student
+    context['team_number'] = assigned_team.team_number
+    context['section_number'] = assigned_team.section.section_number
+
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
 
 #@login_required(login_url='/')
 def instProfile(requests):
     context = {"inst_profile" : "active"}
+
+    username = requests.GET.get('username')
+
+    if username == None:
+        username = 'sample.instructor.1'
+
+    context['user'] = Instructor.objects.get(username=username)
+
     return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
 #@login_required(login_url='/')
