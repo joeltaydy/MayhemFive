@@ -24,8 +24,10 @@ def instOverview(requests): #instructor overview page
     results = {}
     assistanList = []
 
-    # email = requests.GET.get('email')
-    email = 'sample.instructor.1@smu.edu.sg'
+    email = requests.GET.get('email')
+
+    if email == None:
+        email = 'sample.instructor.1@smu.edu.sg'
 
     instructor = Instructor.objects.get(email=email)
     sections = instructor.section.all()
