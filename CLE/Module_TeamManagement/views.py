@@ -22,6 +22,8 @@ def instHome(requests): #student home page
 def instOverview(requests): #instructor overview page
     context = {}
     results = {}
+    assistanList = []
+
     # email = requests.GET.get('email')
     email = 'sample.instructor.1@smu.edu.sg'
 
@@ -29,9 +31,9 @@ def instOverview(requests): #instructor overview page
     sections = instructor.section.all()
 
     for section in sections:
-        assistant = Teaching_Assistant.objects.get(section=section)
         teams = Assigned_Team.objects.all().filter(section=section)
-        results[section.section_number] = {'TA':assistant}
+        assistanList.append(Teaching_Assistant.objects.get(section=section))
+        results[section.section_number] = {}
 
         for team in teams:
             try:
@@ -39,9 +41,9 @@ def instOverview(requests): #instructor overview page
             except:
                 results[section.section_number][team.team_number] = [team.student]
 
-    context["team_list"] = "active"
-    context["results"] = results
-    print(context)
+    context['team_list'] = 'active'
+    context['assistants'] = assistanList
+    context['results'] = results
 
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
