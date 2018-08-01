@@ -1,7 +1,7 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 
 {% block classList %}
-{% if teamList %}
+{{ G1 }}
     <div class="imp_message container">
       <p> <br> </p>
       <h1> Student Managment </h1>
@@ -15,13 +15,17 @@
           </tr>
       </thead>
       <tbody>
-        {% for team in teamList %}
-            <tr>
-                <td> {{ team.section.section_number }}</td>
-                <td> {{ team.team_number }}</td>
-                <td> {{ team.student.email}}</td>
-                <td> {{ team.student.firstname }}</td>
-            </tr>
+        {% for sections in results %}
+          <!-- {% for teams in results.sections %}
+            {% for students in teams %} -->
+              <tr>
+                  <td> {{ sections }}</td>
+                  <td> {{ results.sections }}</td>
+                  <td> {{ students }}</td>
+                  <td> {{ team.student.firstname }}</td>
+              </tr>
+            <!-- {% endfor %}
+          {% endfor %} -->
         {% endfor %}
       </tbody>
       <tfoot>
@@ -34,5 +38,5 @@
       </tfoot>
     </table>
     </div>
-{% endif %}
+
 {% endblock %}

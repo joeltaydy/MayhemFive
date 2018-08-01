@@ -28,7 +28,7 @@ def login(requests):
 
     if result["status"] == "admin":
 
-        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", result)
+        return render(requests, "Module_TeamManagement/Instructor/instructorHome.html", result)
     else:
         #HttpResponseRedirect(('TMmod:home'))
         return render(requests, "Module_TeamManagement/Student/studentHome.html", result)

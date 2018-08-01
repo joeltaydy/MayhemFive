@@ -3,27 +3,49 @@ import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap
-from Module_TeamManagement.models import Assigned_Team
+from Module_TeamManagement.models import Student, Instructor, Section, Assigned_Team, Teaching_Assistant
 from django.contrib.auth.decorators import login_required
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def home(requests): #student home page
     context = {"home_page" : "active"}
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-@login_required(login_url='/')
-def instHome(requests): #instructor home page
+#@login_required(login_url='/')
+def instHome(requests): #student home page
     context = {"home_page" : "active"}
     return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
+    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def instOverview(requests): #instructor overview page
-    teams = Assigned_Team.objects.all().order_by('section')
-    context = {"teamList" : teams, "team_list" : "active"}
+    context = {}
+    results = {}
+    # email = requests.GET.get('email')
+    email = 'sample.instructor.1@smu.edu.sg'
+
+    instructor = Instructor.objects.get(email=email)
+    sections = instructor.section.all()
+
+    for section in sections:
+        assistant = Teaching_Assistant.objects.get(section=section)
+        teams = Assigned_Team.objects.all().filter(section=section)
+        results[section.section_number] = {'TA':assistant}
+
+        for team in teams:
+            try:
+                results[section.section_number][team.team_number].append(team.student)
+            except:
+                results[section.section_number][team.team_number] = [team.student]
+
+    context["team_list"] = "active"
+    context["results"] = results
+    print(context)
+
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def studTeam(requests): # student team view page
     sectionNo = 'G2'
     teams = teams = Assigned_Team.objects.filter(section = sectionNo)
@@ -36,17 +58,17 @@ def studStats(requests):
     context = {"stud_stats" : "active"}
     return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def studProfile(requests):
     context = {"stud_profile" : "active"}
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def instProfile(requests):
     context = {"inst_profile" : "active"}
     return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
-@login_required(login_url='/')
+#@login_required(login_url='/')
 def uploadcsv(requests): # instructor bootstrap page
     context = {"upload_csv" : "active"}
     if requests.method == "GET":
@@ -72,17 +94,17 @@ def uploadcsv(requests): # instructor bootstrap page
             bootstrapFile['type'] = 'zip'
 
         elif file.name.lower() == 'student.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
+            bootstrapFile['file'] = file.temporary_file_path()
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'student'
 
         elif file.name.lower() == 'instructor.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
+            bootstrapFile['file'] = file.temporary_file_path()
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'instructor'
 
         elif file.name.lower() == 'teaching_assistant.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
+            bootstrapFile['file'] = file.temporary_file_path()
             bootstrapFile['type'] = 'excel'
             bootstrapFile['user'] = 'assistant'
 

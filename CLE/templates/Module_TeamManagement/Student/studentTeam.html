@@ -6,7 +6,7 @@
 
 {% block studentTeams %}
 
-{% if teamList %}
+<!-- {% if teamList %} -->
     <div class="imp_message container">
       <p> <br> </p>
       <h1> My Team </h1>
@@ -20,9 +20,9 @@
           </tr>
       </thead>
       <tbody>
-        {% for team in teamList %}
+        {% for section in sections %}
             <tr>
-                <td> {{ team.section.section_number }}</td>
+                <td> {{ section.section_number }}</td>
                 <td> {{ team.team_number }}</td>
                 <td> {{ team.student.email}}</td>
                 <td> {{ team.student.firstname }}</td>
@@ -31,6 +31,6 @@
       </tbody>
     </table>
     </div>
-{% endif %}
+<!-- {% endif %} -->
 
 {% endblock %}
