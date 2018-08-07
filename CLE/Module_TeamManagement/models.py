@@ -160,3 +160,21 @@ class Class(models.Model):
     class Meta:
         managed = True
         db_table = 'Class'
+
+class Cloud_Learning_Tools(models.Model):
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        db_column='Student',
+    )
+    type = models.CharField(
+        db_column='Type',
+        max_length=255,
+    )
+    website_link = models.TextField(
+        db_column='Website_Link',
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Cloud_Learning_Tools'
