@@ -21,7 +21,7 @@
     <link href="{% static 'css/carousel.css' %}" rel="stylesheet" />
     <!-- data table -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> -->
 
 </head>
 
@@ -86,27 +86,24 @@
                     </button>
                     <div class="collapse navbar-collapse justify-content-end" id="navigation">
                         <ul class="navbar-nav ml-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'TMmod:instOverview' %}">
-                                    <span class="no-icon">Account</span>
-                                </a>
-                            </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="http://fillers.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="no-icon">Hola, {{ user.first_name }} </span>
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
+                                    <a class="dropdown-item">{% if 'smu.edu.sg' in user.email %} Student {% else %} Instructor {% endif %}</a>
                                     <div class="divider"></div>
-                                    <a class="dropdown-item" href="#">Separated link</a>
+                                    {% if 'smu.edu.sg' in user.email %}
+                                    <a class="dropdown-item" href="{% url 'TMmod:sProfile' %}">Profile</a>
+                                    <a class="dropdown-item" href="{% url 'Amod:logout' %}">Logout</a>
+                                    {% else %}
+                                    <a class="dropdown-item" href="{% url 'Amod:logout' %}">Logout</a>
+                                    {% endif %}
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'Amod:logout' %}">
-                                    <span class="no-icon">Log out</span>
+                                <a class="nav-link" href="{% url 'TMmod:instOverview' %}">
+                                    <span class="far fa-bell"></span>
                                 </a>
                             </li>
                         </ul>
@@ -167,11 +164,17 @@
 <!--Data table JS Files-->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js" charset="utf-8"></script>
-<script>
-    $(document).ready( function () {
-      $('#studentdata').DataTable();
-    } );
-</script>
+<script src="{% static 'js/datatable.js' %}" charset="utf-8"></script>
+<!--Data export -->
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js" charset="utf-8"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js" charset="utf-8"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js" charset="utf-8"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js" charset="utf-8"></script>
+
+
 
 <!--old JS files-->
 <!-- <script src="{% static 'js/jquery.3.2.1.min.js' %}" type="text/javascript"></script>
