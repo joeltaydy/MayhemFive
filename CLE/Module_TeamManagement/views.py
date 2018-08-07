@@ -161,3 +161,66 @@ def uploadcsv(requests): # instructor bootstrap page
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":e.args[0]})
 
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"message": "Successful Upload"})
+
+
+# Newly added by Faried, 07.08.2018
+# This is for initial configuration by superadmin
+#
+# requests parameters:
+# - file
+#
+# Models to populate:
+# - Course
+# - Course_Section
+# - Faculty
+#
+# response (Succcess):
+# - Number of course
+# - Number of sections for each course
+# - Number of faculty
+#
+def configureDB_admin(requests):
+    context = {"upload_csv" : "active"}
+    if requests.method == "GET":
+        return render(requests, "<path to html page>", context)
+
+    try:
+        file = requests.FILES.get("file", False)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        return render(requests, "<path to html page>", {"error":e.args[0]})
+
+    return render(requests, "<path to html page>", {"message": "Successful Upload"})
+
+
+# Newly added by Faried, 07.08.2018
+# This is for subsequent configuration by faculty
+#
+# requests parameters:
+# - file
+# - course_title
+# - section_number
+#
+# Models to populate:
+# - Students
+# - Class
+#
+# response (Succcess):
+# - Number of student
+#
+def configureDB_faculty(requests):
+    context = {"upload_csv" : "active"}
+    if requests.method == "GET":
+        return render(requests, "<path to html page>", context)
+
+    try:
+        file = requests.FILES.get("file", False)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        return render(requests, "<path to html page>", {"error":e.args[0]})
+
+    return render(requests, "<path to html page>", {"message": "Successful Upload"})
