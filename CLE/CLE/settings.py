@@ -152,7 +152,11 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
+<<<<<<< HEAD
 SITE_ID = 3 # Check your Database to see site id
+=======
+SITE_ID = 2 #Check your Database to see site id
+>>>>>>> c5ccc3723a985f132cb202db1ba6ac03f98aa4df
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
