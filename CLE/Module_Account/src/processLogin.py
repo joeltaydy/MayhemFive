@@ -1,4 +1,4 @@
-from Module_TeamManagement.models import Section, Student, Instructor, Assigned_Team
+from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course
 
 #-----------------------------------------------------------------------------#
 #--------------------------- Validate Function -------------------------------#

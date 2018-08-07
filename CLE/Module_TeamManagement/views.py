@@ -3,7 +3,7 @@ import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap
-from Module_TeamManagement.models import Student, Instructor, Section, Assigned_Team, Teaching_Assistant
+from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course
 from django.contrib.auth.decorators import login_required
 
 #@login_required(login_url='/')

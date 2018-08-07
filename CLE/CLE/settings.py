@@ -79,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CLE.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
@@ -93,14 +92,23 @@ elif 'posix' in os.name and 'ec2-user' in getpass.getuser():
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'CLEdb', #Name of database table, aka need to change
+        'NAME': 'App_Data',
         'USER': 'root',
-        'PASSWORD': password, # need to configure if local or not
+        'PASSWORD': password,
         'HOST': 'localhost',
         'PORT': '3306',
-    }
+    },
+    'CLE_Data': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'CLE_Data',
+        'USER': 'root',
+        'PASSWORD': password,
+        'HOST': 'localhost',
+        'PORT': '3306',
+    },
 }
 
+DATABASE_ROUTERS = ['CLE.router.TMRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -122,6 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 #social authentications
+
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
@@ -143,7 +152,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
-SITE_ID = 3 #Check your Database to see site id 
+SITE_ID = 3 # Check your Database to see site id
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'

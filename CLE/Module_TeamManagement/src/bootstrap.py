@@ -5,7 +5,7 @@ import Module_TeamManagement.src.tele_util as tele
 import Module_TeamManagement.src.telebot_util as telebot
 from Module_TeamManagement.src.telebot_util import ADMIN_GROUP
 from django.core.files import File
-from Module_TeamManagement.models import Section, Student, Instructor, Assigned_Team, Teaching_Assistant
+from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Bootstrap Function -------------------------------#
