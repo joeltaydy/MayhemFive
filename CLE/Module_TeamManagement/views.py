@@ -6,95 +6,143 @@ from Module_TeamManagement.src import bootstrap
 from Module_TeamManagement.models import Assigned_Team
 from django.contrib.auth.decorators import login_required
 
-@login_required(login_url='/')
+
 def home(requests): #student home page
-    context = {"home_page" : "active"}
-    return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context["home_page"] = "active"
+        return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-@login_required(login_url='/')
 def instHome(requests): #instructor home page
-    context = {"home_page" : "active"}
-    return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context = {"home_page" : "active"}
+        return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
 
-@login_required(login_url='/')
+
 def instOverview(requests): #instructor overview page
-    teams = Assigned_Team.objects.all().order_by('section')
-    context = {"teamList" : teams, "team_list" : "active"}
-    return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        teams = Assigned_Team.objects.all().order_by('section')
+        context = {"teamList" : teams, "team_list" : "active"}
+        return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-@login_required(login_url='/')
 def studTeam(requests): # student team view page
-    sectionNo = 'G2'
-    teams = teams = Assigned_Team.objects.filter(section = sectionNo)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        sectionNo = 'G2'
+        teams = teams = Assigned_Team.objects.filter(section = sectionNo)
 
-    context = {"teamList" : teams, "team_list" : "active"}
-    return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
+        context = {"teamList" : teams, "team_list" : "active"}
+        return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
-@login_required(login_url='/')
 def studStats(requests):
-    context = {"stud_stats" : "active"}
-    return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context = {"stud_stats" : "active"}
+        return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
-@login_required(login_url='/')
 def studProfile(requests):
-    context = {"stud_profile" : "active"}
-    return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context = {"stud_profile" : "active"}
+        return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
 
-@login_required(login_url='/')
+
 def instProfile(requests):
-    context = {"inst_profile" : "active"}
-    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context = {"inst_profile" : "active"}
+        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
-@login_required(login_url='/')
 def uploadcsv(requests): # instructor bootstrap page
-    context = {"upload_csv" : "active"}
-    if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", context)
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context = {"upload_csv" : "active"}
+        if requests.method == "GET":
+            return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", context)
 
-    # If not GET, then proceed
-    try:
-        file = requests.FILES.get("file", False)
-        bootstrapFile = {}
+        # If not GET, then proceed
+        try:
+            file = requests.FILES.get("file", False)
+            bootstrapFile = {}
 
-        if file.name.endswith('.zip'):
-            unzipped = ZipFile(file)
-            unzipped.extractall(os.path.abspath('bootstrap_files'))
+            if file.name.endswith('.zip'):
+                unzipped = ZipFile(file)
+                unzipped.extractall(os.path.abspath('bootstrap_files'))
 
-            for fileName in unzipped.namelist():
-                if fileName.lower() == 'student.xlsx':
-                    bootstrapFile['file_student'] = os.path.abspath('bootstrap_files/' + fileName)
-                elif fileName.lower() == 'instructor.xlsx':
-                    bootstrapFile['file_instructor'] = os.path.abspath('bootstrap_files/' + fileName)
-                elif fileName.lower() == 'teaching_assistant.xlsx':
-                    bootstrapFile['file_assistant'] = os.path.abspath('bootstrap_files/' + fileName)
+                for fileName in unzipped.namelist():
+                    if fileName.lower() == 'student.xlsx':
+                        bootstrapFile['file_student'] = os.path.abspath('bootstrap_files/' + fileName)
+                    elif fileName.lower() == 'instructor.xlsx':
+                        bootstrapFile['file_instructor'] = os.path.abspath('bootstrap_files/' + fileName)
+                    elif fileName.lower() == 'teaching_assistant.xlsx':
+                        bootstrapFile['file_assistant'] = os.path.abspath('bootstrap_files/' + fileName)
 
-            bootstrapFile['type'] = 'zip'
+                bootstrapFile['type'] = 'zip'
 
-        elif file.name.lower() == 'student.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
-            bootstrapFile['type'] = 'excel'
-            bootstrapFile['user'] = 'student'
+            elif file.name.lower() == 'student.xlsx': # FILENAME may change. Take note
+                bootstrapFile['file'] = file
+                bootstrapFile['type'] = 'excel'
+                bootstrapFile['user'] = 'student'
 
-        elif file.name.lower() == 'instructor.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
-            bootstrapFile['type'] = 'excel'
-            bootstrapFile['user'] = 'instructor'
+            elif file.name.lower() == 'instructor.xlsx': # FILENAME may change. Take note
+                bootstrapFile['file'] = file
+                bootstrapFile['type'] = 'excel'
+                bootstrapFile['user'] = 'instructor'
 
-        elif file.name.lower() == 'teaching_assistant.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file
-            bootstrapFile['type'] = 'excel'
-            bootstrapFile['user'] = 'assistant'
+            elif file.name.lower() == 'teaching_assistant.xlsx': # FILENAME may change. Take note
+                bootstrapFile['file'] = file
+                bootstrapFile['type'] = 'excel'
+                bootstrapFile['user'] = 'assistant'
 
-        else:
-            raise Exception("File is not .xlsx or .zip type")
+            else:
+                raise Exception("File is not .xlsx or .zip type")
 
-        # If file is .xlsx or .zip then proceed with processing
-        bootstrap.bootstrap(bootstrapFile)
+            # If file is .xlsx or .zip then proceed with processing
+            bootstrap.bootstrap(bootstrapFile)
 
-    except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":e.args[0]})
+        except Exception as e:
+            # Uncomment for debugging - to print stack trace wihtout halting the process
+            # traceback.print_exc()
+            return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":e.args[0]})
 
-    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"message": "Successful Upload"})
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"message": "Successful Upload"})
