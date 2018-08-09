@@ -27,12 +27,13 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
 
 
     # This method overwrites the child class to populate user log in in database
+    '''
     def populate_user(self,
                       request,
                       sociallogin,
                       data):
         pass
-
+    '''
 
     def pre_social_login(self, request, sociallogin):
         email_address=sociallogin.account.extra_data["email"].split('@')[1]

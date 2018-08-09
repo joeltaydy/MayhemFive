@@ -108,7 +108,7 @@ DATABASES = {
         'PASSWORD': password,
         'HOST': 'localhost',
         'PORT': '3306',
-    },
+    }
 }
 
 DATABASE_ROUTERS = ['CLE.router.TMRouter']
