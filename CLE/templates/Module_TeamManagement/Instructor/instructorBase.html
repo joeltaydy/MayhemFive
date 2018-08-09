@@ -11,22 +11,38 @@ Instructor page
         <p>Dashboard</p>
     </a>
 </li>
-<li class="nav-item {{ inst_profile }}">
-    <a class="nav-link" href="{% url 'TMmod:instProfile' %}">
+<!-- <li class="nav-item {{ inst_profile }}">
+    <a class="nav-link" href="{% url 'TMmod:instProfile' %}?username=sample.instructor.1">
         <i class="fas fa-user-tie"></i>
         <p>User Profile</p>
     </a>
-</li>
-<li class="nav-item {{ team_list }}">
-    <a class="nav-link" href="{% url 'TMmod:instOverview' %}">
-        <i class="fa fa-users"></i>
-        <p>Student Management</p>
-    </a>
-</li>
+</li> -->
+<div id="accordion">
+    <li class="nav-item {{ team_list }}">
+        <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            <i class="fa fa-users"></i>
+            <span class="no-icon">Student Management</span>
+        </a>
+    </li>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
+                <a class="nav-link" href="{% url 'TMmod:instOverview' %}?email=sample.instructor.1@smu.edu.sg">
+                    <p>IS480</p>
+                </a>
+                <a class="nav-link" href="{% url 'TMmod:instOverview' %}?email=sample.instructor.1@smu.edu.sg">
+                    <p>IS260</p>
+                </a>
+            </div>
+</div>
 <li class="nav-item {{ upload_csv }}">
-  <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
-    <i class="fas fa-upload"></i>
-    <p>Bootstrap</p>
-  </a>
+    <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
+      <i class="fas fa-upload"></i>
+      <p>Class Setup</p>
+    </a>
+  </li>
+<li class="nav-item {{ notification_management }}">
+    <a class="nav-link" href="{% url">
+        <i class="fa fa-envelope"></i>
+        <p>Message Management</p>
+    </a>
 </li>
 {% endblock %}

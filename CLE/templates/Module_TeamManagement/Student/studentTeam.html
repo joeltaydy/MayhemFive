@@ -5,8 +5,7 @@
 {% endblock %}
 
 {% block studentTeams %}
-
-{% if teamList %}
+{% if team_list == 'active' %}
     <div class="imp_message container">
       <p> <br> </p>
       <h1> My Team </h1>
@@ -20,17 +19,16 @@
           </tr>
       </thead>
       <tbody>
-        {% for team in teamList %}
+          {% for members in results %}
             <tr>
-                <td> {{ team.section.section_number }}</td>
-                <td> {{ team.team_number }}</td>
-                <td> {{ team.student.email}}</td>
-                <td> {{ team.student.firstname }}</td>
+                <td>{{ section_number }}</td>
+                <td>{{ team_number }}</td>
+                <td>{{ members.email }}</td>
+                <td>{{ members.firstname }}</td>
             </tr>
-        {% endfor %}
+          {% endfor %}
       </tbody>
     </table>
     </div>
 {% endif %}
-
 {% endblock %}

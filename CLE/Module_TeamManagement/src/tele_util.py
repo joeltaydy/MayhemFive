@@ -2,7 +2,7 @@ import os
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, contacts
 from telethon.tl.types import InputPhoneContact
-from Module_TeamManagement.models import Student, Instructor, Assigned_Team, Teaching_Assistant
+from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course
 from Module_TeamManagement.src.tele_config import API_ID, API_HASH, SESSION_FOLDER, ADMIN_SESSION, ADMIN_PHONE_NUMBER, BOT_TOKEN, ADMIN_GROUP
 import Module_TeamManagement.src.telebot_util as telebot
 

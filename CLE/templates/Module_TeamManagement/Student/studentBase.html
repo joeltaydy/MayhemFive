@@ -12,18 +12,32 @@
         <p>Dashboard</p>
     </a>
 </li>
-<li class="nav-item {{ stud_profile }}">
-    <a class="nav-link" href="{% url 'TMmod:sProfile' %}">
+
+<!-- <li class="nav-item {{ stud_profile }}">
+    <a class="nav-link" href="{% url 'TMmod:sProfile' %}?username=sample.1">
         <i class="fas fa-user-graduate"></i>
         <p>User Profile</p>
     </a>
-</li>
+</li> -->
+
+<div id="accordion">
 <li class="nav-item {{ team_list }}">
-    <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
+    <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
         <i class="fa fa-users"></i>
-        <p>My Team</p>
+        <span class="no-icon"> My Teams</span>
     </a>
 </li>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
+            <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
+                <p>IS480</p>
+            </a>
+            <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
+                <p>IS260</p>
+            </a>
+        </div>
+</div>
+
+
 <li class="nav-item {{ stud_stats }}">
     <a class="nav-link" href="{% url 'TMmod:sStats' %}">
         <i class="fas fa-tachometer-alt"></i>

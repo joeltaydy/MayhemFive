@@ -1,7 +1,7 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 
 {% block classList %}
-{% if teamList %}
+{% if section_list == 'active' %}
     <div class="imp_message container">
       <p> <br> </p>
       <h1> Student Managment </h1>
@@ -15,14 +15,28 @@
           </tr>
       </thead>
       <tbody>
-        {% for team in teamList %}
-            <tr>
-                <td> {{ team.section.section_number }}</td>
-                <td> {{ team.team_number }}</td>
-                <td> {{ team.student.email}}</td>
-                <td> {{ team.student.firstname }}</td>
-            </tr>
-        {% endfor %}
+          {% for section,teams in results.items %}
+            {% for assistant in assistants %}
+                {% if assistant.section.section_number == section %}
+                    <tr>
+                        <td>{{ section }}</td>
+                        <td>Teaching Assistant (TA)</td>
+                        <td>{{ assistant.email }}</td>
+                        <td>{{ assistant.firstname }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            {% for team_number,students in teams.items %}
+                {% for student in students %}
+                    <tr>
+                        <td>{{ section }}</td>
+                        <td>{{ team_number }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.firstname }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+          {% endfor %}
       </tbody>
       <tfoot>
         <tr>
