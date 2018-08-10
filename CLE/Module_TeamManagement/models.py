@@ -13,6 +13,7 @@ class Course(models.Model):
     course_description = models.CharField(
         db_column='Course_Description',
         max_length=255,
+        null=True,
     )
 
     class Meta:
@@ -103,11 +104,29 @@ class Faculty(models.Model):
     course_section = models.ManyToManyField(
         Course_Section,
         db_column='Course_Section',
+        null=True,
     )
 
     class Meta:
         managed = True
         db_table = 'Faculty'
+
+class Cloud_Learning_Tools(models.Model):
+    id = models.AutoField(
+        db_column='ID',
+        primary_key=True,
+    )
+    type = models.CharField(
+        db_column='Type',
+        max_length=255,
+    )
+    website_link = models.TextField(
+        db_column='Website_Link',
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Cloud_Learning_Tools'
 
 class Class(models.Model):
     GRADES_CHOICES = (
@@ -136,9 +155,23 @@ class Class(models.Model):
         db_column='Student_Score',
         null=True,
     )
-    telegram_grouplink = models.CharField(
+    telegram_grouplink = models.TextField(
         db_column='Telegram_Grouplink',
+        null=True,
+    )
+    telegram_channellink = models.TextField(
+        db_column='Telegram_Channellink',
+        null=True,
+    )
+    team_number = models.CharField(
+        db_column='Team_Number',
         max_length=255,
+        null=True,
+    )
+    clt_id = models.ForeignKey(
+        Cloud_Learning_Tools,
+        on_delete=models.CASCADE,
+        db_column='CLT_ID',
         null=True,
     )
     student = models.ForeignKey(
@@ -151,30 +184,8 @@ class Class(models.Model):
         on_delete=models.CASCADE,
         db_column='Course_Section',
     )
-    team_number = models.CharField(
-        db_column='Team_Number',
-        max_length=255,
-        null=True,
-    )
 
     class Meta:
         managed = True
         db_table = 'Class'
-
-class Cloud_Learning_Tools(models.Model):
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE,
-        db_column='Student',
-    )
-    type = models.CharField(
-        db_column='Type',
-        max_length=255,
-    )
-    website_link = models.TextField(
-        db_column='Website_Link',
-    )
-
-    class Meta:
-        managed = True
-        db_table = 'Cloud_Learning_Tools'
+        unique_together = (('clt_id','student','course_section'),)
