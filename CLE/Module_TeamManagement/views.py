@@ -3,7 +3,7 @@ import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap
-from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course
+from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
 #@login_required(login_url='/')
@@ -109,60 +109,6 @@ def instProfile(requests):
 
     return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
-#@login_required(login_url='/')
-def uploadcsv(requests): # instructor bootstrap page
-    context = {"upload_csv" : "active"}
-    if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", context)
-
-    # If not GET, then proceed
-    try:
-        file = requests.FILES.get("file", False)
-        bootstrapFile = {}
-
-        if file.name.endswith('.zip'):
-            unzipped = ZipFile(file)
-            unzipped.extractall(os.path.abspath('bootstrap_files'))
-
-            for fileName in unzipped.namelist():
-                if fileName.lower() == 'student.xlsx':
-                    bootstrapFile['file_student'] = os.path.abspath('bootstrap_files/' + fileName)
-                elif fileName.lower() == 'instructor.xlsx':
-                    bootstrapFile['file_instructor'] = os.path.abspath('bootstrap_files/' + fileName)
-                elif fileName.lower() == 'teaching_assistant.xlsx':
-                    bootstrapFile['file_assistant'] = os.path.abspath('bootstrap_files/' + fileName)
-
-            bootstrapFile['type'] = 'zip'
-
-        elif file.name.lower() == 'student.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file.temporary_file_path()
-            bootstrapFile['type'] = 'excel'
-            bootstrapFile['user'] = 'student'
-
-        elif file.name.lower() == 'instructor.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file.temporary_file_path()
-            bootstrapFile['type'] = 'excel'
-            bootstrapFile['user'] = 'instructor'
-
-        elif file.name.lower() == 'teaching_assistant.xlsx': # FILENAME may change. Take note
-            bootstrapFile['file'] = file.temporary_file_path()
-            bootstrapFile['type'] = 'excel'
-            bootstrapFile['user'] = 'assistant'
-
-        else:
-            raise Exception("File is not .xlsx or .zip type")
-
-        # If file is .xlsx or .zip then proceed with processing
-        bootstrap.bootstrap(bootstrapFile)
-
-    except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"error":e.args[0]})
-
-    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", {"message": "Successful Upload"})
-
-
 # Newly added by Faried, 07.08.2018
 # This is for initial configuration by superadmin
 #
@@ -171,12 +117,12 @@ def uploadcsv(requests): # instructor bootstrap page
 #
 # Models to populate:
 # - Course
-# - Course_Section
+# - Course_Section  (Optional)
 # - Faculty
 #
 # response (Succcess):
 # - Number of course
-# - Number of sections for each course
+# - Number of sections for each course (Optional)
 # - Number of faculty
 #
 def configureDB_admin(requests):
@@ -186,13 +132,62 @@ def configureDB_admin(requests):
 
     try:
         file = requests.FILES.get("file", False)
+        bootstrapFile = {}
+
+        if file.name.endswith('.zip'):
+            unzipped = ZipFile(file)
+            unzipped.extractall(os.path.abspath('bootstrap_files'))
+            bootstrapFile['file_type'] = 'zip'
+
+            for fileName in unzipped.namelist():
+                if fileName.lower() == 'faculty_information.xlsx' or fileName.lower() == 'faculty_information.csv' :
+                    bootstrapFile['faculty'] = os.path.abspath('bootstrap_files/' + fileName)
+                elif fileName.lower() == 'course_information.xlsx' or fileName.lower() == 'course_information.csv':
+                    bootstrapFile['course'] = os.path.abspath('bootstrap_files/' + fileName)
+
+            if 'faculty' not in bootstrapFile.keys() or 'course' not in bootstrapFile.keys():
+                raise Exception("Invalid file information within .zip file. Please upload faculty or course information only.")
+
+        elif file.name.endswith('.xlsx'):
+            if file.name.lower() == 'faculty_information.xlsx':
+                bootstrapFile['file_path'] = file.temporary_file_path()
+                bootstrapFile['file_type'] = 'excel'
+                bootstrapFile['file_information'] = 'faculty'
+
+            elif file.name.lower() == 'course_information.xlsx':
+                bootstrapFile['file_path'] = file.temporary_file_path()
+                bootstrapFile['file_type'] = 'excel'
+                bootstrapFile['file_information'] = 'course'
+
+            else:
+                raise Exception("Invalid file information. Please upload faculty or course information only.")
+
+        elif file.name.endswith('.csv'):
+            if file.name.lower() == 'faculty_information.csv':
+                bootstrapFile['file_path'] = file.temporary_file_path()
+                bootstrapFile['file_type'] = 'csv'
+                bootstrapFile['file_information'] = 'faculty'
+
+            elif file.name.lower() == 'course_information.csv':
+                bootstrapFile['file_path'] = file.temporary_file_path()
+                bootstrapFile['file_type'] = 'csv'
+                bootstrapFile['file_information'] = 'faculty'
+
+            else:
+                raise Exception("Invalid file information. Please upload faculty or course information only.")
+
+        else:
+            raise Exception("Invalid file type. Please upload .csv or .xlsx or .zip only")
+
+        # If file is .csv or .xlsx or .zip then proceed with processing
+        bootstrap.bootstrap(bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
-        return render(requests, "<path to html page>", {"error":e.args[0]})
+        traceback.print_exc()
+        # return render(requests, "<path to html page>", {"error":e.args[0]})
 
-    return render(requests, "<path to html page>", {"message": "Successful Upload"})
+    # return render(requests, "<path to html page>", {"message": "Successful Upload"})
 
 
 # Newly added by Faried, 07.08.2018
