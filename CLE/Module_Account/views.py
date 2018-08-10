@@ -1,18 +1,16 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from Module_Account.src import processLogin
-from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth import logout
+from  django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 
 
 # LOGIN VALIDATION -----------------------------------------------------------#
-def login(requests):
+def login_view(requests):
     result = {}
-
     if requests.method == "GET":
         return render(requests, "Module_Account/login.html", result)
-        return render(requests, "Registration/login.html", result)
 
     # If not GET, then proceed
     try:
@@ -20,21 +18,22 @@ def login(requests):
         password = requests.POST.get("password")
 
         # Proceed to validating of username and password
-        result = processLogin.validate(username,password)
+        user = processLogin.validate(username,password)
 
     except Exception as e:
 
         return render(requests, "Module_Account/login.html", {"error" : str(e)})
 
-    if result["status"] == "admin":
-        return render(requests, "Module_TeamManagement/Instructor/instructorHome.html", result)
+    if user != None :
+        login(requests,user,backend='django.contrib.auth.backends.ModelBackend')
+        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", result)
     else:
-        return render(requests, "Module_TeamManagement/Student/studentHome.html", result)
-
-
+        #HttpResponseRedirect(('TMmod:home'))
+        return render(requests, "Amod:login", result)
 
 # LOGOUT ---------------------------------------------------------------------#
 #@login_required(login_url='/')
 def logout_view(requests):
     logout(requests)
     return redirect("/")
+

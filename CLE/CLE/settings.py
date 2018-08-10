@@ -29,6 +29,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["54.254.212.240","localhost","127.0.0.1","52.76.46.177.xip.io","52.76.46.177"]
 
+ADMIN_LOGIN = 'admin'
+ADMIN_PASSWORD = 'admin'
+
 
 # Application definition
 
@@ -105,7 +108,7 @@ DATABASES = {
         'PASSWORD': password,
         'HOST': 'localhost',
         'PORT': '3306',
-    },
+    }
 }
 
 DATABASE_ROUTERS = ['CLE.router.TMRouter']
@@ -137,6 +140,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 SOCIALACCOUNT_ADAPTER = 'Module_Account.adapters.SocialAccountWhitelist'
+
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

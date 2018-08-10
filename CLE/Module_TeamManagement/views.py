@@ -8,8 +8,15 @@ from django.contrib.auth.decorators import login_required
 
 #@login_required(login_url='/')
 def home(requests): #student home page
-    context = {"home_page" : "active"}
-    return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context["home_page"] = "active"
+        return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 #@login_required(login_url='/')
@@ -75,8 +82,15 @@ def studTeam(requests): # student team view page
 
 #@login_required(login_url='/')
 def studStats(requests):
-    context = {"stud_stats" : "active"}
-    return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else: 
+        context = {"stud_stats" : "active"}
+        return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
 #@login_required(login_url='/')
 def studProfile(requests):
