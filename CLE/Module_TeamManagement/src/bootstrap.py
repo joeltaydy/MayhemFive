@@ -1,20 +1,17 @@
 import xlrd
 import time
 import traceback
-import Module_TeamManagement.src.tele_util as tele
-import Module_TeamManagement.src.telebot_util as telebot
-from Module_TeamManagement.src.telebot_util import ADMIN_GROUP
 from django.core.files import File
-from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course
+from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Bootstrap Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
-def parse_Excel_Student(file,courseInfo={}):
+def parse_File_Student(filePath,bootstrapInfo={}):
 
-    # Create a workbook object from the file
-    workbook = xlrd.open_workbook(file)
+    # Create a workbook object from the filePath
+    workbook = xlrd.open_workbook(filePath)
 
     # Get first worksheet
     sheet = workbook.sheet_by_index(0)
@@ -60,20 +57,20 @@ def parse_Excel_Student(file,courseInfo={}):
 
         # Store in dict with section_number as key and student : list as value
         try:
-            courseInfo[section_number]['student'].append(student)
+            bootstrapInfo[section_number]['student'].append(student)
         except Exception as ex:
             if ex.args[0] == section_number:
-                courseInfo[section_number] = {'student':[student]}
+                bootstrapInfo[section_number] = {'student':[student]}
             elif ex.args[0] == 'student':
-                courseInfo[section_number].update({'student':[student]})
+                bootstrapInfo[section_number].update({'student':[student]})
 
-    return courseInfo
+    return bootstrapInfo
 
 
-def parse_Excel_Instructor(file,courseInfo={}):
+def parse_File_Faculty(filePath,bootstrapInfo={}):
 
-    # Create a workbook object from the file
-    workbook = xlrd.open_workbook(file)
+    # Create a workbook object from the filePath
+    workbook = xlrd.open_workbook(filePath)
 
     # Get first worksheet
     sheet = workbook.sheet_by_index(0)
@@ -115,20 +112,20 @@ def parse_Excel_Instructor(file,courseInfo={}):
         # Store in dict with section_number as key and instructor : list as value
         for section_number in section_number_list:
             try:
-                courseInfo[section_number]['instructor'].append(instructor)
+                bootstrapInfo[section_number]['instructor'].append(instructor)
             except Exception as ex:
                 if ex.args[0] == section_number:
-                    courseInfo[section_number] = {'instructor':[instructor]}
+                    bootstrapInfo[section_number] = {'instructor':[instructor]}
                 elif ex.args[0] == 'instructor':
-                    courseInfo[section_number].update({'instructor':[instructor]})
+                    bootstrapInfo[section_number].update({'instructor':[instructor]})
 
-    return courseInfo
+    return bootstrapInfo
 
 
-def parse_Excel_Assistant(file,courseInfo={}):
+def parse_File_Course(filePath,bootstrapInfo={}):
 
     # Create a workbook object from the classFile
-    workbook = xlrd.open_workbook(file)
+    workbook = xlrd.open_workbook(filePath)
 
     # Get first worksheet
     sheet = workbook.sheet_by_index(0)
@@ -137,110 +134,56 @@ def parse_Excel_Assistant(file,courseInfo={}):
     headers = sheet.row_values(0)
 
     # Get header indexes of each column
-    index_username = headers.index('Username')
-    index_lastname = headers.index('Last Name')
-    index_firstname = headers.index('First Name')
-    index_email = headers.index('Email')
-    index_hp = headers.index('Phone Number')
-    index_section = headers.index('Section')
+    index_title = headers.index('Course Title')
+    index_name = headers.index('Course Name')
+    index_desc = headers.index('Course Description')
 
     # Start with '1' instead of '0' to clear header buffer
     for row in range(1,sheet.nrows):
         rowData = sheet.row_values(row)
 
         # Declare variables
-        username = rowData[index_username].strip()
-        if '\\' in username:
-            username = username.split("\\")[1]
+        course_Title = rowData[index_title].strip()
+        course_Name = rowData[index_name].strip()
+        course_Desc = rowData[index_desc].strip()
 
-        section_number = rowData[index_section].strip()
-        if ',' in section_number:
-            section_number = section_number.split(',')[-1]
+    return bootstrapInfo
 
-        email = rowData[index_email].strip()
-        firstname = rowData[index_firstname].strip()
-        lastname = rowData[index_lastname].strip()
 
-        phoneNumber = str(int(rowData[index_hp])).strip()
-        if len(phoneNumber) == 8:
-            phoneNumber = str('65') + phoneNumber
-        elif '+' in phoneNumber and len(phoneNumber) == 11:
-            phoneNumber = phoneNumber[1:]
-
-        # Create teaching_assistant : list
-        teaching_assistant = [email,username,firstname,lastname,phoneNumber]
-
-        # Store in dict with section_number as key and teaching_assistant : list as value
-        try:
-            courseInfo[section_number]['teaching_assistant'].append(teaching_assistant)
-        except Exception as ex:
-            if ex.args[0] == section_number:
-                courseInfo[section_number] = {'teaching_assistant':[teaching_assistant]}
-            elif ex.args[0] == 'teaching_assistant':
-                courseInfo[section_number].update({'teaching_assistant':[teaching_assistant]})
-
-    return courseInfo
+def parse_File_CLT(filePath,bootstrapInfo={}):
+    return bootstrapInfo
 
 
 def clear_Database():
-    Instructor.objects.all().delete()
-    Teaching_Assistant.objects.all().delete()
-    Assigned_Team.objects.all().delete()
+    Class.objects.all().delete()
+    Cloud_Learning_Tools.objects.all().delete()
+    Faculty.objects.all().delete()
+    Course_Section.objects.all().delete()
     Student.objects.all().delete()
-    Section.objects.all().delete()
+    Course.objects.all().delete()
 
 
-# TO-DO: Reconfigure model to accept this format
-# Format of dictionary:
-# Section
-#   |- Student
-#       |- [email,username,firstname,lastname,team_number,phoneNumber]
-#       |- [email,username,firstname,lastname,team_number,phoneNumber]
-#       |- [email,username,firstname,lastname,team_number,phoneNumber]
-#       |- ...
-#   |- Instructor
-#       |- [email,username,firstname,lastname,phoneNumber]
-#       |- [email,username,firstname,lastname,phoneNumber]
-#       |- [email,username,firstname,lastname,phoneNumber]
-#       |- ...
-#   |- Teaching_Assistant
-#       |- [email,username,firstname,lastname,phoneNumber]
-#       |- [email,username,firstname,lastname,phoneNumber]
-#       |- [email,username,firstname,lastname,phoneNumber]
-#       |- ...
-#
 def bootstrap(fileDict):
-    courseInfo = {}
+    bootstrapInfo = {}
 
-    if fileDict['type'] == 'excel':
-        if fileDict['user'] == 'student':
-            courseInfo = parse_Excel_Student(fileDict['file'])
-            Assigned_Team.objects.all().delete()
-            Student.objects.all().delete()
+    if fileDict['file_type'] == 'zip':
+        for key in fileDict.keys():
+            if 'faculty' in key:
+                bootstrapInfo = parse_File_Faculty(fileDict['faculty'],bootstrapInfo)
+            elif 'course' in key:
+                bootstrapInfo = parse_File_Course(fileDict['course'],bootstrapInfo)
+            else:
+                # To-do bootstrap zip files for faculty uploads
+                # bootstrapInfo = parse_File_Student(fileDict['file_path'],bootstrapInfo)
+                # bootstrapInfo = parse_File_CLT(fileDict['file_path'],bootstrapInfo)
 
-        elif fileDict['user'] == 'instructor':
-            courseInfo = parse_Excel_Instructor(fileDict['file'])
-            Instructor.objects.all().delete()
-
-        else:
-            courseInfo = parse_Excel_Assistant(fileDict['file'])
-            Teaching_Assistant.objects.all().delete()
-
-        Section.objects.all().delete()
+    # if fileDict['file_type'] is csv or excel
     else:
-        try:
-            courseInfo = parse_Excel_Student(fileDict['file_student'])
-            courseInfo = parse_Excel_Instructor(fileDict['file_instructor'],courseInfo)
-            courseInfo = parse_Excel_Assistant(fileDict['file_assistant'],courseInfo)
-            clear_Database()
-        except:
-            # Uncomment for debugging - to print stack trace wihtout halting the process
-            # traceback.print_exc()
-            raise Exception(".zip file does not contain the required excel files.")
+
 
     try:
         # Bootstrap data into database
-        for section,sectionData in courseInfo.items():
+        for section,sectionData in bootstrapInfo.items():
             sectionObj = Section.objects.create(section_number=section)
             sectionObj.save()
 
@@ -300,11 +243,4 @@ def bootstrap(fileDict):
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
-        # message = 'An Exception as occured during bootstrap. Please look into it.\n\nError Message:\n' + traceback.format_exc()
-        # telebot.send_Message(message=message,group_name=ADMIN_GROUP)
-        raise Exception('Unsucccessfull Upload.')
-
-    # Create the require groups for telegram chat only if zip file was uploaded
-    # if fileDict['type'] = 'zip':
-    #     for instructor in courseInfo[section][instructor]:
-    #         tele.initialize_Groups(instructor[1])
+        # raise Exception('Unsucccessfull Upload.')
