@@ -6,6 +6,8 @@ from Module_TeamManagement.src import bootstrap
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
+
+# TO-DO: update function
 #@login_required(login_url='/')
 def home(requests): #student home page
     '''
@@ -19,68 +21,146 @@ def home(requests): #student home page
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
+
+# TO-DO: update function
 #@login_required(login_url='/')
-def instHome(requests): #student home page
+def faculty_Home(requests): #student home page
     context = {"home_page" : "active"}
     return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
+
+# Updated by Faried, 11.08.2018
+# Requests param : GET
+# - username
+#
+# Response context : Dictionary
+# - faculty_Overview
+# - course
+# - user
+# - message
+#
 #@login_required(login_url='/')
-def instOverview(requests): #instructor overview page
-    context = {}
-    results = {}
-    assistantList = []
+def faculty_Overview(requests):
+    context = {"faculty_Overview" : "active"}
 
-    email = requests.GET.get('email')
+    faculty_username = requests.GET.get('username')
 
-    if email == None:
-        email = 'sample.instructor.1@smu.edu.sg'
+    if faculty_username == None:
+        context['message'] = 'Please specify a username'
+        return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
 
-    instructor = Instructor.objects.get(email=email)
-    sections = instructor.section.all()
+    facultyObj = Faculty.objects.get(username=faculty_username)
+    course_section = facultyObj.course_section.all()
 
-    for section in sections:
-        teams = Assigned_Team.objects.all().filter(section=section)
-        assistantList.append(Teaching_Assistant.objects.get(section=section))
-        results[section.section_number] = {}
+    if len(course_section) > 1:
+        for enrolled_class in course_section:
+            context['course'] = {enrolled_class.course_section_id : {}}
+            students = Class.objects.all().filter(course_section=enrolled_class)
+            for student in students:
+                if student.team_number != 'NULL':
+                    try:
+                        context['course'][course_section.course_section_id][student.team_number].append(student)
+                    except:
+                        context['course'][course_section.course_section_id][student.team_number] = [student]
+                else:
+                    try:
+                        context['course'][course_section.course_section_id].append(student)
+                    except:
+                        context['course'][course_section.course_section_id] = [student]
+    else:
+        context['course'] = {course_section.course_section_id : {}}
+        students = Class.objects.all().filter(course_section=course_section)
+        for student in students:
+            if student.team_number != 'NULL':
+                try:
+                    context['course'][course_section.course_section_id][student.team_number].append(student)
+                except:
+                    context['course'][course_section.course_section_id][student.team_number] = [student]
+            else:
+                try:
+                    context['course'][course_section.course_section_id].append(student)
+                except:
+                    context['course'][course_section.course_section_id] = [student]
 
-        for team in teams:
-            try:
-                results[section.section_number][team.team_number].append(team.student)
-            except:
-                results[section.section_number][team.team_number] = [team.student]
-
-    context['section_list'] = 'active'
-    context['assistants'] = assistantList
-    context['results'] = results
-
+    context['user'] = facultyObj
+    context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-#@login_required(login_url='/')
-def studTeam(requests): # student team view page
-    context = {}
+
+# Updated by Faried, 11.08.2018
+# Requests param : GET
+# - username
+#
+# Response context : Dictionary
+# - faculty_profile
+# - course_list
+# - user
+# - message
+#
+# @login_required(login_url='/')
+def faculty_Profile(requests):
+    context = {"faculty_profile" : "active"}
+
+    faculty_username = requests.GET.get('username')
+
+    if faculty_username == None:
+        context['message'] = 'Please specify a username'
+        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
+
+    facultyObj = Faculty.objects.get(username=faculty_username)
+    course_section = facultyObj.course_section.all()
+
+    if len(course_sectionList) > 1:
+        context['course_list'] = {course_section.course_section_id : course_section}
+    else:
+        context['course_list'] = {course_section.course_section_id : [course_section]}
+
+    context['user'] = facultyObj
+    context['message'] = 'Successful retrieval of faculty\'s profile'
+    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
+
+
+# Updated by Faried, 11.08.2018
+# Requests param : GET
+# - username
+#
+# Response context : Dictionary
+# - student_Team
+# - course
+# - user
+# - message
+#
+# @login_required(login_url='/')
+def student_Team(requests):
+    context = {"student_Team" : "active"}
     studentList = []
 
-    email = requests.GET.get('email')
+    student_username = requests.GET.get('username')
 
-    if email == None:
-        email = 'sample.1@smu.edu.sg'
+    if student_username == None:
+        context['message'] = 'Please specify a username'
+        return render(requests,"Module_TeamManagement/Student/studentTeam.html", context)
 
-    team_number = Assigned_Team.objects.get(student=email).team_number
-    section = Assigned_Team.objects.get(student=email).section
-    team = Assigned_Team.objects.all().filter(team_number=team_number).filter(section=section)
+    studentObj = Student.objects.get(username=student_username)
+    classObj = Class.objects.all().filter(student=studentObj)
 
-    for member in team:
-        studentList.append(member.student)
+    if len(classObj) > 1:
+        for enrolled_class in classObj:
+            team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
+            context['course'] = {enrolled_class.course_section.course_section_id : team_list}
 
-    context['team_list'] = 'active'
-    context['results'] = studentList
-    context['section_number'] = section.section_number
-    context['team_number'] = team_number
+    else:
+        team_list = Class.objects.all().filter(team_number=classObj.team_number).filter(course_section=classObj.course_section).exclude(student=studentObj)
+        context['course'] = {classObj.course_section.course.course_section_id : team_list}
 
+    context['user'] = studentObj
+    context['message'] = 'Successful retrieval of student\'s team'
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
-#@login_required(login_url='/')
+
+# TO-DO: update function
+# @login_required(login_url='/')
 def studStats(requests):
     '''
         Check if user is authenticated aka session
@@ -92,52 +172,55 @@ def studStats(requests):
         context = {"stud_stats" : "active"}
         return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
-#@login_required(login_url='/')
-def studProfile(requests):
-    context = {"stud_profile" : "active"}
 
-    username = requests.GET.get('username')
+# Updated by Faried, 11.08.2018
+# Requests param : GET
+# - username
+#
+# Response context : Dictionary
+# - student_Profile
+# - course_list
+# - user
+# - message
+#
+# @login_required(login_url='/')
+def student_Profile(requests):
+    context = {"student_Profile" : "active"}
 
-    if username == None:
-        username = 'sample.1'
+    student_username = requests.GET.get('username')
 
-    student = Student.objects.get(username=username)
-    assigned_team = Assigned_Team.objects.get(student=student)
+    if student_username == None:
+        context['message'] = 'Please specify a username'
+        return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
 
-    context['user'] = student
-    context['team_number'] = assigned_team.team_number
-    context['section_number'] = assigned_team.section.section_number
+    studentObj = Student.objects.get(username=student_username)
+    classObj = Class.objects.all().filter(student=studentObj)
 
+    if len(classObj) > 1:
+        context['course_list'] = {classObj.course_section.course.course_title : classObj}
+    else:
+        context['course_list'] = {classObj.course_section.course.course_title : [classObj]}
+
+    context['user'] = studentObj
+    context['message'] = 'Successful retrieval of student\'s profile'
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
 
-#@login_required(login_url='/')
-def instProfile(requests):
-    context = {"inst_profile" : "active"}
 
-    username = requests.GET.get('username')
-
-    if username == None:
-        username = 'sample.instructor.1'
-
-    context['user'] = Instructor.objects.get(username=username)
-
-    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
-
-
-# Newly added by Faried, 07.08.2018
+# Newly added by Faried, 07.08.2018 - for bootstrap
 # Updated by Faried, 10.08.2018
 # This is for initial configuration by superadmin
 #
-# requests parameters:
+# Requests param: POST
 # - file
 #
 # Models to populate:
 # - Course
 # - Faculty
 #
-# response (Succcess):
-# - Number of course
-# - Number of faculty
+# Response (Succcess):
+# - configureDB_faculty
+# - results
+# - message
 #
 def configureDB_faculty(requests):
     response = {"configureDB_faculty" : "active"}
@@ -184,17 +267,19 @@ def configureDB_faculty(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message" : e.args[0]}))
+        # traceback.print_exc()
+        response['message'] = e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message": "Successful Upload"}))
+    response['message'] = 'Successful Upload'
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
-# Newly added by Faried, 07.08.2018
+# Newly added by Faried, 07.08.2018 - for bootstrap
 # Updated by Faried, 11.08.2018
 # This is for subsequent configuration by faculty
 #
-# requests parameters:
+# Requests param: POST
 # - file
 # - course_title
 # - section_number
@@ -207,9 +292,10 @@ def configureDB_faculty(requests):
 # Models to modify:
 # - Faculty
 #
-# response (Succcess):
-# - Number of students
-# - Number of sections
+# Response (Succcess):
+# - configureDB_students
+# - results
+# - message
 #
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
@@ -219,7 +305,7 @@ def configureDB_students(requests):
     try:
         file = requests.FILES.get("file", False)
         course_title = requests.POST.get("course_title", False)
-        faculty_username = requests.POST.get("faculty_username", False)
+        faculty_username = requests.POST.get("username", False)
         bootstrapFile = {}
 
         if file.name.endswith('.xlsx'):
@@ -239,16 +325,18 @@ def configureDB_students(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message" : e.args[0]}))
+        # traceback.print_exc()
+        response['message'] = e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message": "Successful Upload"}))
+    response['message'] = 'Successful Upload'
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
-# Newly added by Faried, 11.08.2018
+# Newly added by Faried, 11.08.2018 - for bootstrap
 # This is for initial configuration by faculty
 #
-# requests parameters:
+# Requests param: POST
 # - file
 #
 # Models to populate:
@@ -259,8 +347,9 @@ def configureDB_students(requests):
 # - Faculty
 # - Course_Section
 #
-# response (Succcess):
-# - <nothing>
+# Response (Succcess):
+# - configureDB_faculty_course
+# - message
 #
 def configureDB_faculty_course(requests):
     response = {"configureDB_faculty_course" : "active"}
@@ -268,12 +357,32 @@ def configureDB_faculty_course(requests):
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     try:
-        file = requests.FILES.get("file", False)
-        # TO-DO
+        course_title = requests.POST.get("course_title", False)
+        faculty_username = requests.POST.get("username", False)
+
+        facultyObj = Faculty.objects.get(username=faculty_username)
+        courseObj = Course.objects.get(course_title=course_title)
+        course_section_id = course_title + 'G0'
+
+        # Create course_section object
+        try:
+            course_sectioObj = Course_Section.objects.get(course_section_id=course_section_id)
+        except:
+            course_sectioObj = Course_Section.objects.create(
+                course_section_id=course_section_id,
+                course=courseObj,
+                section_number='S0',
+            )
+            course_sectioObj.save()
+
+        # Associate course with faculty
+        facultyObj.course_section.add(course_sectioObj)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message" : e.args[0]}))
+        # traceback.print_exc()
+        response['message'] = e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message": "Successful Upload"}))
+    response['message'] = 'Course created'
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
