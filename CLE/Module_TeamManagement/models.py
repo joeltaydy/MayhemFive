@@ -10,11 +10,10 @@ class Course(models.Model):
         db_column='Course_Name',
         max_length=255,
     )
-    course_description = models.CharField(
+    course_description = models.TextField(
         db_column='Course_Description',
-        max_length=255,
         null=True,
-    )
+    ) 
 
     class Meta:
         managed = True

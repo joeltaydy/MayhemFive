@@ -14,7 +14,7 @@ def home(requests): #student home page
     context = {}
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
-    else: 
+    else:
         context["home_page"] = "active"
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
@@ -88,7 +88,7 @@ def studStats(requests):
     context = {}
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
-    else: 
+    else:
         context = {"stud_stats" : "active"}
         return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
@@ -123,7 +123,9 @@ def instProfile(requests):
 
     return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
+
 # Newly added by Faried, 07.08.2018
+# Updated by Faried, 10.08.2018
 # This is for initial configuration by superadmin
 #
 # requests parameters:
@@ -131,18 +133,16 @@ def instProfile(requests):
 #
 # Models to populate:
 # - Course
-# - Course_Section  (Optional)
 # - Faculty
 #
 # response (Succcess):
 # - Number of course
-# - Number of sections for each course (Optional)
 # - Number of faculty
 #
-def configureDB_admin(requests):
-    context = {"upload_csv" : "active"}
+def configureDB_faculty(requests):
+    response = {"configureDB_faculty" : "active"}
     if requests.method == "GET":
-        return render(requests, "<path to html page>", context)
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -154,9 +154,9 @@ def configureDB_admin(requests):
             bootstrapFile['file_type'] = 'zip'
 
             for fileName in unzipped.namelist():
-                if fileName.lower() == 'faculty_information.xlsx' or fileName.lower() == 'faculty_information.csv' :
+                if fileName.lower() == 'faculty_information.xlsx':
                     bootstrapFile['faculty'] = os.path.abspath('bootstrap_files/' + fileName)
-                elif fileName.lower() == 'course_information.xlsx' or fileName.lower() == 'course_information.csv':
+                elif fileName.lower() == 'course_information.xlsx':
                     bootstrapFile['course'] = os.path.abspath('bootstrap_files/' + fileName)
 
             if 'faculty' not in bootstrapFile.keys() or 'course' not in bootstrapFile.keys():
@@ -176,35 +176,22 @@ def configureDB_admin(requests):
             else:
                 raise Exception("Invalid file information. Please upload faculty or course information only.")
 
-        elif file.name.endswith('.csv'):
-            if file.name.lower() == 'faculty_information.csv':
-                bootstrapFile['file_path'] = file.temporary_file_path()
-                bootstrapFile['file_type'] = 'csv'
-                bootstrapFile['file_information'] = 'faculty'
-
-            elif file.name.lower() == 'course_information.csv':
-                bootstrapFile['file_path'] = file.temporary_file_path()
-                bootstrapFile['file_type'] = 'csv'
-                bootstrapFile['file_information'] = 'faculty'
-
-            else:
-                raise Exception("Invalid file information. Please upload faculty or course information only.")
-
         else:
-            raise Exception("Invalid file type. Please upload .csv or .xlsx or .zip only")
+            raise Exception("Invalid file type. Please upload .xlsx or .zip only")
 
-        # If file is .csv or .xlsx or .zip then proceed with processing
-        bootstrap.bootstrap(bootstrapFile)
+        # If file is .xlsx or .zip then proceed with processing
+        response['results'] =  bootstrap.bootstrap_Faculty(bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
-        # return render(requests, "<path to html page>", {"error":e.args[0]})
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message" : e.args[0]}))
 
-    # return render(requests, "<path to html page>", {"message": "Successful Upload"})
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message": "Successful Upload"}))
 
 
 # Newly added by Faried, 07.08.2018
+# Updated by Faried, 11.08.2018
 # This is for subsequent configuration by faculty
 #
 # requests parameters:
@@ -214,22 +201,79 @@ def configureDB_admin(requests):
 #
 # Models to populate:
 # - Students
+# - Course_Section
 # - Class
 #
-# response (Succcess):
-# - Number of student
+# Models to modify:
+# - Faculty
 #
-def configureDB_faculty(requests):
-    context = {"upload_csv" : "active"}
+# response (Succcess):
+# - Number of students
+# - Number of sections
+#
+def configureDB_students(requests):
+    response = {"configureDB_students" : "active"}
     if requests.method == "GET":
-        return render(requests, "<path to html page>", context)
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     try:
         file = requests.FILES.get("file", False)
+        course_title = requests.POST.get("course_title", False)
+        faculty_username = requests.POST.get("faculty_username", False)
+        bootstrapFile = {}
+
+        if file.name.endswith('.xlsx'):
+            if 'student_information' in file.name.lower():
+                bootstrapFile['course_title'] = course_title
+                bootstrapFile['faculty_username'] = faculty_username
+                bootstrapFile['file_path'] = file.temporary_file_path()
+
+            else:
+                raise Exception("Invalid file information. Please upload students information only.")
+
+        else:
+            raise Exception("Invalid file type. Please upload .xlsx only")
+
+        # If file is .xlsx then proceed with processing
+        response['results'] =  bootstrap.bootstrap_Students(bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
-        return render(requests, "<path to html page>", {"error":e.args[0]})
+        traceback.print_exc()
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message" : e.args[0]}))
 
-    return render(requests, "<path to html page>", {"message": "Successful Upload"})
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message": "Successful Upload"}))
+
+
+# Newly added by Faried, 11.08.2018
+# This is for initial configuration by faculty
+#
+# requests parameters:
+# - file
+#
+# Models to populate:
+# - Faculty_course_section
+# - Course_Section
+#
+# Models to modify:
+# - Faculty
+# - Course_Section
+#
+# response (Succcess):
+# - <nothing>
+#
+def configureDB_faculty_course(requests):
+    response = {"configureDB_faculty_course" : "active"}
+    if requests.method == "GET":
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+    try:
+        file = requests.FILES.get("file", False)
+        # TO-DO
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        traceback.print_exc()
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message" : e.args[0]}))
+
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response.update({"message": "Successful Upload"}))
