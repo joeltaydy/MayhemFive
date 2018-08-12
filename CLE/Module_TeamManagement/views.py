@@ -42,9 +42,10 @@ def faculty_Home(requests): #student home page
 #
 #@login_required(login_url='/')
 def faculty_Overview(requests):
-    context = {"faculty_Overview" : "active"}
+    context = {"faculty_Overview" : "active", 'course' : {}}
 
     faculty_username = requests.GET.get('username')
+    # faculty_username = 'sample.instructor.1'
 
     if faculty_username == None:
         context['message'] = 'Please specify a username'
@@ -55,33 +56,33 @@ def faculty_Overview(requests):
 
     if len(course_section) > 1:
         for enrolled_class in course_section:
-            context['course'] = {enrolled_class.course_section_id : {}}
+            context['course'][enrolled_class.course_section_id] = {}
             students = Class.objects.all().filter(course_section=enrolled_class)
             for student in students:
-                if student.team_number != 'NULL':
+                if student.team_number != None:
                     try:
-                        context['course'][course_section.course_section_id][student.team_number].append(student)
+                        context['course'][enrolled_class.course_section_id][student.team_number].append(student)
                     except:
-                        context['course'][course_section.course_section_id][student.team_number] = [student]
+                        context['course'][enrolled_class.course_section_id][student.team_number] = [student]
                 else:
                     try:
-                        context['course'][course_section.course_section_id].append(student)
+                        context['course'][enrolled_class.course_section_id]['T0'].append(student)
                     except:
-                        context['course'][course_section.course_section_id] = [student]
+                        context['course'][enrolled_class.course_section_id]['T0'] = [student]
     else:
-        context['course'] = {course_section.course_section_id : {}}
+        context['course'][course_section.course_section_id] = {}
         students = Class.objects.all().filter(course_section=course_section)
         for student in students:
-            if student.team_number != 'NULL':
+            if student.team_number != None:
                 try:
                     context['course'][course_section.course_section_id][student.team_number].append(student)
                 except:
                     context['course'][course_section.course_section_id][student.team_number] = [student]
             else:
                 try:
-                    context['course'][course_section.course_section_id].append(student)
+                    context['course'][course_section.course_section_id]['T0'].append(student)
                 except:
-                    context['course'][course_section.course_section_id] = [student]
+                    context['course'][course_section.course_section_id]['T0'] = [student]
 
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
@@ -100,21 +101,26 @@ def faculty_Overview(requests):
 #
 # @login_required(login_url='/')
 def faculty_Profile(requests):
-    context = {"faculty_profile" : "active"}
+    context = {"faculty_profile" : "active", 'course_list' : {}}
 
     faculty_username = requests.GET.get('username')
+    # faculty_username = 'sample.instructor.1'
 
     if faculty_username == None:
         context['message'] = 'Please specify a username'
         return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
     facultyObj = Faculty.objects.get(username=faculty_username)
-    course_section = facultyObj.course_section.all()
+    course_sectionList = facultyObj.course_section.all()
 
     if len(course_sectionList) > 1:
-        context['course_list'] = {course_section.course_section_id : course_section}
+        for course_section in course_sectionList:
+            try:
+                context['course_list'][course_section.course.course_title].append(course_section)
+            except:
+                context['course_list'][course_section.course.course_title] = [course_section]
     else:
-        context['course_list'] = {course_section.course_section_id : [course_section]}
+        context['course_list'][course_section.course.course_title] = [course_section]
 
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
@@ -133,10 +139,11 @@ def faculty_Profile(requests):
 #
 # @login_required(login_url='/')
 def student_Team(requests):
-    context = {"student_Team" : "active"}
+    context = {"student_Team" : "active", 'course' : {}}
     studentList = []
 
     student_username = requests.GET.get('username')
+    # student_username = 'sample.1'
 
     if student_username == None:
         context['message'] = 'Please specify a username'
@@ -148,11 +155,11 @@ def student_Team(requests):
     if len(classObj) > 1:
         for enrolled_class in classObj:
             team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
-            context['course'] = {enrolled_class.course_section.course_section_id : team_list}
+            context['course'][enrolled_class.course_section.course_section_id] = team_list
 
     else:
         team_list = Class.objects.all().filter(team_number=classObj.team_number).filter(course_section=classObj.course_section).exclude(student=studentObj)
-        context['course'] = {classObj.course_section.course.course_section_id : team_list}
+        context['course'][classObj.course_section.course.course_section_id] = team_list
 
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s team'
@@ -185,21 +192,23 @@ def studStats(requests):
 #
 # @login_required(login_url='/')
 def student_Profile(requests):
-    context = {"student_Profile" : "active"}
+    context = {"student_Profile" : "active", 'course_list' : {}}
 
     student_username = requests.GET.get('username')
+    # student_username = 'sample.1'
 
     if student_username == None:
         context['message'] = 'Please specify a username'
         return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
 
     studentObj = Student.objects.get(username=student_username)
-    classObj = Class.objects.all().filter(student=studentObj)
+    classObjList = Class.objects.all().filter(student=studentObj)
 
-    if len(classObj) > 1:
-        context['course_list'] = {classObj.course_section.course.course_title : classObj}
+    if len(classObjList) > 1:
+        for classObj in classObjList:
+            context['course_list'][classObj.course_section.course.course_title] = classObj
     else:
-        context['course_list'] = {classObj.course_section.course.course_title : [classObj]}
+        context['course_list'][classObjList.course_section.course.course_title] = classObj
 
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s profile'
@@ -282,7 +291,7 @@ def configureDB_faculty(requests):
 # Requests param: POST
 # - file
 # - course_title
-# - section_number
+# - username
 #
 # Models to populate:
 # - Students
@@ -338,6 +347,8 @@ def configureDB_students(requests):
 #
 # Requests param: POST
 # - file
+# - Course_Title
+# - username
 #
 # Models to populate:
 # - Faculty_course_section
@@ -364,14 +375,14 @@ def configureDB_faculty_course(requests):
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
 
-        # Create course_section object
+        # Create/Retrieve (if exists) course_section object
         try:
             course_sectioObj = Course_Section.objects.get(course_section_id=course_section_id)
         except:
             course_sectioObj = Course_Section.objects.create(
                 course_section_id=course_section_id,
                 course=courseObj,
-                section_number='S0',
+                section_number='G0',
             )
             course_sectioObj.save()
 
