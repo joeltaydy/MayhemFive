@@ -234,7 +234,7 @@ def student_Team(requests):
 def configureDB_faculty(requests):
     response = {"configureDB_faculty" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -278,10 +278,10 @@ def configureDB_faculty(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     response['message'] = 'Successful Upload'
-    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
 # Newly added by Faried, 11.08.2018
@@ -290,6 +290,7 @@ def configureDB_faculty(requests):
 # Requests param: POST
 # - course_title
 # - username
+# - file
 #
 # Models to populate:
 # - Faculty_course_section
@@ -306,9 +307,13 @@ def configureDB_faculty(requests):
 def configureDB_course(requests):
     response = {"configureDB_course" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:
+        file = requests.FILES.get("file", False)
+        if file:
+            configureDB_students(requests)
+
         course_title = requests.POST.get("course_title")
         faculty_username = requests.POST.get("username")
 
@@ -334,10 +339,10 @@ def configureDB_course(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     response['message'] = 'Course created'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
 # Newly added by Faried, 07.08.2018 - for bootstrap
@@ -365,7 +370,7 @@ def configureDB_course(requests):
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -392,10 +397,10 @@ def configureDB_students(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     response['message'] = 'Successful Upload'
-    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
 # Newly added by Faried, 12.08.2018 - for bootstrap
@@ -475,6 +480,33 @@ def configureDB_teams(requests):
 def configureDB_clt(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+    try:
+        file = requests.FILES.get("file", False)
+        faculty_username = requests.POST.get("username")
+        course_title = requests.POST.get("course_title")
+        bootstrapFile = {}
+
+        if file.name.endswith('.xlsx'):
+            if 'cloud_learning_tools' in file.name.lower():
+                bootstrapFile['faculty_username'] = faculty_username
+                bootstrapFile['course_title'] = course_title
+                bootstrapFile['file_path'] = file.temporary_file_path()
+
+            else:
+                raise Exception("Invalid file information. Please upload teams information only.")
+
+        else:
+            raise Exception("Invalid file type. Please upload .xlsx only")
+
+        # If file is .xlsx then proceed with processing
+        response['results'] =  bootstrap.update_CLT(bootstrapFile)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     response['message'] = 'Leanring Tools Configured'
