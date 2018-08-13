@@ -2,7 +2,7 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
-from Module_TeamManagement.src import bootstrap
+from Module_TeamManagement.src import bootstrap, utilities
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
@@ -17,6 +17,9 @@ def home(requests): #student home page
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
     else:
+        #Populates the info for the side nav bar for instructor
+        utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)     
+
         context["home_page"] = "active"
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     
@@ -55,11 +58,9 @@ def CLEAdmin(requests): #instructor notification page
 # TO-DO: update function
 #@login_required(login_url='/')
 def faculty_Home(requests): #student home page
-    courseObject = Course.objects.all() #to filter the courses
-    courseList = []
-    for course in courseObject:
-        courseList.append(course.course_title)
-    requests.session['courseList'] = courseList
+    
+    #Populates the info for the side nav bar for instructor
+    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
 
     context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
@@ -119,17 +120,31 @@ def faculty_Profile(requests):
 def faculty_Overview(requests):
     context = {"faculty_Overview" : "active", 'course' : {}}
 
-    faculty_username = requests.GET.get('username')
+    faculty_email = requests.user.email
+    course = requests.GET.get('module')
     # faculty_username = 'sample.instructor.1'
-
+    '''
     if faculty_username == None:
         context['message'] = 'Please specify a username'
         return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
+    '''
 
-    facultyObj = Faculty.objects.get(username=faculty_username)
-    course_section = facultyObj.course_section.all()
+    facultyObj = Faculty.objects.get(email=faculty_email)
+    course_section =  Class.objects.filter(course_section=course)
 
-    if len(course_section) > 1:
+    if len(course_section) > 0:
+        classList = [] # Containing student class objects
+        for enrolled_class in course_section:
+            studentInfo = {}
+            studentInfo['grade'] = enrolled_class.grades
+            studentInfo['score'] = enrolled_class.score
+            studentInfo['team'] = enrolled_class.team_number
+            studentInfo['info'] =  enrolled_class.student #Obtains student model from Foreign key
+            classList.append(studentInfo)
+        context['course']['classList'] = classList
+
+    '''
+    if len(course_section) > 0:
         for enrolled_class in course_section:
             context['course'][enrolled_class.course_section_id] = {}
             students = Class.objects.all().filter(course_section=enrolled_class)
@@ -158,7 +173,8 @@ def faculty_Overview(requests):
                     context['course'][course_section.course_section_id]['T0'].append(student)
                 except:
                     context['course'][course_section.course_section_id]['T0'] = [student]
-
+    '''
+    context['module'] = course
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
@@ -389,6 +405,8 @@ def configureDB_course(requests):
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     response['message'] = 'Course created'
+    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email) #reflush the nav bar
+
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
