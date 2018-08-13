@@ -27,7 +27,6 @@ def home(requests): #student home page
 def faculty_Home(requests): #student home page
     context = {"faculty_Home" : "active"}
     return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
-    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
 # Updated by Faried, 11.08.2018
