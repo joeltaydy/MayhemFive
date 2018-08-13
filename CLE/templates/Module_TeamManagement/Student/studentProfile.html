@@ -78,8 +78,10 @@
                     </div>
                     <div class="card-body">
                         <div class="author">
-                                <img class="avatar border-gray" src="{{ user.socialaccount_set.all.0.get_avatar_url }}">
+                            <a href="#">
+                                <img class="avatar border-gray" src="{{ user.socialaccount_set.all.0.get_avatar_url }}" alt="...">
                                 <h5 class="title">{{ user.first_name }}</h5>
+                            </a>
                             <p class="description">
                                 Student
                             </p>

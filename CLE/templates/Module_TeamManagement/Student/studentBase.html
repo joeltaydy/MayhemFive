@@ -4,6 +4,24 @@
     Student page
 {% endblock %}
 
+{% block sideuserprofile %}
+<div class="col-md-12">
+    <div class="cardsidebar card-user">
+        <div class="card-image">
+        </div>
+            <div class="author">
+                <a href="#">
+                    <img class="avatar border-gray" src="{{ user.socialaccount_set.all.0.get_avatar_url }}" alt="...">
+                    <h5 class="title">{{ user.first_name }}</h5>
+                </a>
+                <p class="description">
+                    Student
+                </p>
+            </div>
+        <hr>
+    </div>
+</div>
+{% endblock %}
 
 {% block sidenavBar %}
 <li class="nav-item {{ home_page }}">
@@ -12,13 +30,6 @@
         <p>Dashboard</p>
     </a>
 </li>
-
-<!-- <li class="nav-item {{ stud_profile }}">
-    <a class="nav-link" href="{% url 'TMmod:sProfile' %}?username=sample.1">
-        <i class="fas fa-user-graduate"></i>
-        <p>User Profile</p>
-    </a>
-</li> -->
 
 <div id="accordion">
 <li class="nav-item {{ team_list }}">
@@ -36,7 +47,6 @@
             </a>
         </div>
 </div>
-
 
 <li class="nav-item {{ stud_stats }}">
     <a class="nav-link" href="{% url 'TMmod:sStats' %}">

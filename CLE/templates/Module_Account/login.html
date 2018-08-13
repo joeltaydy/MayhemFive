@@ -37,11 +37,10 @@
 
           {% load socialaccount %}
           <a href="{% provider_login_url 'google' action="reauthenticate" %}"><div class='googlesignin'> </div></a>
-        
+
           {% if messages %}
               {% for message in messages %}
-              <!-- <div class="alert {% if message.tags %}alert-{% if message.tags == "error" %}danger {% else %}{{message.tags}}{% endif %}"{% endif %}>{{ message }}</div> -->
-              <div class="alert alert-danger">{{ message }}</div>
+                <div class="alert alert-danger">{{ message }}</div>
               {% endfor %}
           {% endif %}
 

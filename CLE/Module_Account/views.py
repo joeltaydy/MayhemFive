@@ -26,7 +26,8 @@ def login_view(requests):
 
     if user != None :
         login(requests,user,backend='django.contrib.auth.backends.ModelBackend')
-        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", result)
+        return render(requests, "Administrator/admindashboard.html", result)
+
     else:
         #HttpResponseRedirect(('TMmod:home'))
         return render(requests, "Amod:login", result)

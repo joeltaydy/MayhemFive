@@ -5,7 +5,142 @@
 {% endblock %}
 
 {% block studentTeams %}
-{% if team_list == 'active' %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="card user">
+                    <div class="card-body ">
+                      <div class="cardsidebar card-user">
+                          <div class="card-image">
+                          </div>
+                              <div class="author">
+                                  <a href="#">
+                                      <img class="avatar border-gray" src="https://goo.gl/N4BQiu" alt="...">
+                                      <h5 class="title">MICHAEL SCOTT</h5>
+                                  </a>
+                                  <p class="emaildescription">
+                                      michael.scott.2017@smu.edu.sg
+                                  </p>
+                              </div>
+                          <hr>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+            <div class="card ">
+                <div class="card-body ">
+                      <div class="cardsidebar card-user">
+                          <div class="card-image">
+                          </div>
+                              <div class="author">
+                                  <a href="#">
+                                      <img class="avatar border-gray" src="https://goo.gl/rfEsMo" alt="...">
+                                      <h5 class="title">PAM HAPERT</h5>
+                                  </a>
+                                  <p class="emaildescription">
+                                      pam.hapert.2016@smu.edu.sg
+                                  </p>
+                              </div>
+                          <hr>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+            <div class="card ">
+                <div class="card-body ">
+                      <div class="cardsidebar card-user">
+                          <div class="card-image">
+                          </div>
+                              <div class="author">
+                                  <a href="#">
+                                      <img class="avatar border-gray" src="https://goo.gl/Cq79Lh" alt="...">
+                                      <h5 class="title">STEPHEN WOLF</h5>
+                                  </a>
+                                  <p class="emaildescription">
+                                      stephen.wolf.2016@smu.edu.sg
+                                  </p>
+                              </div>
+                          <hr>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+              <div class="card">
+                  <div class="card-body ">
+                        <div class="cardsidebar card-user">
+                            <div class="card-image">
+                            </div>
+                                <div class="author">
+                                    <a href="#">
+                                        <img class="avatar border-gray" src="https://goo.gl/VgNLqH" alt="...">
+                                        <h5 class="title">DENZEL WASH</h5>
+                                    </a>
+                                    <p class="emaildescription">
+                                        denzel.washington.2016@smu.edu.sg
+                                    </p>
+                                </div>
+                            <hr>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="col-md-2">
+                  <div class="card ">
+                      <div class="card-body ">
+                            <div class="cardsidebar card-user">
+                                <div class="card-image">
+                                </div>
+                                    <div class="author">
+                                        <a href="#">
+                                            <img class="avatar border-gray" src="https://goo.gl/9e1KTz" alt="...">
+                                            <h5 class="title">HE BEI BEI</h5>
+                                        </a>
+                                        <p class="emaildescription">
+                                            he.bei.2017@smu.edu.sg
+                                        </p>
+                                    </div>
+                                <hr>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+
+      <div class="col-md-8">
+          <div class="card ">
+              <div class="card-header ">
+                  <h4 class="card-title">Team Performance</h4>
+                  <p class="card-category">24 Hours performance</p>
+              </div>
+              <div class="card-body ">
+                  <div id="chartHours" class="ct-chart"></div>
+              </div>
+              <div class="card-footer ">
+                  <div class="legend">
+                      <i class="fa fa-circle text-info"></i> Open
+                      <i class="fa fa-circle text-danger"></i> Click
+                      <i class="fa fa-circle text-warning"></i> Click Second Time
+                  </div>
+                  <hr>
+                  <div class="stats">
+                      <i class="fa fa-history"></i> Updated 3 minutes ago
+                  </div>
+              </div>
+          </div>
+      </div>
+
+    </div>
+</div>
+<!-- {% if team_list == 'active' %}
     <div class="imp_message container">
       <p> <br> </p>
       <h1> My Team </h1>
@@ -29,6 +164,7 @@
           {% endfor %}
       </tbody>
     </table>
-    </div>
-{% endif %}
+  </div>
+{% endif %} -->
 {% endblock %}
+</div>

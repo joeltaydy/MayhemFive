@@ -2,11 +2,22 @@
 
 {% block bootstrapContent %}
 
+<h1>Course Setup</h1>
 <form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
 
     <div class="form-group">
+      <label for="exampleSelect1">Example select</label>
+      <select class="form-control" id="exampleSelect1">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+
+      </br>
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
         <div class="col-md-8">
             <input type="file" name="file" id="file" required="True" class="form-control">
