@@ -58,9 +58,12 @@ def CLEAdmin(requests): #instructor notification page
 # TO-DO: update function
 #@login_required(login_url='/')
 def faculty_Home(requests): #student home page
-    
+    try:
     #Populates the info for the side nav bar for instructor
-    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+        utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+    except: 
+        context = {'messages' : ['Invalid user account']}
+        return render(requests,'Module_Account/login.html',context) 
 
     context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
