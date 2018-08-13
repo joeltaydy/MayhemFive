@@ -80,10 +80,10 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
     index_lastname = headers.index('Last Name')
     index_firstname = headers.index('First Name')
     index_email = headers.index('Email')
-    # index_hp = headers.index('Phone Number')
 
     # Start with '1' instead of '0' to clear header buffer
     for row in range(1,sheet.nrows):
+        faculty = []
         rowData = sheet.row_values(row)
 
         # Declare variables
@@ -95,15 +95,16 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
         firstname = rowData[index_firstname].strip()
         lastname = rowData[index_lastname].strip()
 
-        # phoneNumber = str(int(rowData[index_hp])).strip()
-        # if len(phoneNumber) == 8:
-        #     phoneNumber = str('65') + phoneNumber
-        # elif '+' in phoneNumber and len(phoneNumber) == 11:
-        #     phoneNumber = phoneNumber[1:]
+        if 'Phone Number' in headers:
+            phoneNumber = str(int(rowData[headers.index('Phone Number')])).strip()
+            if len(phoneNumber) == 8:
+                phoneNumber = str('65') + phoneNumber
+            elif '+' in phoneNumber and len(phoneNumber) == 11:
+                phoneNumber = phoneNumber[1:]
+            faculty.append(phoneNumber)
 
         # Create faculty : list
-        # faculty = [email,username,firstname,lastname,phoneNumber]
-        faculty = [email,username,firstname,lastname]
+        faculty = [email,username,firstname,lastname] + faculty
 
         # Store in dict with faculty as key and faculty : list as value
         try:
@@ -265,7 +266,7 @@ def bootstrap_Faculty(fileDict):
                             username=faculty[1],
                             firstname=faculty[2],
                             lastname=faculty[3],
-                            # phone_number=faculty[4],
+                            phone_number=faculty[4] if len(faculty) == 5 else None,
                         )
                         facultyObj.save()
 
