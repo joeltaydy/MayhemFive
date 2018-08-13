@@ -19,8 +19,7 @@ def home(requests): #student home page
     else:
         context["home_page"] = "active"
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
-    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
-
+    
 # TO-DO: update function
 # Add notification management page
 #@login_required(login_url='/')
@@ -38,7 +37,7 @@ def ntmgmt(requests): #instructor notification page
 
 
 # TO-DO: update function
-# Add notification management page
+# Add admin management page
 #@login_required(login_url='/')
 def CLEAdmin(requests): #instructor notification page
     '''
@@ -52,13 +51,20 @@ def CLEAdmin(requests): #instructor notification page
         return render(requests,"Administrator/admindashboard.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-
+    
 # TO-DO: update function
 #@login_required(login_url='/')
 def faculty_Home(requests): #student home page
-    context = {"faculty_Home" : "active"}
-    return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
+    courseObject = Course.objects.all() #to filter the courses
+    courseList = []
+    for course in courseObject:
+        courseList.append(course.course_title)
+    requests.session['courseList'] = courseList
+
+    context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
+    return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+
 
 
 # Updated by Faried, 11.08.2018
@@ -265,7 +271,7 @@ def student_Team(requests):
 def configureDB_faculty(requests):
     response = {"configureDB_faculty" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Administrator/uploadcsv.html", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -309,10 +315,10 @@ def configureDB_faculty(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Administrator/uploadcsv.html", response)
 
     response['message'] = 'Successful Upload'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    return render(requests, "Administrator/uploadcsv.html", response)
 
 
 # Newly added by Faried, 11.08.2018
@@ -336,8 +342,18 @@ def configureDB_faculty(requests):
 # - message
 #
 def configureDB_course(requests):
+
     response = {"configureDB_course" : "active"}
+    courseObject = Course.objects.all() #to retrieve the courses
+    courseList = []
+    for course in courseObject:
+        courseList.append(course.course_title)
+    response['courses'] = courseList
+
+    
     if requests.method == "GET":
+        
+
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:
@@ -347,7 +363,7 @@ def configureDB_course(requests):
 
         course_title = requests.POST.get("course_title")
         faculty_username = requests.POST.get("username")
-
+        print(faculty_username)
         facultyObj = Faculty.objects.get(username=faculty_username)
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
@@ -401,6 +417,7 @@ def configureDB_course(requests):
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
     if requests.method == "GET":
+
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:

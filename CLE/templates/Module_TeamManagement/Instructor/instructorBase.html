@@ -34,12 +34,14 @@ Instructor page
       </a>
   </li>
   <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
-      <a class="nav-link" href="{% url 'TMmod:instOverview' %}?email=sample.instructor.1@smu.edu.sg">
-          <p>IS480</p>
-      </a>
-      <a class="nav-link" href="{% url 'TMmod:instOverview' %}?email=sample.instructor.1@smu.edu.sg">
-          <p>IS260</p>
-      </a>
+      {% for course in request.session.courseList %}
+      
+        <a class="nav-link" href="{% url 'TMmod:instOverview' %}?email=sample.instructor.1@smu.edu.sg">
+            <p>{{ course}}</p>
+        </a>
+        
+
+      {% endfor %}
   </div>
 </div>
 <li class="nav-item {{ upload_csv }}">
