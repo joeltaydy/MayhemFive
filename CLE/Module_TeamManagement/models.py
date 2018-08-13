@@ -13,7 +13,7 @@ class Course(models.Model):
     course_description = models.TextField(
         db_column='Course_Description',
         null=True,
-    ) 
+    )
 
     class Meta:
         managed = True
@@ -111,8 +111,9 @@ class Faculty(models.Model):
         db_table = 'Faculty'
 
 class Cloud_Learning_Tools(models.Model):
-    id = models.AutoField(
+    id = models.CharField(
         db_column='ID',
+        max_length=255,
         primary_key=True,
     )
     type = models.CharField(
@@ -167,9 +168,8 @@ class Class(models.Model):
         max_length=255,
         null=True,
     )
-    clt_id = models.ForeignKey(
+    clt_id = models.ManyToManyField(
         Cloud_Learning_Tools,
-        on_delete=models.CASCADE,
         db_column='CLT_ID',
         null=True,
     )
@@ -187,4 +187,4 @@ class Class(models.Model):
     class Meta:
         managed = True
         db_table = 'Class'
-        unique_together = (('clt_id','student','course_section'),)
+        unique_together = (('student','course_section'),)

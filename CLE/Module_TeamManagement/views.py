@@ -56,9 +56,47 @@ def CLEAdmin(requests): #instructor notification page
 # TO-DO: update function
 #@login_required(login_url='/')
 def faculty_Home(requests): #student home page
-    context = {"home_page" : "active"}
+    context = {"faculty_Home" : "active"}
     return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+
+
+# Updated by Faried, 11.08.2018
+# Requests param : GET
+# - username
+#
+# Response context : Dictionary
+# - faculty_profile
+# - course_list
+# - user
+# - message
+#
+# @login_required(login_url='/')
+def faculty_Profile(requests):
+    context = {"faculty_profile" : "active", 'course_list' : {}}
+
+    faculty_username = requests.GET.get('username')
+    # faculty_username = 'sample.instructor.1'
+
+    if faculty_username == None:
+        context['message'] = 'Please specify a username'
+        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
+
+    facultyObj = Faculty.objects.get(username=faculty_username)
+    course_sectionList = facultyObj.course_section.all()
+
+    if len(course_sectionList) > 1:
+        for course_section in course_sectionList:
+            try:
+                context['course_list'][course_section.course.course_title].append(course_section)
+            except:
+                context['course_list'][course_section.course.course_title] = [course_section]
+    else:
+        context['course_list'][course_section.course.course_title] = [course_section]
+
+    context['user'] = facultyObj
+    context['message'] = 'Successful retrieval of faculty\'s profile'
+    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
 
 # Updated by Faried, 11.08.2018
@@ -120,83 +158,6 @@ def faculty_Overview(requests):
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# Updated by Faried, 11.08.2018
-# Requests param : GET
-# - username
-#
-# Response context : Dictionary
-# - faculty_profile
-# - course_list
-# - user
-# - message
-#
-# @login_required(login_url='/')
-def faculty_Profile(requests):
-    context = {"faculty_profile" : "active", 'course_list' : {}}
-
-    faculty_username = requests.GET.get('username')
-    # faculty_username = 'sample.instructor.1'
-
-    if faculty_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
-
-    facultyObj = Faculty.objects.get(username=faculty_username)
-    course_sectionList = facultyObj.course_section.all()
-
-    if len(course_sectionList) > 1:
-        for course_section in course_sectionList:
-            try:
-                context['course_list'][course_section.course.course_title].append(course_section)
-            except:
-                context['course_list'][course_section.course.course_title] = [course_section]
-    else:
-        context['course_list'][course_section.course.course_title] = [course_section]
-
-    context['user'] = facultyObj
-    context['message'] = 'Successful retrieval of faculty\'s profile'
-    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
-
-
-# Updated by Faried, 11.08.2018
-# Requests param : GET
-# - username
-#
-# Response context : Dictionary
-# - student_Team
-# - course
-# - user
-# - message
-#
-# @login_required(login_url='/')
-def student_Team(requests):
-    context = {"student_Team" : "active", 'course' : {}}
-    studentList = []
-
-    student_username = requests.GET.get('username')
-    # student_username = 'sample.1'
-
-    if student_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Student/studentTeam.html", context)
-
-    studentObj = Student.objects.get(username=student_username)
-    classObj = Class.objects.all().filter(student=studentObj)
-
-    if len(classObj) > 1:
-        for enrolled_class in classObj:
-            team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
-            context['course'][enrolled_class.course_section.course_section_id] = team_list
-
-    else:
-        team_list = Class.objects.all().filter(team_number=classObj.team_number).filter(course_section=classObj.course_section).exclude(student=studentObj)
-        context['course'][classObj.course_section.course.course_section_id] = team_list
-
-    context['user'] = studentObj
-    context['message'] = 'Successful retrieval of student\'s team'
-    return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
-
-
 # TO-DO: update function
 # @login_required(login_url='/')
 def studStats(requests):
@@ -244,6 +205,45 @@ def student_Profile(requests):
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s profile'
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
+
+
+# Updated by Faried, 11.08.2018
+# Requests param : GET
+# - username
+#
+# Response context : Dictionary
+# - student_Team
+# - course
+# - user
+# - message
+#
+# @login_required(login_url='/')
+def student_Team(requests):
+    context = {"student_Team" : "active", 'course' : {}}
+    studentList = []
+
+    student_username = requests.GET.get('username')
+    # student_username = 'sample.1'
+
+    if student_username == None:
+        context['message'] = 'Please specify a username'
+        return render(requests,"Module_TeamManagement/Student/studentTeam.html", context)
+
+    studentObj = Student.objects.get(username=student_username)
+    classObj = Class.objects.all().filter(student=studentObj)
+
+    if len(classObj) > 1:
+        for enrolled_class in classObj:
+            team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
+            context['course'][enrolled_class.course_section.course_section_id] = team_list
+
+    else:
+        team_list = Class.objects.all().filter(team_number=classObj.team_number).filter(course_section=classObj.course_section).exclude(student=studentObj)
+        context['course'][classObj.course_section.course.course_section_id] = team_list
+
+    context['user'] = studentObj
+    context['message'] = 'Successful retrieval of student\'s team'
+    return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
 
 # Newly added by Faried, 07.08.2018 - for bootstrap
@@ -315,6 +315,67 @@ def configureDB_faculty(requests):
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
+# Newly added by Faried, 11.08.2018
+# This is for initial configuration by faculty
+#
+# Requests param: POST
+# - course_title
+# - username
+# - file
+#
+# Models to populate:
+# - Faculty_course_section
+# - Course_Section
+#
+# Models to modify:
+# - Faculty
+# - Course_Section
+#
+# Response (Succcess):
+# - configureDB_course
+# - message
+#
+def configureDB_course(requests):
+    response = {"configureDB_course" : "active"}
+    if requests.method == "GET":
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+
+    try:
+        file = requests.FILES.get("file", False)
+        if file:
+            configureDB_students(requests)
+
+        course_title = requests.POST.get("course_title")
+        faculty_username = requests.POST.get("username")
+
+        facultyObj = Faculty.objects.get(username=faculty_username)
+        courseObj = Course.objects.get(course_title=course_title)
+        course_section_id = course_title + 'G0'
+
+        # Create/Retrieve (if exists) course_section object
+        try:
+            course_sectioObj = Course_Section.objects.get(course_section_id=course_section_id)
+        except:
+            course_sectioObj = Course_Section.objects.create(
+                course_section_id=course_section_id,
+                course=courseObj,
+                section_number='G0',
+            )
+            course_sectioObj.save()
+
+        # Associate course with faculty
+        facultyObj.course_section.add(course_sectioObj)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        response['message'] = e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+
+    response['message'] = 'Course created'
+    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+
+
 # Newly added by Faried, 07.08.2018 - for bootstrap
 # Updated by Faried, 11.08.2018
 # This is for subsequent configuration by faculty
@@ -344,8 +405,8 @@ def configureDB_students(requests):
 
     try:
         file = requests.FILES.get("file", False)
-        course_title = requests.POST.get("course_title", False)
-        faculty_username = requests.POST.get("username", False)
+        course_title = requests.POST.get("course_title")
+        faculty_username = requests.POST.get("username")
         bootstrapFile = {}
 
         if file.name.endswith('.xlsx'):
@@ -365,7 +426,7 @@ def configureDB_students(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
@@ -373,52 +434,50 @@ def configureDB_students(requests):
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
-# Newly added by Faried, 11.08.2018 - for bootstrap
-# This is for initial configuration by faculty
+# Newly added by Faried, 12.08.2018 - for bootstrap
+# This is for subsequent configuration by faculty
 #
 # Requests param: POST
 # - file
-# - Course_Title
+# - course_title
 # - username
 #
 # Models to populate:
-# - Faculty_course_section
-# - Course_Section
+# - NONE
 #
 # Models to modify:
-# - Faculty
-# - Course_Section
+# - Class
 #
 # Response (Succcess):
-# - configureDB_faculty_course
+# - configureDB_teams
+# - results
 # - message
 #
-def configureDB_faculty_course(requests):
-    response = {"configureDB_faculty_course" : "active"}
+def configureDB_teams(requests):
+    response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
     try:
-        course_title = requests.POST.get("course_title", False)
-        faculty_username = requests.POST.get("username", False)
+        file = requests.FILES.get("file", False)
+        faculty_username = requests.POST.get("username")
+        course_title = requests.POST.get("course_title")
+        bootstrapFile = {}
 
-        facultyObj = Faculty.objects.get(username=faculty_username)
-        courseObj = Course.objects.get(course_title=course_title)
-        course_section_id = course_title + 'G0'
+        if file.name.endswith('.xlsx'):
+            if 'team_information' in file.name.lower():
+                bootstrapFile['faculty_username'] = faculty_username
+                bootstrapFile['course_title'] = course_title
+                bootstrapFile['file_path'] = file.temporary_file_path()
 
-        # Create/Retrieve (if exists) course_section object
-        try:
-            course_sectioObj = Course_Section.objects.get(course_section_id=course_section_id)
-        except:
-            course_sectioObj = Course_Section.objects.create(
-                course_section_id=course_section_id,
-                course=courseObj,
-                section_number='G0',
-            )
-            course_sectioObj.save()
+            else:
+                raise Exception("Invalid file information. Please upload teams information only.")
 
-        # Associate course with faculty
-        facultyObj.course_section.add(course_sectioObj)
+        else:
+            raise Exception("Invalid file type. Please upload .xlsx only")
+
+        # If file is .xlsx then proceed with processing
+        response['results'] =  bootstrap.update_Teams(bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
@@ -426,5 +485,60 @@ def configureDB_faculty_course(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
-    response['message'] = 'Course created'
+    response['message'] = 'Teams Configured'
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+
+# Newly added by Faried, 13.08.2018 - for bootstrap
+# This is for subsequent configuration by faculty
+#
+# Requests param: POST
+# - file
+# - course_title
+# - username
+#
+# Models to populate:
+# - Cloud_Learning_Tools
+#
+# Models to modify:
+# - Class
+#
+# Response (Succcess):
+# - configureDB_clt
+# - results
+# - message
+#
+def configureDB_clt(requests):
+    response = {"configureDB_teams" : "active"}
+    if requests.method == "GET":
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+    try:
+        file = requests.FILES.get("file", False)
+        faculty_username = requests.POST.get("username")
+        course_title = requests.POST.get("course_title")
+        bootstrapFile = {}
+
+        if file.name.endswith('.xlsx'):
+            if 'cloud_learning_tools' in file.name.lower():
+                bootstrapFile['faculty_username'] = faculty_username
+                bootstrapFile['course_title'] = course_title
+                bootstrapFile['file_path'] = file.temporary_file_path()
+
+            else:
+                raise Exception("Invalid file information. Please upload teams information only.")
+
+        else:
+            raise Exception("Invalid file type. Please upload .xlsx only")
+
+        # If file is .xlsx then proceed with processing
+        response['results'] =  bootstrap.update_CLT(bootstrapFile)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        response['message'] = e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+    response['message'] = 'Leanring Tools Configured'
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)

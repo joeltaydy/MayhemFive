@@ -28,8 +28,8 @@ def parse_File_Student(filePath,bootstrapInfo={}):
 
     # Start with '1' instead of '0' to clear header buffer
     for row in range(1,sheet.nrows):
+        student = []
         rowData = sheet.row_values(row)
-        teamList = rowData[index_section+1:]
 
         # Declare variables
         username = rowData[index_username].strip()
@@ -40,14 +40,17 @@ def parse_File_Student(filePath,bootstrapInfo={}):
         if ',' in section_number:
             section_number = section_number.split(",")[1]
 
+        teamList = rowData[index_section+1:]
+        if len(teamList) > 0:
+            team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
+            student.append(team_number)
+
         email = rowData[index_email].strip()
         firstname = rowData[index_firstname].strip()
         lastname = rowData[index_lastname].strip()
-        # team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
 
         # Create student : list
-        # student = [email,username,firstname,lastname,team_number]
-        student = [email,username,firstname,lastname]
+        student = [email,username,firstname,lastname] + student
 
         # Store in dict with section_number as key and student : list as value
         try:
@@ -148,8 +151,71 @@ def parse_File_Course(filePath,bootstrapInfo={}):
     return bootstrapInfo
 
 
+def parse_File_Team(filePath,bootstrapInfo={}):
+
+    # Create a workbook object from the filePath
+    workbook = xlrd.open_workbook(filePath)
+
+    # Get first worksheet
+    sheet = workbook.sheet_by_index(0)
+
+    # Get headers
+    headers = sheet.row_values(0)
+
+    # Get header indexes of each column
+    index_email = headers.index('Email')
+    index_section = headers.index('Section')
+
+    # Start with '1' instead of '0' to clear header buffer
+    for row in range(1,sheet.nrows):
+        rowData = sheet.row_values(row)
+
+        # Declare variables
+        email = rowData[index_email].strip()
+
+        teamList = rowData[index_section+1:]
+        if len(teamList) > 0:
+            team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
+            bootstrapInfo[email] = team_number
+
+    return bootstrapInfo
+
+
 def parse_File_CLT(filePath,bootstrapInfo={}):
-    # TO-DO
+
+    # Create a workbook object from the filePath
+    workbook = xlrd.open_workbook(filePath)
+
+    # Get first worksheet
+    sheet = workbook.sheet_by_index(0)
+
+    # Get headers
+    headers = sheet.row_values(0)
+
+    # Get header indexes of each column
+    index_email = headers.index('Email')
+    index_type = headers.index('Type')
+    index_link = headers.index('Link')
+
+    # Start with '1' instead of '0' to clear header buffer
+    for row in range(1,sheet.nrows):
+        rowData = sheet.row_values(row)
+
+        # Declare variables
+        email = rowData[index_email].strip()
+        type = rowData[index_type].strip()
+        link = rowData[index_link].stip()
+        id = email.split('@')[0] + '_' + type
+
+        # Create clt : list
+        clt = [id,type,link]
+
+        # Store in dict with email as key and clt : list as value
+        try:
+            bootstrapInfo[email].append(clt)
+        except:
+            bootstrapInfo[email] = [clt]
+
     return bootstrapInfo
 
 
@@ -172,6 +238,9 @@ def bootstrap_Faculty(fileDict):
         Faculty.objects.all().delete()
 
     try:
+        if len(bootstrapInfo) == 0:
+            raise Exception
+
         for user,data in bootstrapInfo.items():
             if user == 'course':
                 results['course_count'] = len(data)
@@ -202,8 +271,8 @@ def bootstrap_Faculty(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
-        raise Exception('Unsuccessful Upload')
+        # traceback.print_exc()
+        raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
 
     return results
 
@@ -235,13 +304,16 @@ def bootstrap_Students(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
-        raise Exception('Unsuccessful Upload')
+        # traceback.print_exc()
+        raise Exception('Unsuccessful Upload. There was an error during the purging of the database')
     # ==========================================================================
 
 
     # Bootstrap info into database =============================================
     try:
+        if len(bootstrapInfo) == 0:
+            raise Exception
+
         student_count = 0
         for section_number,section_Data in bootstrapInfo.items():
             try:
@@ -253,6 +325,15 @@ def bootstrap_Students(fileDict):
                     section_number=section_number,
                 )
                 course_sectionObj.save()
+
+            # If faculty previously initialize a course without adding student, he will be associated to a section G0
+            # This try,catch is to remove that section G0 before associating a true section
+            try:
+                existing_course_sectionObj = Course_Section.objects.get(course_section_id=course_title+'G0')
+                facultyObj.course_section.all().filter(course_section=existing_course_sectionObj)
+                facultyObj.course_section.remove(existing_course_sectionObj)
+            except:
+                pass
 
             facultyObj.course_section.add(course_sectionObj)
 
@@ -268,6 +349,7 @@ def bootstrap_Students(fileDict):
                                 username=student[1],
                                 firstname=student[2],
                                 lastname=student[3],
+                                team_number=student[4] if len(student) == 5 else None,
                             )
                             studentObj.save()
 
@@ -285,8 +367,102 @@ def bootstrap_Students(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
-        raise Exception('Unsuccessful Upload')
+        # traceback.print_exc()
+        raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
     # ==========================================================================
+
+    return results
+
+
+def update_Teams(fileDict):
+    bootstrapInfo = {}
+    results = {}
+
+    bootstrapInfo = parse_File_Team(fileDict['file_path'],bootstrapInfo)
+
+    faculty_username = fileDict['faculty_username']
+    course_title = fileDict['course_title']
+
+    try:
+        if len(bootstrapInfo) == 0:
+            raise Exception
+
+        facultyObj = Faculty.objects.get(username=faculty_username)
+        all_course_section = facultyObj.course_section.all()
+
+        # Retreive the course_section that's associated under the faculty for that specifc course_title
+        course_section_for_config = []
+        for course_section in all_course_section:
+            if course_title in course_section.course_section_id:
+                course_section_for_config.append(course_section)
+
+        # For each student that falls under that specific course_section, update their team_number
+        for student_email,team_number in bootstrapInfo.items():
+            for course_section in course_section_for_config:
+                try:
+                    student = Class.objects.all().filter(student=student_email).filter(course_section=course_section)
+                    student.team_number = team_number
+                    student.save(update_fields=["team_number"])
+                except:
+                    pass
+
+        results['student_count'] = len(bootstrapInfo)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
+
+    return results
+
+
+def update_CLT(fileDcit):
+    bootstrapInfo = {}
+    results = {}
+
+    bootstrapInfo = parse_File_Team(fileDict['file_path'],bootstrapInfo)
+
+    faculty_username = fileDict['faculty_username']
+    course_title = fileDict['course_title']
+
+    try:
+        if len(bootstrapInfo) == 0:
+            raise Exception
+
+        facultyObj = Faculty.objects.get(username=faculty_username)
+        all_course_section = facultyObj.course_section.all()
+
+        # Retreive the course_section that's associated under the faculty for that specifc course_title
+        course_section_for_config = []
+        for course_section in all_course_section:
+            if course_title in course_section.course_section_id:
+                course_section_for_config.append(course_section)
+
+        # For each student that falls under that specific course_section, create the CLT object and update their CLT
+        for student_email,clt_list in bootstrapInfo.items():
+            for clt in clt_list:
+                try:
+                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0])
+                except:
+                    cltObj = Cloud_Learning_Tools.objects.create(
+                        id=clt[0],
+                        type=clt[1],
+                        website_link=clt[2],
+                    )
+                    cltObj.save()
+
+                for course_section in course_section_for_config:
+                    try:
+                        student = Class.objects.all().filter(student=student_email).filter(course_section=course_section)
+                        student.clt_id.add(cltObj)
+                    except:
+                        pass
+
+        results['student_count'] = len(bootstrapInfo)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
 
     return results
