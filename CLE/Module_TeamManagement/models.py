@@ -168,9 +168,8 @@ class Class(models.Model):
         max_length=255,
         null=True,
     )
-    clt_id = models.ForeignKey(
+    clt_id = models.ManyToManyField(
         Cloud_Learning_Tools,
-        on_delete=models.CASCADE,
         db_column='CLT_ID',
         null=True,
     )
@@ -188,4 +187,4 @@ class Class(models.Model):
     class Meta:
         managed = True
         db_table = 'Class'
-        unique_together = (('clt_id','student','course_section'),)
+        unique_together = (('student','course_section'),)
