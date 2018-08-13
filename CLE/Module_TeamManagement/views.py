@@ -64,7 +64,6 @@ def faculty_Home(requests): #student home page
 
     context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
-    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
 
