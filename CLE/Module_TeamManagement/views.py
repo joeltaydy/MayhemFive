@@ -21,6 +21,37 @@ def home(requests): #student home page
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
+# TO-DO: update function
+# Add notification management page
+#@login_required(login_url='/')
+def ntmgmt(requests): #instructor notification page
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else:
+        context["noti_mgmt"] = "active"
+        return render(requests,"error404.html",context)
+    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+
+
+# TO-DO: update function
+# Add notification management page
+#@login_required(login_url='/')
+def CLEAdmin(requests): #instructor notification page
+    '''
+        Check if user is authenticated aka session
+    '''
+    context = {}
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',context)
+    else:
+        context["home_page"] = "active"
+        return render(requests,"Administrator/admindashboard.html",context)
+    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+
 
 # TO-DO: update function
 #@login_required(login_url='/')
@@ -369,7 +400,7 @@ def configureDB_course(requests):
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:
         file = requests.FILES.get("file", False)

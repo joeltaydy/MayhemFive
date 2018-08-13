@@ -2898,6 +2898,15 @@ Copyright (c) 2015 Daniel Eden
     margin-right: 5px;
 }
 
+.cardsidebar .avatar {
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 5px;
+    background-size: auto;
+}
+
 .card .description {
     font-size: 14px;
     color: #333;
@@ -5338,3 +5347,7 @@ License - nucleoapp.com/license/
 }
 
 /* all icon font classes list here */
+
+.emaildescription{
+
+}
