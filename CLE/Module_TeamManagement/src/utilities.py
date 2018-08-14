@@ -14,10 +14,9 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     elif studentEmail != None:
         courseObject = Class.objects.filter(student=studentEmail).distinct()
 
-    courseList = []
+    courseList = {}
     for course in courseObject:
-        sessionList.append()
-        courseList.append(course.course_section_id)
+        courseList[course.course_section_id] = course.course.course_title + " " + course.section_number
 
     requests.session['courseList'] = courseList
     return
