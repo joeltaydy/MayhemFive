@@ -41,10 +41,16 @@ Instructor page
       {% endfor %}
   </div>
 </div>
-<li class="nav-item {{ upload_csv }}">
+<li class="nav-item {{ configureDB_clt }}">
   <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
     <i class="fas fa-upload"></i>
     <p>Course Setup</p>
+  </a>
+</li>
+<li class="nav-item {{ noti_mgmt }}">
+  <a class="nav-link" href="{% url 'TMmod:configtools' %}">
+    <i class="fas fa-wrench"></i>
+    <p>Tools Setup</p>
   </a>
 </li>
 <li class="nav-item {{ noti_mgmt }}">
