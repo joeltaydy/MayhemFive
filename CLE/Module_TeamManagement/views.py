@@ -178,12 +178,12 @@ def studStats(requests):
 def student_Profile(requests):
     context = {"student_Profile" : "active", 'course_list' : {}}
 
-    student_username = requests.GET.get('username')
+    student_username = requests.user.email.split('@')[0]
     # student_username = 'sample.1'
 
-    if student_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
+    # if student_username == None:
+    #     context['message'] = 'Please specify a username'
+    #     return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
 
     studentObj = Student.objects.get(username=student_username)
     classObjList = Class.objects.all().filter(student=studentObj)
@@ -197,7 +197,7 @@ def student_Profile(requests):
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s profile'
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
-
+    
 
 # Student Team Page
 # @login_required(login_url='/')
