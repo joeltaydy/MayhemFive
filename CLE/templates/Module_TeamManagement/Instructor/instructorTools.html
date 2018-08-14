@@ -3,11 +3,20 @@
 {% block bootstrapContent %}
 
 <h1>Tools Setup</h1>
-<form action="{% url 'TMmod:configtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+<form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
 
     <div class="form-group">
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
+          <select class="form-control" id="course_title" name="course_title">
+            <option value="" disabled selected>Select your course</option>
+          {% for course in courses %}
+              <option value={{course}}>{{course}}</option>
+          {% endfor %}
+        </select>
+
+        </br>
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
         <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
     </div>

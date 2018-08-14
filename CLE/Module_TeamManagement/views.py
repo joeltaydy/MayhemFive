@@ -502,9 +502,17 @@ def configureDB_teams(requests):
 #
 def configureDB_clt(requests):
     response = {"configureDB_clt" : "active"}
+
+    # Retrieve all the course
+    courseObject = Course.objects.all()
+    courseList = []
+
+    for course in courseObject:
+        courseList.append(course.course_title)
+    response['courses'] = courseList
+
     if requests.method == "GET":
-        # return render(requests, "Module_TeamManagement/Instructor/instructorHome.html", response)
-        return faculty_Overview(requests)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
         file = requests.FILES.get("file", False)
