@@ -1,5 +1,5 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
-
+{% load staticfiles %}
 {% block bootstrapContent %}
 
 <h1>Course Setup</h1>
@@ -23,13 +23,25 @@
     <input type="hidden" id="username" name="username" value={{user.username}}>
 
     <div class="form-group">
-        <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
-            <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Upload</button>
+      <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
         </div>
     </div>
 </form>
 
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
 {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
+
+<label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
+  <a href="#" data-toggle="popover" data-html="true" data-content="<img src='{% static 'images/samplecourse.jpg' %}' width='800' />">Help <i class="far fa-question-circle"></i></a>
+</label>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
 
 {% endblock %}

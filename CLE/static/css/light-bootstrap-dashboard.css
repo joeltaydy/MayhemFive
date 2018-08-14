@@ -5347,3 +5347,23 @@ License - nucleoapp.com/license/
 }
 
 /* all icon font classes list here */
+
+.rounded-circle{
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.textbox {
+  height: 700px;
+}
+
+.progress {
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  width: 0;
+}

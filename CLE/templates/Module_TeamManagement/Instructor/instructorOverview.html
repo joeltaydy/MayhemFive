@@ -1,10 +1,95 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
-
+{% load staticfiles %}
 {% block classList %}
 
 <div class="imp_message container">
     <p> <br> </p>
     <h1> Student Managment for {{module}}</h1>
+
+    <span>
+      {% for course in request.session.courseList %}
+      <button type="button" class="btn btn-primary">{{ course}}</button>
+      {% endfor %}
+    </span>
+
+    <div class="content">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="card ">
+                          <div class="card-header ">
+                              <h4 class="card-title">IS480</h4>
+                              <span><button type="button" class="btn btn-info">G1</button> <button type="button" class="btn btn-info">G2</button> <button type="button" class="btn btn-info">G3</button></span>
+                          </div>
+                          <br>
+                          <!--inner card one-->
+                          <div class="row">
+                            <div class="col-md-6">
+                                <div class="card ">
+                                    <div class="card-header ">
+                                        <h4 class="card-title">Participation</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="chartActivity" class="ct-chart"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card ">
+                                    <div class='tableauPlaceholder' id='viz1534167227244' style='position: relative'><noscript><a href='#'><img alt='Stress Level ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;FY&#47;FYP_2&#47;StressChart&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='FYP_2&#47;StressChart' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;FY&#47;FYP_2&#47;StressChart&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1534167227244');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                                </div>
+                            </div>
+                          </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Button trigger modal -->
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Configure Teams
+              </button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Upload excel file</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+
+                      <form action="{% url 'TMmod:uploadteam' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                              <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
+                              <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
+                          </div>
+                          <input type="hidden" id="username" name="username" value={{user.username}}>
+
+                          <div class="form-group">
+                            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                                <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
+                              </div>
+                          </div>
+                      </form>
+
+
+                    </div>
+                    <!-- <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+<!--
+<form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+  <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp"> -->
+
+</form>
+
+  </br>
+</br>
     <table class="table table-striped table-bordered table-hover" id="studentdata">
     <thead>
         <tr>
@@ -15,6 +100,7 @@
         <th>Score</th>
         </tr>
     </thead>
+
     <tbody>
         {% for student in course.classList %}
             <tr>
@@ -28,7 +114,7 @@
 
         <!--
 
-        
+
         {% for section,teams in results.items %}
         {% for assistant in assistants %}
             {% if assistant.section.section_number == section %}
@@ -53,7 +139,15 @@
         {% endfor %}
         -->
     </tbody>
-    
+    <tfoot>
+        <tr>
+        <th>Email</th>
+        <th>First name</th>
+        <th>Team no.</th>
+        <th>Grade</th>
+        <th>Score</th>
+        </tr>
+    </tfoot>
 </table>
 </div>
 

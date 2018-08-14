@@ -178,12 +178,12 @@ def studStats(requests):
 def student_Profile(requests):
     context = {"student_Profile" : "active", 'course_list' : {}}
 
-    student_username = requests.GET.get('username')
+    student_username = requests.user.email.split('@')[0]
     # student_username = 'sample.1'
 
-    if student_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
+    # if student_username == None:
+    #     context['message'] = 'Please specify a username'
+    #     return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
 
     studentObj = Student.objects.get(username=student_username)
     classObjList = Class.objects.all().filter(student=studentObj)
@@ -503,9 +503,9 @@ def configureDB_teams(requests):
 # - message
 #
 def configureDB_clt(requests):
-    response = {"configureDB_teams" : "active"}
+    response = {"configureDB_clt" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -532,10 +532,10 @@ def configureDB_clt(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     response['message'] = 'Learning Tools Configured'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 
 # This is for subsequent configuration by faculty
