@@ -1,13 +1,15 @@
 import traceback
-from Module_TeamManagement.models import *
+import requests
+import json
+import csv
+import sys
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Utilities Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
-'''
-Populate relevant courses related to instructors/students from database
-'''
+
+# Populate relevant courses related to instructors/students from database
 def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     courseList = {}
 
@@ -24,3 +26,56 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 
     requests.session['courseList'] = courseList
     return
+
+
+def webScrapper():
+    input_file = 'trailhead-url.txt'
+    output_file = 'trailhead-points.csv'
+
+    # Get links from csv
+    links = []
+    with open(input_file, 'r') as file:
+        for line in file:
+            if len(line.strip()) > 0:
+                links.append(line.strip())
+
+    # Removes headers
+    links = links[1:]
+    links = links[1:]
+
+    info = {}
+    for link in links[1:]:
+        content = {}
+
+        req = requests.get(link)
+        soup = BeautifulSoup(req.text, 'html.parser')
+        broth = soup.find(attrs={'data-react-class': 'BadgesPanel'})
+        json_obj = json.loads(str(broth['data-react-props']))
+
+        titles = []
+        for i in json_obj['badges']:
+            titles.append(i['title'])
+
+        name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
+        stats = soup.find_all(attrs={'class', 'user-information__achievements-data'})
+
+        content['titles'] = titles,
+        content['name'] = json.loads(str(name['data-react-props']))['full_name'],
+        content['badge-count'] = stats[0].text.strip(),
+        content['points-count'] = stats[1].text.strip(),
+        content['trail-count'] = stats[2].text.strip(),
+
+        info[link] = content
+
+    with (open(output_file, 'w')) as file:
+        writer = csv.writer(file)
+        writer.writerow(['link', 'name', 'badges', 'points', 'trails', 'badges_obtained'])
+        for link,content in info.items():
+            to_write = [link, content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
+            writer.writerow(to_write)
+
+if __name__ == "__main__":
+    from bs4 import BeautifulSoup
+    webScrapper()
+else:
+    from Module_TeamManagement.models import *
