@@ -12,7 +12,12 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     if instructorEmail != None:
         courseObject = Faculty.objects.get(email=instructorEmail).course_section.all()
     elif studentEmail != None:
-        courseObject = Class.objects.filter(student=studentEmail).distinct()
+        classObject = Class.objects.all()filter(student=studentEmail).distinct()
+        for individualClass in classObj:
+            try:
+                courseObject.append(individualClass)
+            except:
+                courseObject = [individualClass]
 
     courseList = {}
     for course in courseObject:
