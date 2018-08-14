@@ -1,8 +1,8 @@
 # Personal/Extra Files
 bootstrap_files
 Diagrams
-trailhead-points
-trailhead-url
+trailhead-points.csv
+trailhead-url.txt
 
 ### Django ###
 *.log
