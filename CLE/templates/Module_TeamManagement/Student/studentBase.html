@@ -37,12 +37,17 @@
     </a>
 </li>
         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
-            <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
-                <p class="col-md-3 col-sm-3 col-xs-12 control-label">IS480</p>
-            </a>
-            <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
-                <p class="col-md-3 col-sm-3 col-xs-12 control-label">IS260</p>
-            </a>
+
+            {% for course in request.session.courseList %}
+
+                <a class="nav-link" href="{% url 'TMmod:sTeam' %}?module={{course}} ">
+                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course}}</p>
+                </a>
+
+            {% endfor %}
+
+
+            
         </div>
 </div>
 
