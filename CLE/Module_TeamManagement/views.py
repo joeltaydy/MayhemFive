@@ -69,7 +69,6 @@ def faculty_Home(requests): #student home page
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
-
 # Updated by Faried, 11.08.2018
 # Requests param : GET
 # - username
@@ -132,7 +131,7 @@ def faculty_Overview(requests):
     '''
 
     facultyObj = Faculty.objects.get(email=faculty_email)
-    course_section =  Class.objects.filter(course_section=course)
+    course_section = Class.objects.filter(course_section=course)
 
     if len(course_section) > 0:
         classList = [] # Containing student class objects
@@ -344,7 +343,6 @@ def configureDB_faculty(requests):
 #
 # Requests param: POST
 # - course_title
-# - username
 # - file
 #
 # Models to populate:
@@ -357,30 +355,28 @@ def configureDB_faculty(requests):
 #
 # Response (Succcess):
 # - configureDB_course
+# - courses
 # - message
 #
 def configureDB_course(requests):
-
     response = {"configureDB_course" : "active"}
-    courseObject = Course.objects.all() #to retrieve the courses
+
+    courseObject = Course.objects.all()
     courseList = []
     for course in courseObject:
         courseList.append(course.course_title)
     response['courses'] = courseList
 
-
     if requests.method == "GET":
-
-
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:
         file = requests.FILES.get("file", False)
         if file:
             configureDB_students(requests)
+            return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
         course_title = requests.POST.get("course_title")
-        faculty_username = requests.POST.get("username")
         facultyObj = Faculty.objects.get(email=requests.user.email)
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
@@ -418,7 +414,6 @@ def configureDB_course(requests):
 # Requests param: POST
 # - file
 # - course_title
-# - username
 #
 # Models to populate:
 # - Students
@@ -436,13 +431,12 @@ def configureDB_course(requests):
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
     if requests.method == "GET":
-
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:
         file = requests.FILES.get("file", False)
+        faculty_username = requests.user.email.split('@')[0]
         course_title = requests.POST.get("course_title")
-        faculty_username = requests.POST.get("username")
         bootstrapFile = {}
 
         if file.name.endswith('.xlsx'):
@@ -464,10 +458,10 @@ def configureDB_students(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     response['message'] = 'Successful Upload'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
 # Newly added by Faried, 12.08.2018 - for bootstrap
@@ -476,7 +470,6 @@ def configureDB_students(requests):
 # Requests param: POST
 # - file
 # - course_title
-# - username
 #
 # Models to populate:
 # - NONE
@@ -496,7 +489,7 @@ def configureDB_teams(requests):
 
     try:
         file = requests.FILES.get("file", False)
-        faculty_username = requests.POST.get("username")
+        faculty_username = requests.user.email.split('@')[0]
         course_title = requests.POST.get("course_title")
         bootstrapFile = {}
 
@@ -531,7 +524,6 @@ def configureDB_teams(requests):
 # Requests param: POST
 # - file
 # - course_title
-# - username
 #
 # Models to populate:
 # - Cloud_Learning_Tools
@@ -551,7 +543,7 @@ def configureDB_clt(requests):
 
     try:
         file = requests.FILES.get("file", False)
-        faculty_username = requests.POST.get("username")
+        faculty_username = requests.user.email.split('@')[0]
         course_title = requests.POST.get("course_title")
         bootstrapFile = {}
 

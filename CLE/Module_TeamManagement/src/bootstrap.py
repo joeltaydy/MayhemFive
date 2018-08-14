@@ -309,6 +309,15 @@ def bootstrap_Students(fileDict):
         raise Exception('Unsuccessful Upload. There was an error during the purging of the database')
     # ==========================================================================
 
+    # If faculty previously initialize a course without adding student, he will be associated to a section G0
+    # This try,catch is to remove that section G0 before associating a true section
+    try:
+        existing_course_sectionObj = Course_Section.objects.get(course_section_id=course_title+'G0')
+        facultyObj.course_section.all().filter(course_section_id=existing_course_sectionObj)
+        facultyObj.course_section.remove(existing_course_sectionObj)
+    except:
+        pass
+
 
     # Bootstrap info into database =============================================
     try:
@@ -326,15 +335,6 @@ def bootstrap_Students(fileDict):
                     section_number=section_number,
                 )
                 course_sectionObj.save()
-
-            # If faculty previously initialize a course without adding student, he will be associated to a section G0
-            # This try,catch is to remove that section G0 before associating a true section
-            try:
-                existing_course_sectionObj = Course_Section.objects.get(course_section_id=course_title+'G0')
-                facultyObj.course_section.all().filter(course_section=existing_course_sectionObj)
-                facultyObj.course_section.remove(existing_course_sectionObj)
-            except:
-                pass
 
             facultyObj.course_section.add(course_sectionObj)
 
