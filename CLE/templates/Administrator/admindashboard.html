@@ -46,20 +46,34 @@
                         <img class="d-block w-10 center" src="{% static 'images/thunderhead monkeys.png' %}">
                     </a>
                 </div>
-                {% block sideuserprofile %}
-
-
-                {% endblock %}
+                <div class="col-md-12">
+                    <div class="cardsidebar card-user">
+                        <div class="card-image">
+                        </div>
+                            <div class="author">
+                                <img class="avatar border-gray" src="http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg" alt="...">
+                                <h5 class="title">{{ user.first_name }}</h5>
+                                <p class="description">Administrator</p>
+                            </div>
+                        <hr>
+                    </div>
+                </div>
 
                 <ul class="nav">
 
 
-                    {% block sidenavBar %}
-
-
-
-                    {% endblock %}
-
+                    <li class="nav-item {{ home_page }}">
+                        <a class="nav-link" href="{% url 'TMmod:cleAdmin' %}">
+                            <i class="fas fa-chart-pie"></i>
+                            <p>Overview</p>
+                        </a>
+                    </li>
+                    <li class="nav-item {{ modulesetup }}">
+                        <a class="nav-link" href="{% url 'TMmod:modSu' %}">
+                            <i class="fas fa-upload"></i>
+                            <p>Module/Faculty Management</p>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -101,34 +115,11 @@
             </nav>
             <!-- End Navbar -->
 
-            <!--Student Cards -->
-            {% block studentStats %}
-
-            {%  endblock %}
-
-            {% block studentTeams %}
-
-            {%  endblock %}
-
-            {% block carouselContent %}
-
-            {% endblock %}
-
-            {% block studentProfile %}
-
-            {% endblock %}
-
-            <!--End of Student Cards -->
-
-            <!--Instructor Cards -->
-            {% block classList %}
-
-            {% endblock %}
 
             {% block bootstrapContent %}
 
             {% endblock %}
-            <!--End of Instructor Cards -->
+            <!--End of Administrator Cards -->
 
             <footer class="footer">
                 <div class="container">

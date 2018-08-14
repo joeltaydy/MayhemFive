@@ -2,7 +2,11 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
+<<<<<<< HEAD
 from Module_TeamManagement.src import bootstrap, tele_util
+=======
+from Module_TeamManagement.src import bootstrap, utilities
+>>>>>>> 33fb857e451d41b89f7e2f11d207e88e5007d4da
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
@@ -17,10 +21,12 @@ def home(requests): #student home page
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
     else:
+        #Populates the info for the side nav bar for instructor
+        utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)     
+
         context["home_page"] = "active"
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
-    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
-
+    
 # TO-DO: update function
 # Add notification management page
 #@login_required(login_url='/')
@@ -38,7 +44,7 @@ def ntmgmt(requests): #instructor notification page
 
 
 # TO-DO: update function
-# Add notification management page
+# Add admin management page
 #@login_required(login_url='/')
 def CLEAdmin(requests): #instructor notification page
     '''
@@ -52,12 +58,20 @@ def CLEAdmin(requests): #instructor notification page
         return render(requests,"Administrator/admindashboard.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-
+    
 # TO-DO: update function
 #@login_required(login_url='/')
 def faculty_Home(requests): #student home page
-    context = {"faculty_Home" : "active"}
-    return render(requests,"Module_TeamManagement/Instructor/instructorHome.html",context)
+    try:
+    #Populates the info for the side nav bar for instructor
+        utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+    except: 
+        context = {'messages' : ['Invalid user account']}
+        return render(requests,'Module_Account/login.html',context) 
+
+    context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
+    return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
+
 
 
 # Updated by Faried, 11.08.2018
@@ -112,17 +126,31 @@ def faculty_Profile(requests):
 def faculty_Overview(requests):
     context = {"faculty_Overview" : "active", 'course' : {}}
 
-    faculty_username = requests.GET.get('username')
+    faculty_email = requests.user.email
+    course = requests.GET.get('module')
     # faculty_username = 'sample.instructor.1'
-
+    '''
     if faculty_username == None:
         context['message'] = 'Please specify a username'
         return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
+    '''
 
-    facultyObj = Faculty.objects.get(username=faculty_username)
-    course_section = facultyObj.course_section.all()
+    facultyObj = Faculty.objects.get(email=faculty_email)
+    course_section =  Class.objects.filter(course_section=course)
 
-    if len(course_section) > 1:
+    if len(course_section) > 0:
+        classList = [] # Containing student class objects
+        for enrolled_class in course_section:
+            studentInfo = {}
+            studentInfo['grade'] = enrolled_class.grades
+            studentInfo['score'] = enrolled_class.score
+            studentInfo['team'] = enrolled_class.team_number
+            studentInfo['info'] =  enrolled_class.student #Obtains student model from Foreign key
+            classList.append(studentInfo)
+        context['course']['classList'] = classList
+
+    '''
+    if len(course_section) > 0:
         for enrolled_class in course_section:
             context['course'][enrolled_class.course_section_id] = {}
             students = Class.objects.all().filter(course_section=enrolled_class)
@@ -151,7 +179,8 @@ def faculty_Overview(requests):
                     context['course'][course_section.course_section_id]['T0'].append(student)
                 except:
                     context['course'][course_section.course_section_id]['T0'] = [student]
-
+    '''
+    context['module'] = course
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
@@ -264,7 +293,7 @@ def student_Team(requests):
 def configureDB_faculty(requests):
     response = {"configureDB_faculty" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Administrator/uploadcsv.html", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -308,10 +337,10 @@ def configureDB_faculty(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Administrator/uploadcsv.html", response)
 
     response['message'] = 'Successful Upload'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    return render(requests, "Administrator/uploadcsv.html", response)
 
 
 # Newly added by Faried, 11.08.2018
@@ -335,8 +364,18 @@ def configureDB_faculty(requests):
 # - message
 #
 def configureDB_course(requests):
+
     response = {"configureDB_course" : "active"}
+    courseObject = Course.objects.all() #to retrieve the courses
+    courseList = []
+    for course in courseObject:
+        courseList.append(course.course_title)
+    response['courses'] = courseList
+
+    
     if requests.method == "GET":
+        
+
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:
@@ -346,8 +385,7 @@ def configureDB_course(requests):
 
         course_title = requests.POST.get("course_title")
         faculty_username = requests.POST.get("username")
-
-        facultyObj = Faculty.objects.get(username=faculty_username)
+        facultyObj = Faculty.objects.get(email=requests.user.email)
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
 
@@ -372,6 +410,8 @@ def configureDB_course(requests):
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     response['message'] = 'Course created'
+    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email) #reflush the nav bar
+
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
@@ -400,6 +440,7 @@ def configureDB_course(requests):
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
     if requests.method == "GET":
+
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     try:

@@ -350,7 +350,6 @@ def bootstrap_Students(fileDict):
                                 username=student[1],
                                 firstname=student[2],
                                 lastname=student[3],
-                                team_number=student[4] if len(student) == 5 else None,
                             )
                             studentObj.save()
 
@@ -360,6 +359,7 @@ def bootstrap_Students(fileDict):
                             classObj = Class.objects.create(
                                 student=studentObj,
                                 course_section=course_sectionObj,
+                                team_number=student[4] if len(student) == 5 else None,
                             )
                             classObj.save()
 
