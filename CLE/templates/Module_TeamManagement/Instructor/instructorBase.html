@@ -10,7 +10,7 @@ Instructor page
         <div class="card-image">
         </div>
             <div class="author">
-                <img class="avatar border-gray" src="http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg" alt="...">
+                <img class="avatar border-gray" src="{{ user.socialaccount_set.all.0.get_avatar_url }}" alt="...">
                 <h5 class="title">{{ user.first_name }}</h5>
                 <p class="description">Faculty</p>
             </div>
@@ -41,10 +41,16 @@ Instructor page
       {% endfor %}
   </div>
 </div>
-<li class="nav-item {{ upload_csv }}">
+<li class="nav-item {{ configureDB_clt }}">
   <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
     <i class="fas fa-upload"></i>
     <p>Course Setup</p>
+  </a>
+</li>
+<li class="nav-item {{ noti_mgmt }}">
+  <a class="nav-link" href="{% url 'TMmod:configtools' %}">
+    <i class="fas fa-wrench"></i>
+    <p>Tools Setup</p>
   </a>
 </li>
 <li class="nav-item {{ noti_mgmt }}">

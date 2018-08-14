@@ -208,8 +208,8 @@ def student_Profile(requests):
 def student_Team(requests):
     context = {"student_Team" : "active", 'course' : {}}
     studentList = []
-
-    student_username = requests.GET.get('username')
+    module = requests.GET.get('module')
+    student_username = requests.user.email.split('@')[0]
     # student_username = 'sample.1'
 
     if student_username == None:
@@ -217,17 +217,19 @@ def student_Team(requests):
         return render(requests,"Module_TeamManagement/Student/studentTeam.html", context)
 
     studentObj = Student.objects.get(username=student_username)
-    classObj = Class.objects.all().filter(student=studentObj)
+    classObj = Class.objects.all().filter(student=studentObj , course_section = module ) #Will return queryset containing 1 row unless has multiple teams in same class
+    
+    print(len(classObj)) #Should be 1 
 
-    if len(classObj) > 1:
-        for enrolled_class in classObj:
+    for enrolled_class in classObj: #Should contain 1 row
+        if(enrolled_class.team_number != None ):
             team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
-            context['course'][enrolled_class.course_section.course_section_id] = team_list
+            for student_class_model in team_list:
+                studentList.append(student_class_model.student) #List containing student models
 
-    else:
-        team_list = Class.objects.all().filter(team_number=classObj.team_number).filter(course_section=classObj.course_section).exclude(student=studentObj)
-        context['course'][classObj.course_section.course.course_section_id] = team_list
+            context['team'] = studentList
 
+    context['module'] = classObj[0].course_section.course_section_id
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s team'
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
@@ -505,9 +507,9 @@ def configureDB_teams(requests):
 # - message
 #
 def configureDB_clt(requests):
-    response = {"configureDB_teams" : "active"}
+    response = {"configureDB_clt" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -534,10 +536,10 @@ def configureDB_clt(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     response['message'] = 'Learning Tools Configured'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 
 # This is for subsequent configuration by faculty
