@@ -197,7 +197,7 @@ def student_Profile(requests):
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s profile'
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
-    
+
 
 # Student Team Page
 # @login_required(login_url='/')
