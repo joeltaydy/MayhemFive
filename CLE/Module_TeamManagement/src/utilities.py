@@ -22,6 +22,5 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             course_section = individuaClass.course_section
             courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
 
-
     requests.session['courseList'] = courseList
     return

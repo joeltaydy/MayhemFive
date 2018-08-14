@@ -4,11 +4,11 @@
 
 <div class="imp_message container">
     <p> <br> </p>
-    <h1> Student Managment for {{module}}</h1>
+    <h1> Student Managment for {{ module }}</h1>
 
     <span>
-      {% for course in request.session.courseList %}
-      <button type="button" class="btn btn-primary">{{ course}}</button>
+      {% for course,course_section in request.session.courseList.items %}
+        <button type="button" class="btn btn-primary">{{ course_section }}</button>
       {% endfor %}
     </span>
 
@@ -66,7 +66,11 @@
                               <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
                           </div>
                           <input type="hidden" id="username" name="username" value={{user.username}}>
-
+                          {% for course,course_section in request.session.courseList.items %}
+                            {% if course_section == module %}
+                                <input type="text" id="course_section" name="course_section" value={{course}}>
+                            {% endif %}
+                          {% endfor %}
                           <div class="form-group">
                             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
                                 <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>

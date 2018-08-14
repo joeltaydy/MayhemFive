@@ -63,7 +63,7 @@ def faculty_Home(requests):
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
-    context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
+    context = {"faculty_Home" : "active", "courses" : requests.session['courseList'] }
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
@@ -102,7 +102,11 @@ def faculty_Overview(requests):
     context = {"faculty_Overview" : "active", 'course' : {}}
 
     faculty_email = requests.user.email
-    course = requests.GET.get('module')
+
+    if requests.method == "GET":
+        course = requests.GET.get('module')
+    else:
+        course = requests.POST.get('course_section')
 
     # if faculty_username == None:
     #     context['message'] = 'Please specify a username'
@@ -433,7 +437,6 @@ def configureDB_students(requests):
 #
 # Requests param: POST
 # - file
-# - course_title
 #
 # Models to populate:
 # - NONE
@@ -449,18 +452,18 @@ def configureDB_students(requests):
 def configureDB_teams(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
 
     try:
         file = requests.FILES.get("file", False)
         faculty_username = requests.user.email.split('@')[0]
-        course_title = requests.POST.get("course_title")
+        course_section = requests.POST.get("course_section")
         bootstrapFile = {}
 
         if file.name.endswith('.xlsx'):
             if 'team_information' in file.name.lower():
                 bootstrapFile['faculty_username'] = faculty_username
-                bootstrapFile['course_title'] = course_title
+                bootstrapFile['course_section'] = course_section
                 bootstrapFile['file_path'] = file.temporary_file_path()
 
             else:
@@ -476,10 +479,11 @@ def configureDB_teams(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
 
     response['message'] = 'Teams Configured'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    #return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+    faculty_Overview(requests)
 
 
 # This is for subsequent configuration by faculty
