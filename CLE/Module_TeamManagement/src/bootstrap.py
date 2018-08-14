@@ -418,7 +418,8 @@ def update_CLT(fileDict):
 
     bootstrapInfo = parse_File_CLT(fileDict['file_path'],bootstrapInfo)
     faculty_email = fileDict['faculty_email']
-    course_section = fileDict['course_section']
+    course = fileDict['course']
+    action = fileDict['action']
 
     try:
         if len(bootstrapInfo) == 0:
@@ -439,9 +440,17 @@ def update_CLT(fileDict):
                     )
                     cltObj.save()
 
-                classObj = Class.objects.filter(student=student_email).filter(course_section=course_section)
-                for student in classObj:
-                    student.clt_id.add(cltObj)
+                if action == 'batch':
+                    course_sections = facultyObj.course_section.all()
+                    for course_section in course_sections:
+                        if course in course_section.course_section_id:
+                            classObj = Class.objects.filter(student=student_email).filter(course_section=course_section)
+                            for student in classObj:
+                                student.clt_id.add(cltObj)
+                else:
+                    classObj = Class.objects.filter(student=student_email).filter(course_section=course)
+                    for student in classObj:
+                        student.clt_id.add(cltObj)
 
         results['student_count'] = len(bootstrapInfo)
 

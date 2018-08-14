@@ -517,13 +517,19 @@ def configureDB_clt(requests):
     try:
         file = requests.FILES.get("file", False)
         faculty_email = requests.user.email
-        course_section = requests.POST.get("course_section")
+        action = requests.POST.get("action")
         bootstrapFile = {}
+
+        if action == 'batch':
+            course = requests.POST.get("course_title")
+        else:
+            course = requests.POST.get("course_section")
 
         if file.name.endswith('.xlsx'):
             if 'learning_tools' in file.name.lower():
                 bootstrapFile['faculty_email'] = faculty_email
-                bootstrapFile['course_section'] = course_section
+                bootstrapFile['course'] = course
+                bootstrapFile['action'] = action
                 bootstrapFile['file_path'] = file.temporary_file_path()
 
             else:
@@ -543,8 +549,10 @@ def configureDB_clt(requests):
         return faculty_Overview(requests)
 
     response['message'] = 'Learning Tools Configured'
-    # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
-    return faculty_Overview(requests)
+    if action == 'batch':
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+    else:
+        return faculty_Overview(requests)
 
 
 # This is for subsequent configuration by faculty

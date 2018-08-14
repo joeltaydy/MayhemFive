@@ -109,6 +109,7 @@
                                 <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
                             </div>
                             <input type="hidden" id="username" name="username" value={{user.username}}>
+                            <input type="hidden" id="action" name="action" value="individual">
                             {% for course,course_section in request.session.courseList.items %}
                               {% if course_section == module %}
                                   <input type="hidden" id="course_section" name="course_section" value={{course}}>
