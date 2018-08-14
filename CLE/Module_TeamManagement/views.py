@@ -203,7 +203,6 @@ def student_Team(requests):
     studentList = []
     module = requests.GET.get('module')
     student_username = requests.user.email.split('@')[0]
-    # student_username = 'sample.1'
 
     if student_username == None:
         context['message'] = 'Please specify a username'
@@ -473,7 +472,7 @@ def configureDB_teams(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         response['message'] = e.args[0]
         # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
         return faculty_Overview(requests)
@@ -530,7 +529,7 @@ def configureDB_clt(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         response['message'] = e.args[0]
         # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
         return faculty_Overview(requests)

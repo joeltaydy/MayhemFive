@@ -211,7 +211,7 @@ def parse_File_CLT(filePath,bootstrapInfo={}):
         # Declare variables
         email = rowData[index_email].strip()
         type = rowData[index_type].strip()
-        link = rowData[index_link].stip()
+        link = rowData[index_link]
         id = email.split('@')[0] + '_' + type
 
         # Create clt : list
@@ -412,11 +412,11 @@ def update_Teams(fileDict):
     return results
 
 
-def update_CLT(fileDcit):
+def update_CLT(fileDict):
     bootstrapInfo = {}
     results = {}
 
-    bootstrapInfo = parse_File_Team(fileDict['file_path'],bootstrapInfo)
+    bootstrapInfo = parse_File_CLT(fileDict['file_path'],bootstrapInfo)
     faculty_email = fileDict['faculty_email']
     course_section = fileDict['course_section']
 
@@ -424,7 +424,7 @@ def update_CLT(fileDcit):
         if len(bootstrapInfo) == 0:
             raise Exception
 
-        facultyObj = Faculty.objects.get(username=faculty_email)
+        facultyObj = Faculty.objects.get(email=faculty_email)
 
         # For each student that falls under that specific course_section, create the CLT object and update their CLT
         for student_email,clt_list in bootstrapInfo.items():
@@ -441,7 +441,7 @@ def update_CLT(fileDcit):
 
                 classObj = Class.objects.filter(student=student_email).filter(course_section=course_section)
                 for student in classObj:
-                    student.add(cltObj)
+                    student.clt_id.add(cltObj)
 
         results['student_count'] = len(bootstrapInfo)
 
