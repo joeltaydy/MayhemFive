@@ -386,19 +386,14 @@ def update_Teams(fileDict):
     results = {}
 
     bootstrapInfo = parse_File_Team(fileDict['file_path'],bootstrapInfo)
-    faculty_username = fileDict['faculty_username']
+    faculty_email = fileDict['faculty_email']
     course_section = fileDict['course_section']
 
     try:
         if len(bootstrapInfo) == 0:
             raise Exception
 
-        facultyObj = Faculty.objects.get(username=faculty_username)
-
-        # course_section_for_config = []
-        # for course_section in course_sections:
-        #     if course_title in course_section.course_section_id:
-        #         course_section_for_config.append(course_section)
+        facultyObj = Faculty.objects.get(email=faculty_email)
 
         # For each student that falls under that specific course_section, update their team_number
         for student_email,team_number in bootstrapInfo.items():
@@ -422,22 +417,14 @@ def update_CLT(fileDcit):
     results = {}
 
     bootstrapInfo = parse_File_Team(fileDict['file_path'],bootstrapInfo)
-
-    faculty_username = fileDict['faculty_username']
-    course_title = fileDict['course_title']
+    faculty_email = fileDict['faculty_email']
+    course_section = fileDict['course_section']
 
     try:
         if len(bootstrapInfo) == 0:
             raise Exception
 
-        facultyObj = Faculty.objects.get(username=faculty_username)
-        all_course_section = facultyObj.course_section.all()
-
-        # Retreive the course_section that's associated under the faculty for that specifc course_title
-        course_section_for_config = []
-        for course_section in all_course_section:
-            if course_title in course_section.course_section_id:
-                course_section_for_config.append(course_section)
+        facultyObj = Faculty.objects.get(username=faculty_email)
 
         # For each student that falls under that specific course_section, create the CLT object and update their CLT
         for student_email,clt_list in bootstrapInfo.items():
@@ -452,12 +439,9 @@ def update_CLT(fileDcit):
                     )
                     cltObj.save()
 
-                for course_section in course_section_for_config:
-                    try:
-                        student = Class.objects.all().filter(student=student_email).filter(course_section=course_section)
-                        student.clt_id.add(cltObj)
-                    except:
-                        pass
+                classObj = Class.objects.filter(student=student_email).filter(course_section=course_section)
+                for student in classObj:
+                    student.add(cltObj)
 
         results['student_count'] = len(bootstrapInfo)
 

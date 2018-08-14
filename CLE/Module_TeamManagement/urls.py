@@ -4,7 +4,7 @@ from django.urls import path
 
 urlpatterns = [
     path('home/', views.home, name='home'),
-    path('instructor/configTools/', views.configureDB_clt, name='configtools'),
+    path('instructor/configTools/', views.configureDB_clt, name='uploadtools'),
     path('instructor/configStudents/', views.configureDB_course, name='uploadcsv'),
     path('instructor/configTeams/', views.configureDB_teams, name='uploadteam'),
     path('student/team/', views.student_Team, name='sTeam'),

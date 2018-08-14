@@ -131,20 +131,16 @@ def faculty_Overview(requests):
     faculty_email = requests.user.email
 
     if requests.method == "GET":
-        course = requests.GET.get('module')
+        course_section = requests.GET.get('module')
     else:
-        course = requests.POST.get('course_section')
-
-    # if faculty_username == None:
-    #     context['message'] = 'Please specify a username'
-    #     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
+        course_section = requests.POST.get('course_section')
 
     facultyObj = Faculty.objects.get(email=faculty_email)
-    course_section = Class.objects.filter(course_section=course)
+    classObj_list = Class.objects.all().filter(course_section=course_section)
 
-    if len(course_section) > 0:
+    if len(classObj_list) > 0:
         classList = [] # Containing student class objects
-        for enrolled_class in course_section:
+        for enrolled_class in classObj_list:
             studentInfo = {}
             studentInfo['grade'] = enrolled_class.grades
             studentInfo['score'] = enrolled_class.score
@@ -153,37 +149,7 @@ def faculty_Overview(requests):
             classList.append(studentInfo)
         context['course']['classList'] = classList
 
-    # if len(course_section) > 0:
-    #     for enrolled_class in course_section:
-    #         context['course'][enrolled_class.course_section_id] = {}
-    #         students = Class.objects.all().filter(course_section=enrolled_class)
-    #         for student in students:
-    #             if student.team_number != None:
-    #                 try:
-    #                     context['course'][enrolled_class.course_section_id][student.team_number].append(student)
-    #                 except:
-    #                     context['course'][enrolled_class.course_section_id][student.team_number] = [student]
-    #             else:
-    #                 try:
-    #                     context['course'][enrolled_class.course_section_id]['T0'].append(student)
-    #                 except:
-    #                     context['course'][enrolled_class.course_section_id]['T0'] = [student]
-    # else:
-    #     context['course'][course_section.course_section_id] = {}
-    #     students = Class.objects.all().filter(course_section=course_section)
-    #     for student in students:
-    #         if student.team_number != None:
-    #             try:
-    #                 context['course'][course_section.course_section_id][student.team_number].append(student)
-    #             except:
-    #                 context['course'][course_section.course_section_id][student.team_number] = [student]
-    #         else:
-    #             try:
-    #                 context['course'][course_section.course_section_id]['T0'].append(student)
-    #             except:
-    #                 context['course'][course_section.course_section_id]['T0'] = [student]
-
-    course_section = Course_Section.objects.get(course_section_id=course)
+    course_section = Course_Section.objects.get(course_section_id=course_section)
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
@@ -481,17 +447,18 @@ def configureDB_students(requests):
 def configureDB_teams(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+        return faculty_Overview(requests)
 
     try:
         file = requests.FILES.get("file", False)
-        faculty_username = requests.user.email.split('@')[0]
+        faculty_email = requests.user.email
         course_section = requests.POST.get("course_section")
         bootstrapFile = {}
 
         if file.name.endswith('.xlsx'):
             if 'team_information' in file.name.lower():
-                bootstrapFile['faculty_username'] = faculty_username
+                bootstrapFile['faculty_email'] = faculty_email
                 bootstrapFile['course_section'] = course_section
                 bootstrapFile['file_path'] = file.temporary_file_path()
 
@@ -502,16 +469,17 @@ def configureDB_teams(requests):
             raise Exception("Invalid file type. Please upload .xlsx only")
 
         # If file is .xlsx then proceed with processing
-        response['results'] =  bootstrap.update_Teams(bootstrapFile)
+        response['results'] = bootstrap.update_Teams(bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+        return faculty_Overview(requests)
 
     response['message'] = 'Teams Configured'
-    #return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+    # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
     return faculty_Overview(requests)
 
 
@@ -536,18 +504,19 @@ def configureDB_teams(requests):
 def configureDB_clt(requests):
     response = {"configureDB_clt" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+        # return render(requests, "Module_TeamManagement/Instructor/instructorHome.html", response)
+        return faculty_Overview(requests)
 
     try:
         file = requests.FILES.get("file", False)
-        faculty_username = requests.user.email.split('@')[0]
-        course_title = requests.POST.get("course_title")
+        faculty_email = requests.user.email
+        course_section = requests.POST.get("course_section")
         bootstrapFile = {}
 
         if file.name.endswith('.xlsx'):
-            if 'cloud_learning_tools' in file.name.lower():
-                bootstrapFile['faculty_username'] = faculty_username
-                bootstrapFile['course_title'] = course_title
+            if 'learning_tools' in file.name.lower():
+                bootstrapFile['faculty_email'] = faculty_email
+                bootstrapFile['course_section'] = course_section
                 bootstrapFile['file_path'] = file.temporary_file_path()
 
             else:
@@ -557,16 +526,18 @@ def configureDB_clt(requests):
             raise Exception("Invalid file type. Please upload .xlsx only")
 
         # If file is .xlsx then proceed with processing
-        response['results'] =  bootstrap.update_CLT(bootstrapFile)
+        response['results'] = bootstrap.update_CLT(bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+        # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+        return faculty_Overview(requests)
 
     response['message'] = 'Learning Tools Configured'
-    return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+    # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+    return faculty_Overview(requests)
 
 
 # This is for subsequent configuration by faculty
