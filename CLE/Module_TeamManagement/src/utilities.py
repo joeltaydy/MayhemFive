@@ -16,7 +16,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 
     courseList = []
     for course in courseObject:
-        courseList.append(course.course_section_id)
+        courseList.append(course.course.course_title + " " + course.section_number)
 
     requests.session['courseList'] = courseList
     return
