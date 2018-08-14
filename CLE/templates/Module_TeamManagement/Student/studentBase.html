@@ -10,10 +10,8 @@
         <div class="card-image">
         </div>
             <div class="author">
-                <a href="#">
                     <img class="avatar border-gray" src="{{ user.socialaccount_set.all.0.get_avatar_url }}" alt="...">
                     <h5 class="title">{{ user.first_name }}</h5>
-                </a>
                 <p class="description">
                     Student
                 </p>
@@ -40,10 +38,10 @@
 </li>
         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
             <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
-                <p>IS480</p>
+                <p class="col-md-3 col-sm-3 col-xs-12 control-label">IS480</p>
             </a>
             <a class="nav-link" href="{% url 'TMmod:sTeam' %}">
-                <p>IS260</p>
+                <p class="col-md-3 col-sm-3 col-xs-12 control-label">IS260</p>
             </a>
         </div>
 </div>

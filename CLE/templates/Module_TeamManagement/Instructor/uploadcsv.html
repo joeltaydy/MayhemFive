@@ -8,18 +8,17 @@
     {% csrf_token %}
 
     <div class="form-group">
-      <label for="exampleSelect1">Choose a course</label>
+      <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
         <select class="form-control" id="course_title" name="course_title">
+          <option value="" disabled selected>Select your course</option>
         {% for course in courses %}
             <option value={{course}}>{{course}}</option>
         {% endfor %}
       </select>
 
       </br>
-        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
-        <div class="col-md-8">
-            <input type="file" name="file" id="file" class="form-control">
-        </div>
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input (Optional)</label>
+        <input type="file" class="form-control" id="file" aria-describedby="fileHelp">
     </div>
     <input type="hidden" id="username" name="username" value={{user.username}}>
 

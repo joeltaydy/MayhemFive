@@ -12,7 +12,7 @@ Instructor page
             <div class="author">
                 <img class="avatar border-gray" src="http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg" alt="...">
                 <h5 class="title">{{ user.first_name }}</h5>
-                <p class="description">Instructor</p>
+                <p class="description">Faculty</p>
             </div>
         <hr>
     </div>
@@ -30,16 +30,15 @@ Instructor page
   <li class="nav-item {{ team_list }}">
       <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
           <i class="fa fa-users"></i>
-          <span class="no-icon">Student Management</span>
+          <p>Student Mgmt</p>
       </a>
   </li>
   <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
       {% for course in request.session.courseList %}
-      
+
         <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{course}} ">
-            <p>{{ course}}</p>
+            <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course}}</p>
         </a>
-        
 
       {% endfor %}
   </div>
@@ -52,8 +51,8 @@ Instructor page
 </li>
 <li class="nav-item {{ noti_mgmt }}">
   <a class="nav-link" href="{% url 'TMmod:noti_mgmt' %}">
-    <i class="fas fa-upload"></i>
-    <p>Notification Management</p>
+    <i class="far fa-bell"></i>
+    <p>Notification Mgmt</p>
   </a>
 </li>
 {% endblock %}
