@@ -37,8 +37,14 @@ Instructor page
       {% for course in request.session.courseList %}
 
         <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{course}} ">
+<<<<<<< HEAD
+            <p>{{ course }}</p>
+        </a>
+
+=======
             <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course}}</p>
         </a>
+>>>>>>> 87664900929101d07199372bc80402a2d1bd73c1
 
       {% endfor %}
   </div>
