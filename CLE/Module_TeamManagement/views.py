@@ -361,8 +361,10 @@ def configureDB_faculty(requests):
 def configureDB_course(requests):
     response = {"configureDB_course" : "active"}
 
+    # Retrieve all the course
     courseObject = Course.objects.all()
     courseList = []
+
     for course in courseObject:
         courseList.append(course.course_title)
     response['courses'] = courseList
@@ -401,9 +403,10 @@ def configureDB_course(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
-    response['message'] = 'Course created'
-    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email) #reflush the nav bar
+    # Reflush the nav bar
+    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
 
+    response['message'] = 'Course created'
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
