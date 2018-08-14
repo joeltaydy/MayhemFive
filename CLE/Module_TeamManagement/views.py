@@ -152,7 +152,8 @@ def faculty_Overview(requests):
     #             except:
     #                 context['course'][course_section.course_section_id]['T0'] = [student]
 
-    context['module'] = course
+    course_section = Course_Section.objects.get(course_section_id=course)
+    context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
