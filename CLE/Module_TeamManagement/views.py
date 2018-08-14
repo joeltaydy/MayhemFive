@@ -2,7 +2,7 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
-from Module_TeamManagement.src import bootstrap
+from Module_TeamManagement.src import bootstrap, tele_util
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
@@ -425,7 +425,7 @@ def configureDB_students(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
+        # traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
@@ -539,5 +539,43 @@ def configureDB_clt(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
-    response['message'] = 'Leanring Tools Configured'
+    response['message'] = 'Learning Tools Configured'
+    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+
+# Newly added by Faried, 13.08.2018
+# This is for subsequent configuration by faculty
+#
+# Requests param: GET
+# - course_title
+# - section_number
+# - username
+#
+# Models to modify:
+# - Class
+#
+# Response (Succcess):
+# - initialize_Section_Channel
+# - results
+# - message
+#
+def initialize_Section_Channel(request):
+    response = {"initialize_Section_Channel" : "active"}
+    if requests.method == "GET":
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+    try:
+        section_number = requests.GET.get("section_number")
+        faculty_username = requests.GET.get("username")
+        course_title = requests.GET.get("course_title")
+
+        response['results'] = tele_util.initialize_Channel(faculty_username,course_title,section_number)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        # traceback.print_exc()
+        response['message'] = e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+
+    response['message'] = 'Telegram Channel for Section Created'
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
