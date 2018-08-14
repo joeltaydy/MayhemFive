@@ -179,7 +179,10 @@ def parse_File_Team(filePath,bootstrapInfo={}):
 
         teamList = rowData[index_section+1:]
         if len(teamList) > 0:
-            team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
+            if 'Team' in list(filter(None,teamList))[0]:
+                team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
+            else:
+                team_number = list(filter(None,teamList))[0]
             bootstrapInfo[email] = team_number
 
     return bootstrapInfo
@@ -383,38 +386,32 @@ def update_Teams(fileDict):
     results = {}
 
     bootstrapInfo = parse_File_Team(fileDict['file_path'],bootstrapInfo)
-
     faculty_username = fileDict['faculty_username']
-    course_title = fileDict['course_title']
+    course_section = fileDict['course_section']
 
     try:
         if len(bootstrapInfo) == 0:
             raise Exception
 
         facultyObj = Faculty.objects.get(username=faculty_username)
-        all_course_section = facultyObj.course_section.all()
 
-        # Retreive the course_section that's associated under the faculty for that specifc course_title
-        course_section_for_config = []
-        for course_section in all_course_section:
-            if course_title in course_section.course_section_id:
-                course_section_for_config.append(course_section)
+        # course_section_for_config = []
+        # for course_section in course_sections:
+        #     if course_title in course_section.course_section_id:
+        #         course_section_for_config.append(course_section)
 
         # For each student that falls under that specific course_section, update their team_number
         for student_email,team_number in bootstrapInfo.items():
-            for course_section in course_section_for_config:
-                try:
-                    student = Class.objects.all().filter(student=student_email).filter(course_section=course_section)
-                    student.team_number = team_number
-                    student.save(update_fields=["team_number"])
-                except:
-                    pass
+            classObj = Class.objects.filter(student=student_email).filter(course_section=course_section)
+            for student in classObj:
+                student.team_number = team_number
+                student.save()
 
         results['student_count'] = len(bootstrapInfo)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
 
     return results
