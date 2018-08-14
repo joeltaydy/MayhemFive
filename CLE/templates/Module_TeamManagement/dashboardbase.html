@@ -22,13 +22,8 @@
     <!-- data table -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-    <!-- calendar js-->
-    <link href="{% static 'css/fullcalendar.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/calendar.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/fullcalendar.print.css' %}" rel="stylesheet" media='print' />
-    <script src="{% static 'js/fullcalendar.js' %}" charset="utf-8"></script>
-      <script src="{% static 'js/jquery-1.10.2.js' %}" charset="utf-8"></script>
-        <script src="{% static 'js/jquery-ui.custom.min.js' %}" charset="utf-8"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
 
 </head>
 
@@ -84,7 +79,7 @@
                                   {% endif %}
                               </a>
                               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                  <a class="dropdown-item">{% if 'smu.edu.sg' in user.email %} Student {% else %} Instructor {% endif %}</a>
+                                  <a class="dropdown-item">{% if 'smu.edu.sg' in user.email %} Student {% else %} Faculty {% endif %}</a>
                                   <div class="divider"></div>
                                   {% if 'smu.edu.sg' in user.email %}
                                   <a class="dropdown-item" href="{% url 'TMmod:sProfile' %}">Profile</a>
@@ -138,11 +133,7 @@
                 <div class="container">
                     <nav>
                         <p class="copyright text-center">
-                            ©
-                            <script>
-                                document.write(new Date().getFullYear())
-                            </script>
-                            Thunderhead Monkeys, future of learning
+                            © 2018 Thunderhead Monkeys, future of learning
                         </p>
                     </nav>
                 </div>
