@@ -6,10 +6,9 @@ from Module_TeamManagement.src import bootstrap, tele_util, utilities
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
-
-# TO-DO: update function
+# Student Home Page
 #@login_required(login_url='/')
-def home(requests): #student home page
+def home(requests):
     '''
         Check if user is authenticated aka session
     '''
@@ -23,10 +22,10 @@ def home(requests): #student home page
         context["home_page"] = "active"
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
-# TO-DO: update function
-# Add notification management page
+
+# Faculty Notification Page
 #@login_required(login_url='/')
-def ntmgmt(requests): #instructor notification page
+def ntmgmt(requests):
     '''
         Check if user is authenticated aka session
     '''
@@ -39,10 +38,9 @@ def ntmgmt(requests): #instructor notification page
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# TO-DO: update function
-# Add admin management page
+# Faculty Notification Page
 #@login_required(login_url='/')
-def CLEAdmin(requests): #instructor notification page
+def CLEAdmin(requests):
     '''
         Check if user is authenticated aka session
     '''
@@ -55,9 +53,9 @@ def CLEAdmin(requests): #instructor notification page
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# TO-DO: update function
+# Student Home Page
 #@login_required(login_url='/')
-def faculty_Home(requests): #student home page
+def faculty_Home(requests):
     try:
     #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
@@ -69,16 +67,7 @@ def faculty_Home(requests): #student home page
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
-# Updated by Faried, 11.08.2018
-# Requests param : GET
-# - username
-#
-# Response context : Dictionary
-# - faculty_profile
-# - course_list
-# - user
-# - message
-#
+# Faculty Profile Page
 # @login_required(login_url='/')
 def faculty_Profile(requests):
     context = {"faculty_profile" : "active", 'course_list' : {}}
@@ -107,28 +96,17 @@ def faculty_Profile(requests):
     return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
 
-# Updated by Faried, 11.08.2018
-# Requests param : GET
-# - username
-#
-# Response context : Dictionary
-# - faculty_Overview
-# - course
-# - user
-# - message
-#
+#Faculty Student Management Page
 #@login_required(login_url='/')
 def faculty_Overview(requests):
     context = {"faculty_Overview" : "active", 'course' : {}}
 
     faculty_email = requests.user.email
     course = requests.GET.get('module')
-    # faculty_username = 'sample.instructor.1'
-    '''
-    if faculty_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
-    '''
+
+    # if faculty_username == None:
+    #     context['message'] = 'Please specify a username'
+    #     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     course_section = Class.objects.filter(course_section=course)
@@ -144,37 +122,36 @@ def faculty_Overview(requests):
             classList.append(studentInfo)
         context['course']['classList'] = classList
 
-    '''
-    if len(course_section) > 0:
-        for enrolled_class in course_section:
-            context['course'][enrolled_class.course_section_id] = {}
-            students = Class.objects.all().filter(course_section=enrolled_class)
-            for student in students:
-                if student.team_number != None:
-                    try:
-                        context['course'][enrolled_class.course_section_id][student.team_number].append(student)
-                    except:
-                        context['course'][enrolled_class.course_section_id][student.team_number] = [student]
-                else:
-                    try:
-                        context['course'][enrolled_class.course_section_id]['T0'].append(student)
-                    except:
-                        context['course'][enrolled_class.course_section_id]['T0'] = [student]
-    else:
-        context['course'][course_section.course_section_id] = {}
-        students = Class.objects.all().filter(course_section=course_section)
-        for student in students:
-            if student.team_number != None:
-                try:
-                    context['course'][course_section.course_section_id][student.team_number].append(student)
-                except:
-                    context['course'][course_section.course_section_id][student.team_number] = [student]
-            else:
-                try:
-                    context['course'][course_section.course_section_id]['T0'].append(student)
-                except:
-                    context['course'][course_section.course_section_id]['T0'] = [student]
-    '''
+    # if len(course_section) > 0:
+    #     for enrolled_class in course_section:
+    #         context['course'][enrolled_class.course_section_id] = {}
+    #         students = Class.objects.all().filter(course_section=enrolled_class)
+    #         for student in students:
+    #             if student.team_number != None:
+    #                 try:
+    #                     context['course'][enrolled_class.course_section_id][student.team_number].append(student)
+    #                 except:
+    #                     context['course'][enrolled_class.course_section_id][student.team_number] = [student]
+    #             else:
+    #                 try:
+    #                     context['course'][enrolled_class.course_section_id]['T0'].append(student)
+    #                 except:
+    #                     context['course'][enrolled_class.course_section_id]['T0'] = [student]
+    # else:
+    #     context['course'][course_section.course_section_id] = {}
+    #     students = Class.objects.all().filter(course_section=course_section)
+    #     for student in students:
+    #         if student.team_number != None:
+    #             try:
+    #                 context['course'][course_section.course_section_id][student.team_number].append(student)
+    #             except:
+    #                 context['course'][course_section.course_section_id][student.team_number] = [student]
+    #         else:
+    #             try:
+    #                 context['course'][course_section.course_section_id]['T0'].append(student)
+    #             except:
+    #                 context['course'][course_section.course_section_id]['T0'] = [student]
+
     context['module'] = course
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
@@ -195,16 +172,7 @@ def studStats(requests):
         return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
 
-# Updated by Faried, 11.08.2018
-# Requests param : GET
-# - username
-#
-# Response context : Dictionary
-# - student_Profile
-# - course_list
-# - user
-# - message
-#
+# Student Profile Page
 # @login_required(login_url='/')
 def student_Profile(requests):
     context = {"student_Profile" : "active", 'course_list' : {}}
@@ -230,16 +198,7 @@ def student_Profile(requests):
     return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
 
 
-# Updated by Faried, 11.08.2018
-# Requests param : GET
-# - username
-#
-# Response context : Dictionary
-# - student_Team
-# - course
-# - user
-# - message
-#
+# Student Team Page
 # @login_required(login_url='/')
 def student_Team(requests):
     context = {"student_Team" : "active", 'course' : {}}
@@ -269,9 +228,8 @@ def student_Team(requests):
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
 
-# Newly added by Faried, 07.08.2018 - for bootstrap
-# Updated by Faried, 10.08.2018
 # This is for initial configuration by superadmin
+# This function populates the database with the fauclty members and the courses
 #
 # Requests param: POST
 # - file
@@ -338,8 +296,8 @@ def configureDB_faculty(requests):
     return render(requests, "Administrator/uploadcsv.html", response)
 
 
-# Newly added by Faried, 11.08.2018
 # This is for initial configuration by faculty
+# This function associates the course witht he faculty member
 #
 # Requests param: POST
 # - course_title
@@ -410,9 +368,8 @@ def configureDB_course(requests):
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
-# Newly added by Faried, 07.08.2018 - for bootstrap
-# Updated by Faried, 11.08.2018
 # This is for subsequent configuration by faculty
+# This function populates the database with the students information
 #
 # Requests param: POST
 # - file
@@ -463,12 +420,15 @@ def configureDB_students(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
+    # Reflush the nav bar
+    utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+
     response['message'] = 'Successful Upload'
     return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
 
-# Newly added by Faried, 12.08.2018 - for bootstrap
 # This is for subsequent configuration by faculty
+# This function configures the students team based on a excel file
 #
 # Requests param: POST
 # - file
@@ -521,8 +481,8 @@ def configureDB_teams(requests):
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
-# Newly added by Faried, 13.08.2018 - for bootstrap
 # This is for subsequent configuration by faculty
+# This function configures the CLT with the associate student
 #
 # Requests param: POST
 # - file
@@ -575,7 +535,6 @@ def configureDB_clt(requests):
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
 
-# Newly added by Faried, 13.08.2018
 # This is for subsequent configuration by faculty
 #
 # Requests param: GET

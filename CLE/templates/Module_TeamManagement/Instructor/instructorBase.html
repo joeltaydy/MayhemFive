@@ -35,11 +35,11 @@ Instructor page
   </li>
   <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
       {% for course in request.session.courseList %}
-      
+
         <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{course}} ">
-            <p>{{ course}}</p>
+            <p>{{ course }}</p>
         </a>
-        
+
 
       {% endfor %}
   </div>
