@@ -56,14 +56,41 @@ def CLEAdmin(requests):
 # Student Home Page
 #@login_required(login_url='/')
 def faculty_Home(requests):
+    context = {"faculty_Home" : "active"}
+
+    faculty_username = requests.user.email.split('@')[0]
+
     try:
-    #Populates the info for the side nav bar for instructor
+        #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+
+        facultyObj = Faculty.objects.get(username=faculty_username)
+        registered_course_section = facultyObj.course_section.all()
+
+        courses = []
+        for course_section in registered_course_section:
+            course_title = course_section.course.course_title
+            if course_title not in courses:
+                courses.append(course_title)
+
+        students = []
+        for course_section in registered_course_section:
+            classObj = Class.objects.all().filter(course_section=course_section)
+            for student in classObj:
+                students.append(student)
+
+        context['section_count'] = len(registered_course_section)
+        context['course_count'] = len(courses)
+        context['student_count'] = len(students)
+
     except:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
-    context = {"faculty_Home" : "active", "courses" : requests.session['courseList'] }
+    context["courses"] = requests.session['courseList']
+    context['message'] = 'Successful retrieval of faculty\'s overview information'
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
@@ -218,8 +245,8 @@ def student_Team(requests):
 
     studentObj = Student.objects.get(username=student_username)
     classObj = Class.objects.all().filter(student=studentObj , course_section = module ) #Will return queryset containing 1 row unless has multiple teams in same class
-    
-    print(len(classObj)) #Should be 1 
+
+    print(len(classObj)) #Should be 1
 
     for enrolled_class in classObj: #Should contain 1 row
         if(enrolled_class.team_number != None ):
@@ -485,7 +512,7 @@ def configureDB_teams(requests):
 
     response['message'] = 'Teams Configured'
     #return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-    faculty_Overview(requests)
+    return faculty_Overview(requests)
 
 
 # This is for subsequent configuration by faculty
