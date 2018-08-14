@@ -1,118 +1,38 @@
 {% extends 'Module_TeamManagement/Student/studentBase.html' %}
 
 {% block title %}
-    My Team
+    {{module}} Team Information
 {% endblock %}
 
 {% block studentTeams %}
 <div class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-2">
-                <div class="card user">
-                    <div class="card-body ">
-                      <div class="cardsidebar card-user">
-                          <div class="card-image">
-                          </div>
-                              <div class="author">
-                                  <a href="#">
-                                      <img class="avatar border-gray" src="https://goo.gl/N4BQiu" alt="...">
-                                      <h5 class="title">MICHAEL SCOTT</h5>
-                                  </a>
-                                  <p class="emaildescription">
-                                      michael.scott.2017@smu.edu.sg
-                                  </p>
-                              </div>
-                          <hr>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-            <div class="card ">
-                <div class="card-body ">
-                      <div class="cardsidebar card-user">
-                          <div class="card-image">
-                          </div>
-                              <div class="author">
-                                  <a href="#">
-                                      <img class="avatar border-gray" src="https://goo.gl/rfEsMo" alt="...">
-                                      <h5 class="title">PAM HAPERT</h5>
-                                  </a>
-                                  <p class="emaildescription">
-                                      pam.hapert.2016@smu.edu.sg
-                                  </p>
-                              </div>
-                          <hr>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-            <div class="card ">
-                <div class="card-body ">
-                      <div class="cardsidebar card-user">
-                          <div class="card-image">
-                          </div>
-                              <div class="author">
-                                  <a href="#">
-                                      <img class="avatar border-gray" src="https://goo.gl/Cq79Lh" alt="...">
-                                      <h5 class="title">STEPHEN WOLF</h5>
-                                  </a>
-                                  <p class="emaildescription">
-                                      stephen.wolf.2016@smu.edu.sg
-                                  </p>
-                              </div>
-                          <hr>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-2">
-              <div class="card">
-                  <div class="card-body ">
+        {% if team != None %}
+            <div class="row">
+            {% for teammembers in team %}
+                <div class="col-md-2">
+                    <div class="card user">
+                        <div class="card-body ">
                         <div class="cardsidebar card-user">
                             <div class="card-image">
                             </div>
                                 <div class="author">
-                                    <a href="#">
-                                        <img class="avatar border-gray" src="https://goo.gl/VgNLqH" alt="...">
-                                        <h5 class="title">DENZEL WASH</h5>
+                                    <a href= {% url 'TMmod:noti_mgmt' %}>
+                                        <img class="avatar border-gray" src="https://goo.gl/Lom4Jq" alt="...">
+                                        <h5 class="title">{{teammembers.firstname}} {{teammembers.lastname}} </h5>
                                     </a>
                                     <p class="emaildescription">
-                                        denzel.washington.2016@smu.edu.sg
+                                        {{teammembers.email}}
                                     </p>
                                 </div>
                             <hr>
                         </div>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="col-md-2">
-                  <div class="card ">
-                      <div class="card-body ">
-                            <div class="cardsidebar card-user">
-                                <div class="card-image">
-                                </div>
-                                    <div class="author">
-                                        <a href="#">
-                                            <img class="avatar border-gray" src="https://goo.gl/9e1KTz" alt="...">
-                                            <h5 class="title">HE BEI BEI</h5>
-                                        </a>
-                                        <p class="emaildescription">
-                                            he.bei.2017@smu.edu.sg
-                                        </p>
-                                    </div>
-                                <hr>
-                            </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+                        </div>
+                    </div>
+                </div>       
+            {% endfor %}
+        
+            
 
 
       <div class="col-md-8">
@@ -137,6 +57,10 @@
               </div>
           </div>
       </div>
+      {% else %}
+
+      <h1> No teams found </h1>
+        {% endif %}
 
     </div>
 </div>
