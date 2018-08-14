@@ -2,11 +2,7 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
-<<<<<<< HEAD
-from Module_TeamManagement.src import bootstrap, tele_util
-=======
-from Module_TeamManagement.src import bootstrap, utilities
->>>>>>> 33fb857e451d41b89f7e2f11d207e88e5007d4da
+from Module_TeamManagement.src import bootstrap, tele_util, utilities
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
@@ -22,11 +18,11 @@ def home(requests): #student home page
         return render(requests,'Module_Account/login.html',context)
     else:
         #Populates the info for the side nav bar for instructor
-        utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)     
+        utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
 
         context["home_page"] = "active"
         return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
-    
+
 # TO-DO: update function
 # Add notification management page
 #@login_required(login_url='/')
@@ -58,16 +54,16 @@ def CLEAdmin(requests): #instructor notification page
         return render(requests,"Administrator/admindashboard.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
-    
+
 # TO-DO: update function
 #@login_required(login_url='/')
 def faculty_Home(requests): #student home page
     try:
     #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-    except: 
+    except:
         context = {'messages' : ['Invalid user account']}
-        return render(requests,'Module_Account/login.html',context) 
+        return render(requests,'Module_Account/login.html',context)
 
     context = {"faculty_Home" : "active", "courses" :requests.session['courseList'] }
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
@@ -372,9 +368,9 @@ def configureDB_course(requests):
         courseList.append(course.course_title)
     response['courses'] = courseList
 
-    
+
     if requests.method == "GET":
-        
+
 
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
