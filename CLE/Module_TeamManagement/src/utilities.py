@@ -28,6 +28,31 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     return
 
 
+# Returns webscrapper info from csv():
+def readScrapperCSV():
+    file_name = 'trailhead-points.csv'
+    results = {}
+
+    with open(file_name) as csvInput:
+        csv_reader = csv.reader(csvInput, delimiter=',')
+        counter = 0
+
+        for row in csv_reader:
+            content = {}
+
+            if counter == 0:
+                counter += 1
+            else:
+                content['name'] = row[1]
+                content['badge-count'] = row[2]
+                content['points-count'] = row[3]
+                content['trail-count'] = row[4]
+                results[row[0]] = content
+
+    return results
+
+
+# The webscreapper to scrap static info from website
 def webScrapper():
     input_file = 'trailhead-url.txt'
     output_file = 'trailhead-points.csv'
@@ -59,11 +84,11 @@ def webScrapper():
         name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
         stats = soup.find_all(attrs={'class', 'user-information__achievements-data'})
 
-        content['titles'] = titles,
-        content['name'] = json.loads(str(name['data-react-props']))['full_name'],
-        content['badge-count'] = stats[0].text.strip(),
-        content['points-count'] = stats[1].text.strip(),
-        content['trail-count'] = stats[2].text.strip(),
+        content['titles'] = titles
+        content['name'] = json.loads(str(name['data-react-props']))['full_name']
+        content['badge-count'] = stats[0].text.strip()
+        content['points-count'] = stats[1].text.strip()
+        content['trail-count'] = stats[2].text.strip()
 
         info[link] = content
 
@@ -74,8 +99,11 @@ def webScrapper():
             to_write = [link, content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
             writer.writerow(to_write)
 
+
+# FOR TESTING
 if __name__ == "__main__":
     from bs4 import BeautifulSoup
-    webScrapper()
+    results = readScrapperCSV()
+    print(results)
 else:
     from Module_TeamManagement.models import *
