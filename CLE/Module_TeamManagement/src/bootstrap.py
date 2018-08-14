@@ -42,7 +42,10 @@ def parse_File_Student(filePath,bootstrapInfo={}):
 
         teamList = rowData[index_section+1:]
         if len(teamList) > 0:
-            team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
+            if 'Team' in list(filter(None,teamList))[0]:
+                team_number = 'T' + list(filter(None,teamList))[0].split()[-1]
+            else:
+                team_number = list(filter(None,teamList))[0]
             student.append(team_number)
 
         email = rowData[index_email].strip()
