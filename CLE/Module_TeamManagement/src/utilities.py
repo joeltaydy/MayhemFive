@@ -20,7 +20,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
         classObject = Class.objects.all().filter(student=studentEmail).distinct()
         for individuaClass in classObject:
             course_section = individuaClass.course_section
-            courseList[course.course_section_id] = course.course.course_title + " " + course.section_number
+            courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
 
 
     requests.session['courseList'] = courseList
