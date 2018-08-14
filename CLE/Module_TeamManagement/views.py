@@ -381,8 +381,7 @@ def configureDB_course(requests):
 
         course_title = requests.POST.get("course_title")
         faculty_username = requests.POST.get("username")
-        print(faculty_username)
-        facultyObj = Faculty.objects.get(username=faculty_username)
+        facultyObj = Faculty.objects.get(email=requests.user.email)
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
 
