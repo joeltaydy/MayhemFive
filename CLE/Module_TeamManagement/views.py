@@ -123,7 +123,7 @@ def faculty_Profile(requests):
     return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
 
-#Faculty Student Management Page
+# Faculty Student Management Page
 #@login_required(login_url='/')
 def faculty_Overview(requests):
     context = {"faculty_Overview" : "active", 'course' : {}}
