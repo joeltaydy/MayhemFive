@@ -3,7 +3,7 @@
 {% block bootstrapContent %}
 
 <h1>Tools Setup</h1>
-<form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+<form action="{% url 'TMmod:uploadtoolStudent' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
 
@@ -11,17 +11,25 @@
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
           <select class="form-control" id="course_title" name="course_title">
             <option value="" disabled selected>Select your course</option>
-          {% for course in courses %}
-              <option value={{course}}>{{course}}</option>
-          {% endfor %}
-        </select>
+            {% for course,course_section in courses.items %}
+                <option value={{course}}>{{course_section}}</option>
+            {% endfor %}
+          </select>
 
         </br>
-        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
-        <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Learning Tools</label>
+          <select class="form-control" id="type" name="type">
+            <option value="" disabled selected>Select your tools</option>
+                <option value="Trailhead">Trailhead</option>
+                <option value="Tableu">Tableu</option>
+                <option value="Kahoot">Kahoot</option>
+          </select>
+
+        </br>
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Website Link Input</label>
+        <input type="text" class="form-control" name="link" id="link" aria-describedby="fileHelp">
     </div>
-    <input type="hidden" id="username" name="username" value={{user.username}}>
-    <input type="hidden" id="action" name="action" value="batch">
+    <input type="hidden" id="user" name="user" value="student">
 
     <div class="form-group">
       <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">

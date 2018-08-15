@@ -3,6 +3,7 @@ import requests
 import json
 import csv
 import sys
+import os
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Utilities Function -------------------------------#
@@ -25,15 +26,14 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
 
     requests.session['courseList'] = courseList
-    return
 
 
 # Returns webscrapper info from csv():
 def readScrapperCSV():
-    file_name = 'trailhead-points.csv'
+    file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results = {}
 
-    with open(file_name) as csvInput:
+    with open(file_path) as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 
@@ -44,9 +44,16 @@ def readScrapperCSV():
                 counter += 1
             else:
                 content['name'] = row[1]
-                content['badge-count'] = row[2]
-                content['points-count'] = row[3]
-                content['trail-count'] = row[4]
+                content['badge_count'] = row[2]
+                content['points_count'] = row[3]
+                content['trail_count'] = row[4]
+
+                badges_obtained = row[5].split('|')
+                new_badges_obtained = []
+                for badge_obtained in badges_obtained:
+                    new_badges_obtained.append(badge_obtained.replace(" ","_").lower())
+
+                content['badges_obtained'] = new_badges_obtained
                 results[row[0]] = content
 
     return results
