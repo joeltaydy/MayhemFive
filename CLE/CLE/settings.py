@@ -32,7 +32,6 @@ ALLOWED_HOSTS = ["54.254.212.240","localhost","127.0.0.1","52.76.46.177.xip.io",
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
 
-
 # Application definition
 
 INSTALLED_APPS = [

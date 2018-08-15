@@ -36,7 +36,7 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
     '''
 
     def pre_social_login(self, request, sociallogin):
-        email_address=sociallogin.account.extra_data["email"].split('@')[1]
+        email_address = sociallogin.account.extra_data["email"].split('@')[1]
         messages.error(request, "Please use an SMU account")
 
         #use for team's test using any gmail account w/o numbers infront
@@ -46,16 +46,15 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
         #isInstructor = re.findall(r"(^[a-zA-Z.]+@smu.edu.sg+$)",sociallogin.account.extra_data["email"])
 
         # Pretty much hard code the login redirect url as the overwriting method above does not seem to be work
-        print(isInstructor)
         if isInstructor != [] :
-            print("Push to instructor's home")
+            print("Pushing to instructor's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
 
 
         elif not email_address == "smu.edu.sg":
-            print("Push to back to login page")
+            print("Pushing to back to login page")
             raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))
 
         else:
-            print("Push to student's home")
+            print("Pushing to student's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:home"

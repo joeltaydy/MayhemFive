@@ -94,7 +94,7 @@ def faculty_Home(requests):
 
     except:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
+        # traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
