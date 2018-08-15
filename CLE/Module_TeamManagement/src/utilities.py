@@ -47,6 +47,13 @@ def readScrapperCSV():
                 content['badge_count'] = row[2]
                 content['points_count'] = row[3]
                 content['trail_count'] = row[4]
+
+                badges_obtained = row[5].split('|')
+                new_badges_obtained = []
+                for badge_obtained in badges_obtained:
+                    new_badges_obtained.append(badge_obtained.replace(" ","_").lower())
+
+                content['badges_obtained'] = new_badges_obtained
                 results[row[0]] = content
 
     return results

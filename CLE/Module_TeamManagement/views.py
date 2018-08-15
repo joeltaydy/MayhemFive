@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 # Student Home Page
 #@login_required(login_url='/')
-def home(requests,results={}):
+def home(requests,results={'badge_count' : 0, 'points_count' : 0, 'trail_count' : 0, 'badges_obtained' : []}):
     response = {"home" : "active"}
     response.update(results)
 
