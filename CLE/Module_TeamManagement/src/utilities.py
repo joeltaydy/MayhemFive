@@ -40,7 +40,7 @@ def getTrailheadInformation(link):
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 
-        for row in csv_reader:
+        for row in csv_reader.decode('utf-8').strip():
             content = {}
 
             if counter == 0:
