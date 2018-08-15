@@ -518,7 +518,7 @@ def configureDB_clt(requests):
         user = requests.POST.get("user")
 
         if user == "student":
-            
+            pass
 
         file = requests.FILES.get("file", False)
         faculty_email = requests.user.email
