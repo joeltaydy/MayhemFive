@@ -3,6 +3,7 @@ import requests
 import json
 import csv
 import sys
+import os
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Utilities Function -------------------------------#
@@ -25,15 +26,14 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
 
     requests.session['courseList'] = courseList
-    return
 
 
 # Returns webscrapper info from csv():
 def readScrapperCSV():
-    file_name = 'trailhead-points.csv'
+    file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results = {}
 
-    with open(file_name) as csvInput:
+    with open(file_path) as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 

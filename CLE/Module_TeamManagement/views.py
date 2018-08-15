@@ -8,8 +8,9 @@ from django.contrib.auth.decorators import login_required
 
 # Student Home Page
 #@login_required(login_url='/')
-def home(requests,results=[]):
-    response = {"home" : "active", "results" : results}
+def home(requests,results={}):
+    response = {"home" : "active"}
+    response.update(results)
 
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
@@ -501,43 +502,47 @@ def configureDB_teams(requests):
 def configureDB_clt(requests):
     response = {"configureDB_clt" : "active"}
 
-    # Retrieve all the course
-    courseObject = Course.objects.all()
-    courseList = []
-
-    for course in courseObject:
-        courseList.append(course.course_title)
-    response['courses'] = courseList
-
-    if requests.method == "GET" and requests.POST.get("user") == "faculty":
+    if requests.method == "GET" and requests.GET.get("user") == "faculty":
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
-    elif requests.method == "GET" and requests.POST.get("user") == "student":
+
+    elif requests.method == "GET" and requests.GET.get("user") == "student":
+        utilities.populateRelevantCourses(requests,studentEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         return render(requests, "Module_TeamManagement/Student/studentTools.html", response)
 
     try:
         user = requests.POST.get("user")
 
         if user == "student":
-            student_eamil = requests.user.email
-            type = requests.POST.get("type").strip()
-            link = requests.POST.get("link").strip()
+            student_email = requests.user.email
+            type = requests.POST.get("type")
+            link = requests.POST.get("link")
+            course = requests.POST.get("course_title")
             id = student_email.split('@')[0] + "_" + type
 
-            class_studentObj = Class.objects.filter(student=student_email)
+            class_studentObj = Class.objects.filter(student=student_email).filter(course_section=course)
             try:
                 # Update
                 cltObj = Cloud_Learning_Tools.objects.get(id=id)
                 cltObj.website_link = link
                 cltObj.save()
+                print(cltObj.website_link)
+                print('update')
+                print(cltObj.website_link)
             except:
                 # Create
                 cltObj = Cloud_Learning_Tools.objects.create(
-                    id=id
-                    type=type
-                    website_link=link
+                    id=id,
+                    type=type,
+                    website_link=link,
                 )
                 cltObj.save()
-            class_studentObj.add(cltObj)
+                print('create')
+
+            for student in class_studentObj:
+                student.clt_id.add(cltObj)
 
             # Read results csv
             results = utilities.readScrapperCSV()
@@ -574,11 +579,17 @@ def configureDB_clt(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
-        return faculty_Overview(requests)
+        if action == 'batch':
+            utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+            response['courses'] = requests.session['courseList']
+            return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+        else:
+            return faculty_Overview(requests)
 
     response['message'] = 'Learning Tools Configured'
     if action == 'batch':
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
     else:
         return faculty_Overview(requests)
