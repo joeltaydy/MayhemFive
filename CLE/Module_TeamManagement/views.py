@@ -183,27 +183,27 @@ def studStats(requests):
 # @login_required(login_url='/')
 def student_Profile(requests):
     context = {"student_Profile" : "active", 'course_list' : {}}
-
-    student_username = requests.user.email.split('@')[0]
-    # student_username = 'sample.1'
-
-    # if student_username == None:
-    #     context['message'] = 'Please specify a username'
-    #     return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
-
-    studentObj = Student.objects.get(username=student_username)
-    classObjList = Class.objects.all().filter(student=studentObj)
-
-    if len(classObjList) > 1:
-        for classObj in classObjList:
-            context['course_list'][classObj.course_section.course.course_title] = classObj
-    else:
-        context['course_list'][classObjList.course_section.course.course_title] = classObj
-
-    context['user'] = studentObj
-    context['message'] = 'Successful retrieval of student\'s profile'
-    return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
-
+    #
+    # student_username = requests.user.email.split('@')[0]
+    # # student_username = 'sample.1'
+    #
+    # # if student_username == None:
+    # #     context['message'] = 'Please specify a username'
+    # #     return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
+    #
+    # studentObj = Student.objects.get(username=student_username)
+    # classObjList = Class.objects.all().filter(student=studentObj)
+    #
+    # if len(classObjList) > 1:
+    #     for classObj in classObjList:
+    #         context['course_list'][classObj.course_section.course.course_title] = classObj
+    # else:
+    #     context['course_list'][classObjList.course_section.course.course_title] = classObj
+    #
+    # context['user'] = studentObj
+    # context['message'] = 'Successful retrieval of student\'s profile'
+    # return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
+    return render(requests,"error404.html",context)
 
 # Student Team Page
 # @login_required(login_url='/')
