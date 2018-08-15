@@ -515,6 +515,11 @@ def configureDB_clt(requests):
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
+        user = requests.POST.get("user")
+
+        if user == "student":
+            
+
         file = requests.FILES.get("file", False)
         faculty_email = requests.user.email
         action = requests.POST.get("action")
@@ -543,7 +548,7 @@ def configureDB_clt(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
+        # traceback.print_exc()
         response['message'] = e.args[0]
         # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
         return faculty_Overview(requests)
