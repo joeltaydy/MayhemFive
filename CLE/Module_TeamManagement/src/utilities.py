@@ -29,9 +29,12 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 
 
 # Returns webscrapper info from csv():
-def readScrapperCSV():
+def readScrapperCSV(link):
     file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results = {}
+
+    if len(link) == 0:
+        return {'badge_count' : 0, 'points_count' : 0, 'trail_count' : 0, 'badges_obtained' : []}
 
     with open(file_path) as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
@@ -56,8 +59,7 @@ def readScrapperCSV():
                 content['badges_obtained'] = new_badges_obtained
                 results[row[0]] = content
 
-    return results
-
+    return results[link]
 
 # The webscreapper to scrap static info from website
 def webScrapper():
