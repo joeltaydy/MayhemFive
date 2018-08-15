@@ -29,7 +29,7 @@ Instructor page
 <div id="accordion">
   <li class="nav-item {{ team_list }}">
       <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-          <i class="fa fa-users"></i>
+          <i class="fas fa-chalkboard-teacher"></i>
           <p>Student Mgmt</p>
       </a>
   </li>
@@ -41,19 +41,19 @@ Instructor page
       {% endfor %}
   </div>
 </div>
-<li class="nav-item {{ configureDB_clt }}">
+<li class="nav-item {{ configureDB_course }}">
   <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
     <i class="fas fa-upload"></i>
     <p>Course Setup</p>
   </a>
 </li>
-<li class="nav-item {{ noti_mgmt }}">
-  <a class="nav-link" href="{% url 'TMmod:noti_mgmt' %}">
-    <i class=""></i>
+<li class="nav-item {{ configureDB_teams }}">
+  <a class="nav-link" href="{% url 'TMmod:uploadteam' %}">
+    <i class="fa fa-users"></i>
     <p>Teams Setup</p>
   </a>
 </li>
-<li class="nav-item {{ noti_mgmt }}">
+<li class="nav-item {{ configureDB_clt }}">
   <a class="nav-link" href="{% url 'TMmod:uploadtools' %}">
     <i class="fas fa-wrench"></i>
     <p>Tools Setup</p>
