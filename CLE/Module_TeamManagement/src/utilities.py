@@ -44,9 +44,9 @@ def readScrapperCSV():
                 counter += 1
             else:
                 content['name'] = row[1]
-                content['badge-count'] = row[2]
-                content['points-count'] = row[3]
-                content['trail-count'] = row[4]
+                content['badge_count'] = row[2]
+                content['points_count'] = row[3]
+                content['trail_count'] = row[4]
                 results[row[0]] = content
 
     return results

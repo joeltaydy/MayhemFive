@@ -8,19 +8,17 @@ from django.contrib.auth.decorators import login_required
 
 # Student Home Page
 #@login_required(login_url='/')
-def home(requests):
-    '''
-        Check if user is authenticated aka session
-    '''
-    context = {}
-    if not requests.user.is_authenticated:
-        return render(requests,'Module_Account/login.html',context)
-    else:
-        #Populates the info for the side nav bar for instructor
-        utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
+def home(requests,results=[]):
+    response = {"home" : "active", "results" : results}
 
-        context["home_page"] = "active"
-        return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
+    # Redirect user to login page if not authorized
+    if not requests.user.is_authenticated:
+        return render(requests,'Module_Account/login.html',response)
+
+    #Populates the info for the side nav bar for instructor
+    utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
+
+    return render(requests,"Module_TeamManagement/Student/studentHome.html",response)
 
 
 # Faculty Notification Page
@@ -511,14 +509,40 @@ def configureDB_clt(requests):
         courseList.append(course.course_title)
     response['courses'] = courseList
 
-    if requests.method == "GET":
+    if requests.method == "GET" and requests.POST.get("user") == "faculty":
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+    elif requests.method == "GET" and requests.POST.get("user") == "student":
+        return render(requests, "Module_TeamManagement/Student/studentTools.html", response)
 
     try:
         user = requests.POST.get("user")
 
         if user == "student":
-            pass
+            student_eamil = requests.user.email
+            type = requests.POST.get("type").strip()
+            link = requests.POST.get("link").strip()
+            id = student_email.split('@')[0] + "_" + type
+
+            class_studentObj = Class.objects.filter(student=student_email)
+            try:
+                # Update
+                cltObj = Cloud_Learning_Tools.objects.get(id=id)
+                cltObj.website_link = link
+                cltObj.save()
+            except:
+                # Create
+                cltObj = Cloud_Learning_Tools.objects.create(
+                    id=id
+                    type=type
+                    website_link=link
+                )
+                cltObj.save()
+            class_studentObj.add(cltObj)
+
+            # Read results csv
+            results = utilities.readScrapperCSV()
+
+            return home(requests,results[link])
 
         file = requests.FILES.get("file", False)
         faculty_email = requests.user.email
