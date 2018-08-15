@@ -341,8 +341,7 @@ def configureDB_course(requests):
     try:
         file = requests.FILES.get("file", False)
         if file:
-            configureDB_students(requests)
-            return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+            return configureDB_students(requests)
 
         course_title = requests.POST.get("course_title")
         facultyObj = Faculty.objects.get(email=requests.user.email)
@@ -373,7 +372,7 @@ def configureDB_course(requests):
     utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
 
     response['message'] = 'Course created'
-    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+    return faculty_Home(requests)
 
 
 # This is for subsequent configuration by faculty
@@ -432,7 +431,8 @@ def configureDB_students(requests):
     utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
 
     response['message'] = 'Successful Upload'
-    return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+    # return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+    return faculty_Home(requests)
 
 
 # This is for subsequent configuration by faculty
