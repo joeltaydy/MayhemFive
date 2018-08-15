@@ -36,7 +36,7 @@ def getTrailheadInformation(link):
     if len(link) == 0:
         return {'badge_count' : 0, 'points_count' : 0, 'trail_count' : 0, 'badges_obtained' : []}
 
-    with open(file_path) as csvInput:
+    with open(file_path,mode='r+',encoding="utf-8") as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 
