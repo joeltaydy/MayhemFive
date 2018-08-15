@@ -26,7 +26,7 @@ def home(requests):
             if clt.type == 'Trailhead':
                 link = clt.website_link
 
-    results = utilities.readScrapperCSV(link)
+    results = utilities.getTrailheadInformation(link)
     response.update(results)
 
     return render(requests,"Module_TeamManagement/Student/studentHome.html",response)
