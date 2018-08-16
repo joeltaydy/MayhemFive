@@ -453,43 +453,42 @@ def configureDB_students(requests):
 # - message
 #
 def configureDB_teams(requests):
-    # response = {"configureDB_teams" : "active"}
-    # if requests.method == "GET":
-    #     # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-    #     return faculty_Overview(requests)
-    #
-    # try:
-    #     file = requests.FILES.get("file", False)
-    #     faculty_email = requests.user.email
-    #     course_section = requests.POST.get("course_section")
-    #     bootstrapFile = {}
-    #
-    #     if file.name.endswith('.xlsx'):
-    #         if 'team_information' in file.name.lower():
-    #             bootstrapFile['faculty_email'] = faculty_email
-    #             bootstrapFile['course_section'] = course_section
-    #             bootstrapFile['file_path'] = file.temporary_file_path()
-    #
-    #         else:
-    #             raise Exception("Invalid file information. Please upload teams information only.")
-    #
-    #     else:
-    #         raise Exception("Invalid file type. Please upload .xlsx only")
-    #
-    #     # If file is .xlsx then proceed with processing
-    #     response['results'] = bootstrap.update_Teams(bootstrapFile)
-    #
-    # except Exception as e:
-    #     # Uncomment for debugging - to print stack trace wihtout halting the process
-    #     traceback.print_exc()
-    #     response['message'] = e.args[0]
-    #     # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-    #     return faculty_Overview(requests)
-    #
-    # response['message'] = 'Teams Configured'
-    # # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-    # return faculty_Overview(requests)
-    return render(requests,"error404.html")
+    response = {"configureDB_teams" : "active"}
+    if requests.method == "GET":
+        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+        return faculty_Overview(requests)
+
+    try:
+        file = requests.FILES.get("file", False)
+        faculty_email = requests.user.email
+        course_section = requests.POST.get("course_section")
+        bootstrapFile = {}
+
+        if file.name.endswith('.xlsx'):
+            if 'team_information' in file.name.lower():
+                bootstrapFile['faculty_email'] = faculty_email
+                bootstrapFile['course_section'] = course_section
+                bootstrapFile['file_path'] = file.temporary_file_path()
+
+            else:
+                raise Exception("Invalid file information. Please upload teams information only.")
+
+        else:
+            raise Exception("Invalid file type. Please upload .xlsx only")
+
+        # If file is .xlsx then proceed with processing
+        response['results'] = bootstrap.update_Teams(bootstrapFile)
+
+    except Exception as e:
+        # Uncomment for debugging - to print stack trace wihtout halting the process
+        traceback.print_exc()
+        response['message'] = e.args[0]
+        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+        return faculty_Overview(requests)
+
+    response['message'] = 'Teams Configured'
+    # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
+    return faculty_Overview(requests)
 
 
 # This is for subsequent configuration by faculty
