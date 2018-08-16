@@ -15,13 +15,13 @@ except ImportError:
     from django.utils.encoding import force_unicode as force_text
 from allauth.account.signals import user_signed_up
 
- 
+
 
 class SocialAccountWhitelist(DefaultSocialAccountAdapter):
 
     def get_connect_redirect_url(self, request, socialaccount):
         assert request.user.is_authenticated
-        
+
         path = "instructor/home/"
         return path
 
@@ -37,22 +37,21 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
 
     def pre_social_login(self, request, sociallogin):
         email_address=sociallogin.account.extra_data["email"].split('@')[1]
-        messages.error(request, "Please use an SMU account")
 
         #use for team's test using any gmail account w/o numbers infront
         isInstructor = re.findall(r"(^[a-zA-Z.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",sociallogin.account.extra_data["email"])
-        
+
         #uncomment below for staff email
         #isInstructor = re.findall(r"(^[a-zA-Z.]+@smu.edu.sg+$)",sociallogin.account.extra_data["email"])
-        
+
         # Pretty much hard code the login redirect url as the overwriting method above does not seem to be work
         if isInstructor != [] :
             settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
 
 
         elif not email_address == "smu.edu.sg":
+            messages.error(request, "Please use an SMU account")
             raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))
-        
+
         else:
             settings.LOGIN_REDIRECT_URL = "TMmod:home"
-

@@ -37,4 +37,3 @@ def login_view(requests):
 def logout_view(requests):
     logout(requests)
     return redirect("/")
-
