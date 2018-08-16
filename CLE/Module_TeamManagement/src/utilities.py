@@ -29,11 +29,14 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 
 
 # Returns webscrapper info from csv():
-def readScrapperCSV():
+def getTrailheadInformation(link):
     file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results = {}
 
-    with open(file_path) as csvInput:
+    if len(link) == 0:
+        return {'badge_count' : 0, 'points_count' : 0, 'trail_count' : 0, 'badges_obtained' : []}
+
+    with open(file_path,mode='r+',encoding="utf-8") as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 
@@ -56,8 +59,7 @@ def readScrapperCSV():
                 content['badges_obtained'] = new_badges_obtained
                 results[row[0]] = content
 
-    return results
-
+    return results[link]
 
 # The webscreapper to scrap static info from website
 def webScrapper():
@@ -110,7 +112,6 @@ def webScrapper():
 # FOR TESTING
 if __name__ == "__main__":
     from bs4 import BeautifulSoup
-    results = readScrapperCSV()
-    print(results)
+    webScrapper()
 else:
     from Module_TeamManagement.models import *

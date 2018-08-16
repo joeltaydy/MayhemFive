@@ -46,6 +46,7 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
 
         # Pretty much hard code the login redirect url as the overwriting method above does not seem to be work
         if isInstructor != [] :
+            print("Pushing to instructor's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
 
 
@@ -54,4 +55,5 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
             raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))
 
         else:
+            print("Pushing to student's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:home"
