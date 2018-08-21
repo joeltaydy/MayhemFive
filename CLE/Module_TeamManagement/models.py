@@ -1,4 +1,5 @@
 from django.db import models
+from jchart import Chart
 
 class Course(models.Model):
     course_title = models.CharField(

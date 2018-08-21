@@ -16,5 +16,7 @@ urlpatterns = [
     path('instructor/home/', views.faculty_Home, name='instHome'),
     path('instructor/notiMgmt/', views.ntmgmt, name = 'noti_mgmt' ),
     path('CLEAdmin/',views.CLEAdmin, name = 'cleAdmin'),
-    path('CLEAdmin/moduleSetup',views.configureDB_faculty, name = 'modSu'),
+    # path('CLEAdmin/moduleSetup',views.configureDB_faculty, name = 'modSu'),
+    path('CLEAdmin/moduleSetup',views.chart_view, name = 'modSu'),
+    path('testcharts/',views.chart_view, name='viewchart')
 ]
