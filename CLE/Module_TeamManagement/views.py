@@ -646,8 +646,3 @@ def initialize_Section_Channel(request):
 
     response['message'] = 'Telegram Channel for Section Created'
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
-
-def chart_view(request):
-    render(request, "Module_TeamManagement/charts.html", {
-        'line_chart': LineChart(),
-    })
