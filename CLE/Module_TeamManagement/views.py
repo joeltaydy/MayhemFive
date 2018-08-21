@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 # Student Home Page
 #@login_required(login_url='/')
 def home(requests):
-    response = {"home" : "active"}
+    context = {"home" : "active"}
 
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
@@ -27,9 +27,9 @@ def home(requests):
                 link = clt.website_link
 
     results = utilities.getTrailheadInformation(link)
-    response.update(results)
+    context.update(results)
 
-    return render(requests,"Module_TeamManagement/Student/studentHome.html",response)
+    return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
 # Faculty Notification Page
