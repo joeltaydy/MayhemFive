@@ -9,14 +9,14 @@
 
     <div class="form-group">
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
-          <select class="form-control" id="course_title" name="course_title">
+          <select class="form-control col-md-offset-3" id="course_title" name="course_title">
             <option value="" disabled selected>Select your course</option>
-          {% for course,course_section in courses.items %}
+            {% for course,course_section in courses.items %}
               <option value={{course}}>{{course_section}}</option>
           {% endfor %}
         </select>
 
-        </br>
+        <br>
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
         <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
     </div>
