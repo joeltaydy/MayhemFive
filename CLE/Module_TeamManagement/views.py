@@ -13,7 +13,7 @@ def home(requests):
 
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
-        return render(requests,'Module_Account/login.html',response)
+        return render(requests,'Module_Account/login.html',context)
 
     # Populates the info for the side nav bar for instructor
     utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
@@ -68,33 +68,35 @@ def faculty_Home(requests):
     context = {"faculty_Home" : "active"}
 
     faculty_username = requests.user.email.split('@')[0]
-
+    #print(requests.user.email)
     try:
         #Populates the info for the side nav bar for instructor
+        print("a")
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-
-        facultyObj = Faculty.objects.get(username=faculty_username)
+        print("b")
+        facultyObj = Faculty.objects.get(email=requests.user.email)
+        print("c")
         registered_course_section = facultyObj.course_section.all()
-
+        print("d")
         courses = []
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
             if course_title not in courses:
                 courses.append(course_title)
-
+        print("e")
         students = []
         for course_section in registered_course_section:
             classObj = Class.objects.all().filter(course_section=course_section)
             for student in classObj:
                 students.append(student)
-
+        print("d")
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
         context['student_count'] = len(students)
 
     except:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 

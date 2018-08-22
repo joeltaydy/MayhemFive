@@ -8,7 +8,7 @@ logger = get_task_logger(__name__)
 
 @shared_task(name='trailheadscrapper')
 def webscrapper():
-    from bs4 import BeautifulSoup
+    
     """
     Saves latest image from Flickr
     """
