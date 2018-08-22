@@ -3,7 +3,7 @@ bootstrap_files
 Diagrams
 
 #ignore vscode
-.vscode/
+CLE/.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
