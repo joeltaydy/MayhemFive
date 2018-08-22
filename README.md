@@ -7,8 +7,9 @@
 **Setup**
 ###### Environments to run django:
 * WAMP OR MAMP(for Mac)
-* Python 2.7.x
-* Django 1.11.x (install via `pip install django`)    
+* Python 3.6.x or above
+* Django 2.0.x 
+(install via `pip install -r requirements.txt`)    
 
 
 **Instructions**
