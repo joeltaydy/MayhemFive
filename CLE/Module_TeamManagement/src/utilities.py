@@ -63,8 +63,9 @@ def getTrailheadInformation(link):
 
 # The webscreapper to scrap static info from website
 def webScrapper():
-    input_file = 'trailhead-url.txt'
-    output_file = 'trailhead-points.csv'
+    from bs4 import BeautifulSoup
+    input_file = 'clt_files/trailhead-url.txt'
+    output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
     # Get links from csv
     links = []
@@ -110,10 +111,3 @@ def webScrapper():
             writer.writerow(to_write)
     print("done scrapping info from  file : %.9f " % (time.time()-st) ) 
 
-
-# FOR TESTING
-if __name__ == "__main__":
-    from bs4 import BeautifulSoup
-    webScrapper()
-else:
-    from Module_TeamManagement.models import *

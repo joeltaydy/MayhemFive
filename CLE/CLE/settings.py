@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.account', # new
     'allauth.socialaccount', # new
     'allauth.socialaccount.providers.google', # new
+    'django_celery_beat', # new
 ]
 
 MIDDLEWARE = [
@@ -189,6 +190,8 @@ FILE_UPLOAD_HANDLERS = (
 )
 
 from celery.schedules import crontab
+# If you need to execute every n day
+
 # CELERY STUFF
 # Celery application definition
 # http://docs.celeryproject.org/en/v4.0.2/userguide/configuration.html
@@ -199,8 +202,9 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Makassar'
 CELERY_BEAT_SCHEDULE = {
-    'task-number-one': {
-    'task': 'trailheadscrapper',
-    'schedule': 80.0
+    'task-number-one': { #name of scheduler
+    'task': 'trailheadscrapper', #name of task
+    'schedule':  100.0 #period of running in seconds
+    #'arg's :  #if have args
     }
 }
