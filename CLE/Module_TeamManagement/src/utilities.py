@@ -5,7 +5,8 @@ import csv
 import sys
 import os
 import time
-from Module_TeamManagement.models import *
+from Module_TeamManagement.models import Cloud_Learning_Tools,Faculty,Class
+
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Utilities Function -------------------------------#
@@ -32,15 +33,20 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     requests.session['courseList'] = courseList
     return
 
-# Returns webscrapper info from csv():
-def getTrailheadInformation(link):
+# Returns all trailhead webscrapper info from tcsv():
+'''
+        final format should be 
+        results = {
+            "joel.tay.2016@smu.edu.sg" : {'badge_count' : 4 , ...}
+            "shlye.2016@smu.edu.sg" :{'badge_count': '52', 'points_count': '29,650', 'trail_count': '3', 'badges_obtained': ['commerce_cloud_functional_consulting', .. }
+        }
+
+'''
+def getTrailheadInformation():
     file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
-    results = {}
-
-    if len(link) == 0:
-        return {'badge_count' : 0, 'points_count' : 0, 'trail_count' : 0, 'badges_obtained' : []}
-
-    with open(file_path,mode='r+',encoding="utf-8") as csvInput:
+    results ={}
+    
+    with open(file_path,mode='r') as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 
@@ -48,40 +54,99 @@ def getTrailheadInformation(link):
             content = {}
 
             if counter == 0:
-                counter += 1
+                counter += 2 # skip headers
             else:
-                content['name'] = row[1]
-                content['badge_count'] = row[2]
-                content['points_count'] = row[3]
-                content['trail_count'] = row[4]
 
-                badges_obtained = row[5].split('|')
+                # Track all student information
+                studId = row[1]
+                content['badge_count'] = row[3]
+                content['points_count'] = row[4]
+                content['trail_count'] = row[5]
+
+                badges_obtained = row[6].split('|')
                 new_badges_obtained = []
                 for badge_obtained in badges_obtained:
                     new_badges_obtained.append(badge_obtained.replace(" ","_").lower())
 
                 content['badges_obtained'] = new_badges_obtained
-                results[row[0]] = content
+                results[studId] = content #Key is student_email
+   
+    return results
 
-    return results[link]
+# Main method to retreive all information of trailhead informations
+'''
+        final format should be 
+        context = {
+            "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
+            "CourseTrailResults" : {'badge_count' : 4 , ...}
+        }
+'''
+def populateTrailheadInformation(student_email=None):
+    context = {} 
+    trailHeadInfo = getTrailheadInformation()
+                
+    if student_email != None:
+        try:
+            context["personal"] = trailHeadInfo[student_email]
+        except:
+            context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
+
+    context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo)
+    return context
+
+# Retrieve team info based on course
+'''
+    final format should be
+    'CourseTrailResults': {
+        BPAS210G4: {
+            'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51}, 
+            'T3': {'badges': 280, 'points': 207475, 'trails': 26}, 'T4': {'badges': 138, 'points': 173400, 'trails': 12}
+            }
+        },
+        BPAS201G2: {
+            ...
+        }
+
+    }
+'''
+def populateTeamTrailHeadInformation(results):
+    classes = Class.objects.exclude(team_number = None).order_by('course_section','team_number') #Omit classes with no teams
+    classResult = {}
+    for classObj in classes:
+        course_section_id = classObj.course_section.course_section_id
+        if course_section_id not in classResult:
+            classResult[course_section_id] = {}
+
+        if classObj.team_number not in classResult[course_section_id]:
+            classResult[course_section_id][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
+        classResult[course_section_id][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+        classResult[course_section_id][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+        classResult[course_section_id][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+    
+    return classResult
 
 # The webscreapper to scrap static info from website
 def webScrapper():
     from bs4 import BeautifulSoup
-    input_file = 'clt_files/trailhead-url.txt'
+    from Module_TeamManagement.models import Cloud_Learning_Tools
+    import datetime
+    
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
-    # Get links from csv
-    links = []
-    with open(input_file, 'r') as file:
-        for line in file:
-            if len(line.strip()) > 0:
-                links.append(line.strip())
+    
+    clt_tools = Cloud_Learning_Tools.objects.filter(type='TrailHead')
+
+    studentEmails = []
+    studentLinks = []
+
+    for clt in clt_tools:
+        studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
+        studentLinks.append(clt.website_link)
 
     # Removes headers
     print("read link from file : %.9f " % (time.time()-st) )
     info = {}
-    for link in links[1:]:
+    for link in studentLinks:
         content = {}
 
         req = requests.get(link)
@@ -106,13 +171,17 @@ def webScrapper():
         info[link] = content
   
     print("scrapping info from  file : %.9f " % (time.time()-st) )
-
-    with (open(output_file, 'w')) as file:
+    
+    counter=0 #iterate in studentList
+    with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
-        writer.writerow(['link', 'name', 'badges', 'points', 'trails', 'badges_obtained'])
+        writer.writerow(["last updated:" , str(datetime.datetime.now())])
+        writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
         for link,content in info.items():
-            to_write = [link, content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
+            to_write = [link,studentEmails[counter], content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
             writer.writerow(to_write)
+            counter+=1
+
     print("done scrapping info from  file : %.9f " % (time.time()-st) ) 
 
  

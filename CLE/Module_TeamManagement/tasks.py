@@ -12,10 +12,9 @@ def webscrapper():
     """
     Saves latest image from Flickr
     """
-    print("12b")
     utilities.webScrapper()
-    print("23d")
-    logger.info("Saved image from Flickr") 
+
+    logger.info("trailhead last updated at ") 
 
 #if __name__ == "__main__":
  #   webscrapper()

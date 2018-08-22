@@ -14,21 +14,15 @@ def home(requests):
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
-
+    student_email = requests.user.email
     # Populates the info for the side nav bar for instructor
-    utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
+    utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-    student_email = requests.user.email
-    link = ''
-    for occurance in Class.objects.filter(student=student_email):
-        for clt in occurance.clt_id.all():
-            if clt.type == 'Trailhead':
-                link = clt.website_link
-
-    results = utilities.getTrailheadInformation(link)
-    context.update(results)
-
+    
+    trailResults = utilities.populateTrailheadInformation(student_email)
+    context.update(trailResults)
+    print(context)
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -71,25 +65,19 @@ def faculty_Home(requests):
     #print(requests.user.email)
     try:
         #Populates the info for the side nav bar for instructor
-        print("a")
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-        print("b")
         facultyObj = Faculty.objects.get(email=requests.user.email)
-        print("c")
         registered_course_section = facultyObj.course_section.all()
-        print("d")
         courses = []
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
             if course_title not in courses:
                 courses.append(course_title)
-        print("e")
         students = []
         for course_section in registered_course_section:
             classObj = Class.objects.all().filter(course_section=course_section)
             for student in classObj:
                 students.append(student)
-        print("d")
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
         context['student_count'] = len(students)
@@ -145,7 +133,7 @@ def faculty_Overview(requests):
         course_section = requests.GET.get('module')
     else:
         course_section = requests.POST.get('course_section')
-
+    print(course_section)
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
