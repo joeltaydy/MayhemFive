@@ -38,73 +38,100 @@
 
         <div class="row">
             <div class="col-md-12">
+                <div class=”progress”>
+                        <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <h3 align = "center">7 / 14 WEEKS </h3>
+                </div>
+            </div>
+        </div>    
+
+        <div class="row">
+            <div class="col-md-6">
                 <div class="card ">
                     <div class="card-header ">
                         <h2 class="card-title">IS480</h2>
-                        <p class="card-category">Progress</p>
-                        <div class=”progress”>
-                          <div class="progress">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25</div>
-                          </div>
-                    </div>
-                    <br>
-                    <!--inner card one-->
-                    <div class="row">
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 align="center" class="card-title">Students</h3>
-                                  <h1 align="center">{{student_count}}</h1>
+                            <br>
+                            <!--inner card row one-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 align="center" class="card-title">Students</h5>
+                                            <h2 align="center">{{student_count}}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 align="center" class="card-title">Sections</h5>
+                                            <h2 align="center">{{section_count}}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <!--inner card row two-->
+                            <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 align="center" class="card-title">Tools used</h5>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-4"align="center">
+                                                <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle">
+                                            </div>
+                                            <div class="col-md-4"align="center">
+                                                <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <center>
+                                                <a href="{% url 'TMmod:uploadtools' %}"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle add"></a>
+                                                </center>
+                                                <h6 align = "center">Add Tools</h6>
+                                            </div>
+                                         </div>
+                                        
+                                        
+                                        <br>
+                                        
+                                    <br>
+                                    <br>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card ">
+                                    <div class="card-header ">
+                                        <h5 align="center" class="card-title">Telegram Status</h5>
+                                        <span align = "center">
+                                             
+                                            <h4><b>45/50</b> <br>Registered</h4>
+                                            <center><button type="button" class="btn btn-sm btn-primary">Send reminder</button></center>
+                                            <br>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 align="center" class="card-title">Sections</h3>
-                                <h1 align="center">{{section_count}}</h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 align="center" class="card-title">Tools used</h3>
-                              </br>
-                                <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle">
-                                <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle">
-                                <a href="{% url 'TMmod:uploadtools' %}"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle"></a>
-                                <label for="addmore">Add</label>
-                              </br>
-                              </br>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card ">
-                            <div class="card-header ">
-                                <h3 align="center" class="card-title">Telegram Status</h3>
-                                  <span>
-                                    <h4>45/50 Registered</h4>
-                                    <button type="button" class="btn btn-sm btn-primary">Send reminder</button>
-                                  </span>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                    <!--end of inner card one-->
-                    <div class="col-md-6">
-                              <div class='tableauPlaceholder' id='viz1534230322003' style='position: relative'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;fy&#47;fypdashboard2&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='fypdashboard2&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;fy&#47;fypdashboard2&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1534230322003');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='1000px';vizElement.style.height='827px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
-                   </div>
+                        <!--end of inner card row two-->
 
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
+                              <div class='tableauPlaceholder' id='viz1534230322003' style='position: relative'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;fy&#47;fypdashboard2&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='fypdashboard2&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;fy&#47;fypdashboard2&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1534230322003');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='1000px';vizElement.style.height='827px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+                   </div> -->
+                   <div class="row">
+                        <div class="col-md-12">
                         <div class="card ">
                             <div class="card-header ">
-                                <h4 class="card-title">View Ranking</h4>
-                                <p class="card-category">24 Hours performance</p>
+                                    <h5 align="center" class="card-title">Class Ranking</h5>
+                                <p class="card-category" align="center">24 Hours performance</p>
                             </div>
                             <div class="card-body">
-                                {% include "Module_TeamManagement/Student/scoreboard.html" %}
+                                <span align="center">
+                                     {% include "Module_TeamManagement/Student/scoreboard.html" %}
+                                </span>
                             </div>
                             <div class="card-footer ">
                                 <div class="stats">
@@ -114,9 +141,10 @@
                         </div>
                     </div>
                   </div>
-                </br>
+                <br>
                 </div>
                 </div>
+            </div>
     </div>
 </div>
 </div>

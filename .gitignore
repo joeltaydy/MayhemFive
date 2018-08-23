@@ -2,6 +2,12 @@
 bootstrap_files
 Diagrams
 
+#ignore vscode
+CLE/.vscode/settings.json
+CLE/.vscode/tasks.json
+CLE/.vscode/launch.json
+CLE/.vscode/extensions.json
+
 ### Django ###
 *.log
 *.pot

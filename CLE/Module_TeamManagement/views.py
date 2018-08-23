@@ -9,27 +9,21 @@ from django.contrib.auth.decorators import login_required
 # Student Home Page
 #@login_required(login_url='/')
 def home(requests):
-    response = {"home" : "active"}
+    context = {"home" : "active"}
 
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
-        return render(requests,'Module_Account/login.html',response)
-
+        return render(requests,'Module_Account/login.html',context)
+    student_email = requests.user.email
     # Populates the info for the side nav bar for instructor
-    utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
+    utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-    student_email = requests.user.email
-    link = ''
-    for occurance in Class.objects.filter(student=student_email):
-        for clt in occurance.clt_id.all():
-            if clt.type == 'Trailhead':
-                link = clt.website_link
-
-    results = utilities.getTrailheadInformation(link)
-    response.update(results)
-
-    return render(requests,"Module_TeamManagement/Student/studentHome.html",response)
+    
+    trailResults = utilities.populateTrailheadInformation(student_email)
+    context.update(trailResults)
+    #print(context)
+    return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
 # Faculty Notification Page
@@ -68,33 +62,29 @@ def faculty_Home(requests):
     context = {"faculty_Home" : "active"}
 
     faculty_username = requests.user.email.split('@')[0]
-
+    #print(requests.user.email)
     try:
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-
-        facultyObj = Faculty.objects.get(username=faculty_username)
+        facultyObj = Faculty.objects.get(email=requests.user.email)
         registered_course_section = facultyObj.course_section.all()
-
         courses = []
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
             if course_title not in courses:
                 courses.append(course_title)
-
         students = []
         for course_section in registered_course_section:
             classObj = Class.objects.all().filter(course_section=course_section)
             for student in classObj:
                 students.append(student)
-
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
         context['student_count'] = len(students)
 
     except:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
@@ -143,7 +133,7 @@ def faculty_Overview(requests):
         course_section = requests.GET.get('module')
     else:
         course_section = requests.POST.get('course_section')
-
+    print(course_section)
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
