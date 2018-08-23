@@ -4,7 +4,7 @@ asn1crypto==0.24.0
 astroid==2.0.3
 async-generator==1.9
 attrs==18.1.0
-Automat==0.0.0
+Automat==0.7.0
 awscli==1.15.59
 beautifulsoup4==4.6.3
 billiard==3.5.0.4
@@ -56,7 +56,6 @@ pytest-runner==4.2
 python-dateutil==2.7.3
 python3-openid==3.1.0
 pytz==2018.5
-pywin32==221
 PyYAML==3.13
 queuelib==1.5.0
 redis==2.10.6
