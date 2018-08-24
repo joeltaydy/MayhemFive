@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'allauth.account', # new
     'allauth.socialaccount', # new
     'allauth.socialaccount.providers.google', # new
-    'jchart' 
+    'chartjs'
 ]
 
 MIDDLEWARE = [
@@ -188,4 +188,3 @@ STATICFILES_DIRS = [
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
-

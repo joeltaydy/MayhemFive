@@ -6,6 +6,10 @@ from Module_TeamManagement.src import bootstrap, tele_util, utilities
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 
+from random import randint
+from django.views.generic import TemplateView
+from chartjs.views.lines import BaseLineChartView
+
 # Student Home Page
 #@login_required(login_url='/')
 def home(requests):
@@ -17,7 +21,7 @@ def home(requests):
 
     # Populates the info for the side nav bar for instructor
     utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
-
+    
     # Reads web scrapper results
     student_email = requests.user.email
     link = ''
@@ -647,7 +651,4 @@ def initialize_Section_Channel(request):
     response['message'] = 'Telegram Channel for Section Created'
     return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
 
-def chart_view(request):
-    render(request, "Module_TeamManagement/charts.html", {
-        'line_chart': LineChart(),
-    })
+line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
