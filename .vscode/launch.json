@@ -38,7 +38,7 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/CLE/manage.py",
+            "program": "${workspaceFolder}/manage.py",
             "args": [
                 "runserver",
                 "--noreload",
@@ -46,7 +46,7 @@
             ],
             "debugOptions": [
                 "RedirectOutput",
-                "Django",
+                "Django"
             ]
         },
         {

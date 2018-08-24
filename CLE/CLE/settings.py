@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'allauth.account', # new
     'allauth.socialaccount', # new
     'allauth.socialaccount.providers.google', # new
-    'chartjs'
+    'django_celery_beat', # new
 ]
 
 MIDDLEWARE = [
@@ -188,3 +188,26 @@ STATICFILES_DIRS = [
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
+<<<<<<< HEAD
+=======
+
+from celery.schedules import crontab
+# If you need to execute every n day
+
+# CELERY STUFF
+# Celery application definition
+# http://docs.celeryproject.org/en/v4.0.2/userguide/configuration.html
+CELERY_BROKER_URL  = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Makassar'
+CELERY_BEAT_SCHEDULE = {
+    'task-number-one': { #name of scheduler
+    'task': 'trailheadscrapper', #name of task
+    'schedule':  100.0 #period of running in seconds
+    #'arg's :  #if have args
+    }
+}
+>>>>>>> e35d2f5c8bb8a4911159fbe257cf521fe848c5fd

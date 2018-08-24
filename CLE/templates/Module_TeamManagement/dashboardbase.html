@@ -73,7 +73,7 @@
                             <li class="nav-item dropdown">
                               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   {% if  user.email != '' %}
-                                  <span class="no-icon">Hola, {{ user.first_name }} </span>
+                                  <span class="no-icon">Hola, {{ request.session.user_name }} </span>
                                   {% else %}
                                      <span class="no-icon">Hola, Administrator </span>
                                   {% endif %}
