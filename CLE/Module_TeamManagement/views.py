@@ -25,6 +25,7 @@ def home(requests):
         data = each_SocialAccount.extra_data
         if data['email'] == student_email:
             requests.session['user_picture'] = data['picture']
+            requests.session['user_name'] = data['name'].replace('_','').strip()
 
     # Populates the info for the side nav bar for instructor
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
@@ -80,6 +81,7 @@ def faculty_Home(requests):
         data = each_SocialAccount.extra_data
         if data['email'] == requests.user.email:
             requests.session['user_picture'] = data['picture']
+            requests.session['user_name'] = data['name'].replace('_','').strip()
 
     #print(requests.user.email)
     try:
