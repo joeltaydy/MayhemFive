@@ -11,7 +11,7 @@ Instructor page
         </div>
             <div class="author">
                 <img class="avatar border-gray" src="{{ request.session.user_picture }}" alt="...">
-                <h5 class="title">{{ user.first_name }}</h5>
+                <h5 class="title">{{ request.session.user_name }}</h5>
                 <p class="description">Faculty</p>
             </div>
         <hr>
