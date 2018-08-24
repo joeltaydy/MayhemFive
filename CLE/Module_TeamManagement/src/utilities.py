@@ -16,7 +16,7 @@ from Module_TeamManagement.models import Cloud_Learning_Tools,Faculty,Class
 # Populate relevant courses related to instructors/students from database
 def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     courseList = {}
-    try: 
+    try:
         if instructorEmail != None:
             courseObject = Faculty.objects.get(email=instructorEmail).course_section.all()
             for course in courseObject:
@@ -27,7 +27,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             for individuaClass in classObject:
                 course_section = individuaClass.course_section
                 courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
-    except : 
+    except :
         traceback.print_exc()
 
     requests.session['courseList'] = courseList
@@ -35,7 +35,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 
 # Returns all trailhead webscrapper info from tcsv():
 '''
-        final format should be 
+        final format should be
         results = {
             "joel.tay.2016@smu.edu.sg" : {'badge_count' : 4 , ...}
             "shlye.2016@smu.edu.sg" :{'badge_count': '52', 'points_count': '29,650', 'trail_count': '3', 'badges_obtained': ['commerce_cloud_functional_consulting', .. }
@@ -45,8 +45,8 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 def getTrailheadInformation():
     file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results ={}
-    
-    with open(file_path,mode='r') as csvInput:
+
+    with open(file_path,mode='r',encoding='cp1252') as csvInput:
         csv_reader = csv.reader(csvInput, delimiter=',')
         counter = 0
 
@@ -70,21 +70,21 @@ def getTrailheadInformation():
 
                 content['badges_obtained'] = new_badges_obtained
                 results[studId] = content #Key is student_email
-   
+
     return results
 
 # Main method to retreive all information of trailhead informations
 '''
-        final format should be 
+        final format should be
         context = {
             "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
             "CourseTrailResults" : {'badge_count' : 4 , ...}
         }
 '''
 def populateTrailheadInformation(student_email=None):
-    context = {} 
+    context = {}
     trailHeadInfo = getTrailheadInformation()
-                
+
     if student_email != None:
         try:
             context["personal"] = trailHeadInfo[student_email]
@@ -99,7 +99,7 @@ def populateTrailheadInformation(student_email=None):
     final format should be
     'CourseTrailResults': {
         BPAS210G4: {
-            'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51}, 
+            'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
             'T3': {'badges': 280, 'points': 207475, 'trails': 26}, 'T4': {'badges': 138, 'points': 173400, 'trails': 12}
             }
         },
@@ -122,7 +122,7 @@ def populateTeamTrailHeadInformation(results):
         classResult[course_section_id][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
         classResult[course_section_id][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
         classResult[course_section_id][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
-    
+
     return classResult
 
 # The webscreapper to scrap static info from website
@@ -130,10 +130,10 @@ def webScrapper():
     from bs4 import BeautifulSoup
     from Module_TeamManagement.models import Cloud_Learning_Tools
     import datetime
-    
+
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
-    
+
     clt_tools = Cloud_Learning_Tools.objects.filter(type='TrailHead')
 
     studentEmails = []
@@ -152,7 +152,7 @@ def webScrapper():
         req = requests.get(link)
         soup = BeautifulSoup(req.text, 'html.parser')
         broth = soup.find(attrs={'data-react-class': 'BadgesPanel'})
-        
+
         json_obj = json.loads(str(broth['data-react-props']))
 
         titles = []
@@ -161,7 +161,7 @@ def webScrapper():
 
         name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
         stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
- 
+
         content['titles'] = titles
         content['name'] = json.loads(str(name['data-react-props']))['full_name']
         content['badge-count'] = stats[0].text.strip()
@@ -169,9 +169,9 @@ def webScrapper():
         content['trail-count'] = stats[2].text.strip()
 
         info[link] = content
-  
+
     print("scrapping info from  file : %.9f " % (time.time()-st) )
-    
+
     counter=0 #iterate in studentList
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
@@ -182,6 +182,4 @@ def webScrapper():
             writer.writerow(to_write)
             counter+=1
 
-    print("done scrapping info from  file : %.9f " % (time.time()-st) ) 
-
- 
+    print("done scrapping info from  file : %.9f " % (time.time()-st) )
