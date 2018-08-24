@@ -2,9 +2,12 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
-from Module_TeamManagement.src import bootstrap, tele_util, utilities
+from Module_TeamManagement.src import bootstrap, utilities
+from Module_TeamManagement.src.tele_util import *
+from Module_TeamManagement.src.tele_config import *
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
+from allauth.socialaccount.models import SocialAccount
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -14,12 +17,20 @@ def home(requests):
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
+
     student_email = requests.user.email
+    all_SocialAccount = SocialAccount.objects.all()
+
+    for each_SocialAccount in all_SocialAccount:
+        data = each_SocialAccount.extra_data
+        if data['email'] == student_email:
+            requests.session['user_picture'] = data['picture']
+
     # Populates the info for the side nav bar for instructor
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-    
+
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
     #print(context)
@@ -56,12 +67,20 @@ def CLEAdmin(requests):
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# Student Home Page
+# Faculty Home Page
 #@login_required(login_url='/')
 def faculty_Home(requests):
     context = {"faculty_Home" : "active"}
 
     faculty_username = requests.user.email.split('@')[0]
+
+    all_SocialAccount = SocialAccount.objects.all()
+
+    for each_SocialAccount in all_SocialAccount:
+        data = each_SocialAccount.extra_data
+        if data['email'] == requests.user.email:
+            requests.session['user_picture'] = data['picture']
+
     #print(requests.user.email)
     try:
         #Populates the info for the side nav bar for instructor
@@ -604,35 +623,54 @@ def configureDB_clt(requests):
 # This is for subsequent configuration by faculty
 #
 # Requests param: GET
-# - course_title
-# - section_number
-# - username
+# - phone_number
 #
 # Models to modify:
 # - Class
 #
 # Response (Succcess):
-# - initialize_Section_Channel
+# - configure_telegram
 # - results
 # - message
 #
-def initialize_Section_Channel(request):
-    response = {"initialize_Section_Channel" : "active"}
+def configure_telegram(requests):
+    response = {"configure_telegram" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
-        section_number = requests.GET.get("section_number")
-        faculty_username = requests.GET.get("username")
-        course_title = requests.GET.get("course_title")
+        username = requets.user.email.split('@')[0]
+        phone_number = requests.POST.get('phone_number')
+        login_code = requests.POST.get('login_code')
+        session_file = username + '.session'
 
-        response['results'] = tele_util.initialize_Channel(faculty_username,course_title,section_number)
+        client = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+        client.connect()
+
+        if not client.is_user_authorized():
+            if phone_number != None and login_code == None:
+                client.send_code_request(phone_number)
+                facultyObj = Faculty.objects.get(username=username)
+
+                # Todo: Hash phone number before storinginto database
+                facultyObj.phone_number = phone_number
+
+                response['action'] = 'login'
+                return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+
+            elif phone_number == None and login_code != None:
+                try:
+                    client.sign_in(phone_number, login_code)
+                except PhoneNumberUnoccupiedError:
+                    client.sign_up(phone_number, login_code)
+
+        client.disconnect()
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    response['message'] = 'Telegram Channel for Section Created'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    response['message'] = 'Telegram Group Configured'
+    return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
