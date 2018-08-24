@@ -188,8 +188,6 @@ STATICFILES_DIRS = [
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
-<<<<<<< HEAD
-=======
 
 from celery.schedules import crontab
 # If you need to execute every n day
@@ -210,4 +208,3 @@ CELERY_BEAT_SCHEDULE = {
     #'arg's :  #if have args
     }
 }
->>>>>>> e35d2f5c8bb8a4911159fbe257cf521fe848c5fd

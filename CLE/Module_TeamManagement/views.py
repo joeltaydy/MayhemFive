@@ -32,13 +32,8 @@ def home(requests):
             requests.session['user_name'] = data['name'].replace('_','').strip()
 
     # Populates the info for the side nav bar for instructor
-<<<<<<< HEAD
-    utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
-    
-=======
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
->>>>>>> e35d2f5c8bb8a4911159fbe257cf521fe848c5fd
     # Reads web scrapper results
 
     trailResults = utilities.populateTrailheadInformation(student_email)
@@ -683,9 +678,7 @@ def configure_telegram(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-<<<<<<< HEAD
-line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
-=======
     response['message'] = 'Telegram Group Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
->>>>>>> e35d2f5c8bb8a4911159fbe257cf521fe848c5fd
+
+line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
