@@ -17,17 +17,17 @@
                         <h3 align = "center">7 / 14 WEEKS </h3>
                 </div>
             </div>
-        </div>    
+        </div>
 
         <!--Class One Card-->
-        
+
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title" align="center">IS480</h2>
                 </div>
                 <br>
-                
+
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
@@ -42,24 +42,24 @@
                                 </div>
                                 </div>
                                 <br>
-                                
+
                                 <p align="right">
                                     <a class="btn btn-danger btn-sm" role="button" href = "{% url 'TMmod:uploadtoolStudent' %}?user=student" >Set up tools</a>
                                 </p>
-                            
+
                         </div>
                     </div>
                 </div>
-                                
+
                 <!--Tool 1 Card-->
-                
+
                 <div class="col-md-12">
                     <div class = "card">
                         <div class="card-header">
                                 <h3 class="card-title" align="right">Trailhead</h3>
                                 <br>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                     <center><h1>{{personal.points_count}}</h1> <h6>POINTS</h6></center>
@@ -70,7 +70,7 @@
                                 <center><h1>{{personal.trail_count}}</h1> <h6>TRAILS COMPLETED</h6></center>
                                 <br>
                             </div>
-                        
+
                         </div>
 
                         <div class = "col-md-12">
@@ -81,10 +81,10 @@
                                 </div>
                             </div>
                         </div>
-                        
-                            
-                        
-                        
+
+
+
+
                             <!-- <div class="col-md-6">
                                 <div class="card card-tasks">
                                     <div class="card-header">
@@ -102,12 +102,12 @@
                                     </div>
                                 </div>
                                 </div> -->
-                        
+
                     </div>
                 </div>
-                
+
                 <!--END Tool 1 Card-->
-        
+
                 <!-- calendar-->
                 <!-- <div class="col-md-6">
                     <div class="card card-tasks">
@@ -136,15 +136,25 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <!--End Class Ranking-->
-                
-            <br>
-               
-            
-            </div>
-        </div>
-      <!--End Class 1 Card-->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Ranking</h4>
+                                <p class="card-category">24 Hours performance</p>
+                            </div>
+                            <div class="card-body">
+                                {% include "Module_TeamManagement/line_chart.html" %}
+                            </div>
+                            <div class="card-footer ">
+                                <div class="stats">
+                                    <i class="fa fa-history"></i> Updated 24 hours ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </br>
+      </div>
     </div>
 </div>
 {% endblock %}
