@@ -31,7 +31,6 @@ def home(requests):
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
     #print(context)
@@ -654,8 +653,8 @@ def configure_telegram(requests):
                 client.send_code_request(phone_number)
                 facultyObj = Faculty.objects.get(username=username)
 
-                # Todo: Hash phone number before storinginto database
-                facultyObj.phone_number = phone_number
+                # Todo: Hash phone number before storing into database
+                facultyObj.phone_number = hash_phone_number
 
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
