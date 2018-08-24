@@ -170,3 +170,6 @@ def initialize_Channel(username=None,course_title=None,section_number=None):
 
     finally:
         client.disconnect()
+
+def initialize_Groups(username=None,course_title=None,section_number=None):
+    return
