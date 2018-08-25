@@ -1,9 +1,9 @@
 import os
+import datetime
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, channels
-from telethon.tl.types import ChannelAdminRights
+from telethon.tl.types import ChannelAdminRights, ChatInviteExported
 from Module_TeamManagement.src.tele_config import *
-import Module_TeamManagement.src.telebot_util as telebot
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
@@ -44,6 +44,12 @@ def getDialog(client,dialog_name):
 # Valid for:
 # 1. Course Channel
 # 2. Section Channel
+#
+# Returns dict:
+# - status
+# - message
+# - channel_name
+# - channel_link
 def initialize_Channel(client=None,course_title='',section_number=''):
     results = {}
 
@@ -79,9 +85,9 @@ def initialize_Channel(client=None,course_title='',section_number=''):
         results['status'] = True
         results['message'] = title + ' channel create.'
 
-    invite_link = telebot.getInviteLink(title)
+    invite_link = client(channels.ExportInviteRequest(getDialog(client,title)))
     results['channel_name'] = title
-    results['channel_link'] = invite_link
+    results['channel_link'] = invite_link.link
 
     return results
 
@@ -90,6 +96,12 @@ def initialize_Channel(client=None,course_title='',section_number=''):
 # Valid for:
 # 1. Section Groups
 # 2. Team Groups
+#
+# Returns dict:
+# - status
+# - message
+# - group_name
+# - group_link
 def initialize_Groups(client=None,course_title='',section_number='',team_number=''):
     results = {}
 
@@ -112,8 +124,28 @@ def initialize_Groups(client=None,course_title='',section_number='',team_number=
         results['status'] = True
         results['message'] = title + ' group create.'
 
-    invite_link = telebot.getInviteLink(title)
+    invite_link = client(messages.ExportChatInviteRequest(getDialog(client,title)))
     results['group_name'] = title
-    results['group_link'] = invite_link
+    results['group_link'] = invite_link.link
 
     return results
+
+
+if __name__ == "__main__":
+    try:
+        client = getClient(ADMIN_USERNAME)
+        client.connect()
+
+        if not client.is_user_authorized():
+            client.send_code_request(ADMIN_PHONE_NUMBER)
+            try:
+                client.sign_in(ADMIN_PHONE_NUMBER, input("Enter Code: "))
+            except PhoneNumberUnoccupiedError:
+                client.sign_up(ADMIN_PHONE_NUMBER, input("Enter Code: "))
+
+        # RUN test methods here
+
+        client.disconnect()
+
+    except Exception as e:
+        traceback.print_exc()

@@ -5,19 +5,27 @@ from Module_TeamManagement.src.tele_config import *
 #------------------------ Telegram Bot Functions -----------------------------#
 #-----------------------------------------------------------------------------#
 
-# Initilize bot
-def getBot(token=BOT_TOKEN):
-    return telegram.Bot(token=token)
+# # Initilize bot
+# def getBot(token=BOT_TOKEN):
+#     return telegram.Bot(token=token)
 
 
-# Get group/channel invite link
-def getInviteLink(group_name=''):
-    if group_name == '':
-        raise Exception('Please specify group/channel name.')
-
-    bot = getBot()
-    return bot.exportChatInviteLink(chat_id='@'+group_name)
-
+# # Get channel invite link
+# def getChannelInviteLink(group_name=''):
+#     if group_name == '':
+#         raise Exception('Please specify group/channel name.')
+#
+#     bot = getBot()
+#     return bot.exportChatInviteLink(chat_id='@'+group_name)
+#
+#
+# # Get group invite link
+# def getGroupInviteLink(group_name=''):
+#     if group_name == '':
+#         raise Exception('Please specify group/channel name.')
+#
+#     bot = getBot()
+#     return bot.exportChatInviteLink(chat_id='@'+group_name)
 
 # def send_Message(message=None, group_name=None):
 #     bot = telegram.Bot(token=BOT_TOKEN)
