@@ -104,6 +104,8 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
                 phoneNumber = str('65') + phoneNumber
             elif '+' in phoneNumber and len(phoneNumber) == 11:
                 phoneNumber = phoneNumber[1:]
+
+            # Todo: Hash phone number if there's any    
             faculty.append(phoneNumber)
 
         # Create faculty : list
@@ -233,16 +235,12 @@ def bootstrap_Faculty(fileDict):
     if fileDict['file_type'] == 'zip':
         bootstrapInfo = parse_File_Faculty(fileDict['faculty'], bootstrapInfo)
         bootstrapInfo = parse_File_Course(fileDict['course'], bootstrapInfo)
-        Course.objects.all().delete()
-        Faculty.objects.all().delete()
 
     elif fileDict['file_type'] == 'excel' and fileDict['file_information'] == 'course':
         bootstrapInfo = parse_File_Course(fileDict['file_path'], bootstrapInfo)
-        Course.objects.all().delete()
 
     elif fileDict['file_type'] == 'excel' and fileDict['file_information'] == 'faculty':
         bootstrapInfo = parse_File_Faculty(fileDict['file_path'], bootstrapInfo)
-        Faculty.objects.all().delete()
 
     try:
         if len(bootstrapInfo) == 0:
