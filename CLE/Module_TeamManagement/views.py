@@ -11,7 +11,7 @@ from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
-from chartjs.views.lines import BaseLineChartView
+
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -679,5 +679,7 @@ def configure_telegram(requests):
 
     response['message'] = 'Telegram Group Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+
+
 
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
