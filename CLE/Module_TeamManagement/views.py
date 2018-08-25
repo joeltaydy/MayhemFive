@@ -655,7 +655,7 @@ def configure_telegram(requests):
                 facultyObj = Faculty.objects.get(username=username)
 
                 # Todo: hash/encrypt phone number before storing into database
-                facultyObj.phone_number = hex_phone_number
+                # facultyObj.phone_number = hex_phone_number
 
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
