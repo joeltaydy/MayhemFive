@@ -161,6 +161,8 @@ SITE_ID = 2 # Check your Database to see site id
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
 
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
