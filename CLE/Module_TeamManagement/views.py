@@ -2,16 +2,14 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
-from Module_TeamManagement.src import bootstrap, utilities
-from Module_TeamManagement.src.tele_util import *
-from Module_TeamManagement.src.tele_config import *
+from Module_TeamManagement.src import bootstrap, utilities, tele_util
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
-from chartjs.views.lines import BaseLineChartView
+# from chartjs.views.lines import BaseLineChartView
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -647,9 +645,8 @@ def configure_telegram(requests):
         username = requets.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
-        session_file = username + '.session'
 
-        client = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+        client = tele_util.getClient(username)
         client.connect()
 
         if not client.is_user_authorized():
@@ -657,8 +654,8 @@ def configure_telegram(requests):
                 client.send_code_request(phone_number)
                 facultyObj = Faculty.objects.get(username=username)
 
-                # Todo: Hash phone number before storing into database
-                facultyObj.phone_number = hash_phone_number
+                # Todo: hash/encrypt phone number before storing into database
+                facultyObj.phone_number = hex_phone_number
 
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
