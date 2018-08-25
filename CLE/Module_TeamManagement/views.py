@@ -666,7 +666,7 @@ def configure_telegram(requests):
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-            elif phone_number == None and login_code != None:
+            elif phone_number != None and login_code != None:
                 try:
                     client.sign_in(int(phone_number), login_code)
                 except PhoneNumberUnoccupiedError:

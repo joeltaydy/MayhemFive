@@ -203,6 +203,7 @@ def encode(plainText=''):
     cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
     return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
 
+
 # Decrypt a 32-bit string
 # Accepts:
 # - cipherText : string
