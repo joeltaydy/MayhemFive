@@ -656,20 +656,21 @@ def configure_telegram(requests):
 
         if not client.is_user_authorized():
             if phone_number != None and login_code == None:
-                client.send_code_request(phone_number)
+                client.send_code_request(int(phone_number))
 
-                # facultyObj = Faculty.objects.get(username=username)
-                # Todo: hash/encrypt phone number before storing into database
-                # facultyObj.phone_number = hex_phone_number
+                facultyObj = Faculty.objects.get(username=username)
+                encrypt_phone_number = utilities.encode(phone_number)
+                facultyObj.phone_number = encrypt_phone_number
+                facultyObj.save()
 
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
             elif phone_number == None and login_code != None:
                 try:
-                    client.sign_in(phone_number, login_code)
+                    client.sign_in(int(phone_number), login_code)
                 except PhoneNumberUnoccupiedError:
-                    client.sign_up(phone_number, login_code)
+                    client.sign_up(int(phone_number), login_code)
 
         client.disconnect()
 

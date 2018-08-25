@@ -5,6 +5,9 @@ import csv
 import sys
 import os
 import time
+import base64
+from Crypto.Cipher import AES
+from CLE.settings import AES_SECRET_KEY
 from Module_TeamManagement.models import Cloud_Learning_Tools,Faculty,Class
 
 
@@ -125,6 +128,7 @@ def populateTeamTrailHeadInformation(results):
 
     return classResult
 
+
 # The webscreapper to scrap static info from website
 def webScrapper():
     from bs4 import BeautifulSoup
@@ -183,3 +187,15 @@ def webScrapper():
             counter+=1
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
+
+
+# Encrypt a 32-bit string
+def encode(plainText):
+    plainText = plainText.rjust(32)
+    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
+    return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
+
+# DEcrypt a 32-bit string
+def decode(cipherText):
+    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
+    return cipher.decrypt(base64.b64decode(encoded)).strip().decode('utf-8')
