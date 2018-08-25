@@ -190,12 +190,28 @@ def webScrapper():
 
 
 # Encrypt a 32-bit string
-def encode(plainText):
+# Accepts:
+# - plainText : string
+#
+# Return:
+# - cipherText : string
+def encode(plainText=''):
+    if plainText == '':
+        raise Exception('Please specify a 32 bit long plain text when encoding')
+
     plainText = plainText.rjust(32)
     cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
     return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
 
-# DEcrypt a 32-bit string
-def decode(cipherText):
+# Decrypt a 32-bit string
+# Accepts:
+# - cipherText : string
+#
+# Return:
+# - plainText : string
+def decode(cipherText=''):
+    if cipherText == '':
+        raise Exception('Please specify a cipher text for decoding')
+
     cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
     return cipher.decrypt(base64.b64decode(encoded)).strip().decode('utf-8')
