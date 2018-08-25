@@ -12,4 +12,4 @@ ADMIN_CHAT_ID = '-1001296496624'
 
 # admin credentials
 ADMIN_PHONE_NUMBER = '6591169096'
-ADMIN_GROUP = 'Thunderhead Monkey'
+ADMIN_GROUP = 'Thunderhead Monkeys'

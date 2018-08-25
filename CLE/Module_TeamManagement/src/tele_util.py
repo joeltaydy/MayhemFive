@@ -9,7 +9,6 @@ import Module_TeamManagement.src.telebot_util as telebot
 #-------------------------- Telegram Functions -------------------------------#
 #-----------------------------------------------------------------------------#
 
-
 # Return telegram client object.
 # Default username = admin_login
 def getClient(username=None):
@@ -80,6 +79,10 @@ def initialize_Channel(client=None,course_title='',section_number=''):
         results['status'] = True
         results['message'] = title + ' channel create.'
 
+    invite_link = telebot.getInviteLink(title)
+    results['channel_name'] = title
+    results['channel_link'] = invite_link
+
     return results
 
 
@@ -103,10 +106,14 @@ def initialize_Groups(client=None,course_title='',section_number='',team_number=
         results['status'] = False
         results['message'] = title + ' group already exists within Telegram.'
     else:
-        users = ['@rizzzy','@SMUCLEBot']
+        users = ['@Slaphappy','@SMUCLEBot']
         client(messages.CreateChatRequest(users=users,title=title))
 
         results['status'] = True
         results['message'] = title + ' group create.'
+
+    invite_link = telebot.getInviteLink(title)
+    results['group_name'] = title
+    results['group_link'] = invite_link
 
     return results
