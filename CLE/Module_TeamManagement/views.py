@@ -750,6 +750,8 @@ def configureDB_telegram(requests):
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
