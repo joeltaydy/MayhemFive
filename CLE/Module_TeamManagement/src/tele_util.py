@@ -174,9 +174,6 @@ if __name__ == "__main__":
                 client.sign_up(ADMIN_PHONE_NUMBER, input("Enter Code: "))
 
         # RUN test methods here
-        results = initialize_Group(client,'IS480','G4','T1')
-
-        print(results)
 
         client.disconnect()
 
