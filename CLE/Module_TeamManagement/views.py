@@ -181,7 +181,7 @@ def faculty_Overview(requests):
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
-    return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+    return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
 
 
 # TO-DO: update function
@@ -223,6 +223,7 @@ def student_Profile(requests):
     # context['message'] = 'Successful retrieval of student\'s profile'
     # return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
     return render(requests,"error404.html",context)
+
 
 # Student Team Page
 # @login_required(login_url='/')
@@ -679,6 +680,7 @@ def configureDB_telegram(requests):
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(int(phone_number), login_code)
 
+        # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
         action = requests.POST.get('action')
         course_section = requests.POST.get('course_section')
 
@@ -696,6 +698,9 @@ def configureDB_telegram(requests):
                 student.telegram_channellink = results['channel_link']
                 student.save()
 
+            response['message'] = results['message']
+            return faculty_Overview(requests)
+
         elif action == 'create_sectionGroup':
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
             class_QuerySet = Class.objects.filter(course_section=course_section)
@@ -710,17 +715,33 @@ def configureDB_telegram(requests):
                 student.telegram_grouplink = results['group_link']
                 student.save()
 
+            response['message'] = results['message']
+            return faculty_Overview(requests)
+
         elif action == 'create_teamGroup':
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
             class_QuerySet = Class.objects.filter(course_section=course_section)
 
-            # results = tele_util.initialize_Group(
-            #     client=client,
-            #     course_title=course_sectionObj.course.course_title,
-            #     section_number=course_sectionObj.section_number,
-            # )
+            teams = {}
+            for student in class_QuerySet:
+                try:
+                    teams[student.team_number].append(student)
+                except:
+                    teams[student.team_number] = [student]
 
-        client.disconnect()
+            for team_number,students in teams.items():
+                results = tele_util.initialize_Group(
+                    client=client,
+                    course_title=course_sectionObj.course.course_title,
+                    section_number=course_sectionObj.section_number,
+                    team_number=team_number,
+                )
+                for student in students:
+                    student.telegram_grouplink = results['group_link']
+                    student.save()
+
+            response['message'] = 'Teams Telegram Group Configured'
+            return faculty_Overview(requests)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
@@ -728,9 +749,11 @@ def configureDB_telegram(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
+    finally:
+        client.disconnect()
+
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
-
 
 
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
