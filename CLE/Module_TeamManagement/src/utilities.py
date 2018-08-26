@@ -106,14 +106,14 @@ def populateTrailheadInformation(student_email=None):
         BPAS210G4: {
             "Teams_Information" : {
                 'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...            
-            }, 
+                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+            },
             "Students_Information" : {
                 "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
                 "points" : [2323, 3333, 4445 ..]
                 "badges" : [3, 5, 6...]
             }
-            
+
         },
         BPAS201G2: {
             "Teams_Information" : {...}
@@ -125,11 +125,11 @@ def populateTrailheadInformation(student_email=None):
 def populateTeamTrailHeadInformation(results): #This is for instructor retrieval
     # SQL equivalent to order by course_section , team_number
     classes = Class.objects.order_by('course_section','team_number')
-    
+
 
     classResult = {}
     for classObj in classes:
-        course_section_id = classObj.course_section.course_section_id #Getting course code 
+        course_section_id = classObj.course_section.course_section_id #Getting course code
         if course_section_id not in classResult:
             classResult[course_section_id] = {}
             classResult[course_section_id]["Teams_Information"] = {}
@@ -139,7 +139,7 @@ def populateTeamTrailHeadInformation(results): #This is for instructor retrieval
             classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
             classResult[course_section_id]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
             classResult[course_section_id]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-        except: 
+        except:
             pass
 
         if classObj.team_number != None : #Omit classes with no teams
@@ -159,14 +159,14 @@ def populateTeamTrailHeadInformation(results): #This is for instructor retrieval
         BPAS210G4: {
             "Teams_Information" : {
                 'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...            
-            }, 
+                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+            },
             "Students_Information" : {
                 "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
                 "points" : [2323, 3333, 4445 ..]
                 "badges" : [3, 5, 6...]
             }
-            
+
         },
         BPAS201G2: {
             "Teams_Information" : {...}
@@ -176,24 +176,24 @@ def populateTeamTrailHeadInformation(results): #This is for instructor retrieval
     }
 '''
 def populateTeamTrailHeadInformation(results, studentemail): #This is for student retrieval
-    
+
     classStudentObj = Class.objects.filter(student=studentemail)
     courseSection = classStudentObj[0].course_section.course_section_id
     # SQL equivalent to filter by course section and order by team_number
     classes = Class.objects.filter(course_section= courseSection).order_by('team_number')
-    
+
     classResult = {}
     classResult["class"] = {}
     classResult["class"]["Teams_Information"] = {}
     classResult["class"]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
-        
+
     for classObj in classes:
         try:
             #populate student results
             classResult["class"]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
             classResult["class"]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
             classResult["class"]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-        except: 
+        except:
             pass
 
         if classObj.team_number != None : #Omit classes with no teams
@@ -278,8 +278,8 @@ def encode(plainText=''):
         raise Exception('Please specify a 32 bit long plain text when encoding')
 
     plainText = plainText.rjust(32)
-    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
-    return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+    return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
 
 
 # Decrypt a 32-bit string
@@ -292,5 +292,5 @@ def decode(cipherText=''):
     if cipherText == '':
         raise Exception('Please specify a cipher text for decoding')
 
-    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
-    return cipher.decrypt(base64.b64decode(encoded)).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+    return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
