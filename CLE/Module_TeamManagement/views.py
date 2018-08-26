@@ -10,6 +10,7 @@ from allauth.socialaccount.models import SocialAccount
 from random import randint
 from django.views.generic import TemplateView
 
+
 # Student Home Page
 #@login_required(login_url='/')
 def home(requests):
@@ -27,6 +28,7 @@ def home(requests):
         if data['email'] == student_email:
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
+            requests.session['user'] = 'student'
 
     # Populates the info for the side nav bar for instructor
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
@@ -34,7 +36,7 @@ def home(requests):
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
-    print(context)
+
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -82,6 +84,7 @@ def faculty_Home(requests):
         if data['email'] == requests.user.email:
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
+            requests.session['user'] = 'faculty'
 
     #print(requests.user.email)
     try:
@@ -154,7 +157,7 @@ def faculty_Overview(requests):
         course_section = requests.GET.get('module')
     else:
         course_section = requests.POST.get('course_section')
-    print(course_section)
+
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
@@ -635,7 +638,7 @@ def configureDB_clt(requests):
 # - results
 # - message
 #
-def configure_telegram(requests):
+def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
@@ -671,6 +674,47 @@ def configure_telegram(requests):
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(int(phone_number), login_code)
 
+        action = requests.POST.get('action')
+        course_section = requests.POST.get('course_section')
+
+        if action == 'create_sectionChannel':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Channel(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_channellink = results['channel_link']
+                student.save()
+
+        elif action == 'create_sectionGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Group(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_grouplink = results['group_link']
+                student.save()
+
+        elif action == 'create_teamGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            # results = tele_util.initialize_Group(
+            #     client=client,
+            #     course_title=course_sectionObj.course.course_title,
+            #     section_number=course_sectionObj.section_number,
+            # )
+
         client.disconnect()
 
     except Exception as e:
@@ -679,7 +723,7 @@ def configure_telegram(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    response['message'] = 'Telegram Group Configured'
+    response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 
