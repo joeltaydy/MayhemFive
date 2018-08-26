@@ -11,7 +11,6 @@ from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
-from chartjs.views.lines import BaseLineChartView
 
 # Student Home Page
 #@login_required(login_url='/')
