@@ -2,6 +2,7 @@ import xlrd
 import time
 import traceback
 from django.core.files import File
+from Module_TeamManagement.src import utilities
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 
 #-----------------------------------------------------------------------------#
@@ -104,7 +105,9 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
                 phoneNumber = str('65') + phoneNumber
             elif '+' in phoneNumber and len(phoneNumber) == 11:
                 phoneNumber = phoneNumber[1:]
-            faculty.append(phoneNumber)
+
+            encrypt_phoneNumber = utilities.encode(phoneNumber)
+            faculty.append(encrypt_phoneNumber)
 
         # Create faculty : list
         faculty = [email,username,firstname,lastname] + faculty
@@ -233,16 +236,12 @@ def bootstrap_Faculty(fileDict):
     if fileDict['file_type'] == 'zip':
         bootstrapInfo = parse_File_Faculty(fileDict['faculty'], bootstrapInfo)
         bootstrapInfo = parse_File_Course(fileDict['course'], bootstrapInfo)
-        Course.objects.all().delete()
-        Faculty.objects.all().delete()
 
     elif fileDict['file_type'] == 'excel' and fileDict['file_information'] == 'course':
         bootstrapInfo = parse_File_Course(fileDict['file_path'], bootstrapInfo)
-        Course.objects.all().delete()
 
     elif fileDict['file_type'] == 'excel' and fileDict['file_information'] == 'faculty':
         bootstrapInfo = parse_File_Faculty(fileDict['file_path'], bootstrapInfo)
-        Faculty.objects.all().delete()
 
     try:
         if len(bootstrapInfo) == 0:

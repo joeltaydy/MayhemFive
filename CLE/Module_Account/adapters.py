@@ -1,6 +1,5 @@
 # from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-
 from allauth.exceptions import ImmediateHttpResponse
 from  django.http import HttpResponseRedirect
 from django.conf import settings
@@ -36,7 +35,7 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
     '''
 
     def pre_social_login(self, request, sociallogin):
-        email_address=sociallogin.account.extra_data["email"].split('@')[1]
+        email_address = sociallogin.account.extra_data["email"].split('@')[1]
 
         #use for team's test using any gmail account w/o numbers infront
         isInstructor = re.findall(r"(^[a-zA-Z.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",sociallogin.account.extra_data["email"])
@@ -48,7 +47,6 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
         if isInstructor != [] :
             print("Pushing to instructor's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
-
 
         elif not email_address == "smu.edu.sg":
             messages.error(request, "Please use an SMU account")

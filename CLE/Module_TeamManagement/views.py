@@ -2,15 +2,17 @@ import os
 import traceback
 from zipfile import ZipFile
 from django.shortcuts import render
-from Module_TeamManagement.src import bootstrap, utilities
-from Module_TeamManagement.src.tele_util import *
-from Module_TeamManagement.src.tele_config import *
+from Module_TeamManagement.src import bootstrap, utilities, tele_util
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
+<<<<<<< HEAD
+=======
+
+>>>>>>> 103536d18f26ba8fe10d9d5d62c9f848080610a7
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -34,7 +36,6 @@ def home(requests):
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
     #print(context)
@@ -647,27 +648,32 @@ def configure_telegram(requests):
         username = requets.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
-        session_file = username + '.session'
 
-        client = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+        if len(phone_number) == 8:
+            phone_number = str('65') + phone_number
+        elif '+' in phone_number and len(phone_number) == 11:
+            phone_number = phone_number[1:]
+
+        client = tele_util.getClient(username)
         client.connect()
 
         if not client.is_user_authorized():
             if phone_number != None and login_code == None:
-                client.send_code_request(phone_number)
-                facultyObj = Faculty.objects.get(username=username)
+                client.send_code_request(int(phone_number))
 
-                # Todo: Hash phone number before storinginto database
-                facultyObj.phone_number = phone_number
+                facultyObj = Faculty.objects.get(username=username)
+                encrypt_phone_number = utilities.encode(phone_number)
+                facultyObj.phone_number = encrypt_phone_number
+                facultyObj.save()
 
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-            elif phone_number == None and login_code != None:
+            elif phone_number != None and login_code != None:
                 try:
-                    client.sign_in(phone_number, login_code)
+                    client.sign_in(int(phone_number), login_code)
                 except PhoneNumberUnoccupiedError:
-                    client.sign_up(phone_number, login_code)
+                    client.sign_up(int(phone_number), login_code)
 
         client.disconnect()
 
@@ -679,5 +685,7 @@ def configure_telegram(requests):
 
     response['message'] = 'Telegram Group Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+
+
 
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
