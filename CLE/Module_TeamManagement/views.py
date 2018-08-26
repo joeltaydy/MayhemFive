@@ -37,6 +37,27 @@ def home(requests):
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
 
+    # Get telegram group/channel link
+    enrolled_classes = Class.objects.filter(student=student_email)
+    context['telegram'] = {'status' : 'False'}
+    for enrolled_class in enrolled_classes:
+        group_link = enrolled_class.telegram_grouplink
+        channel_link = enrolled_class.telegram_channellink
+
+        if group_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['group'].update({enrolled_class.course_section : group_link})
+            except:
+                context['telegram']['group'] = {enrolled_class.course_section : group_link}
+
+        if channel_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
+            except:
+                context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
+
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
