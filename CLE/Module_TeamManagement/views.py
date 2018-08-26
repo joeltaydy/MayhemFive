@@ -9,10 +9,7 @@ from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
-<<<<<<< HEAD
-=======
 
->>>>>>> 103536d18f26ba8fe10d9d5d62c9f848080610a7
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -31,6 +28,7 @@ def home(requests):
         if data['email'] == student_email:
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
+            requests.session['user'] = 'student'
 
     # Populates the info for the side nav bar for instructor
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
@@ -38,7 +36,7 @@ def home(requests):
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
-    #print(context)
+
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -86,6 +84,7 @@ def faculty_Home(requests):
         if data['email'] == requests.user.email:
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
+            requests.session['user'] = 'faculty'
 
     #print(requests.user.email)
     try:
@@ -158,7 +157,7 @@ def faculty_Overview(requests):
         course_section = requests.GET.get('module')
     else:
         course_section = requests.POST.get('course_section')
-    print(course_section)
+
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
@@ -674,6 +673,23 @@ def configure_telegram(requests):
                     client.sign_in(int(phone_number), login_code)
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(int(phone_number), login_code)
+
+        action = requests.POST.get('action')
+
+        if action == 'create_channel':
+            results = tele_util.initialize_Channel(
+                client=client,
+                course_title=,
+                section_number=,
+            )
+
+        elif action == 'create_group':
+            results = tele_util.initialize_Channel(
+                client=client,
+                course_title=,
+                section_number=,
+                team_number=,
+            )
 
         client.disconnect()
 
