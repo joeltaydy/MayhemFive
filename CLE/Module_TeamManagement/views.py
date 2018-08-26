@@ -693,7 +693,7 @@ def configureDB_telegram(requests):
                 student.telegram_channellink = results['channel_link']
                 student.save()
 
-            response['message'] = 'Telegram Channel Configured'
+            response['message'] = results['message']
             return faculty_Overview(requests)
 
         elif action == 'create_sectionGroup':
@@ -710,7 +710,7 @@ def configureDB_telegram(requests):
                 student.telegram_grouplink = results['group_link']
                 student.save()
 
-            response['message'] = 'Telegram Group Configured'
+            response['message'] = results['message']
             return faculty_Overview(requests)
 
         elif action == 'create_teamGroup':
@@ -735,7 +735,7 @@ def configureDB_telegram(requests):
                     student.telegram_grouplink = results['group_link']
                     student.save()
 
-            response['message'] = 'Telegram Group Configured'
+            response['message'] = 'Teams Telegram Group Configured'
             return faculty_Overview(requests)
 
     except Exception as e:
