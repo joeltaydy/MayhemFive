@@ -73,7 +73,7 @@ def getFinancialYear():
 # - channel_name
 # - channel_link
 def initialize_Channel(client=None,course_title='',section_number=''):
-    results = {}
+    results = {'status' : False}
 
     if client == None:
         raise Exception('Client is invalid. Please connect to telegram client first.')
@@ -86,7 +86,7 @@ def initialize_Channel(client=None,course_title='',section_number=''):
 
     # Create channel for specified user
     if dialogExists(client,title,Channel):
-        results['status'] = False
+        results['status'] = True
         results['message'] = title + ' channel already exists within Telegram.'
     else:
         client(channels.CreateChannelRequest(title=title,about='This channel is for students in ' + title))
@@ -126,7 +126,7 @@ def initialize_Channel(client=None,course_title='',section_number=''):
 # - group_name
 # - group_link
 def initialize_Group(client=None,course_title='',section_number='',team_number=''):
-    results = {}
+    results = {'status' : False}
 
     if client == None:
         raise Exception('Client is invalid. Please connect to telegram client first.')
@@ -139,7 +139,7 @@ def initialize_Group(client=None,course_title='',section_number='',team_number='
 
     # Create groups for specified user
     if dialogExists(client,title,Chat):
-        results['status'] = False
+        results['status'] = True
         results['message'] = title + ' group already exists within Telegram.'
     else:
         users = ['@rizzzy','@SMUCLEBot']
