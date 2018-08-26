@@ -35,7 +35,7 @@ def home(requests):
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(student_email)
     context.update(trailResults)
-    #print(context)
+    print(context)
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 

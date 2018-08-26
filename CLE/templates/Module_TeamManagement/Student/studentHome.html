@@ -19,12 +19,12 @@
             </div>
         </div>
 
-        <!--Class One Card-->
-
-        <div class="col-md-6">
+        <!--Class One Card-->   
+        {% for course,course_section in request.session.courseList.items %}
+            <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title" align="center">IS480</h2>
+                    <h2 class="card-title" align="center">{{course_section}}</h2>
                 </div>
                 <br>
 
@@ -132,11 +132,11 @@
                             </div>
                         <div class="card-footer ">
                             <div class="stats">
-                                <i class="fa fa-history"></i> Updated 24 hours ago
+                                <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Ranking</h4>
@@ -147,14 +147,17 @@
                             </div>
                             <div class="card-footer ">
                                 <div class="stats">
-                                    <i class="fa fa-history"></i> Updated 24 hours ago
+                                    <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
                                 </div>
                             </div>
                         </div>
                     </div>
-                  </div>
-                </br>
-      </div>
+            </div>
+
+        {% endfor %}
+        
+        </br>
     </div>
 </div>
+
 {% endblock %}
