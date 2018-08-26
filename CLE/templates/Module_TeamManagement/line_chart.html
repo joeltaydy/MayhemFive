@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load charts_extra %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -11,38 +12,30 @@
   </head>
   <body>
     <div class="container">
-      <canvas id="myChart" width="400" height="400"></canvas>
+      <canvas id="myChart" width="1000" height="800"></canvas>
     </div>
-
+    
     <script>
     var ctx = document.getElementById("myChart").getContext('2d');
+    
     var myChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'bubble',
         data: {
-            labels: [{% for course,course_sectionObj in request.session.courseList.items %}'{{course}}',{% endfor %}],
-            datasets: [{
-                label: 'Badges against Points',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1,
-                hoverBorderWidth:3,
-                hoverBorderColor:'#000'
-            }]
+            datasets: [
+                {% for index in CourseTrailResults.studentLoopTimes %}
+                 {
+                    label: '{{CourseTrailResults.class.Students_Information.students|get_index:index}}',
+                    data: [
+                    {
+                        x: {{CourseTrailResults.class.Students_Information.badges|get_index:index}},
+                        y: {{CourseTrailResults.class.Students_Information.points|get_index:index}},
+                        r: 3
+                    }
+                    ],
+                    backgroundColor:"#ff6384",
+                    hoverBackgroundColor: "#ff6384"
+                },
+                {% endfor %}]
         },
         options: {
             scales: {
@@ -53,7 +46,9 @@
                 }]
             }
         }
-    });
+    }); 
+
+   
     </script>
   </body>
 </html>
