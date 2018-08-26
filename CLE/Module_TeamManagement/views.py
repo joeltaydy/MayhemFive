@@ -9,7 +9,10 @@ from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
+<<<<<<< HEAD
+=======
 
+>>>>>>> 103536d18f26ba8fe10d9d5d62c9f848080610a7
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -646,25 +649,31 @@ def configure_telegram(requests):
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
 
+        if len(phone_number) == 8:
+            phone_number = str('65') + phone_number
+        elif '+' in phone_number and len(phone_number) == 11:
+            phone_number = phone_number[1:]
+
         client = tele_util.getClient(username)
         client.connect()
 
         if not client.is_user_authorized():
             if phone_number != None and login_code == None:
-                client.send_code_request(phone_number)
-                facultyObj = Faculty.objects.get(username=username)
+                client.send_code_request(int(phone_number))
 
-                # Todo: hash/encrypt phone number before storing into database
-                # facultyObj.phone_number = hex_phone_number
+                facultyObj = Faculty.objects.get(username=username)
+                encrypt_phone_number = utilities.encode(phone_number)
+                facultyObj.phone_number = encrypt_phone_number
+                facultyObj.save()
 
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-            elif phone_number == None and login_code != None:
+            elif phone_number != None and login_code != None:
                 try:
-                    client.sign_in(phone_number, login_code)
+                    client.sign_in(int(phone_number), login_code)
                 except PhoneNumberUnoccupiedError:
-                    client.sign_up(phone_number, login_code)
+                    client.sign_up(int(phone_number), login_code)
 
         client.disconnect()
 
