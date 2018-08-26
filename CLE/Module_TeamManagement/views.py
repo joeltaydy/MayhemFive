@@ -701,6 +701,7 @@ def configureDB_telegram(requests):
                 facultyObj.save()
 
                 response['action'] = 'login'
+                # Currently temporary address. Not sure where to direct user to
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
             elif phone_number != None and login_code != None:
@@ -782,6 +783,7 @@ def configureDB_telegram(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
+    # Need to double confirm where to direct the user to once done.
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
