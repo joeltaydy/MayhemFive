@@ -7,13 +7,15 @@
 
     {% csrf_token %}
     <div class="form-group">
-   
+
       </br>
         <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
         <div class="col-md-8">
             <input type="file" name="file" id="file" required="True" class="form-control">
+            <input type="checkbox" name="action" id="action" value="True"> Clear Database<br>
         </div>
     </div>
+
     <div class="form-group">
         <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
             <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Upload</button>

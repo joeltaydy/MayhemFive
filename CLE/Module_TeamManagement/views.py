@@ -278,8 +278,12 @@ def configureDB_faculty(requests):
 
     try:
         file = requests.FILES.get("file", False)
-        bootstrapFile = {}
+        action = requests.POST.get("action")
 
+        if action:
+            bootstrap.clear_Database()
+
+        bootstrapFile = {}
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
             unzipped.extractall(os.path.abspath('bootstrap_files'))
