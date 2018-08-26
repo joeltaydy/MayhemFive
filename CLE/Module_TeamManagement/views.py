@@ -677,13 +677,19 @@ def configureDB_telegram(requests):
         action = requests.POST.get('action')
         course_section = requests.POST.get('course_section')
 
-        if action == 'create_channel':
+        if action == 'create_sectionChannel':
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
-            # results = tele_util.initialize_Channel(
-            #     client=client,
-            #     course_title=,
-            #     section_number=,
-            # )
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Channel(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_channellink = results['channel_link']
+                student.save()
 
         elif action == 'create_sectionGroup':
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
