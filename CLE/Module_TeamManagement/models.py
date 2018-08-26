@@ -92,7 +92,7 @@ class Faculty(models.Model):
     )
     phone_number = models.CharField(
         db_column='Phone_Number',
-        max_length=10,
+        max_length=255,
         null=True,
     )
     telegram_username = models.CharField(

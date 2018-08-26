@@ -2,6 +2,7 @@ import xlrd
 import time
 import traceback
 from django.core.files import File
+from Module_TeamManagement.src import utilities
 from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
 
 #-----------------------------------------------------------------------------#
@@ -105,8 +106,8 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
             elif '+' in phoneNumber and len(phoneNumber) == 11:
                 phoneNumber = phoneNumber[1:]
 
-            # Todo: Hash phone number if there's any    
-            faculty.append(phoneNumber)
+            encrypt_phoneNumber = utilities.encode(phoneNumber)
+            faculty.append(encrypt_phoneNumber)
 
         # Create faculty : list
         faculty = [email,username,firstname,lastname] + faculty

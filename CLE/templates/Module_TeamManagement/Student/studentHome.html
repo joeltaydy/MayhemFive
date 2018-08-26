@@ -62,12 +62,12 @@
 
                         <div class="row">
                             <div class="col-md-6">
-                                    <center><h1>{{personal.points_count}}</h1> <h6>POINTS</h6></center>
+                                    <center><h1><img src="https://png.icons8.com/office/40/000000/test-failed.png">{{personal.points_count}}</h1><h6>POINTS</h6></center>
                                     <br>
                             </div>
 
                             <div class="col-md-6">
-                                <center><h1>{{personal.trail_count}}</h1> <h6>TRAILS COMPLETED</h6></center>
+                                <center><h1><img src="https://png.icons8.com/dusk/40/000000/waypoint-map.png">{{personal.trail_count}}</h1> <h6>TRAILS COMPLETED</h6></center>
                                 <br>
                             </div>
 
@@ -122,7 +122,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 align="center" class="card-title">Class Ranking</h5>
+                            <h5 align="center" class="card-title">Team Ranking</h5>
                             <p class="card-category" align="center">24 Hours performance</p>
                         </div>
                         <div class="card-body">
@@ -136,21 +136,23 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Ranking</h4>
-                                <p class="card-category">24 Hours performance</p>
-                            </div>
-                            <div class="card-body">
-                                {% include "Module_TeamManagement/line_chart.html" %}
-                            </div>
-                            <div class="card-footer ">
-                                <div class="stats">
-                                    <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
-                                </div>
+                    
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title"> Ranking</h4>
+                            <p class="card-category">24 Hours performance</p>
+                        </div>
+                        
+                        <div class="card-body">
+                            {% include "Module_TeamManagement/line_chart.html" %}
+                        </div>
+                        <div class="card-footer ">
+                            <div class="stats">
+                                <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
                             </div>
                         </div>
+                        
                     </div>
             </div>
 
