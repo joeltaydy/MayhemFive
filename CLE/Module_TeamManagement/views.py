@@ -751,5 +751,4 @@ def configureDB_telegram(requests):
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 
-
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
