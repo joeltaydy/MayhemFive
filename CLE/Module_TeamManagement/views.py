@@ -111,14 +111,14 @@ def faculty_Home(requests):
         #traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
-   
+
     context["courses"] = requests.session['courseList']
 
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
-    print(context)
+
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
