@@ -176,7 +176,7 @@ def faculty_Overview(requests):
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
-    return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
+    return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
 
 
 # TO-DO: update function
@@ -218,6 +218,7 @@ def student_Profile(requests):
     # context['message'] = 'Successful retrieval of student\'s profile'
     # return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
     return render(requests,"error404.html",context)
+
 
 # Student Team Page
 # @login_required(login_url='/')
@@ -692,6 +693,9 @@ def configureDB_telegram(requests):
                 student.telegram_channellink = results['channel_link']
                 student.save()
 
+            response['message'] = 'Telegram Channel Configured'
+            return faculty_Overview(requests)
+
         elif action == 'create_sectionGroup':
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
             class_QuerySet = Class.objects.filter(course_section=course_section)
@@ -705,6 +709,9 @@ def configureDB_telegram(requests):
             for student in class_QuerySet:
                 student.telegram_grouplink = results['group_link']
                 student.save()
+
+            response['message'] = 'Telegram Group Configured'
+            return faculty_Overview(requests)
 
         elif action == 'create_teamGroup':
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
@@ -728,13 +735,17 @@ def configureDB_telegram(requests):
                     student.telegram_grouplink = results['group_link']
                     student.save()
 
-        client.disconnect()
+            response['message'] = 'Telegram Group Configured'
+            return faculty_Overview(requests)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+
+    finally:
+        client.disconnect()
 
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
