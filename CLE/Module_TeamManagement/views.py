@@ -638,7 +638,7 @@ def configureDB_clt(requests):
 # - results
 # - message
 #
-def configure_telegram(requests):
+def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
@@ -675,21 +675,39 @@ def configure_telegram(requests):
                     client.sign_up(int(phone_number), login_code)
 
         action = requests.POST.get('action')
+        course_section = requests.POST.get('course_section')
 
         if action == 'create_channel':
-            results = tele_util.initialize_Channel(
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            # results = tele_util.initialize_Channel(
+            #     client=client,
+            #     course_title=,
+            #     section_number=,
+            # )
+
+        elif action == 'create_sectionGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Group(
                 client=client,
-                course_title=,
-                section_number=,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
             )
 
-        elif action == 'create_group':
-            results = tele_util.initialize_Channel(
-                client=client,
-                course_title=,
-                section_number=,
-                team_number=,
-            )
+            for student in class_QuerySet:
+                student.telegram_grouplink = results['group_link']
+                student.save()
+
+        elif action == 'create_teamGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            # results = tele_util.initialize_Group(
+            #     client=client,
+            #     course_title=course_sectionObj.course.course_title,
+            #     section_number=course_sectionObj.section_number,
+            # )
 
         client.disconnect()
 
@@ -699,7 +717,7 @@ def configure_telegram(requests):
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    response['message'] = 'Telegram Group Configured'
+    response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 
