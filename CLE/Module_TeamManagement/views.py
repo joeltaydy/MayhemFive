@@ -632,6 +632,7 @@ def configureDB_clt(requests):
 
 
 # This is for subsequent configuration by faculty
+# This function authenticates the faculty and creates the channels/groups
 #
 # Requests param: GET
 # - phone_number
