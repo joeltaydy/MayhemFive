@@ -674,6 +674,7 @@ def configureDB_telegram(requests):
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(int(phone_number), login_code)
 
+        # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
         action = requests.POST.get('action')
         course_section = requests.POST.get('course_section')
 
@@ -709,11 +710,23 @@ def configureDB_telegram(requests):
             course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
             class_QuerySet = Class.objects.filter(course_section=course_section)
 
-            # results = tele_util.initialize_Group(
-            #     client=client,
-            #     course_title=course_sectionObj.course.course_title,
-            #     section_number=course_sectionObj.section_number,
-            # )
+            teams = {}
+            for student in class_QuerySet:
+                try:
+                    teams[student.team_number].append(student)
+                except:
+                    teams[student.team_number] = [student]
+
+            for team_number,students in teams.items():
+                results = tele_util.initialize_Group(
+                    client=client,
+                    course_title=course_sectionObj.course.course_title,
+                    section_number=course_sectionObj.section_number,
+                    team_number=team_number,
+                )
+                for student in students:
+                    student.telegram_grouplink = results['group_link']
+                    student.save()
 
         client.disconnect()
 
