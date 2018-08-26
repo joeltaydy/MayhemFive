@@ -642,10 +642,12 @@ def configureDB_clt(requests):
 def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
-        username = requets.user.email.split('@')[0]
+        username = requests.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
 
@@ -738,14 +740,13 @@ def configureDB_telegram(requests):
             response['message'] = 'Teams Telegram Group Configured'
             return faculty_Overview(requests)
 
+        client.disconnect()
+
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
-
-    finally:
-        client.disconnect()
 
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
