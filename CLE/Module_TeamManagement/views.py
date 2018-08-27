@@ -310,14 +310,15 @@ def configureDB_faculty(requests):
         file = requests.FILES.get("file", False)
         action = requests.POST.get("action")
 
+        bootstrapFile = {}
         # Retrieve start and end date for term
         bootstrapFile['start_date'] = requests.POST.get("start_date")
         bootstrapFile['end_date'] = requests.POST.get("end_date")
-
-        if action:
+        
+        if action != None: 
             bootstrap.clear_Database()
 
-        bootstrapFile = {}
+        
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
             unzipped.extractall(os.path.abspath('bootstrap_files'))
@@ -354,7 +355,7 @@ def configureDB_faculty(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Administrator/uploadcsv.html", response)
 

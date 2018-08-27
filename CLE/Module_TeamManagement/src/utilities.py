@@ -99,10 +99,8 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
         except:
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
 
-
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
-    if instructorEmail != None:
-       
+    if instructorEmail != None:   
         moduleCode = requests.GET.get('module')
         if moduleCode != None: 
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
