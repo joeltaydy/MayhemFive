@@ -34,7 +34,7 @@ def home(requests):
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-    trailResults = utilities.populateTrailheadInformation(student_email)
+    trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)
 
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
@@ -115,7 +115,7 @@ def faculty_Home(requests):
     context["courses"] = requests.session['courseList']
 
     # Reads web scrapper results
-    trailResults = utilities.populateTrailheadInformation(instructorEmail=requests.user.email)
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
     print(context)
@@ -180,6 +180,8 @@ def faculty_Overview(requests):
     course_section = Course_Section.objects.get(course_section_id=course_section)
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
+    context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html", context)
 

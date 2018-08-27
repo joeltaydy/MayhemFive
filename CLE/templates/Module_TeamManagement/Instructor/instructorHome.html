@@ -132,12 +132,12 @@
                             </div>
                             <div class="card-body">
                                 <span align="center">
-                                     {% include "Module_TeamManagement/Student/scoreboard.html" %}
+                                     {% include "Module_TeamManagement/Dashboard/courses_linechart.html" %}
                                 </span>
                             </div>
                             <div class="card-footer ">
                                 <div class="stats">
-                                    <i class="fa fa-history"></i> Updated 24 hours ago
+                                    <i class="fa fa-history"></i> Updated "{{last_updated}}"
                                 </div>
                             </div>
                         </div>
@@ -150,7 +150,7 @@
                                 <p class="card-category">24 Hours performance</p>
                             </div>
                             <div class="card-body">
-                                {% include "Module_TeamManagement/line_chart.html" %}
+                                {% include "Module_TeamManagement/Dashboard/courses_radarchart.html" %}
                             </div>
                             <div class="card-footer ">
                                 <div class="stats">
