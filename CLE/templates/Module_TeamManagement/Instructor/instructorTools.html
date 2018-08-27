@@ -2,114 +2,56 @@
 
 {% block bootstrapContent %}
 
-  <h1 style="margin-left:10px;">Tools Setup</h1>
+<h1>Tools Setup</h1>
+<form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
-  <h3 style="margin-left:10px;">Select Tool:</h3>
-  <span style ="margin-left:10px">
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#telegramModal" data-tool="telegram" id="type" value="telegram">Telegram</button>
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">Trailhead</button>
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">Kahoot</button>
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">Tableau</button>
-  <input type="hidden" id="user" name="user" value="faculty">
-  <input type="hidden" id="action" name="action" value="batch">
-  <br><br>
-  
-    {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
-    {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
-  <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
-      <a href="#" data-toggle="popover" data-html="true" data-content="<img src='http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg' width='300' />">Help <i class="far fa-question-circle"></i></a>
-    </label>
-    
-</span>
+    {% csrf_token %}
 
+    <div class="form-group">
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
+          <select class="form-control col-md-offset-3" id="course_title" name="course_title">
+            <option value="" disabled selected>Select your course</option>
+            {% for course,course_section in courses.items %}
+              <option value={{course}}>{{course_section}}</option>
+          {% endfor %}
+        </select>
 
-  <!--Telegram Popup-->
-  <div class="modal fade" id="telegramModal" tabindex="-1" role="dialog" aria-labelledby="telegramModalTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="telegramModalTitle">Set up Telegram</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-                {% csrf_token %}
-                <br>
-                <div class="form-group">
-                    <label for="name">Course Code</label>
-                      <select class="form-control" id="course_title" name="course_title">
-                        <option value="" disabled selected>Select your course</option>
-                             {% for course,course_section in courses.items %}
-                          <option value={{course}}>{{course_section}}</option>
-                            {% endfor %}
-                     </select>
-                  <label for="contact-number" class="col-form-label">Telegram Contact Number: </label>
-                  <input type="text" class="form-control" id="contact-number">
-                </div>
-              </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Set Up</button>
-          </div>
-        </div>
-      </div>
-  </div>
+        </br>
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Learning Tools</label>
+          <select class="form-control" id="type" name="type">
+            <option value="" disabled selected>Select your tools</option>
+                <option value="Trailhead">Trailhead</option>
+                <option value="Tableu">Tableu</option>
+                <option value="Kahoot">Kahoot</option>
+          </select>
+        </br>
 
-  <!--Other Tools Popup-->
-  <div class="modal fade" id="otherToolsModal" tabindex="-1" role="dialog" aria-labelledby="otherToolsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="otherToolsModalLabel">Set up</h5>
-          
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-            <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-              {% csrf_token %}
-              <br>
-              <div class="form-group">
-                  <label for="name">Course Code</label>
-                    <select class="form-control" id="course_title" name="course_title">
-                      <option value="" disabled selected>Select your course</option>
-                            {% for course,course_section in courses.items %}
-                        <option value={{course}}>{{course_section}}</option>
-                          {% endfor %}
-                    </select>
-              <label for="name">File Input</label>
-              <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp" style="margin-bottom:10px">
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Set Up</button>
-        </div>
-      </div>
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
+        <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
     </div>
-  </div>
-  
-<script>
-    $(document).ready(function(){
-        $('[data-toggle="popover"]').popover();
-    });
-    
-    
-  $('#otherToolsModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var recipient = button.data('whatever') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    modal.find('.modal-title').text('Set Up ' + recipient)
-    modal.find('.modal-body input').val(recipient)
-  })
-  </script>
+    <input type="hidden" id="user" name="user" value="faculty">
+    <input type="hidden" id="action" name="action" value="batch">
 
-<br>
+    <div class="form-group">
+      <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure tools</button>
+        </div>
+    </div>
+</form>
+
+{% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
+{% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
+
+<label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
+  <a href="#" data-toggle="popover" data-html="true" data-content="<img src='http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg' width='300' />">Help <i class="far fa-question-circle"></i></a>
+</label>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
 
 {% endblock %}

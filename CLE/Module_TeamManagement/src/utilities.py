@@ -57,7 +57,6 @@ def getTrailheadInformation():
             content = {}
 
             if counter == 0:
-                results['last_updated'] = row[0] # take last updated information
                 counter += 2 # skip headers
             else:
 
@@ -83,10 +82,9 @@ def getTrailheadInformation():
         context = {
             "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
             "CourseTrailResults" : {'badge_count' : 4 , ...}
-            'last_updated': '23/8/2018 1:05'
         }
 '''
-def populateTrailheadInformation(student_email=None, instructorEmail=None):
+def populateTrailheadInformation(student_email=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
 
@@ -96,11 +94,7 @@ def populateTrailheadInformation(student_email=None, instructorEmail=None):
         except:
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
 
-        context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,student_email)
-    if instructorEmail != None:
-        context["CourseTrailResults"] = populateTeamTrailHeadInformation_instructor(trailHeadInfo,instructorEmail ) # instructor
-
-    context["last_updated"] = trailHeadInfo["last_updated"]
+    context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo)
     return context
 
 # Retrieve team info based on course
@@ -108,109 +102,30 @@ def populateTrailheadInformation(student_email=None, instructorEmail=None):
     final format should be
     'CourseTrailResults': {
         BPAS210G4: {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
+            'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+            'T3': {'badges': 280, 'points': 207475, 'trails': 26}, 'T4': {'badges': 138, 'points': 173400, 'trails': 12}
             }
-
         },
         BPAS201G2: {
-            "Teams_Information" : {...}
-            "Students_Information" : {...}
+            ...
         }
 
     }
 '''
-
-def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor retrieval
-    # SQL equivalent to order by course_section , team_number
-    facultyObj = Faculty.objects.filter(email=instructorEmail)[0]
-    registered_course_section = facultyObj.course_section.all()
-    courses = []
-
-    for course_section in registered_course_section:
-        courses.append(course_section.course_section_id)
-
-    classes = Class.objects.order_by('course_section','team_number')
-
+def populateTeamTrailHeadInformation(results):
+    classes = Class.objects.exclude(team_number = None).order_by('course_section','team_number') #Omit classes with no teams
     classResult = {}
     for classObj in classes:
-        course_section_id = classObj.course_section.course_section_id #Getting course code
-        if course_section_id in courses: #extract classes only
-            if course_section_id not in classResult:
-                classResult[course_section_id] = {}
-                classResult[course_section_id]["Teams_Information"] = {}
-                classResult[course_section_id]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
-            try:
-                #populate student results
-                classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
-                classResult[course_section_id]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
-                classResult[course_section_id]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-            except:
-                pass
+        course_section_id = classObj.course_section.course_section_id
+        if course_section_id not in classResult:
+            classResult[course_section_id] = {}
 
-            if classObj.team_number != None : #Omit classes with no teams
-            # populate team results
-                if classObj.team_number not in classResult[course_section_id]["Teams_Information"]:
-                    classResult[course_section_id]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
-                classResult[course_section_id]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
-                classResult[course_section_id]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
-                classResult[course_section_id]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+        if classObj.team_number not in classResult[course_section_id]:
+            classResult[course_section_id][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
+        classResult[course_section_id][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+        classResult[course_section_id][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+        classResult[course_section_id][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
 
-    return classResult
-
-# Retrieve team info based on course
-'''
-    final format should be
-    'CourseTrailResults': {
-        BPAS210G4: {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
-
-        },
-        "studentLoopTimes" : range(0, number of students)
-    }
-'''
-def populateTeamTrailHeadInformation(results, studentemail): #This is for student retrieval
-    classStudentObj = Class.objects.filter(student=studentemail)
-    courseSection = classStudentObj[0].course_section.course_section_id
-    # SQL equivalent to filter by course section and order by team_number
-    classes = Class.objects.filter(course_section= courseSection).order_by('team_number')
-
-    classResult = {}
-    classResult["class"] = {}
-    classResult["class"]["Teams_Information"] = {}
-    classResult["class"]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
-
-    for classObj in classes:
-        try:
-            #populate student results
-            classResult["class"]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
-            classResult["class"]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
-            classResult["class"]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-        except:
-            pass
-
-        if classObj.team_number != None : #Omit classes with no teams
-        # populate team results
-            if classObj.team_number not in classResult["class"]["Teams_Information"]:
-                classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
-            classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
-            classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
-            classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
-    classResult["studentLoopTimes"] = range(len(classResult["class"]["Students_Information"]["points"]))
     return classResult
 
 
@@ -285,8 +200,8 @@ def encode(plainText=''):
         raise Exception('Please specify a 32 bit long plain text when encoding')
 
     plainText = plainText.rjust(32)
-    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
-    return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
+    return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
 
 
 # Decrypt a 32-bit string
@@ -299,5 +214,5 @@ def decode(cipherText=''):
     if cipherText == '':
         raise Exception('Please specify a cipher text for decoding')
 
-    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
-    return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
+    return cipher.decrypt(base64.b64decode(encoded)).strip().decode('utf-8')

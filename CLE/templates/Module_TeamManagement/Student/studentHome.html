@@ -19,12 +19,12 @@
             </div>
         </div>
 
-        <!--Class One Card-->   
-        {% for course,course_section in request.session.courseList.items %}
-            <div class="col-md-6">
+        <!--Class One Card-->
+
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title" align="center">{{course_section}}</h2>
+                    <h2 class="card-title" align="center">IS480</h2>
                 </div>
                 <br>
 
@@ -44,7 +44,7 @@
                                 <br>
 
                                 <p align="right">
-                                    <a class="btn btn-dark btn-sm" role="button" href = "{% url 'TMmod:uploadtoolStudent' %}?user=student" >Initialise tools</a>
+                                    <a class="btn btn-danger btn-sm" role="button" href = "{% url 'TMmod:uploadtoolStudent' %}?user=student" >Set up tools</a>
                                 </p>
 
                         </div>
@@ -62,12 +62,12 @@
 
                         <div class="row">
                             <div class="col-md-6">
-                                    <center><img src="https://png.icons8.com/dusk/50/000000/report-card.png"><h1>{{personal.points_count}}</h1><h6>POINTS</h6></center>
+                                    <center><h1><img src="https://png.icons8.com/office/40/000000/test-failed.png">{{personal.points_count}}</h1><h6>POINTS</h6></center>
                                     <br>
                             </div>
 
                             <div class="col-md-6">
-                                <center><img src="https://png.icons8.com/dusk/40/000000/waypoint-map.png"><h1>{{personal.trail_count}}</h1><h6>TRAILS COMPLETED</h6></center>
+                                <center><h1><img src="https://png.icons8.com/dusk/40/000000/waypoint-map.png">{{personal.trail_count}}</h1> <h6>TRAILS COMPLETED</h6></center>
                                 <br>
                             </div>
 
@@ -75,13 +75,33 @@
 
                         <div class = "col-md-12">
                             <div class = "card">
-                                <p class="card-category"><Br><center><img src="https://png.icons8.com/dusk/50/000000/prize.png"><h1>{{personal.badge_count}}</h1> <h6>BADGES</h6></center></p>
+                                <p class="card-category"><center><h1>{{personal.badge_count}}</h1> <h6>BADGES</h6></center></p>
                                 <div class="card-body">
                                     <span align = "center"> {% include "Module_TeamManagement/Student/trailhead.html" %} </span>
                                 </div>
                             </div>
                         </div>
 
+
+
+
+                            <!-- <div class="col-md-6">
+                                <div class="card card-tasks">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Trails</h3>
+                                    </div>
+
+                                    <div class="card-body ">
+                                        <h1 align="center">{{trail_count}}</h1>
+                                    </div>
+
+                                    <div class="card-footer ">
+                                        <div class="stats">
+                                            <p class="card-category">trails completed</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div> -->
 
                     </div>
                 </div>
@@ -102,7 +122,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 align="center" class="card-title">Team Ranking</h5>
+                            <h5 align="center" class="card-title">Class Ranking</h5>
                             <p class="card-category" align="center">24 Hours performance</p>
                         </div>
                         <div class="card-body">
@@ -112,11 +132,10 @@
                             </div>
                         <div class="card-footer ">
                             <div class="stats">
-                                <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
+                                <i class="fa fa-history"></i> Updated 24 hours ago
                             </div>
                         </div>
                     </div>
-<<<<<<< HEAD
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
@@ -130,32 +149,12 @@
                                 <div class="stats">
                                     <i class="fa fa-history"></i> Updated 24 hours ago
                                 </div>
-=======
-                    
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title"> Ranking</h4>
-                            <p class="card-category">24 Hours performance</p>
-                        </div>
-                        
-                        <div class="card-body">
-                            {% include "Module_TeamManagement/line_chart.html" %}
-                        </div>
-                        <div class="card-footer ">
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated "{{last_updated}}"
->>>>>>> 3889e540f020b944e9710bd385bb909efebceca4
                             </div>
                         </div>
-                        
                     </div>
-            </div>
-
-        {% endfor %}
-        
-        </br>
+                  </div>
+                </br>
+      </div>
     </div>
 </div>
-
 {% endblock %}
