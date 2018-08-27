@@ -1,6 +1,7 @@
 import os
 import datetime
 import traceback
+from Module_TeamManagement.src.utilities import getFinancialYear
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, channels
 from telethon.tl.types import ChannelAdminRights, ChatInviteExported, Channel, Chat, ChannelParticipantsSearch
@@ -8,19 +9,6 @@ from telethon.tl.types import ChannelAdminRights, ChatInviteExported, Channel, C
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
 #-----------------------------------------------------------------------------#
-
-# Return a string of the current financial year
-def getFinancialYear():
-    year = int(datetime.datetime.now().strftime("%y"))
-    month = int(datetime.datetime.now().strftime("%m"))
-
-    if month >= 4:
-        fin_year = 'AY' + str(year) + '/' + str(year+1)
-    else:
-        fin_year = 'AY' + str(year-1) + '/' + str(year)
-
-    return fin_year
-
 
 # Return telegram client object.
 def getClient(username=None):

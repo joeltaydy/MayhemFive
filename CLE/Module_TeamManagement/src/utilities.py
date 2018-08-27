@@ -4,11 +4,13 @@ import json
 import csv
 import sys
 import os
+import math
 import time
 import base64
+import datetime
 from Crypto.Cipher import AES
 from CLE.settings import AES_SECRET_KEY
-from Module_TeamManagement.models import Cloud_Learning_Tools,Faculty,Class
+from Module_TeamManagement.models import *
 
 
 #-----------------------------------------------------------------------------#
@@ -301,3 +303,46 @@ def decode(cipherText=''):
 
     cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
     return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
+
+
+# Return a string of the current financial year
+def getFinancialYear():
+    year = int(datetime.datetime.now().strftime("%y"))
+    month = int(datetime.datetime.now().strftime("%m"))
+
+    if month >= 4:
+        fin_year = 'AY' + str(year) + '/' + str(year+1)
+    else:
+        fin_year = 'AY' + str(year-1) + '/' + str(year)
+
+    return fin_year
+
+
+# Returns an int of the current school term
+def getSchoolTerm():
+    currentMonth = int(datetime.datetime.now().strftime("%m"))
+
+    if currentMonth >= 8 and currentMonth <= 12:
+        return 1
+    elif currentMonth >= 1 and currentMonth <= 4:
+        return 2
+    else:
+        return 3
+
+
+# Returns two int of the number of remaining & past weeks since school term start
+def getRemainingWeeks():
+    # Get school term object
+    school_term_id = getFinancialYear() + 'T' + str(getSchoolTerm())
+    school_termObj = School_Term.objects.get(school_term_id=school_term_id)
+
+    # Calculate the difference in days
+    term_start_date = school_termObj.start_date
+    today = datetime.datetime.date(datetime.datetime.now())
+    difference_days_start = (today - term_start_date).days
+
+    # Calculate number of past weeks since start of school term
+    past_weeks = math.ceil(difference_days_start / 7)
+    remaining_weeks = 16 - past_weeks
+
+    return past_weeks, remaining_weeks

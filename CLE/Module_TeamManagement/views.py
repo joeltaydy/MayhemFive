@@ -1,5 +1,6 @@
 import os
 import traceback
+import datetime
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
@@ -135,11 +136,16 @@ def faculty_Home(requests):
 
     context["courses"] = requests.session['courseList']
 
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
+    context['past_weeks'] = past_weeks
+    context['remaining_weeks'] = remaining_weeks
+    context['progress'] = past_weeks/remaining_weeks * 100
+
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
-
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
@@ -286,6 +292,7 @@ def student_Team(requests):
 # Models to populate:
 # - Course
 # - Faculty
+# - School_Term
 #
 # Response (Succcess):
 # - configureDB_faculty
@@ -300,6 +307,10 @@ def configureDB_faculty(requests):
     try:
         file = requests.FILES.get("file", False)
         action = requests.POST.get("action")
+
+        # Retrieve start and end date for term
+        bootstrapFile['start_date'] = requests.POST.get("start_date")
+        bootstrapFile['end_date'] = requests.POST.get("end_date")
 
         if action:
             bootstrap.clear_Database()
