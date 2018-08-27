@@ -9,10 +9,7 @@ from allauth.socialaccount.models import SocialAccount
 
 from random import randint
 from django.views.generic import TemplateView
-<<<<<<< HEAD
-=======
 
->>>>>>> 103536d18f26ba8fe10d9d5d62c9f848080610a7
 
 # Student Home Page
 #@login_required(login_url='/')
