@@ -138,9 +138,15 @@ def faculty_Home(requests):
 
     # Get number of weeks since school term start and reamining weeks till school term ends
     past_weeks, remaining_weeks = utilities.getRemainingWeeks()
-    context['past_weeks'] = past_weeks
-    context['remaining_weeks'] = remaining_weeks
-    context['progress'] = past_weeks/remaining_weeks * 100
+
+    if past_weeks != None and remaining_weeks != None:
+        context['past_weeks'] = past_weeks
+        context['remaining_weeks'] = remaining_weeks
+        context['progress'] = past_weeks/remaining_weeks * 100
+    else:
+        context['past_weeks'] = 0
+        context['remaining_weeks'] = 0
+        context['progress'] = 0
 
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(instructorEmail=requests.user.email)

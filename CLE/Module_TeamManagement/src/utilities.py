@@ -332,9 +332,11 @@ def getSchoolTerm():
 
 # Returns two int of the number of remaining & past weeks since school term start
 def getRemainingWeeks():
-    # Get school term object
     school_term_id = getFinancialYear() + 'T' + str(getSchoolTerm())
-    school_termObj = School_Term.objects.get(school_term_id=school_term_id)
+    try:
+        school_termObj = School_Term.objects.get(school_term_id=school_term_id)
+    except:
+        return None, None
 
     # Calculate the difference in days
     term_start_date = school_termObj.start_date
