@@ -1,16 +1,16 @@
 import os
 import datetime
 import traceback
+from Module_TeamManagement.src.utilities import getFinancialYear
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, channels
-from telethon.tl.types import ChannelAdminRights, ChatInviteExported, Channel, Chat
+from telethon.tl.types import ChannelAdminRights, ChatInviteExported, Channel, Chat, ChannelParticipantsSearch
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
 #-----------------------------------------------------------------------------#
 
 # Return telegram client object.
-# Default username = admin_login
 def getClient(username=None):
     if username == None:
         raise Exception('Please specify a username.')
@@ -20,7 +20,16 @@ def getClient(username=None):
 
 
 # Return True if name already exists within telegram. Else False
-def dialogExists(client,dialog_name,type):
+def dialogExists(client=None,dialog_name=None,type=None):
+    if client == None:
+        raise Exception('Please specify a client.')
+
+    if dialog_name == None:
+        raise Exception('Please specify a group/channel name.')
+
+    if type == None:
+        raise Exception('Please specify a type; group/channel.')
+
     dialogs = client.get_dialogs()
     for dialog in dialogs:
         if dialog.name == dialog_name and isinstance(dialog.entity,type):
@@ -49,17 +58,32 @@ def getEntity(client,dialog_name,type):
     return None
 
 
-# Return a string of the current financial year
-def getFinancialYear():
-    year = int(datetime.datetime.now().strftime("%y"))
-    month = int(datetime.datetime.now().strftime("%m"))
+# Return members : list and number of memebers : int if name exists within telegram. Else empty list
+def getMembers(client,dialog_name,type):
+    offset = 0
+    limit = 1000
+    valid_members = []
+    entity = getEntity(client,dialog_name,type)
 
-    if month >= 4:
-        fin_year = 'AY' + str(year) + '/' + str(year+1)
-    else:
-        fin_year = 'AY' + str(year-1) + '/' + str(year)
+    if type == Channel:
+        members = client(channels.GetParticipantsRequest(
+            channel=entity,
+            filter=ChannelParticipantsSearch(''),
+            offset=offset,
+            limit=limit,
+            hash=0
+        ))
+        for user in members.users:
+            if not user.bot:
+                valid_members.append(user.username)
 
-    return fin_year
+    elif type == Chat:
+        members = client.get_participants(entity)
+        for member in members:
+            if not member.bot:
+                valid_members.append(member.username)
+
+    return valid_members, len(valid_members)
 
 
 # Return True if channel is succesfully create, ELSE False

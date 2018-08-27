@@ -142,6 +142,16 @@
 
                         <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                           {% csrf_token %}
+
+                        <label for="name" class="col-md-6 col-sm-6 col-xs-12 control-label">Learning Tools</label>
+                          <select class="form-control" id="type" name="type">
+                            <option value="" disabled selected>Select your tools</option>
+                                <option value="Trailhead">Trailhead</option>
+                                <option value="Tableu">Tableu</option>
+                                <option value="Kahoot">Kahoot</option>
+                          </select>
+                          
+                        </br>
                                 <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
                                 <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
                             </div>

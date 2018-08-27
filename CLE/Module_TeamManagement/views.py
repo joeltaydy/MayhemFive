@@ -1,5 +1,6 @@
 import os
 import traceback
+import datetime
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
@@ -36,6 +37,27 @@ def home(requests):
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)
+
+    # Get telegram group/channel link
+    enrolled_classes = Class.objects.filter(student=student_email)
+    context['telegram'] = {'status' : 'False'}
+    for enrolled_class in enrolled_classes:
+        group_link = enrolled_class.telegram_grouplink
+        channel_link = enrolled_class.telegram_channellink
+
+        if group_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['group'].update({enrolled_class.course_section : group_link})
+            except:
+                context['telegram']['group'] = {enrolled_class.course_section : group_link}
+
+        if channel_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
+            except:
+                context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
 
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
@@ -111,14 +133,19 @@ def faculty_Home(requests):
         #traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
-   
+
     context["courses"] = requests.session['courseList']
+
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
+    context['past_weeks'] = past_weeks
+    context['remaining_weeks'] = remaining_weeks
+    context['progress'] = past_weeks/remaining_weeks * 100
 
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
-    print(context)
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
@@ -267,6 +294,7 @@ def student_Team(requests):
 # Models to populate:
 # - Course
 # - Faculty
+# - School_Term
 #
 # Response (Succcess):
 # - configureDB_faculty
@@ -280,8 +308,16 @@ def configureDB_faculty(requests):
 
     try:
         file = requests.FILES.get("file", False)
-        bootstrapFile = {}
+        action = requests.POST.get("action")
 
+        # Retrieve start and end date for term
+        bootstrapFile['start_date'] = requests.POST.get("start_date")
+        bootstrapFile['end_date'] = requests.POST.get("end_date")
+
+        if action:
+            bootstrap.clear_Database()
+
+        bootstrapFile = {}
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
             unzipped.extractall(os.path.abspath('bootstrap_files'))
@@ -477,8 +513,9 @@ def configureDB_students(requests):
 def configureDB_teams(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
-        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-        return faculty_Overview(requests)
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
+        return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -503,7 +540,7 @@ def configureDB_teams(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        traceback.print_exc()
+        # traceback.print_exc()
         response['message'] = e.args[0]
         # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
         return faculty_Overview(requests)
@@ -634,6 +671,7 @@ def configureDB_clt(requests):
 
 
 # This is for subsequent configuration by faculty
+# This function authenticates the faculty and creates the channels/groups
 #
 # Requests param: GET
 # - phone_number
@@ -649,10 +687,12 @@ def configureDB_clt(requests):
 def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
-        username = requets.user.email.split('@')[0]
+        username = requests.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
 
@@ -673,7 +713,9 @@ def configureDB_telegram(requests):
                 facultyObj.phone_number = encrypt_phone_number
                 facultyObj.save()
 
+                response['phone_number'] = phone_number
                 response['action'] = 'login'
+                # Currently temporary address. Not sure where to direct user to
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
             elif phone_number != None and login_code != None:
@@ -745,15 +787,17 @@ def configureDB_telegram(requests):
             response['message'] = 'Teams Telegram Group Configured'
             return faculty_Overview(requests)
 
+        client.disconnect()
+
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    finally:
-        client.disconnect()
-
+    # Need to double confirm where to direct the user to once done.
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 

@@ -4,12 +4,13 @@ import json
 import csv
 import sys
 import os
+import math
 import time
 import base64
+import datetime
 from Crypto.Cipher import AES
 from CLE.settings import AES_SECRET_KEY
-from Module_TeamManagement.models import Cloud_Learning_Tools,Faculty,Class
-
+from Module_TeamManagement.models import *
 
 
 #-----------------------------------------------------------------------------#
@@ -87,6 +88,7 @@ def getTrailheadInformation():
             'last_updated': '23/8/2018 1:05'
         }
 '''
+
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
@@ -97,8 +99,10 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
         except:
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
 
+
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
     if instructorEmail != None:
+       
         moduleCode = requests.GET.get('module')
         if moduleCode != None: 
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
@@ -115,14 +119,15 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
         BPAS210G4: {
             "Teams_Information" : {
                 'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...            
-            }, 
+             
+                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+            },
             "Students_Information" : {
                 "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
                 "points" : [2323, 3333, 4445 ..]
                 "badges" : [3, 5, 6...]
             }
-            
+
         },
         BPAS201G2: {
             "Teams_Information" : {...}
@@ -131,18 +136,19 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
 
     }
 '''
+
 def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor dashboard retrieval
     # SQL equivalent to order by course_section , team_number
     facultyObj = Faculty.objects.filter(email=instructorEmail)[0]
     registered_course_section = facultyObj.course_section.all()
     courses = []
+
     for course_section in registered_course_section:
         courses.append(course_section.course_section_id)
-    classes = Class.objects.order_by('course_section','team_number')
-    
+
     classResult = {}
     for classObj in classes:
-        course_section_id = classObj.course_section.course_section_id #Getting course code 
+        course_section_id = classObj.course_section.course_section_id #Getting course code
         if course_section_id in courses: #extract classes only
             if course_section_id not in classResult:
                 classResult[course_section_id] = {}
@@ -153,7 +159,7 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
                 classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
                 classResult[course_section_id]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
                 classResult[course_section_id]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-            except: 
+            except:
                 pass
 
             if classObj.team_number != None : #Omit classes with no teams
@@ -172,8 +178,8 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
         "class": {
             "Teams_Information" : {
                 'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...            
-            }, 
+                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+            },
             "Students_Information" : {
                 "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
                 "points" : [2323, 3333, 4445 ..]
@@ -220,7 +226,7 @@ def classInformationRetrieval( results,courseSection):
             classResult["class"]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
             classResult["class"]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
             classResult["class"]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-        except: 
+        except:
             pass
 
         if classObj.team_number != None : #Omit classes with no teams
@@ -303,8 +309,8 @@ def encode(plainText=''):
         raise Exception('Please specify a 32 bit long plain text when encoding')
 
     plainText = plainText.rjust(32)
-    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
-    return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+    return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
 
 
 # Decrypt a 32-bit string
@@ -317,5 +323,48 @@ def decode(cipherText=''):
     if cipherText == '':
         raise Exception('Please specify a cipher text for decoding')
 
-    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
-    return cipher.decrypt(base64.b64decode(encoded)).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+    return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
+
+
+# Return a string of the current financial year
+def getFinancialYear():
+    year = int(datetime.datetime.now().strftime("%y"))
+    month = int(datetime.datetime.now().strftime("%m"))
+
+    if month >= 4:
+        fin_year = 'AY' + str(year) + '/' + str(year+1)
+    else:
+        fin_year = 'AY' + str(year-1) + '/' + str(year)
+
+    return fin_year
+
+
+# Returns an int of the current school term
+def getSchoolTerm():
+    currentMonth = int(datetime.datetime.now().strftime("%m"))
+
+    if currentMonth >= 8 and currentMonth <= 12:
+        return 1
+    elif currentMonth >= 1 and currentMonth <= 4:
+        return 2
+    else:
+        return 3
+
+
+# Returns two int of the number of remaining & past weeks since school term start
+def getRemainingWeeks():
+    # Get school term object
+    school_term_id = getFinancialYear() + 'T' + str(getSchoolTerm())
+    school_termObj = School_Term.objects.get(school_term_id=school_term_id)
+
+    # Calculate the difference in days
+    term_start_date = school_termObj.start_date
+    today = datetime.datetime.date(datetime.datetime.now())
+    difference_days_start = (today - term_start_date).days
+
+    # Calculate number of past weeks since start of school term
+    past_weeks = math.ceil(difference_days_start / 7)
+    remaining_weeks = 16 - past_weeks
+
+    return past_weeks, remaining_weeks
