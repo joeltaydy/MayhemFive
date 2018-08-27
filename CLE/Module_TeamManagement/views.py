@@ -700,6 +700,7 @@ def configureDB_telegram(requests):
                 facultyObj.phone_number = encrypt_phone_number
                 facultyObj.save()
 
+                response['phone_number'] = phone_number
                 response['action'] = 'login'
                 # Currently temporary address. Not sure where to direct user to
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
