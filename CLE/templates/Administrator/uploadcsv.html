@@ -17,14 +17,14 @@
             var date_input=$('input[name="date"]'); //our date input has the name "date"
             var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
             date_input.datepicker({
-                format: 'mm/dd/yyyy',
+                ormat: 'mm/dd/yyyy', //not sure how to change format to 'yyyy-mm-dd'
                 container: container,
                 todayHighlight: true,
                 autoclose: true,
             })
         })
     </script>
-    
+
     <div class="col-md-8"><h1>Course/Faculty Setup</h1></div>
     <form action="{% url 'TMmod:modSu' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
         </br>
