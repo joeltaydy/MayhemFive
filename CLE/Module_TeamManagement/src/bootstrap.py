@@ -9,6 +9,15 @@ from Module_TeamManagement.models import Student, Faculty, Class, Course_Section
 #-------------------------- Bootstrap Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
+def clear_Database():
+    Class.objects.all().delete()
+    Cloud_Learning_Tools.objects.all().delete()
+    Faculty.objects.all().delete()
+    Course_Section.objects.all().delete()
+    Student.objects.all().delete()
+    Course.objects.all().delete()
+
+
 def parse_File_Student(filePath,bootstrapInfo={}):
 
     # Create a workbook object from the filePath
