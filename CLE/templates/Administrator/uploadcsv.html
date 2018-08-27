@@ -1,17 +1,46 @@
 {% extends 'Administrator/admindashboard.html' %}
 
 {% block bootstrapContent %}
-
 <body>
-    <h1>Course/Faculty Setup</h1>
+    <!--  jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- Isolated Version of Bootstrap, not needed if your site already uses Bootstrap -->
+    <link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" />
+
+    <!-- Bootstrap Date-Picker Plugin -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+
+    <script>
+    	$(document).ready(function(){
+    		var date_input=$('input[name="date"]'); //our date input has the name "date"
+    		var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+    		date_input.datepicker({
+    			format: 'mm/dd/yyyy',
+    			container: container,
+    			todayHighlight: true,
+    			autoclose: true,
+    		})
+    	})
+    </script>
+
+    <div class="col-md-8"><h1>Course/Faculty Setup</h1></div>
     <form action="{% url 'TMmod:modSu' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
         </br>
         {% csrf_token %}
         <div class="form-group">
-            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File: </label>
             <div class="col-md-8">
+            <label class="control-label" for="date"> Term Start Date:</label>
+                <input class="form-control" id="start_date" name="date" placeholder="YYYY-MM-DD" type="text"/>
+            </br>
+            <label class="control-label" for="date"> Term End Date:</label>
+                <input class="form-control" id="end_date" name="date" placeholder="YYYY-MM-DD" type="text"/>
+            </br>
+            <label for="name" class="control-label">File: </label>
                 <input type="file" name="file" id="file" required="True" class="form-control">
                 <input type="checkbox" name="action" id="action" value="True"> Clear Database<br>
+            </br>
             </div>
         </div>
 
