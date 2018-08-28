@@ -12,7 +12,7 @@ from Module_TeamManagement.models import *
 
 def clear_Database():
     Class.objects.all().delete()
-    School_Term.all().delete()
+    School_Term.objects.all().delete()
     Cloud_Learning_Tools.objects.all().delete()
     Faculty.objects.all().delete()
     Course_Section.objects.all().delete()
