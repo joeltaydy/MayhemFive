@@ -113,9 +113,7 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
         if 'Phone Number' in headers:
             phoneNumber = str(int(rowData[headers.index('Phone Number')])).strip()
             if len(phoneNumber) == 8:
-                phoneNumber = str('65') + phoneNumber
-            elif '+' in phoneNumber and len(phoneNumber) == 11:
-                phoneNumber = phoneNumber[1:]
+                phoneNumber = str('+65') + phoneNumber
 
             encrypt_phoneNumber = utilities.encode(phoneNumber)
             faculty.append(encrypt_phoneNumber)

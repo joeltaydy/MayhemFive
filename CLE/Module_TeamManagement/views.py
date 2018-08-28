@@ -7,6 +7,7 @@ from Module_TeamManagement.src import bootstrap, utilities, tele_util
 from Module_TeamManagement.models import *
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
+from telethon.errors import PhoneNumberUnoccupiedError
 
 from random import randint
 from django.views.generic import TemplateView
@@ -704,9 +705,7 @@ def configureDB_telegram(requests):
         login_code = requests.POST.get('login_code')
 
         if len(phone_number) == 8:
-            phone_number = str('65') + phone_number
-        elif '+' in phone_number and len(phone_number) == 11:
-            phone_number = phone_number[1:]
+            phone_number = str('+65') + phone_number
 
         client = tele_util.getClient(username)
         client.connect()
@@ -726,10 +725,12 @@ def configureDB_telegram(requests):
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
             elif phone_number != None and login_code != None:
+                print(phone_number)
+                print(login_code)
                 try:
-                    client.sign_in(int(phone_number), login_code)
+                    client.sign_in(phone_number, login_code)
                 except PhoneNumberUnoccupiedError:
-                    client.sign_up(int(phone_number), login_code)
+                    client.sign_up(phone_number, login_code)
 
         # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
         action = requests.POST.get('action')
@@ -798,7 +799,7 @@ def configureDB_telegram(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
         response['courses'] = requests.session['courseList']
         response['message'] = e.args[0]

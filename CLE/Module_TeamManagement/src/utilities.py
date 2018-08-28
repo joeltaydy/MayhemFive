@@ -91,7 +91,6 @@ def getTrailheadInformation():
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
-    print(trailHeadInfo.keys())
 
     if student_email != None:
         try:
@@ -131,7 +130,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             "Teams_Information" : {...}
             "Students_Information" : {...}
         }
-        
+
     }
 '''
 
