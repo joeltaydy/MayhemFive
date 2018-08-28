@@ -1,5 +1,6 @@
 import os
 import traceback
+import datetime
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
@@ -39,9 +40,34 @@ def home(requests):
     utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-    trailResults = utilities.populateTrailheadInformation(student_email)
+    trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)
+<<<<<<< HEAD
     #print(context)
+=======
+
+    # Get telegram group/channel link
+    enrolled_classes = Class.objects.filter(student=student_email)
+    context['telegram'] = {'status' : 'False'}
+    for enrolled_class in enrolled_classes:
+        group_link = enrolled_class.telegram_grouplink
+        channel_link = enrolled_class.telegram_channellink
+
+        if group_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['group'].update({enrolled_class.course_section : group_link})
+            except:
+                context['telegram']['group'] = {enrolled_class.course_section : group_link}
+
+        if channel_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
+            except:
+                context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
+    print(context)
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -117,6 +143,25 @@ def faculty_Home(requests):
         return render(requests,'Module_Account/login.html',context)
 
     context["courses"] = requests.session['courseList']
+<<<<<<< HEAD
+=======
+
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
+
+    if past_weeks != None and remaining_weeks != None:
+        context['past_weeks'] = past_weeks
+        context['remaining_weeks'] = remaining_weeks
+        context['progress'] = past_weeks/remaining_weeks * 100
+    else:
+        context['past_weeks'] = 0
+        context['remaining_weeks'] = 0
+        context['progress'] = 0
+
+    # Reads web scrapper results
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
+    context.update(trailResults)
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     context['message'] = 'Successful retrieval of faculty\'s overview information'
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
@@ -179,6 +224,8 @@ def faculty_Overview(requests):
     course_section = Course_Section.objects.get(course_section_id=course_section)
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
+    context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
@@ -263,6 +310,7 @@ def student_Team(requests):
 # Models to populate:
 # - Course
 # - Faculty
+# - School_Term
 #
 # Response (Succcess):
 # - configureDB_faculty
@@ -276,8 +324,22 @@ def configureDB_faculty(requests):
 
     try:
         file = requests.FILES.get("file", False)
+<<<<<<< HEAD
         bootstrapFile = {}
 
+=======
+        action = requests.POST.get("action")
+
+        bootstrapFile = {}
+        # Retrieve start and end date for term
+        bootstrapFile['start_date'] = requests.POST.get("start_date")
+        bootstrapFile['end_date'] = requests.POST.get("end_date")
+        
+        if action != None: 
+            bootstrap.clear_Database()
+
+        
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
             unzipped.extractall(os.path.abspath('bootstrap_files'))
@@ -314,7 +376,7 @@ def configureDB_faculty(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Administrator/uploadcsv.html", response)
 
@@ -669,6 +731,7 @@ def configure_telegram(requests):
                 facultyObj.phone_number = encrypt_phone_number
                 facultyObj.save()
 
+                response['phone_number'] = phone_number
                 response['action'] = 'login'
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
