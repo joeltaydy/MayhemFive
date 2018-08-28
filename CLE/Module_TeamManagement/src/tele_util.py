@@ -1,7 +1,6 @@
 import os
 import datetime
 import traceback
-from Module_TeamManagement.src.utilities import getFinancialYear
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, channels
 from telethon.tl.types import ChannelAdminRights, ChatInviteExported, Channel, Chat, ChannelParticipantsSearch
@@ -15,8 +14,8 @@ def getClient(username=None):
     if username == None:
         raise Exception('Please specify a username.')
 
-    session_file = username + '.session'
     if tele_config.CLIENT == None:
+        session_file = username + '.session'
         tele_config.CLIENT = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
 
     return tele_config.CLIENT
@@ -188,7 +187,11 @@ def initialize_Group(client=None,course_title='',section_number='',team_number='
 
 
 if __name__ == "__main__":
+    import tele_config
     from tele_config import *
+
+    SESSION_FOLDER = os.path.abspath('telegram_sessions')
+
     try:
         client = getClient(ADMIN_USERNAME)
         client.connect()
@@ -209,3 +212,4 @@ if __name__ == "__main__":
 else:
     from Module_TeamManagement.src.tele_config import *
     from Module_TeamManagement.src import tele_config
+    from Module_TeamManagement.src.utilities import getFinancialYear
