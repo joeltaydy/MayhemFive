@@ -144,29 +144,35 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
     for course_section in registered_course_section:
         courses.append(course_section.course_section_id)
 
+    classes = Class.objects.order_by('course_section','team_number') 
     classResult = {}
     for classObj in classes:
         course_section_id = classObj.course_section.course_section_id #Getting course code
         if course_section_id in courses: #extract classes only
-            if course_section_id not in classResult:
-                classResult[course_section_id] = {}
-                classResult[course_section_id]["Teams_Information"] = {}
-                classResult[course_section_id]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
+           
             try:
-                #populate student results
-                classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
-                classResult[course_section_id]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
-                classResult[course_section_id]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
-            except:
-                pass
+                if course_section_id not in classResult:
+                    classResult[course_section_id] = {}
+                    classResult[course_section_id]["Teams_Information"] = {}
+                    classResult[course_section_id]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
+                try:
+                    #populate student results
+                    classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
+                    classResult[course_section_id]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
+                    classResult[course_section_id]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
+                except:
+                    pass
 
-            if classObj.team_number != None : #Omit classes with no teams
-            # populate team results
-                if classObj.team_number not in classResult[course_section_id]["Teams_Information"]:
-                    classResult[course_section_id]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
-                classResult[course_section_id]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
-                classResult[course_section_id]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
-                classResult[course_section_id]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+                if classObj.team_number != None : #Omit classes with no teams
+                # populate team results
+                    if classObj.team_number not in classResult[course_section_id]["Teams_Information"]:
+                        classResult[course_section_id]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
+                    classResult[course_section_id]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+                    classResult[course_section_id]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+                    classResult[course_section_id]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+            except:
+                pass # for cases where they dont have trail head links
+                
     return classResult
 
 # Retrieve team info based on course for both students main page and instructor class page
