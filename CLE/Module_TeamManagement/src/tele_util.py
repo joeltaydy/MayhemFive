@@ -16,7 +16,10 @@ def getClient(username=None):
         raise Exception('Please specify a username.')
 
     session_file = username + '.session'
-    return TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+    if tele_config.CLIENT == None:
+        tele_config.CLIENT = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+
+    return tele_config.CLIENT
 
 
 # Return True if name already exists within telegram. Else False
@@ -205,3 +208,4 @@ if __name__ == "__main__":
         traceback.print_exc()
 else:
     from Module_TeamManagement.src.tele_config import *
+    from Module_TeamManagement.src import tele_config

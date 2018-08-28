@@ -725,12 +725,10 @@ def configureDB_telegram(requests):
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
             elif phone_number != None and login_code != None:
-                print(phone_number)
-                print(login_code)
                 try:
-                    client.sign_in(phone_number, login_code)
+                    client.sign_in(phone=phone_number, code=login_code)
                 except PhoneNumberUnoccupiedError:
-                    client.sign_up(phone_number, login_code)
+                    client.sign_up(phone=phone_number, code=login_code)
 
         # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
         action = requests.POST.get('action')
