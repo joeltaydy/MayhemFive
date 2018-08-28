@@ -1,0 +1,49 @@
+{% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
+
+{% block bootstrapContent %}
+
+<h1>Teams Setup</h1>
+<form action="{% url 'TMmod:uploadteam' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
+          <select class="form-control col-md-offset-3" id="course_section" name="course_section">
+            <option value="" disabled selected>Select your course</option>
+            {% for course,course_section in courses.items %}
+              <option value={{course}}>{{course_section}}</option>
+          {% endfor %}
+        </select>
+
+        </br>
+
+        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
+        <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
+    </div>
+    <input type="hidden" id="user" name="user" value="faculty">
+    <input type="hidden" id="action" name="action" value="batch">
+
+    <div class="form-group">
+      <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure tools</button>
+        </div>
+    </div>
+</form>
+
+{% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
+{% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
+
+<label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
+  <a href="#" data-toggle="popover" data-html="true" data-content="<img src='http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg' width='300' />">Help <i class="far fa-question-circle"></i></a>
+</label>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
+
+{% endblock %}

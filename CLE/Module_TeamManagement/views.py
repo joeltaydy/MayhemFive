@@ -522,8 +522,9 @@ def configureDB_students(requests):
 def configureDB_teams(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
-        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-        return faculty_Overview(requests)
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
+        return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
 
     try:
         file = requests.FILES.get("file", False)

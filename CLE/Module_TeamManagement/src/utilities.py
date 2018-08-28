@@ -104,7 +104,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
         else:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation_instructor(trailHeadInfo,instructorEmail ) # instructor dashboard
 
-    context["last_updated"] = trailHeadInfo["last_updated"]
+    # context["last_updated"] = trailHeadInfo["last_updated"]
 
     return context
 
