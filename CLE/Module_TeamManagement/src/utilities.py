@@ -61,7 +61,6 @@ def getTrailheadInformation():
             if counter == 0:
                 counter += 2 # skip headers
             else:
-
                 # Track all student information
                 studId = row[1]
                 content['badge_count'] = row[3]
@@ -89,6 +88,7 @@ def getTrailheadInformation():
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
+    print(trailHeadInfo.keys())
 
     if student_email != None:
         try:
