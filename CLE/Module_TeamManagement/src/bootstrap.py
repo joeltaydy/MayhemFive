@@ -10,6 +10,8 @@ from Module_TeamManagement.models import *
 #-------------------------- Bootstrap Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
+<<<<<<< HEAD
+=======
 def clear_Database():
     Class.objects.all().delete()
     School_Term.all().delete()
@@ -20,6 +22,7 @@ def clear_Database():
     Course.objects.all().delete()
 
 
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
 def parse_File_Student(filePath,bootstrapInfo={}):
 
     # Create a workbook object from the filePath

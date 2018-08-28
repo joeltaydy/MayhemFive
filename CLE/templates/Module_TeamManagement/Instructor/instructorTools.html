@@ -2,114 +2,198 @@
 
 {% block bootstrapContent %}
 
-  <h1 style="margin-left:10px;">Tools Setup</h1>
 
-  <h3 style="margin-left:10px;">Select Tool:</h3>
-  <span style ="margin-left:10px">
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#telegramModal" data-tool="telegram" id="type" value="telegram">Telegram</button>
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">Trailhead</button>
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">Kahoot</button>
-  <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">Tableau</button>
-  <input type="hidden" id="user" name="user" value="faculty">
-  <input type="hidden" id="action" name="action" value="batch">
-  <br><br>
-  
-    {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
-    {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
-  <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
-      <a href="#" data-toggle="popover" data-html="true" data-content="<img src='http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg' width='300' />">Help <i class="far fa-question-circle"></i></a>
-    </label>
-    
-</span>
+<!-- Button to Open the Modal -->
+<h1>Tools Setup</h1>
+<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">Trailhead</button>
+<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">Kahoot</button>
+<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">Tableau</button>
+<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#TelegramModalstep1" data-whatever="Telegram" id="type" value="Telegram">Telegram</button>
 
 
-  <!--Telegram Popup-->
-  <div class="modal fade" id="telegramModal" tabindex="-1" role="dialog" aria-labelledby="telegramModalTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="telegramModalTitle">Set up Telegram</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-                {% csrf_token %}
-                <br>
-                <div class="form-group">
-                    <label for="name">Course Code</label>
-                      <select class="form-control" id="course_title" name="course_title">
-                        <option value="" disabled selected>Select your course</option>
-                             {% for course,course_section in courses.items %}
-                          <option value={{course}}>{{course_section}}</option>
-                            {% endfor %}
-                     </select>
-                  <label for="contact-number" class="col-form-label">Telegram Contact Number: </label>
-                  <input type="text" class="form-control" id="contact-number">
-                </div>
-              </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Set Up</button>
-          </div>
-        </div>
-      </div>
-  </div>
-
-  <!--Other Tools Popup-->
-  <div class="modal fade" id="otherToolsModal" tabindex="-1" role="dialog" aria-labelledby="otherToolsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+  <!-- The Modal -->
+  <div class="modal fade" id="otherToolsModal">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
+
+        <!-- Modal Header -->
         <div class="modal-header">
-          <h5 class="modal-title" id="otherToolsModalLabel">Set up</h5>
-          
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <h4 class="modal-title">'data-whatever'</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
+
+        <!-- Modal body -->
         <div class="modal-body">
-            <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+          <!--Form-->
+          <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+
               {% csrf_token %}
-              <br>
+
               <div class="form-group">
-                  <label for="name">Course Code</label>
-                    <select class="form-control" id="course_title" name="course_title">
+                  <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
+                    <select class="form-control col-md-offset-3" id="course_title" name="course_title">
                       <option value="" disabled selected>Select your course</option>
-                            {% for course,course_section in courses.items %}
+                      {% for course,course_section in courses.items %}
                         <option value={{course}}>{{course_section}}</option>
-                          {% endfor %}
+                    {% endfor %}
+                  </select>
+
+                  </br>
+                  <!-- <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Learning Tools</label>
+                    <select class="form-control" id="type" name="type">
+                      <option value="" disabled selected>Select your tools</option>
+                          <option value="Trailhead">Trailhead</option>
+                          <option value="Tableu">Tableu</option>
+                          <option value="Kahoot">Kahoot</option>
                     </select>
-              <label for="name">File Input</label>
-              <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp" style="margin-bottom:10px">
-          </form>
+                  </br> -->
+
+                  <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
+                  <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
+              </div>
+              <input type="hidden" id="user" name="user" value="faculty">
+              <input type="hidden" id="action" name="action" value="batch">
+
+          <!-- end of Form -->
         </div>
+
+        <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Set Up</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure tools</button>
         </div>
+        </form>
       </div>
     </div>
   </div>
-  
-<script>
-    $(document).ready(function(){
-        $('[data-toggle="popover"]').popover();
-    });
-    
-    
-  $('#otherToolsModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var recipient = button.data('whatever') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    modal.find('.modal-title').text('Set Up ' + recipient)
-    modal.find('.modal-body input').val(recipient)
-  })
-  </script>
 
-<br>
+
+
+  <!--Telegram modal 1-->
+  <div class="modal fade" id="TelegramModalstep1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Telegram Setup</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <!--Form-->
+          <form action="{% url 'TMmod:telegram_setup' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+
+              {% csrf_token %}
+
+              <label for="name">Please enter a valid phone number.</label>
+              <div class="form-group row">
+                <label for="phone_number" class="col-sm-2 col-form-label">+65</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="phone_number" id="phone_number" placeholder="Phone Number" onkeypress="return isNumberKey(event)">
+                </div>
+              </div>
+
+              <input type="hidden" id="user" name="user" value="faculty">
+              <input type="hidden" id="action" name="action" value="batch">
+
+
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button class="btn btn-primary TelegramModalstep2" data-dismiss="modal"> <span style="margin-right:5px;"></span>Next Step</button>
+          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Send verification code</button>
+        </div>
+        </form>
+          <!-- end of Form -->
+      </div>
+    </div>
+  </div>
+
+
+  <!--Telegram modal 2-->
+  <div class="modal fade" id="TelegramModalstep2">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Telegram setup</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <!--Form-->
+          <form action="{% url 'TMmod:telegram_setup' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+
+              {% csrf_token %}
+
+              <label for="name">We've sent the code via SMS. Please enter the code below.</label>
+              <div class="form-group row">
+                <label for="phone_number" class="col-sm-2 col-form-label">+65</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="login_code" id="login_code" placeholder="Verification Code" onkeypress="return isNumberKey(event)">
+                </div>
+              </div>
+
+              <input type="hidden" id="user" name="user" value="faculty">
+              <input type="hidden" id="action" name="action" value="batch">
+
+
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button class="btn btn-primary TelegramModalstep1" data-dismiss="modal"> <span style="margin-right:5px;"></span>Previous Step</button>
+          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure tools</button>
+        </div>
+        </form>
+          <!-- end of Form -->
+      </div>
+    </div>
+  </div>
+
+<script>
+  $(function(){
+    $(".TelegramModalstep2").click(function() {
+       $("#TelegramModalstep2").modal();
+    });
+    $(".TelegramModalstep1").click(function() {
+       $("#TelegramModalstep1").modal();
+    });
+  });
+
+  function isNumberKey(evt)
+			{
+				var charCode = (evt.which) ? evt.which : evt.keyCode;
+				if (charCode != 46 && charCode > 31
+				&& (charCode < 48 || charCode > 57))
+				return false;
+				return true;
+			}
+
+</script>
+
+
+
+{% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
+{% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
+
+<label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
+  <a href="#" data-toggle="popover" data-html="true" data-content="<img src='http://www.browndailyherald.com/wp-content/uploads/2012/10/1028540347.jpg' width='300' />">Help <i class="far fa-question-circle"></i></a>
+</label>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
 
 {% endblock %}

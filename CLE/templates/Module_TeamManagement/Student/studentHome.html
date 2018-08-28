@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <!--Class One Card-->   
+        <!--Class One Card-->
         {% for course,course_section in request.session.courseList.items %}
             <div class="col-md-6">
             <div class="card">
@@ -116,28 +116,36 @@
                             </div>
                         </div>
                     </div>
+<<<<<<< HEAD
+
+=======
                     
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title"> Ranking</h4>
                             <p class="card-category">24 Hours performance</p>
                         </div>
-                        
+
                         <div class="card-body">
+<<<<<<< HEAD
+                            {% include "Module_TeamManagement/bubble_chart.html" %}
+=======
                             {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
                         </div>
                         <div class="card-footer ">
                             <div class="stats">
                                 <i class="fa fa-history"></i> Updated "{{last_updated}}"
                             </div>
                         </div>
-                        
+
                     </div>
             </div>
 
         {% endfor %}
-        
+
         </br>
     </div>
 </div>

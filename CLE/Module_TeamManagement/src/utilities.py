@@ -59,7 +59,6 @@ def getTrailheadInformation():
             content = {}
 
             if counter == 0:
-                results['last_updated'] = row[0] # take last updated information
                 counter += 2 # skip headers
             else:
 
@@ -85,11 +84,14 @@ def getTrailheadInformation():
         context = {
             "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
             "CourseTrailResults" : {'badge_count' : 4 , ...}
-            'last_updated': '23/8/2018 1:05'
         }
 '''
+<<<<<<< HEAD
+def populateTrailheadInformation(student_email=None):
+=======
 
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     context = {}
     trailHeadInfo = getTrailheadInformation()
 
@@ -99,6 +101,9 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
         except:
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
 
+<<<<<<< HEAD
+    context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo)
+=======
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
     if instructorEmail != None:   
         moduleCode = requests.GET.get('module')
@@ -108,6 +113,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["CourseTrailResults"] = populateTeamTrailHeadInformation_instructor(trailHeadInfo,instructorEmail ) # instructor dashboard
 
     context["last_updated"] = trailHeadInfo["last_updated"]
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     return context
 
 # Retrieve team info based on course
@@ -115,6 +121,10 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
     final format should be
     'CourseTrailResults': {
         BPAS210G4: {
+<<<<<<< HEAD
+            'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+            'T3': {'badges': 280, 'points': 207475, 'trails': 26}, 'T4': {'badges': 138, 'points': 173400, 'trails': 12}
+=======
             "Teams_Information" : {
                 'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
              
@@ -124,16 +134,31 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
                 "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
                 "points" : [2323, 3333, 4445 ..]
                 "badges" : [3, 5, 6...]
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
             }
-
         },
         BPAS201G2: {
-            "Teams_Information" : {...}
-            "Students_Information" : {...}
+            ...
         }
 
     }
 '''
+<<<<<<< HEAD
+def populateTeamTrailHeadInformation(results):
+    classes = Class.objects.exclude(team_number = None).order_by('course_section','team_number') #Omit classes with no teams
+    classResult = {}
+    for classObj in classes:
+        course_section_id = classObj.course_section.course_section_id
+        if course_section_id not in classResult:
+            classResult[course_section_id] = {}
+
+        if classObj.team_number not in classResult[course_section_id]:
+            classResult[course_section_id][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
+        classResult[course_section_id][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+        classResult[course_section_id][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+        classResult[course_section_id][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+
+=======
 
 def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor dashboard retrieval
     # SQL equivalent to order by course_section , team_number
@@ -240,6 +265,7 @@ def classInformationRetrieval( results,courseSection):
             classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
             classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
             classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     return classResult
 
 # The webscreapper to scrap static info from website
@@ -313,8 +339,8 @@ def encode(plainText=''):
         raise Exception('Please specify a 32 bit long plain text when encoding')
 
     plainText = plainText.rjust(32)
-    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
-    return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
+    return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
 
 
 # Decrypt a 32-bit string
@@ -327,6 +353,10 @@ def decode(cipherText=''):
     if cipherText == '':
         raise Exception('Please specify a cipher text for decoding')
 
+<<<<<<< HEAD
+    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
+    return cipher.decrypt(base64.b64decode(encoded)).strip().decode('utf-8')
+=======
     cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
     return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
 
@@ -374,3 +404,4 @@ def getRemainingWeeks():
     remaining_weeks = 16 - past_weeks
 
     return past_weeks, remaining_weeks
+>>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518

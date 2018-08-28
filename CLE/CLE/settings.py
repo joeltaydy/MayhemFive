@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount', # new
     'allauth.socialaccount.providers.google', # new
     'django_celery_beat', # new
+    'formtools',
 ]
 
 MIDDLEWARE = [
