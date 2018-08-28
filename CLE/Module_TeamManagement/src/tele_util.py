@@ -1,10 +1,7 @@
 import os
 import datetime
-<<<<<<< HEAD
-=======
 import traceback
 from Module_TeamManagement.src.utilities import getFinancialYear
->>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, channels
 from telethon.tl.types import ChannelAdminRights, ChatInviteExported

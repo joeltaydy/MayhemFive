@@ -42,9 +42,6 @@ def home(requests):
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)
-<<<<<<< HEAD
-    #print(context)
-=======
 
     # Get telegram group/channel link
     enrolled_classes = Class.objects.filter(student=student_email)
@@ -67,7 +64,6 @@ def home(requests):
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
     print(context)
->>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -143,8 +139,6 @@ def faculty_Home(requests):
         return render(requests,'Module_Account/login.html',context)
 
     context["courses"] = requests.session['courseList']
-<<<<<<< HEAD
-=======
 
     # Get number of weeks since school term start and reamining weeks till school term ends
     past_weeks, remaining_weeks = utilities.getRemainingWeeks()
@@ -161,7 +155,6 @@ def faculty_Home(requests):
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
->>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
     context['message'] = 'Successful retrieval of faculty\'s overview information'
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
@@ -324,22 +317,16 @@ def configureDB_faculty(requests):
 
     try:
         file = requests.FILES.get("file", False)
-<<<<<<< HEAD
-        bootstrapFile = {}
-
-=======
         action = requests.POST.get("action")
 
         bootstrapFile = {}
         # Retrieve start and end date for term
         bootstrapFile['start_date'] = requests.POST.get("start_date")
         bootstrapFile['end_date'] = requests.POST.get("end_date")
-        
-        if action != None: 
+
+        if action != None:
             bootstrap.clear_Database()
 
-        
->>>>>>> 1aca9105af4ac4e813f65c222503a74c10a9d518
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
             unzipped.extractall(os.path.abspath('bootstrap_files'))
