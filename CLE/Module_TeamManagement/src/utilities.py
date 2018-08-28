@@ -59,8 +59,10 @@ def getTrailheadInformation():
             content = {}
 
             if counter == 0:
+                results['last_updated'] = row[0] # take last updated information
                 counter += 2 # skip headers
             else:
+
                 # Track all student information
                 studId = row[1]
                 content['badge_count'] = row[3]
@@ -85,6 +87,7 @@ def getTrailheadInformation():
             "CourseTrailResults" : {'badge_count' : 4 , ...}
         }
 '''
+
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
@@ -104,8 +107,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
         else:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation_instructor(trailHeadInfo,instructorEmail ) # instructor dashboard
 
-    # context["last_updated"] = trailHeadInfo["last_updated"]
-
+    context["last_updated"] = trailHeadInfo["last_updated"]
     return context
 
 # Retrieve team info based on course
@@ -123,13 +125,16 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
                 "points" : [2323, 3333, 4445 ..]
                 "badges" : [3, 5, 6...]
             }
+
         },
         BPAS201G2: {
-            ...
+            "Teams_Information" : {...}
+            "Students_Information" : {...}
         }
-
+        
     }
 '''
+
 def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor dashboard retrieval
     # SQL equivalent to order by course_section , team_number
     facultyObj = Faculty.objects.filter(email=instructorEmail)[0]
@@ -308,8 +313,8 @@ def encode(plainText=''):
         raise Exception('Please specify a 32 bit long plain text when encoding')
 
     plainText = plainText.rjust(32)
-    cipher = AES.new(AES_SECRET_KEY,AES.MODE_ECB)
-    return base64.b64encode(cipher.encrypt(plainText)).strip().decode('utf-8')
+    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+    return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
 
 
 # Decrypt a 32-bit string

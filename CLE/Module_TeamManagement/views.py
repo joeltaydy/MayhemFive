@@ -4,11 +4,9 @@ import datetime
 from zipfile import ZipFile
 from django.shortcuts import render
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
-from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
+from Module_TeamManagement.models import *
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
-
-
 
 from random import randint
 from django.views.generic import TemplateView
@@ -680,6 +678,7 @@ def configureDB_clt(requests):
 
 
 # This is for subsequent configuration by faculty
+# This function authenticates the faculty and creates the channels/groups
 #
 # Requests param: GET
 # - phone_number
@@ -692,9 +691,11 @@ def configureDB_clt(requests):
 # - results
 # - message
 #
-def configure_telegram(requests):
+def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
@@ -721,6 +722,7 @@ def configure_telegram(requests):
 
                 response['phone_number'] = phone_number
                 response['action'] = 'login'
+                # Currently temporary address. Not sure where to direct user to
                 return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
             elif phone_number != None and login_code != None:
@@ -729,21 +731,85 @@ def configure_telegram(requests):
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(int(phone_number), login_code)
 
+        # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
+        action = requests.POST.get('action')
+        course_section = requests.POST.get('course_section')
+
+        if action == 'create_sectionChannel':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Channel(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_channellink = results['channel_link']
+                student.save()
+
+            response['message'] = results['message']
+            return faculty_Overview(requests)
+
+        elif action == 'create_sectionGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Group(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_grouplink = results['group_link']
+                student.save()
+
+            response['message'] = results['message']
+            return faculty_Overview(requests)
+
+        elif action == 'create_teamGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            teams = {}
+            for student in class_QuerySet:
+                try:
+                    teams[student.team_number].append(student)
+                except:
+                    teams[student.team_number] = [student]
+
+            for team_number,students in teams.items():
+                results = tele_util.initialize_Group(
+                    client=client,
+                    course_title=course_sectionObj.course.course_title,
+                    section_number=course_sectionObj.section_number,
+                    team_number=team_number,
+                )
+                for student in students:
+                    student.telegram_grouplink = results['group_link']
+                    student.save()
+
+            response['message'] = 'Teams Telegram Group Configured'
+            return faculty_Overview(requests)
+
         client.disconnect()
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    response['message'] = 'Telegram Group Configured'
+    # Need to double confirm where to direct the user to once done.
+    response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 
-
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
-
 
 
 #multistep form for telegram Setup
@@ -754,6 +820,7 @@ class TelegramWizard(SessionWizardView):
         form_data = process_form_data(form_list)
 
         return render(self.request, 'Module_TeamManagement/Instructor/done.html', {'form_data': form_data})
+
 
 def process_form_data(form_list):
     form_data = [form.cleaned_data for form in form_list]

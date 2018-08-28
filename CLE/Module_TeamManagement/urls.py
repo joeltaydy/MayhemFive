@@ -22,5 +22,5 @@ urlpatterns = [
     path('charts/',views.line_chart, name = 'charts_view'),
     # path('instructor/telegram_setup/', TelegramWizard.as_view(FORMS, condition_dict={'verificationcode': views.enter_phonenumber}), name='telegram_setup'),
     # path('instructor/telegram_setup/', TelegramWizard.as_view([PhoneNumberForm, VerificationCodeForm]), name='telegram_setup'),
-    path('instructor/telegram_setup/', views.configure_telegram, name='telegram_setup'),
+    path('instructor/telegram_setup/', views.configureDB_telegram, name='telegram_setup'),
 ]
