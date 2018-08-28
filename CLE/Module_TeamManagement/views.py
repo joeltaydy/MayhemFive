@@ -7,9 +7,15 @@ from Module_TeamManagement.models import Student, Faculty, Class, Course_Section
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
 
+
+
 from random import randint
 from django.views.generic import TemplateView
-
+from formtools.wizard.views import SessionWizardView
+from django.http import HttpResponseRedirect
+from Module_TeamManagement import forms
+import logging
+logr = logging.getLogger(__name__)
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -642,7 +648,7 @@ def configure_telegram(requests):
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
-        username = requets.user.email.split('@')[0]
+        username = requests.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
 
@@ -686,3 +692,23 @@ def configure_telegram(requests):
 
 
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
+
+
+
+#multistep form for telegram Setup
+class TelegramWizard(SessionWizardView):
+    template_name = "Module_TeamManagement/Instructor/telegram.html"
+
+    def done(self, form_list, **kwargs):
+        form_data = process_form_data(form_list)
+
+        return render(self.request, 'Module_TeamManagement/Instructor/done.html', {'form_data': form_data})
+
+def process_form_data(form_list):
+    form_data = [form.cleaned_data for form in form_list]
+
+    logr.debug(form_data[0]['phone_number'])
+    logr.debug(form_data[1]['login_code'])
+
+    #add in method to return the validation Code
+    return form_data
