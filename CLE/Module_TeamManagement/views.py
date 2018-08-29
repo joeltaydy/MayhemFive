@@ -314,14 +314,18 @@ def configureDB_faculty(requests):
     if requests.method == "GET":
         return render(requests, "Administrator/uploadcsv.html", response)
 
+    bootstrapFile = {}
     try:
         file = requests.FILES.get("file", False)
         action = requests.POST.get("action")
+        start_date = requests.POST.get("start_date")
+        end_date = requests.POST.get("end_date")
 
-        bootstrapFile = {}
-        # Retrieve start and end date for term
-        bootstrapFile['start_date'] = requests.POST.get("start_date")
-        bootstrapFile['end_date'] = requests.POST.get("end_date")
+        if not utilities.validateDate(start_date) or not utilities.validateDate(end_date):
+            raise Exception("Incorrect date format, should be YYYY-MM-DD")
+
+        bootstrapFile['start_date'] = start_date
+        bootstrapFile['end_date'] = end_date
 
         if action != None:
             bootstrap.clear_Database()

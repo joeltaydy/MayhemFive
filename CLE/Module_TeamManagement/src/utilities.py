@@ -373,3 +373,12 @@ def getRemainingWeeks():
     remaining_weeks = 16 - past_weeks
 
     return past_weeks, remaining_weeks
+
+
+# Validates if date string is in proper format
+def validateDate(date_text):
+    try:
+        datetime.datetime.strptime(date_text, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False

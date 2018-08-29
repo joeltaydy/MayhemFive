@@ -32,10 +32,10 @@
         <div class="form-group">
             <div class="col-md-8">
             <label class="control-label" for="date"> Term Start Date:</label>
-                <input class="form-control" id="start_date" name="start_date" placeholder="YYYY-MM-DD" type="text"/>
+                <input class="form-control" id="start_date" name="start_date" placeholder="YYYY-MM-DD" type="text" required="True">
             </br>
             <label class="control-label" for="date"> Term End Date:</label>
-                <input class="form-control" id="end_date" name="end_date" placeholder="YYYY-MM-DD" type="text"/>
+                <input class="form-control" id="end_date" name="end_date" placeholder="YYYY-MM-DD" type="text" required="True">
             </br>
             <label for="name" class="control-label">File: </label>
                 <input type="file" name="file" id="file" required="True" class="form-control">
@@ -51,7 +51,8 @@
         </div>
     </form>
 </body>
+<div class="col-md-8">
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
 {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
-
+</div>
 {% endblock %}
