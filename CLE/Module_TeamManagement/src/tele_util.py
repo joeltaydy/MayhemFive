@@ -180,6 +180,12 @@ def initialize_Group(client=None,course_title='',section_number='',team_number='
 
     return results
 
+def disconnectClient(client=None):
+    if client == None:
+        raise Exception('Please specify a client.')
+
+    tele_config.CLIENT = None
+    client.disconnect()
 
 # ============================================================================ #
 # ============================================================================ #
@@ -206,6 +212,7 @@ if __name__ == "__main__":
         # RUN test methods here
 
         client.disconnect()
+
 
     except Exception as e:
         traceback.print_exc()

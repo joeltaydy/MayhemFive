@@ -797,7 +797,8 @@ def configureDB_telegram(requests):
             response['message'] = 'Teams Telegram Group Configured'
             return faculty_Overview(requests)
 
-        client.disconnect()
+        tele_util.disconnectClient(client)
+
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
