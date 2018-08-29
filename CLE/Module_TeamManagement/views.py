@@ -712,7 +712,7 @@ def configureDB_telegram(requests):
 
         if not client.is_user_authorized():
             if phone_number != None and login_code == None:
-                client.send_code_request(int(phone_number))
+                client.send_code_request(phone_number)
 
                 facultyObj = Faculty.objects.get(username=username)
                 encrypt_phone_number = utilities.encode(phone_number)
