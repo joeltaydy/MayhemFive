@@ -22,13 +22,6 @@
     <!-- data table -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-    <!-- calendar js-->
-    <link href="{% static 'css/fullcalendar.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/calendar.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/fullcalendar.print.css' %}" rel="stylesheet" media='print' />
-    <script src="{% static 'js/fullcalendar.js' %}" charset="utf-8"></script>
-      <script src="{% static 'js/jquery-1.10.2.js' %}" charset="utf-8"></script>
-        <script src="{% static 'js/jquery-ui.custom.min.js' %}" charset="utf-8"></script>
 
 </head>
 
@@ -97,7 +90,7 @@
                               </a>
                               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                   <a class="dropdown-item">
-                                      
+
                                   {% if 'smu.edu.sg' in user.email %} Student {% else %} Instructor {% endif %}</a>
                                   <div class="divider"></div>
                                   {% if 'smu.edu.sg' in user.email %}
