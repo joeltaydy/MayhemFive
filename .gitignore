@@ -1,7 +1,7 @@
 # Personal/Extra Files
 bootstrap_files
 Diagrams
-keagenkoi.session
+*.session
 
 #ignore vscode
 CLE/.vscode/settings.json
