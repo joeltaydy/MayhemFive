@@ -12,7 +12,7 @@ from telethon.errors import PhoneNumberUnoccupiedError
 from random import randint
 from django.views.generic import TemplateView
 from formtools.wizard.views import SessionWizardView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from Module_TeamManagement import forms
 import logging
 logr = logging.getLogger(__name__)
@@ -723,10 +723,7 @@ def configureDB_telegram(requests):
                 facultyObj.phone_number = encrypt_phone_number
                 facultyObj.save()
 
-                response['phone_number'] = phone_number
-                response['action'] = 'login'
-                # Currently temporary address. Not sure where to direct user to
-                return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+                return HttpResponse('')
 
             elif phone_number != None and login_code != None:
                 try:
