@@ -339,7 +339,7 @@ def configureDB_faculty(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        #traceback.print_exc()
+        traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Administrator/uploadcsv.html", response)
 
