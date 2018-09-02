@@ -28,7 +28,7 @@ AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["54.254.212.240","localhost","127.0.0.1","52.76.46.177.xip.io","52.76.46.177"]
+ALLOWED_HOSTS = ['172.31.25.38',"cle-alb-433525205.ap-southeast-1.elb.amazonaws.com","localhost","127.0.0.1","52.76.46.177.xip.io","52.76.46.177"]
 
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
