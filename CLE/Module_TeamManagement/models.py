@@ -68,6 +68,11 @@ class Course_Section(models.Model):
         null=True,
     )
 
+    learning_tools = models.TextField(
+        db_column='Course_Section_Learning_Tools_List',
+        null=True,
+    )
+
     class Meta:
         managed = True
         db_table = 'Course_Section'
