@@ -2,13 +2,14 @@
 {% load staticfiles %}
 {% block bootstrapContent %}
 
+<div class="col-md-8">
 <h1>Course Setup</h1>
 <form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
 
     <div class="form-group">
-      <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
+      <label for="name" class="control-label">Course Code</label>
         <select class="form-control" id="course_title" name="course_title">
           <option value="" disabled selected>Select your course</option>
         {% for course in courses %}
@@ -17,13 +18,13 @@
       </select>
 
       </br>
-        <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input (Optional)</label>
+        <label for="name" class="control-label">File Input (Optional)</label>
         <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
     </div>
     <input type="hidden" id="username" name="username" value={{user.username}}>
 
     <div class="form-group">
-      <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+      <div style="margin-bottom:10px;">
           <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
         </div>
     </div>
@@ -32,7 +33,7 @@
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
 {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
 
-<label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">
+<label for="name" class="control-label">
   <a href="#" data-toggle="popover" data-html="true" data-content="<img src='{% static 'images/samplecourse.jpg' %}' width='800' />">Help <i class="far fa-question-circle"></i></a>
 </label>
 
@@ -42,6 +43,6 @@ $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
 });
 </script>
-
+</div>
 
 {% endblock %}

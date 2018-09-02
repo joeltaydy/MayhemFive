@@ -1,6 +1,13 @@
 # Personal/Extra Files
 bootstrap_files
 Diagrams
+*.session
+
+#ignore vscode
+CLE/.vscode/settings.json
+CLE/.vscode/tasks.json
+CLE/.vscode/launch.json
+CLE/.vscode/extensions.json
 
 ### Django ###
 *.log

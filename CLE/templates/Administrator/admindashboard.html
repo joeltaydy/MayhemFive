@@ -22,13 +22,6 @@
     <!-- data table -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-    <!-- calendar js-->
-    <link href="{% static 'css/fullcalendar.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/calendar.css' %}" rel="stylesheet" />
-    <link href="{% static 'css/fullcalendar.print.css' %}" rel="stylesheet" media='print' />
-    <script src="{% static 'js/fullcalendar.js' %}" charset="utf-8"></script>
-      <script src="{% static 'js/jquery-1.10.2.js' %}" charset="utf-8"></script>
-        <script src="{% static 'js/jquery-ui.custom.min.js' %}" charset="utf-8"></script>
 
 </head>
 
@@ -42,7 +35,7 @@
     -->
             <div class="sidebar-wrapper">
                 <div class="logo">
-                    <a href="{% url 'TMmod:cleAdmin' %}" class="simple-text"> 
+                    <a href="{% url 'TMmod:cleAdmin' %}" class="simple-text">
                         <img class="d-block w-10 center" src="{% static 'images/thunderhead monkeys.png' %}">
                     </a>
                 </div>
@@ -91,13 +84,13 @@
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item dropdown">
                               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  
+
                                 <span class="no-icon">Hola, Administrator </span>
-                          
+
                               </a>
                               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                   <a class="dropdown-item">
-                                  
+
                                   {% if 'smu.edu.sg' in user.email %} Student {% else %} Instructor {% endif %}</a>
                                   <div class="divider"></div>
                                   {% if 'smu.edu.sg' in user.email %}
@@ -108,7 +101,7 @@
                                   {% endif %}
                               </div>
                             </li>
-                            
+
                         </ul>
                     </div>
                 </div>

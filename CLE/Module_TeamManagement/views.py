@@ -1,35 +1,81 @@
 import os
 import traceback
+import datetime
 from zipfile import ZipFile
 from django.shortcuts import render
-from Module_TeamManagement.src import bootstrap, tele_util, utilities
-from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
+from Module_TeamManagement.src import bootstrap, utilities, tele_util
+from Module_TeamManagement.models import *
 from django.contrib.auth.decorators import login_required
+from allauth.socialaccount.models import SocialAccount
+from telethon.errors import PhoneNumberUnoccupiedError
+
+from random import randint
+from django.views.generic import TemplateView
+from formtools.wizard.views import SessionWizardView
+from django.http import HttpResponse
+from Module_TeamManagement import forms
+import logging
+logr = logging.getLogger(__name__)
 
 # Student Home Page
 #@login_required(login_url='/')
 def home(requests):
-    response = {"home" : "active"}
+    context = {"home" : "active"}
 
     # Redirect user to login page if not authorized
     if not requests.user.is_authenticated:
-        return render(requests,'Module_Account/login.html',response)
+        return render(requests,'Module_Account/login.html',context)
+
+    student_email = requests.user.email
+    all_SocialAccount = SocialAccount.objects.all()
+
+    for each_SocialAccount in all_SocialAccount:
+        data = each_SocialAccount.extra_data
+        if data['email'] == student_email:
+            requests.session['user_picture'] = data['picture']
+            requests.session['user_name'] = data['name'].replace('_','').strip()
 
     # Populates the info for the side nav bar for instructor
-    utilities.populateRelevantCourses(requests, studentEmail=requests.user.email)
+    utilities.populateRelevantCourses(requests, studentEmail=student_email)
 
     # Reads web scrapper results
-    student_email = requests.user.email
-    link = ''
-    for occurance in Class.objects.filter(student=student_email):
-        for clt in occurance.clt_id.all():
-            if clt.type == 'Trailhead':
-                link = clt.website_link
+    trailResults = utilities.populateTrailheadInformation(requests, student_email)
+    context.update(trailResults)
 
-    results = utilities.getTrailheadInformation(link)
-    response.update(results)
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
 
-    return render(requests,"Module_TeamManagement/Student/studentHome.html",response)
+    if past_weeks != None and remaining_weeks != None:
+        context['past_weeks'] = past_weeks
+        context['remaining_weeks'] = remaining_weeks
+        context['progress'] = past_weeks/remaining_weeks * 100
+    else:
+        context['past_weeks'] = 0
+        context['remaining_weeks'] = 0
+        context['progress'] = 0
+
+    # Get telegram group/channel link
+    enrolled_classes = Class.objects.filter(student=student_email)
+    context['telegram'] = {'status' : 'False'}
+    for enrolled_class in enrolled_classes:
+        group_link = enrolled_class.telegram_grouplink
+        channel_link = enrolled_class.telegram_channellink
+
+        if group_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['group'].update({enrolled_class.course_section : group_link})
+            except:
+                context['telegram']['group'] = {enrolled_class.course_section : group_link}
+
+        if channel_link != None:
+            context['telegram']['status'] = 'True'
+            try:
+                context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
+            except:
+                context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
+    print(context)
+    return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
 # Faculty Notification Page
@@ -62,74 +108,82 @@ def CLEAdmin(requests):
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# Student Home Page
+# Faculty Home Page
 #@login_required(login_url='/')
 def faculty_Home(requests):
     context = {"faculty_Home" : "active"}
 
     faculty_username = requests.user.email.split('@')[0]
 
+    all_SocialAccount = SocialAccount.objects.all()
+
+    for each_SocialAccount in all_SocialAccount:
+        data = each_SocialAccount.extra_data
+        if data['email'] == requests.user.email:
+            requests.session['user_picture'] = data['picture']
+            requests.session['user_name'] = data['name'].replace('_','').strip()
+
+    #print(requests.user.email)
     try:
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-
-        facultyObj = Faculty.objects.get(username=faculty_username)
+        facultyObj = Faculty.objects.get(email=requests.user.email)
         registered_course_section = facultyObj.course_section.all()
-
-        courses = []
+        courses = {}
+        students = []
+        previouscourse ="a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
             if course_title not in courses:
-                courses.append(course_title)
+                courses[course_title]= {}
+                if previouscourse != "a":
+                    courses[previouscourse]["count"] = len(courseStudents)
+                    courses[previouscourse]["sectionCount"] = sectionCounter
+                courseStudents=[]
+                previoussection = "a"
+                previouscourse = course_title
+                sectionCounter = 0
 
-        students = []
-        for course_section in registered_course_section:
+            if previoussection != course_section:
+                sectionCounter += 1
             classObj = Class.objects.all().filter(course_section=course_section)
             for student in classObj:
                 students.append(student)
+                courseStudents.append(student)
+            previoussection = course_section
+        courses[previouscourse]["count"] = len(courseStudents)
+        courses[previouscourse]["sectionCount"] = sectionCounter
 
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
+        context['course_list'] = courses
         context['student_count'] = len(students)
 
     except:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
     context["courses"] = requests.session['courseList']
+
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
+
+    if past_weeks != None and remaining_weeks != None:
+        context['past_weeks'] = past_weeks
+        context['remaining_weeks'] = remaining_weeks
+        context['progress'] = past_weeks/remaining_weeks * 100
+    else:
+        context['past_weeks'] = 0
+        context['remaining_weeks'] = 0
+        context['progress'] = 0
+
+    # Reads web scrapper results
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
+    context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
-
-
-# Faculty Profile Page
-# @login_required(login_url='/')
-def faculty_Profile(requests):
-    context = {"faculty_profile" : "active", 'course_list' : {}}
-
-    faculty_username = requests.GET.get('username')
-    # faculty_username = 'sample.instructor.1'
-
-    if faculty_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
-
-    facultyObj = Faculty.objects.get(username=faculty_username)
-    course_sectionList = facultyObj.course_section.all()
-
-    if len(course_sectionList) > 1:
-        for course_section in course_sectionList:
-            try:
-                context['course_list'][course_section.course.course_title].append(course_section)
-            except:
-                context['course_list'][course_section.course.course_title] = [course_section]
-    else:
-        context['course_list'][course_section.course.course_title] = [course_section]
-
-    context['user'] = facultyObj
-    context['message'] = 'Successful retrieval of faculty\'s profile'
-    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
 
 
 # Faculty Student Management Page
@@ -140,10 +194,9 @@ def faculty_Overview(requests):
     faculty_email = requests.user.email
 
     if requests.method == "GET":
-        course_section = requests.GET.get('module')
+        course_section = requests.GET.get('module').replace(" ", "")
     else:
         course_section = requests.POST.get('course_section')
-
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
@@ -161,7 +214,10 @@ def faculty_Overview(requests):
     course_section = Course_Section.objects.get(course_section_id=course_section)
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
+    context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s profile'
+    print(context)
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
@@ -178,32 +234,6 @@ def studStats(requests):
         context = {"stud_stats" : "active"}
         return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
-
-# Student Profile Page
-# @login_required(login_url='/')
-def student_Profile(requests):
-    context = {"student_Profile" : "active", 'course_list' : {}}
-    #
-    # student_username = requests.user.email.split('@')[0]
-    # # student_username = 'sample.1'
-    #
-    # # if student_username == None:
-    # #     context['message'] = 'Please specify a username'
-    # #     return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
-    #
-    # studentObj = Student.objects.get(username=student_username)
-    # classObjList = Class.objects.all().filter(student=studentObj)
-    #
-    # if len(classObjList) > 1:
-    #     for classObj in classObjList:
-    #         context['course_list'][classObj.course_section.course.course_title] = classObj
-    # else:
-    #     context['course_list'][classObjList.course_section.course.course_title] = classObj
-    #
-    # context['user'] = studentObj
-    # context['message'] = 'Successful retrieval of student\'s profile'
-    # return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
-    return render(requests,"error404.html",context)
 
 # Student Team Page
 # @login_required(login_url='/')
@@ -245,6 +275,7 @@ def student_Team(requests):
 # Models to populate:
 # - Course
 # - Faculty
+# - School_Term
 #
 # Response (Succcess):
 # - configureDB_faculty
@@ -256,9 +287,21 @@ def configureDB_faculty(requests):
     if requests.method == "GET":
         return render(requests, "Administrator/uploadcsv.html", response)
 
+    bootstrapFile = {}
     try:
         file = requests.FILES.get("file", False)
-        bootstrapFile = {}
+        action = requests.POST.get("action")
+        start_date = requests.POST.get("start_date")
+        end_date = requests.POST.get("end_date")
+
+        if not utilities.validateDate(start_date) or not utilities.validateDate(end_date):
+            raise Exception("Incorrect date format, should be YYYY-MM-DD")
+
+        bootstrapFile['start_date'] = start_date
+        bootstrapFile['end_date'] = end_date
+
+        if action != None:
+            bootstrap.clear_Database()
 
         if file.name.endswith('.zip'):
             unzipped = ZipFile(file)
@@ -296,7 +339,7 @@ def configureDB_faculty(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Administrator/uploadcsv.html", response)
 
@@ -455,8 +498,9 @@ def configureDB_students(requests):
 def configureDB_teams(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
-        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-        return faculty_Overview(requests)
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
+        return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
 
     try:
         file = requests.FILES.get("file", False)
@@ -612,37 +656,151 @@ def configureDB_clt(requests):
 
 
 # This is for subsequent configuration by faculty
+# This function authenticates the faculty and creates the channels/groups
 #
 # Requests param: GET
-# - course_title
-# - section_number
-# - username
+# - phone_number
 #
 # Models to modify:
 # - Class
 #
 # Response (Succcess):
-# - initialize_Section_Channel
+# - configure_telegram
 # - results
 # - message
 #
-def initialize_Section_Channel(request):
-    response = {"initialize_Section_Channel" : "active"}
+def configureDB_telegram(requests):
+    response = {"configure_telegram" : "active"}
     if requests.method == "GET":
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
-        section_number = requests.GET.get("section_number")
-        faculty_username = requests.GET.get("username")
-        course_title = requests.GET.get("course_title")
+        username = requests.user.email.split('@')[0]
+        phone_number = requests.POST.get('phone_number')
+        login_code = requests.POST.get('login_code')
 
-        response['results'] = tele_util.initialize_Channel(faculty_username,course_title,section_number)
+        if len(phone_number) == 8:
+            phone_number = str('+65') + phone_number
+
+        client = tele_util.getClient(username)
+        client.connect()
+
+        if not client.is_user_authorized():
+            if phone_number != None and login_code == None:
+                client.send_code_request(phone_number)
+
+                facultyObj = Faculty.objects.get(username=username)
+                encrypt_phone_number = utilities.encode(phone_number)
+                facultyObj.phone_number = encrypt_phone_number
+                facultyObj.save()
+
+                return HttpResponse('')
+
+            elif phone_number != None and login_code != None:
+                try:
+                    client.sign_in(phone=phone_number, code=login_code)
+                except PhoneNumberUnoccupiedError:
+                    client.sign_up(phone=phone_number, code=login_code)
+
+        # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
+        action = requests.POST.get('action')
+        course_section = requests.POST.get('course_section')
+
+        if action == 'create_sectionChannel':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Channel(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_channellink = results['channel_link']
+                student.save()
+
+            response['message'] = results['message']
+            return faculty_Overview(requests)
+
+        elif action == 'create_sectionGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            results = tele_util.initialize_Group(
+                client=client,
+                course_title=course_sectionObj.course.course_title,
+                section_number=course_sectionObj.section_number,
+            )
+
+            for student in class_QuerySet:
+                student.telegram_grouplink = results['group_link']
+                student.save()
+
+            response['message'] = results['message']
+            return faculty_Overview(requests)
+
+        elif action == 'create_teamGroup':
+            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+            class_QuerySet = Class.objects.filter(course_section=course_section)
+
+            teams = {}
+            for student in class_QuerySet:
+                try:
+                    teams[student.team_number].append(student)
+                except:
+                    teams[student.team_number] = [student]
+
+            for team_number,students in teams.items():
+                results = tele_util.initialize_Group(
+                    client=client,
+                    course_title=course_sectionObj.course.course_title,
+                    section_number=course_sectionObj.section_number,
+                    team_number=team_number,
+                )
+                for student in students:
+                    student.telegram_grouplink = results['group_link']
+                    student.save()
+
+            response['message'] = 'Teams Telegram Group Configured'
+            return faculty_Overview(requests)
+
+        tele_util.disconnectClient(client)
+
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
+        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+        response['courses'] = requests.session['courseList']
         response['message'] = e.args[0]
-        return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    response['message'] = 'Telegram Channel for Section Created'
-    return render(requests, "Module_TeamManagement/Instructor/<html page>", response)
+    # Need to double confirm where to direct the user to once done.
+    response['message'] = 'Telegram Account Configured'
+    return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+
+
+line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
+
+
+#multistep form for telegram Setup
+class TelegramWizard(SessionWizardView):
+    template_name = "Module_TeamManagement/Instructor/telegram.html"
+
+    def done(self, form_list, **kwargs):
+        form_data = process_form_data(form_list)
+
+        return render(self.request, 'Module_TeamManagement/Instructor/done.html', {'form_data': form_data})
+
+
+def process_form_data(form_list):
+    form_data = [form.cleaned_data for form in form_list]
+
+    logr.debug(form_data[0]['phone_number'])
+    logr.debug(form_data[1]['login_code'])
+
+    #add in method to return the validation Code
+    return form_data

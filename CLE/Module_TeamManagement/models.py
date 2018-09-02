@@ -41,6 +41,10 @@ class Student(models.Model):
         max_length=255,
         null=True,
     )
+    loginCounts = models.IntegerField(
+        db_column='Number of Logins',
+        default=0,
+    )
 
     class Meta:
         managed = True
@@ -68,6 +72,11 @@ class Course_Section(models.Model):
         null=True,
     )
 
+    learning_tools = models.TextField(
+        db_column='Course_Section_Learning_Tools_List',
+        null=True,
+    )
+
     class Meta:
         managed = True
         db_table = 'Course_Section'
@@ -92,7 +101,7 @@ class Faculty(models.Model):
     )
     phone_number = models.CharField(
         db_column='Phone_Number',
-        max_length=10,
+        max_length=255,
         null=True,
     )
     telegram_username = models.CharField(
@@ -127,6 +136,32 @@ class Cloud_Learning_Tools(models.Model):
     class Meta:
         managed = True
         db_table = 'Cloud_Learning_Tools'
+
+class School_Term(models.Model):
+    school_term_id = models.CharField(
+        db_column='School_Term_ID',
+        max_length=255,
+        primary_key=True,
+    )
+    term = models.CharField(
+        db_column='Term',
+        max_length=255,
+    )
+    financial_year = models.CharField(
+        db_column='Financial_Year',
+        max_length=255,
+    )
+    start_date = models.DateField(
+        db_column='Start_Date',
+    )
+    end_date = models.DateField(
+        db_column='End_Date',
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'School_Term'
+        unique_together = (('financial_year','term'),)
 
 class Class(models.Model):
     GRADES_CHOICES = (
@@ -183,8 +218,13 @@ class Class(models.Model):
         on_delete=models.CASCADE,
         db_column='Course_Section',
     )
+    school_term = models.ForeignKey(
+        School_Term,
+        on_delete=models.CASCADE,
+        db_column='School_Term',
+    )
 
     class Meta:
         managed = True
         db_table = 'Class'
-        unique_together = (('student','course_section'),)
+        unique_together = (('student','course_section','school_term'),)

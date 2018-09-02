@@ -16,13 +16,49 @@
               <div class="row">
                   <div class="col-md-12">
                       <div class="card ">
-                          <div class="card-header ">
+                            <div class="card-header ">
                               <h4 class="card-title">{{ module }}</h4>
                               <!-- <span><button type="button" class="btn btn-info">G1</button> <button type="button" class="btn btn-info">G2</button> <button type="button" class="btn btn-info">G3</button></span> -->
-                          </div>
-                          <br>
-                          <!--inner card one-->
-                          <div class="row">
+                            </div>
+                            <br>
+                             <!--inner card one-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 align="center" class="card-title">Team Ranking</h5>
+                                            <p class="card-category" align="center">24 Hours performance</p>
+                                        </div>
+                                        <div class="card-body">
+                                                <span align="center">
+                                                        {% include "Module_TeamManagement/Dashboard/class_scoreboard.html" %}
+                                                </span>
+                                            </div>
+                                        <div class="card-footer ">
+                                            <div class="stats">
+                                                <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4 class="card-title"> Ranking</h4>
+                                            <p class="card-category">24 Hours performance</p>
+                                        </div>
+                                        
+                                        <div class="card-body">
+                                            {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
+                                        </div>
+                                        <div class="card-footer ">
+                                            <div class="stats">
+                                                <i class="fa fa-history"></i> Updated "{{last_updated}}"
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <!-- Martin's old code
                             <div class="col-md-6">
                                 <div class="card ">
                                     <div class="card-header ">
@@ -33,11 +69,16 @@
                                     </div>
                                 </div>
                             </div>
+
+
                             <div class="col-md-6">
                                 <div class="card ">
                                     <div class='tableauPlaceholder' id='viz1534167227244' style='position: relative'><noscript><a href='#'><img alt='Stress Level ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;FY&#47;FYP_2&#47;StressChart&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='FYP_2&#47;StressChart' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;FY&#47;FYP_2&#47;StressChart&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1534167227244');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
                                 </div>
                             </div>
+
+                            -->
+                            
                           </div>
                   </div>
                 </div>
@@ -83,11 +124,7 @@
                           </div>
                       </form>
 
-
                     </div>
-                    <!-- <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div> -->
                   </div>
                 </div>
 
@@ -105,6 +142,16 @@
 
                         <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                           {% csrf_token %}
+
+                        <label for="name" class="col-md-6 col-sm-6 col-xs-12 control-label">Learning Tools</label>
+                          <select class="form-control" id="type" name="type">
+                            <option value="" disabled selected>Select your tools</option>
+                                <option value="Trailhead">Trailhead</option>
+                                <option value="Tableu">Tableu</option>
+                                <option value="Kahoot">Kahoot</option>
+                          </select>
+                          
+                        </br>
                                 <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
                                 <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
                             </div>
@@ -122,14 +169,10 @@
                             </div>
                         </form>
 
-
                       </div>
-                      <!-- <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      </div> -->
                     </div>
                   </div>
-              </div>
+      </div>
 <!--
 <form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
   <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp"> -->

@@ -5349,11 +5349,19 @@ License - nucleoapp.com/license/
 /* all icon font classes list here */
 
 .rounded-circle{
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: 20%;
   margin-right: 5px;
+}
+
+.rounded-circle.add{
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 5px;
 }
 
 .textbox {

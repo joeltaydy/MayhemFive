@@ -1,12 +1,24 @@
 import xlrd
 import time
 import traceback
+import datetime
 from django.core.files import File
-from Module_TeamManagement.models import Student, Faculty, Class, Course_Section, Course, Cloud_Learning_Tools
+from Module_TeamManagement.src import utilities
+from Module_TeamManagement.models import *
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Bootstrap Function -------------------------------#
 #-----------------------------------------------------------------------------#
+
+def clear_Database():
+    Class.objects.all().delete()
+    School_Term.objects.all().delete()
+    Cloud_Learning_Tools.objects.all().delete()
+    Faculty.objects.all().delete()
+    Course_Section.objects.all().delete()
+    Student.objects.all().delete()
+    Course.objects.all().delete()
+
 
 def parse_File_Student(filePath,bootstrapInfo={}):
 
@@ -101,10 +113,10 @@ def parse_File_Faculty(filePath,bootstrapInfo={}):
         if 'Phone Number' in headers:
             phoneNumber = str(int(rowData[headers.index('Phone Number')])).strip()
             if len(phoneNumber) == 8:
-                phoneNumber = str('65') + phoneNumber
-            elif '+' in phoneNumber and len(phoneNumber) == 11:
-                phoneNumber = phoneNumber[1:]
-            faculty.append(phoneNumber)
+                phoneNumber = str('+65') + phoneNumber
+
+            encrypt_phoneNumber = utilities.encode(phoneNumber)
+            faculty.append(encrypt_phoneNumber)
 
         # Create faculty : list
         faculty = [email,username,firstname,lastname] + faculty
@@ -233,20 +245,34 @@ def bootstrap_Faculty(fileDict):
     if fileDict['file_type'] == 'zip':
         bootstrapInfo = parse_File_Faculty(fileDict['faculty'], bootstrapInfo)
         bootstrapInfo = parse_File_Course(fileDict['course'], bootstrapInfo)
-        Course.objects.all().delete()
-        Faculty.objects.all().delete()
 
     elif fileDict['file_type'] == 'excel' and fileDict['file_information'] == 'course':
         bootstrapInfo = parse_File_Course(fileDict['file_path'], bootstrapInfo)
-        Course.objects.all().delete()
 
     elif fileDict['file_type'] == 'excel' and fileDict['file_information'] == 'faculty':
         bootstrapInfo = parse_File_Faculty(fileDict['file_path'], bootstrapInfo)
-        Faculty.objects.all().delete()
 
     try:
         if len(bootstrapInfo) == 0:
             raise Exception
+
+        start_date = fileDict['start_date']
+        end_date = fileDict['end_date']
+        financial_year = utilities.getFinancialYear()
+        school_term_number = utilities.getSchoolTerm()
+        school_term_id = financial_year + 'T' + str(school_term_number)
+
+        try:
+            School_Term.objects.get(school_term_id=school_term_id)
+        except:
+            school_temrObj = School_Term.objects.create(
+                school_term_id=school_term_id,
+                term=school_term_number,
+                financial_year=financial_year,
+                start_date=start_date,
+                end_date=end_date if end_date != None else start_date + datetime.timedelta(weeks=16),
+            )
+            school_temrObj.save()
 
         for user,data in bootstrapInfo.items():
             if user == 'course':
@@ -324,6 +350,9 @@ def bootstrap_Students(fileDict):
     except:
         pass
 
+    # Get school term object
+    school_term_id = utilities.getFinancialYear() + 'T' + str(utilities.getSchoolTerm())
+    school_termObj = School_Term.objects.get(school_term_id=school_term_id)
 
     # Bootstrap info into database =============================================
     try:
@@ -366,6 +395,7 @@ def bootstrap_Students(fileDict):
                                 student=studentObj,
                                 course_section=course_sectionObj,
                                 team_number=student[4] if len(student) == 5 else None,
+                                school_term=school_termObj,
                             )
                             classObj.save()
 
