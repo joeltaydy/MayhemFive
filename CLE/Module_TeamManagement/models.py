@@ -41,6 +41,10 @@ class Student(models.Model):
         max_length=255,
         null=True,
     )
+    loginCounts = models.IntegerField(
+        db_column='Number of Logins',
+        default=0,
+    )
 
     class Meta:
         managed = True

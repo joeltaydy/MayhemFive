@@ -42,6 +42,18 @@ def home(requests):
     trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)
 
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
+
+    if past_weeks != None and remaining_weeks != None:
+        context['past_weeks'] = past_weeks
+        context['remaining_weeks'] = remaining_weeks
+        context['progress'] = past_weeks/remaining_weeks * 100
+    else:
+        context['past_weeks'] = 0
+        context['remaining_weeks'] = 0
+        context['progress'] = 0
+
     # Get telegram group/channel link
     enrolled_classes = Class.objects.filter(student=student_email)
     context['telegram'] = {'status' : 'False'}

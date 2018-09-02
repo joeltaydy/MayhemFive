@@ -82,11 +82,10 @@
                                   <a class="dropdown-item">{% if 'smu.edu.sg' in user.email %} Student {% else %} Faculty {% endif %}</a>
                                   <div class="divider"></div>
                                   {% if 'smu.edu.sg' in user.email %}
-                                  <a class="dropdown-item" href="{% url 'TMmod:sProfile' %}">Profile</a>
-                                  <a class="dropdown-item" href="{% url 'Amod:logout' %}">Logout</a>
-                                  {% else %}
-                                  <a class="dropdown-item" href="{% url 'Amod:logout' %}">Logout</a>
+                                  <a class="dropdown-item" >Profile</a>
                                   {% endif %}
+                                  <a class="dropdown-item" href="{% url 'Amod:logout' %}">Logout</a>
+                                  
                               </div>
                             </li>
                             <li class="nav-item">
