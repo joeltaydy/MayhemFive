@@ -12,9 +12,10 @@
             <div class="col-md-12">
                 <div class=”progress”>
                         <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width:50%">{{progress}}%</div>
                         </div>
-                        <h3 align = "center">7 / 14 WEEKS </h3>
+
+                        <h3 align = "center"> {{ past_weeks }} / 16 WEEKS </h3>
                 </div>
             </div>
         </div>
@@ -107,7 +108,7 @@
                         </div>
                         <div class="card-body">
                                 <span align="center">
-                                        {% include "Module_TeamManagement/Student/scoreboard.html" %}
+                                        {% include "Module_TeamManagement/Dashboard/class_scoreboard.html" %}
                                 </span>
                             </div>
                         <div class="card-footer ">
@@ -125,7 +126,7 @@
                         </div>
                         
                         <div class="card-body">
-                            {% include "Module_TeamManagement/line_chart.html" %}
+                            {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
                         </div>
                         <div class="card-footer ">
                             <div class="stats">
@@ -143,3 +144,19 @@
 </div>
 
 {% endblock %}
+<script>
+var delay = 500;
+$(".progress-bar").each(function(i){
+    $(this).delay( delay*i ).animate( { width: $(this).attr('aria-valuenow') + '%' }, delay );
+
+    $(this).prop('Counter',0).animate({
+        Counter: $(this).text()
+    }, {
+        duration: delay,
+        easing: 'swing',
+        step: function (now) {
+            $(this).text(Math.ceil(now)+'%');
+        }
+    });
+});
+</script>

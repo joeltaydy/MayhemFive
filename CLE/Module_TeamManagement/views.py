@@ -42,6 +42,18 @@ def home(requests):
     trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)
 
+    # Get number of weeks since school term start and reamining weeks till school term ends
+    past_weeks, remaining_weeks = utilities.getRemainingWeeks()
+
+    if past_weeks != None and remaining_weeks != None:
+        context['past_weeks'] = past_weeks
+        context['remaining_weeks'] = remaining_weeks
+        context['progress'] = past_weeks/remaining_weeks * 100
+    else:
+        context['past_weeks'] = 0
+        context['remaining_weeks'] = 0
+        context['progress'] = 0
+
     # Get telegram group/channel link
     enrolled_classes = Class.objects.filter(student=student_email)
     context['telegram'] = {'status' : 'False'}
@@ -117,23 +129,39 @@ def faculty_Home(requests):
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
         facultyObj = Faculty.objects.get(email=requests.user.email)
         registered_course_section = facultyObj.course_section.all()
-        courses = []
+        courses = {}
+        students = []
+        previouscourse ="a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
             if course_title not in courses:
-                courses.append(course_title)
-        students = []
-        for course_section in registered_course_section:
+                courses[course_title]= {}
+                if previouscourse != "a":
+                    courses[previouscourse]["count"] = len(courseStudents)
+                    courses[previouscourse]["sectionCount"] = sectionCounter
+                courseStudents=[]
+                previoussection = "a"
+                previouscourse = course_title
+                sectionCounter = 0
+
+            if previoussection != course_section:
+                sectionCounter += 1
             classObj = Class.objects.all().filter(course_section=course_section)
             for student in classObj:
                 students.append(student)
+                courseStudents.append(student)
+            previoussection = course_section
+        courses[previouscourse]["count"] = len(courseStudents)
+        courses[previouscourse]["sectionCount"] = sectionCounter
+
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
+        context['course_list'] = courses
         context['student_count'] = len(students)
 
     except:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        #traceback.print_exc()
+        traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
@@ -158,35 +186,6 @@ def faculty_Home(requests):
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
-# Faculty Profile Page
-# @login_required(login_url='/')
-def faculty_Profile(requests):
-    context = {"faculty_profile" : "active", 'course_list' : {}}
-
-    faculty_username = requests.GET.get('username')
-    # faculty_username = 'sample.instructor.1'
-
-    if faculty_username == None:
-        context['message'] = 'Please specify a username'
-        return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
-
-    facultyObj = Faculty.objects.get(username=faculty_username)
-    course_sectionList = facultyObj.course_section.all()
-
-    if len(course_sectionList) > 1:
-        for course_section in course_sectionList:
-            try:
-                context['course_list'][course_section.course.course_title].append(course_section)
-            except:
-                context['course_list'][course_section.course.course_title] = [course_section]
-    else:
-        context['course_list'][course_section.course.course_title] = [course_section]
-
-    context['user'] = facultyObj
-    context['message'] = 'Successful retrieval of faculty\'s profile'
-    return render(requests,"Module_TeamManagement/Instructor/instructorProfile.html", context)
-
-
 # Faculty Student Management Page
 #@login_required(login_url='/')
 def faculty_Overview(requests):
@@ -195,10 +194,9 @@ def faculty_Overview(requests):
     faculty_email = requests.user.email
 
     if requests.method == "GET":
-        course_section = requests.GET.get('module')
+        course_section = requests.GET.get('module').replace(" ", "")
     else:
         course_section = requests.POST.get('course_section')
-    print(course_section)
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
@@ -219,6 +217,7 @@ def faculty_Overview(requests):
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s profile'
+    print(context)
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
@@ -235,32 +234,6 @@ def studStats(requests):
         context = {"stud_stats" : "active"}
         return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
-
-# Student Profile Page
-# @login_required(login_url='/')
-def student_Profile(requests):
-    context = {"student_Profile" : "active", 'course_list' : {}}
-    #
-    # student_username = requests.user.email.split('@')[0]
-    # # student_username = 'sample.1'
-    #
-    # # if student_username == None:
-    # #     context['message'] = 'Please specify a username'
-    # #     return render(requests,"Module_TeamManagement/Student/studentProfile.html", context)
-    #
-    # studentObj = Student.objects.get(username=student_username)
-    # classObjList = Class.objects.all().filter(student=studentObj)
-    #
-    # if len(classObjList) > 1:
-    #     for classObj in classObjList:
-    #         context['course_list'][classObj.course_section.course.course_title] = classObj
-    # else:
-    #     context['course_list'][classObjList.course_section.course.course_title] = classObj
-    #
-    # context['user'] = studentObj
-    # context['message'] = 'Successful retrieval of student\'s profile'
-    # return render(requests,"Module_TeamManagement/Student/studentProfile.html",context)
-    return render(requests,"error404.html",context)
 
 # Student Team Page
 # @login_required(login_url='/')

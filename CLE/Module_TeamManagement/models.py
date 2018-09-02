@@ -41,6 +41,10 @@ class Student(models.Model):
         max_length=255,
         null=True,
     )
+    loginCounts = models.IntegerField(
+        db_column='Number of Logins',
+        default=0,
+    )
 
     class Meta:
         managed = True
@@ -65,6 +69,11 @@ class Course_Section(models.Model):
         Student,
         on_delete=models.CASCADE,
         db_column='Teaching_Assistant',
+        null=True,
+    )
+
+    learning_tools = models.TextField(
+        db_column='Course_Section_Learning_Tools_List',
         null=True,
     )
 

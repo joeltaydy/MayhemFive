@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.contrib import messages
 import re
 from django.urls import reverse
-
+from Module_TeamManagement.models import Student
 try:
     from django.utils.encoding import force_text
 except ImportError:
@@ -40,12 +40,12 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
         #use for team's test using any gmail account w/o numbers infront
         isInstructor = re.findall(r"(^[a-zA-Z.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",sociallogin.account.extra_data["email"])
 
-        #uncomment below for staff email
+        #uncomment below for usage on staff email
         #isInstructor = re.findall(r"(^[a-zA-Z.]+@smu.edu.sg+$)",sociallogin.account.extra_data["email"])
 
         # Pretty much hard code the login redirect url as the overwriting method above does not seem to be work
         if isInstructor != [] :
-            print("Pushing to instructor's home")
+            #print("Pushing to instructor's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
 
         elif not email_address == "smu.edu.sg":
@@ -53,5 +53,8 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
             raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))
 
         else:
-            print("Pushing to student's home")
+            #print("Pushing to student's home")
+            stu = Student.objects.get(email=sociallogin.account.extra_data["email"])
+            stu.loginCounts += 1
+            stu.save()
             settings.LOGIN_REDIRECT_URL = "TMmod:home"
