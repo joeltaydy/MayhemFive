@@ -125,6 +125,7 @@ def faculty_Home(requests):
 
     #print(requests.user.email)
     try:
+        courseStudents = []
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
         facultyObj = Faculty.objects.get(email=requests.user.email)
