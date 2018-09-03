@@ -125,6 +125,7 @@ def faculty_Home(requests):
 
     #print(requests.user.email)
     try:
+        courseStudents = []
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
         facultyObj = Faculty.objects.get(email=requests.user.email)
@@ -340,7 +341,7 @@ def configureDB_faculty(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        #traceback.print_exc()
+        traceback.print_exc()
         response['message'] = e.args[0]
         return render(requests, "Administrator/uploadcsv.html", response)
 
