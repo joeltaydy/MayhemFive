@@ -151,8 +151,9 @@ def faculty_Home(requests):
                 students.append(student)
                 courseStudents.append(student)
             previoussection = course_section
-        courses[previouscourse]["count"] = len(courseStudents)
-        courses[previouscourse]["sectionCount"] = sectionCounter
+        if previouscourse != "a":
+            courses[previouscourse]["count"] = len(courseStudents)
+            courses[previouscourse]["sectionCount"] = sectionCounter
 
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
