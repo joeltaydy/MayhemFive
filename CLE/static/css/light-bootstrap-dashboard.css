@@ -358,7 +358,7 @@ body>.navbar-collapse {
     top: 0;
     bottom: 0;
     left: 0;
-    width: 260px;
+    width: 240px;
     display: block;
     z-index: 1;
     color: #fff;
@@ -373,7 +373,7 @@ body>.navbar-collapse .sidebar-wrapper {
     max-height: calc(100vh - 75px);
     min-height: 100%;
     overflow: auto;
-    width: 260px;
+    width: 240px;
     z-index: 4;
     padding-bottom: 100px;
 }
@@ -2053,8 +2053,15 @@ fieldset[disabled] .form-control {
     margin: 16px 3px;
 }
 
-.navbar .navbar-nav .nav-item .nav-link [class^="fa"] {
+.navbar .navbar-nav .nav-item .nav-link [class^="fa"]{
     font-size: 19px;
+    position: relative;
+    line-height: 40px;
+    top: 1px;
+}
+
+.nav .sidenavBar .nav-item{
+    font-size: 190px!important;
     position: relative;
     line-height: 40px;
     top: 1px;

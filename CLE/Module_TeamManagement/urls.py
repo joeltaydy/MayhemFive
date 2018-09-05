@@ -2,7 +2,7 @@ from Module_TeamManagement import views
 from django.contrib import admin
 from django.urls import path
 from Module_TeamManagement.forms import PhoneNumberForm, VerificationCodeForm
-from Module_TeamManagement.views import TelegramWizard
+from Module_TeamManagement.views import TelegramWizard, PhoneNumberFormView
 
 urlpatterns = [
     path('home/', views.home, name='home'),
@@ -21,4 +21,5 @@ urlpatterns = [
     # path('instructor/telegram_setup/', TelegramWizard.as_view(FORMS, condition_dict={'verificationcode': views.enter_phonenumber}), name='telegram_setup'),
     # path('instructor/telegram_setup/', TelegramWizard.as_view([PhoneNumberForm, VerificationCodeForm]), name='telegram_setup'),
     path('instructor/telegram_setup/', views.configureDB_telegram, name='telegram_setup'),
+    path('join/', PhoneNumberFormView.as_view(), name='phone_number_form'),
 ]
