@@ -59,8 +59,11 @@ def getTrailheadInformation():
             content = {}
 
             if counter == 0:
-                results['last_updated'] = row[0] # take last updated information
-                counter += 2 # skip headers
+                results['last_updated'] = row[1] # take last updated information
+                counter+=1
+            elif counter ==1:
+                counter+=1
+                pass #skip headers
             else:
 
                 # Track all student information
@@ -76,7 +79,7 @@ def getTrailheadInformation():
 
                 content['badges_obtained'] = new_badges_obtained
                 results[studId] = content #Key is student_email
-
+            
     return results
 
 # Main method to retreive all information of trailhead informations
@@ -91,7 +94,7 @@ def getTrailheadInformation():
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
-
+    moduleCode = requests.GET.get('module')
     if student_email != None:
         try:
             context["personal"] = trailHeadInfo[student_email]
@@ -100,7 +103,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
 
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
     if instructorEmail != None:
-        moduleCode = requests.GET.get('module')
+        
         if moduleCode != None:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
         else:
@@ -222,7 +225,6 @@ def classInformationRetrieval( results,courseSection):
     classResult["class"] = {}
     classResult["class"]["Teams_Information"] = {}
     classResult["class"]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
-
     for classObj in classes:
         try:
             #populate student results
@@ -230,15 +232,21 @@ def classInformationRetrieval( results,courseSection):
             classResult["class"]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
             classResult["class"]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
         except:
+            classResult["class"]["Students_Information"]["badges"].append(0)
+            classResult["class"]["Students_Information"]["points"].append(0)
             pass
 
         if classObj.team_number != None : #Omit classes with no teams
         # populate team results
-            if classObj.team_number not in classResult["class"]["Teams_Information"]:
+            try:
+                if classObj.team_number not in classResult["class"]["Teams_Information"]:
+                    classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
+                    classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+                    classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+                    classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+            except:
                 classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
-            classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
-            classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
-            classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+                pass
     return classResult
 
 # The webscreapper to scrap static info from website

@@ -28,6 +28,17 @@ def validate(username,password):
         return user
     return None
 
+#Verification of student login credentials in database
+def studentVerification(requests):
+    studentEmail = requests.user.email
+    studentObj = Student.objects.get(email=studentEmail)
+    return
+
+#Verification of student login credentials in database
+def InstructorVerification(requests):
+    studentEmail = requests.user.email
+    studentObj = Faculty.objects.get(email=studentEmail)
+    return
 
 
 def changePassword(oldPassword,newPassword,studObj):

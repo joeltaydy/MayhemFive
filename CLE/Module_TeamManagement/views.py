@@ -13,6 +13,11 @@ from random import randint
 from django.views.generic import TemplateView
 from formtools.wizard.views import SessionWizardView
 from django.http import HttpResponse
+
+# Required for verification
+from Module_Account.src import processLogin
+from django.contrib.auth import logout, login
+
 from Module_TeamManagement import forms
 import logging
 logr = logging.getLogger(__name__)
@@ -24,11 +29,14 @@ from Module_TeamManagement.mixins import AjaxFormMixin
 # Student Home Page
 #@login_required(login_url='/')
 def home(requests):
-    context = {"home" : "active"}
-
-    # Redirect user to login page if not authorized
-    if not requests.user.is_authenticated:
+    context = {}
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
         return render(requests,'Module_Account/login.html',context)
+    context["home"] = "active"
 
     student_email = requests.user.email
     all_SocialAccount = SocialAccount.objects.all()
@@ -78,7 +86,7 @@ def home(requests):
                 context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
-    print(context)
+    #print(context)
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -89,11 +97,14 @@ def ntmgmt(requests):
         Check if user is authenticated aka session
     '''
     context = {}
-    if not requests.user.is_authenticated:
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
         return render(requests,'Module_Account/login.html',context)
-    else:
-        context["noti_mgmt"] = "active"
-        return render(requests,"error404.html",context)
+    context["noti_mgmt"] = "active"
+    return render(requests,"error404.html",context)
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
@@ -115,6 +126,14 @@ def CLEAdmin(requests):
 # Faculty Home Page
 #@login_required(login_url='/')
 def faculty_Home(requests):
+    context = {}
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',context)
+
     context = {"faculty_Home" : "active"}
 
     faculty_username = requests.user.email.split('@')[0]
@@ -195,6 +214,15 @@ def faculty_Home(requests):
 # Faculty Student Management Page
 #@login_required(login_url='/')
 def faculty_Overview(requests):
+
+    context = {}
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',context)
+        
     context = {"faculty_Overview" : "active", 'course' : {}}
 
     faculty_email = requests.user.email
@@ -223,7 +251,6 @@ def faculty_Overview(requests):
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s profile'
-    print(context)
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
@@ -234,20 +261,32 @@ def studStats(requests):
         Check if user is authenticated aka session
     '''
     context = {}
-    if not requests.user.is_authenticated:
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
         return render(requests,'Module_Account/login.html',context)
-    else:
-        context = {"stud_stats" : "active"}
-        return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
+    context = {"stud_stats" : "active"}
+    return render(requests,"Module_TeamManagement/Student/studentStatistics.html",context)
 
 
 # Student Team Page
 # @login_required(login_url='/')
 def student_Team(requests):
+    context = {}
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',context)
+
     context = {"student_Team" : "active", 'course' : {}}
     studentList = []
     module = requests.GET.get('module')
-    student_username = requests.user.email.split('@')[0]
+    student_email =requests.user.email
+    student_username = student_email.split('@')[0]
 
     if student_username == None:
         context['message'] = 'Please specify a username'
@@ -256,7 +295,6 @@ def student_Team(requests):
     studentObj = Student.objects.get(username=student_username)
     classObj = Class.objects.all().filter(student=studentObj , course_section = module ) #Will return queryset containing 1 row unless has multiple teams in same class
 
-    print(len(classObj)) #Should be 1
 
     for enrolled_class in classObj: #Should contain 1 row
         if(enrolled_class.team_number != None ):
@@ -265,6 +303,10 @@ def student_Team(requests):
                 studentList.append(student_class_model.student) #List containing student models
 
             context['team'] = studentList
+    
+    # Reads web scrapper results
+    trailResults = utilities.populateTrailheadInformation(requests, student_email)
+    context.update(trailResults)
 
     context['module'] = classObj[0].course_section.course_section_id
     context['user'] = studentObj
