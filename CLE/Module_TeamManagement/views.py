@@ -21,6 +21,10 @@ from django.contrib.auth import logout, login
 from Module_TeamManagement import forms
 import logging
 logr = logging.getLogger(__name__)
+#Async form submission
+from Module_TeamManagement.forms import PhoneNumberForm
+from django.views.generic import FormView
+from Module_TeamManagement.mixins import AjaxFormMixin
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -713,6 +717,11 @@ def configureDB_clt(requests):
 # - results
 # - message
 #
+class PhoneNumberFormView(AjaxFormMixin, FormView):
+    form_class = PhoneNumberForm
+    template_name  = 'Module_TeamManagement/Instructor/instructorTools.html'
+    success_url = '/form-success/'
+
 def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
