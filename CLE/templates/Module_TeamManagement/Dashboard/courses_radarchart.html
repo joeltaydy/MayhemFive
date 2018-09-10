@@ -12,11 +12,11 @@
   </head>
   <body>
     <div class="container">
-      <canvas id="myChart4" width="400" height="400"></canvas>
+      <canvas id='myClassRoundCharts{{forloop.counter}}' width="400" height="400"></canvas>
     </div>
     
     <script>
-    var ctx = document.getElementById("myChart4").getContext('2d');
+    var ctx = document.getElementById('myClassRoundCharts{{forloop.counter}}').getContext('2d');
     var bgColors= [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -34,23 +34,24 @@
                     'rgba(255, 159, 64, 1)'
                 ]
 
-    var myChart4 = new Chart(ctx, {
+    var myClassRoundCharts{{forloop.counter}} = new Chart(ctx, {
         type: 'radar',
         data: {
             labels: ['min' , 'max' , 'median' , 'average'],
             datasets: [
             {% for courseID in CourseTrailResults %}
-            
-            { 
-                label: '{{courseID}}',
-                data: {% with CourseTrailResults|get_item:courseID as courseDict%}   // custom django filter
-                        {{ courseDict.Students_Information.badges|describeSet}} 
-                      {% endwith %} ,
-                fill:true,
-                backgroundColor:bgColors[{{ forloop.counter }}],
-                borderColor:borderColors[{{ forloop.counter }}]   
-                
-            },
+            {% if course in courseID %}
+                { 
+                    label: '{{courseID}}',
+                    data: {% with CourseTrailResults|get_item:courseID as courseDict%}   // custom django filter
+                            {{ courseDict.Students_Information.badges|describeSet}} 
+                        {% endwith %} ,
+                    fill:true,
+                    backgroundColor:bgColors[{{ forloop.counter }}],
+                    borderColor:borderColors[{{ forloop.counter }}]   
+                    
+                },
+            {% endif %}
             {% endfor %}
 
             ]
