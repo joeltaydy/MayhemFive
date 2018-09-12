@@ -44,8 +44,12 @@
                   <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
                     <select class="form-control col-md-offset-3" id="course_title" name="course_title">
                       <option value="" disabled selected>Select your course</option>
-                      {% for course,course_section in courses.items %}
-                        <option value={{course}}>{{course_section}}</option>
+                      {% for course_title,course_sectionList in courses.items %}
+                          {% for course_section in course_sectionList %}
+                              {% if course_section.section_number != 'G0' %}
+                                  <option value={{course_section.id}}>{{ course_section.to_string }}</option>
+                              {% endif %}
+                          {% endfor %}
                     {% endfor %}
                   </select>
 
