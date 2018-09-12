@@ -155,7 +155,7 @@ def faculty_Home(requests):
         registered_course_section = facultyObj.course_section.all()
         courses = {}
         students = []
-        previouscourse ="a"
+        previouscourse = "a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
             if course_title not in courses:
@@ -222,7 +222,7 @@ def faculty_Overview(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',context)
-        
+
     context = {"faculty_Overview" : "active", 'course' : {}}
 
     faculty_email = requests.user.email
@@ -233,7 +233,7 @@ def faculty_Overview(requests):
         course_section = requests.POST.get('course_section')
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
-    
+
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     if len(classObj_list) > 0:
@@ -250,7 +250,10 @@ def faculty_Overview(requests):
         context['course']['classList'] = classList
 
     course_section = Course_Section.objects.get(course_section_id=course_section)
-    context['module'] = course_section.course.course_title + " " + course_section.section_number
+    if course_section.section_number == 'G0':
+        context['module'] = course_section.course.course_title
+    else:
+        context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
@@ -305,7 +308,7 @@ def student_Team(requests):
                 studentList.append(student_class_model.student) #List containing student models
 
             context['team'] = studentList
-    
+
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(requests, student_email)
     context.update(trailResults)

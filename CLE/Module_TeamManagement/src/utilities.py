@@ -25,7 +25,10 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
         if instructorEmail != None:
             courseObject = Faculty.objects.get(email=instructorEmail).course_section.all()
             for course in courseObject:
-                courseList[course.course_section_id] = course.course.course_title + " " + course.section_number
+                if course.section_number == 'G0':
+                    courseList[course.course_section_id] = course.course.course_title
+                else:
+                    courseList[course.course_section_id] = course.course.course_title + " " + course.section_number
 
         elif studentEmail != None:
             classObject = Class.objects.all().filter(student=studentEmail).distinct()
@@ -79,7 +82,7 @@ def getTrailheadInformation():
 
                 content['badges_obtained'] = new_badges_obtained
                 results[studId] = content #Key is student_email
-            
+
     return results
 
 # Main method to retreive all information of trailhead informations
@@ -103,7 +106,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
 
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
     if instructorEmail != None:
-        
+
         if moduleCode != None:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
         else:
