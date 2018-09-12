@@ -140,9 +140,9 @@ def faculty_Home(requests):
         previouscourse = "a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
-            if "G0" in (course_section.course_section_id): 
+            if "G0" in (course_section.course_section_id):
                 courses[course_title]= {"count" : 0, "sectionCount" : 0}
-            else: 
+            else:
                 if course_title not in courses:
                     courses[course_title]= {}
                     if previouscourse != "a":
@@ -224,18 +224,8 @@ def faculty_Overview(requests):
         course_title = course_section[:-2]
 
     # Return sections that's related to the course
-<<<<<<< HEAD
     courseList_updated = requests.session['courseList_updated']
     context['course_sectionList'] = courseList_updated[course_title]
-=======
-    
-    course_sectionList = {course_title : {}}
-    courseList = requests.session['courseList']
-    for temp1,temp2 in courseList.items():
-        if course_title in temp1:
-            course_sectionList[course_title].update({temp1:temp2})
-    context['course_sectionList'] = course_sectionList
->>>>>>> 27c2492d20389021b6138af71de62cbac6017c1d
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
@@ -253,9 +243,9 @@ def faculty_Overview(requests):
             studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
             studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
             studentInfo['badges'] = trailResults['CourseTrailResults']['class']['Students_Information']['badges'][studentPointsPosition]
-            try: 
+            try:
                 studentInfo['link'] = Cloud_Learning_Tools.objects.get(id = studentUserName+"_Trailhead").website_link
-            except: 
+            except:
                 studentInfo['link'] ="No link" #Exception which is caused by no cle linked
             classList.append(studentInfo)
         context['course']['classList'] = classList
