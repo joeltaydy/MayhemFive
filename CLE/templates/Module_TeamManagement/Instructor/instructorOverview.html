@@ -5,12 +5,35 @@
 <div class="imp_message container">
     <p> <br> </p>
     <h1> Student Managment for {{ module }}</h1>
-
-    <span>
-      {% for course,course_section in request.session.courseList.items %}
-        <button type="button" class="btn btn-primary">{{ course_section }}</button>
-      {% endfor %}
-    </span>
+    <!-- 
+        thinking of removing this part because it is pointless - Joel
+    -->
+    <div class= "redirect">
+        <span>
+        {% for course,course_section in request.session.courseList.items %}
+            <button type="button" class="btn btn-primary">{{ course_section }}</button>
+        {% endfor %}
+        </span>
+    <div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card ">
+                <div class="card-header ">
+                    <h4 align="center" class="card-title">Teams</h4>
+                        <h1 align="center">{{CourseTrailResults.class.Teams_Information | length }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card ">
+                <div class="card-header ">
+                    <h4 align="center" class="card-title">Students</h4>
+                        <h1 align="center">{{CourseTrailResults.class.Students_Information.students | length }}</h1>
+                </div>
+            </div>
+        </div>
+    </div
 
     <div class="content">
               <div class="row">
@@ -187,8 +210,8 @@
         <th>Email</th>
         <th>First name</th>
         <th>Team no.</th>
-        <th>Grade</th>
-        <th>Score</th>
+        <th>Points</th>
+        <th>Badges</th>
         </tr>
     </thead>
 
@@ -198,8 +221,8 @@
                 <td>{{ student.info.email }}</td>
                 <td>{{ student.info.firstname }}</td>
                 <td>{{ student.team }}</td>
-                <td>{{ student.grade }}</td>
-                <td>{{ student.score }}</td>
+                <td>{{ student.points }}</td>
+                <td>{{ student.badges }}</td>
             </tr>
         {% endfor %}
 
