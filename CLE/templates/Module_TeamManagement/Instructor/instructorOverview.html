@@ -40,7 +40,11 @@
                   <div class="col-md-12">
                       <div class="card ">
                             <div class="card-header ">
-                              <h4 class="card-title">{{ module }}</h4>
+                                {% for course_section in course_sectionList %}
+                                    {% ifequal course_section.to_string module %}
+                                        <h4 class="card-title">Section {{course_section.section_number}}</h4>
+                                    {% endifequal %}
+                                {% endfor %}
                               <!-- <span><button type="button" class="btn btn-info">G1</button> <button type="button" class="btn btn-info">G2</button> <button type="button" class="btn btn-info">G3</button></span> -->
                             </div>
                             <br>
