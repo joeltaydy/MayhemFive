@@ -252,7 +252,7 @@ def faculty_Overview(requests):
     course_section = Course_Section.objects.get(course_section_id=course_section)
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
-    
+    print(context)
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
