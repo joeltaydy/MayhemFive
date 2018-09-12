@@ -233,23 +233,26 @@ def faculty_Overview(requests):
         course_section = requests.POST.get('course_section')
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
-
+    
+    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
+    context.update(trailResults)
     if len(classObj_list) > 0:
         classList = [] # Containing student class objects
         for enrolled_class in classObj_list:
             studentInfo = {}
-            studentInfo['grade'] = enrolled_class.grades
-            studentInfo['score'] = enrolled_class.score
             studentInfo['team'] = enrolled_class.team_number
             studentInfo['info'] =  enrolled_class.student #Obtains student model from Foreign key
+            studentUserName = enrolled_class.student.username
+            studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
+            studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
+            studentInfo['badges'] = trailResults['CourseTrailResults']['class']['Students_Information']['badges'][studentPointsPosition]
             classList.append(studentInfo)
         context['course']['classList'] = classList
 
     course_section = Course_Section.objects.get(course_section_id=course_section)
     context['module'] = course_section.course.course_title + " " + course_section.section_number
     context['user'] = facultyObj
-    trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
-    context.update(trailResults)
+    
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
