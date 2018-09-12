@@ -29,8 +29,10 @@
 
     <div class= "redirect">
         <span>
-        {% for course,course_section in course_sectionList.items %}
-                <button type="button" class="btn btn-primary">{{ course_section }}</button>
+        {% for course_title,courseList in course_sectionList.items %}
+            {% for course,course_section in courseList.items %}
+                <button onclick="location.href = '/instructor/overview/?module={{course}}&course_title={{course_title}}';" type="button" class="btn btn-primary">{{ course_section }}</button>
+            {% endfor %}
         {% endfor %}
         </span>
     <div>

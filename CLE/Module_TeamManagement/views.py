@@ -226,11 +226,11 @@ def faculty_Overview(requests):
                 course_title = temp1
 
     # Return sections that's related to the course
-    course_sectionList = {}
+    course_sectionList = {course_title : {}}
     courseList = requests.session['courseList']
     for temp1,temp2 in courseList.items():
         if course_title in temp1:
-            course_sectionList.update({temp1:temp2})
+            course_sectionList[course_title].update({temp1:temp2})
     context['course_sectionList'] = course_sectionList
 
     facultyObj = Faculty.objects.get(email=faculty_email)
