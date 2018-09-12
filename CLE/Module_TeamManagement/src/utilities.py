@@ -27,15 +27,24 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
         if instructorEmail != None:
             courseObject = Faculty.objects.get(email=instructorEmail).course_section.all()
             for course_section in courseObject:
-                if course_section.section_number == 'G0':
-                    courseList[course_section.course_section_id] = course_section.course.course_title
-                else:
-                    courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
-
                 try:
-                    courseList_updated[course_section.course.course_title].append([course_section.course_section_id])
+                    courseList_updated[course_section.course.course_title].append(
+                        {
+                            'id':course_section.course_section_id,
+                            'course_title':course_section.course.course_title,
+                            'section_number':course_section.section_number,
+                            'to_string':course_section.course.course_title + " " + course_section.section_number,
+                        }
+                    )
                 except:
-                    courseList_updated[course_section.course.course_title] = [course_section.course_section_id]
+                    courseList_updated[course_section.course.course_title] = [
+                        {
+                            'id':course_section.course_section_id,
+                            'course_title':course_section.course.course_title,
+                            'section_number':course_section.section_number,
+                            'to_string':course_section.course.course_title + " " + course_section.section_number,
+                        }
+                    ]
 
         elif studentEmail != None:
             classObject = Class.objects.all().filter(student=studentEmail).distinct()

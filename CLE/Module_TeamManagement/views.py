@@ -140,9 +140,9 @@ def faculty_Home(requests):
         previouscourse = "a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
-            if "G0" in (course_section.course_section_id): 
+            if "G0" in (course_section.course_section_id):
                 courses[course_title]= {"count" : 0, "sectionCount" : 0}
-            else: 
+            else:
                 if course_title not in courses:
                     courses[course_title]= {}
                     if previouscourse != "a":
@@ -179,7 +179,7 @@ def faculty_Home(requests):
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
-    context["courses"] = requests.session['courseList']
+    # context["courses"] = requests.session['courseList_updated']
 
     # Get number of weeks since school term start and reamining weeks till school term ends
     past_weeks, remaining_weeks = utilities.getRemainingWeeks()
@@ -224,13 +224,8 @@ def faculty_Overview(requests):
         course_title = course_section[:-2]
 
     # Return sections that's related to the course
-    
-    course_sectionList = {course_title : {}}
-    courseList = requests.session['courseList']
-    for temp1,temp2 in courseList.items():
-        if course_title in temp1:
-            course_sectionList[course_title].update({temp1:temp2})
-    context['course_sectionList'] = course_sectionList
+    courseList_updated = requests.session['courseList_updated']
+    context['course_sectionList'] = courseList_updated[course_title]
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
@@ -245,7 +240,7 @@ def faculty_Overview(requests):
             studentInfo['team'] = enrolled_class.team_number
             studentInfo['info'] =  enrolled_class.student #Obtains student model from Foreign key
             studentUserName = enrolled_class.student.username
-            try: 
+            try:
                 studentInfo['link'] = Cloud_Learning_Tools.objects.get(id = studentUserName+"_Trailhead").website_link
                 studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
                 studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
@@ -309,9 +304,8 @@ def student_Team(requests):
     studentObj = Student.objects.get(username=student_username)
     classObj = Class.objects.all().filter(student=studentObj , course_section = module ) #Will return queryset containing 1 row unless has multiple teams in same class
 
-
     for enrolled_class in classObj: #Should contain 1 row
-        if(enrolled_class.team_number != None ):
+        if enrolled_class.team_number != None :
             team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
             for student_class_model in team_list:
                 studentList.append(student_class_model.student) #List containing student models
@@ -570,7 +564,7 @@ def configureDB_teams(requests):
     response = {"configureDB_teams" : "active"}
     if requests.method == "GET":
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList']
+        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
 
     try:
@@ -629,12 +623,12 @@ def configureDB_clt(requests):
 
     if requests.method == "GET" and requests.GET.get("user") == "faculty":
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList']
+        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     elif requests.method == "GET" and (requests.GET.get("user") == "student" or requests.POST.get("user") == "student"):
         utilities.populateRelevantCourses(requests,studentEmail=requests.user.email)
-        response['courses'] = requests.session['courseList']
+        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Student/studentTools.html", response)
 
     try:
@@ -706,12 +700,12 @@ def configureDB_clt(requests):
         response['message'] = e.args[0]
         if requests.POST.get("user") == "student":
             utilities.populateRelevantCourses(requests,studentEmail=requests.user.email)
-            response['courses'] = requests.session['courseList']
+            response['courses'] = requests.session['courseList_updated']
             return render(requests, "Module_TeamManagement/Student/studentTools.html", response)
 
         if action == 'batch':
             utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-            response['courses'] = requests.session['courseList']
+            response['courses'] = requests.session['courseList_updated']
             return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
         else:
@@ -720,7 +714,7 @@ def configureDB_clt(requests):
     response['message'] = 'Learning Tools Configured'
     if action == 'batch':
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList']
+        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
     else:
         return faculty_Overview(requests)
@@ -749,7 +743,7 @@ def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList']
+        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
@@ -850,7 +844,7 @@ def configureDB_telegram(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList']
+        response['courses'] = requests.session['courseList_updated']
         response['message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
