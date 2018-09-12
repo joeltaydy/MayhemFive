@@ -105,7 +105,13 @@ def getTrailheadInformation():
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
-    moduleCode = requests.GET.get('module')
+
+    if requests.method == "GET":
+        moduleCode = requests.GET.get('module')
+    else:
+        course_section = requests.POST.get('course_section')
+        moduleCode = course_section[:-2] + " " + course_section[len(course_section)-2:]
+
     if student_email != None:
         try:
             context["personal"] = trailHeadInfo[student_email]
