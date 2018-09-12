@@ -212,6 +212,7 @@
         <th>Team no.</th>
         <th>Points</th>
         <th>Badges</th>
+        <th>Link</th>
         </tr>
     </thead>
 
@@ -223,6 +224,7 @@
                 <td>{{ student.team }}</td>
                 <td>{{ student.points }}</td>
                 <td>{{ student.badges }}</td>
+                <td> {% if student.link ==  "No link" %} No Trailhead Account Linked {% else %}<a href='{{student.link}}'>Click here to acccess link</a> {% endif %}</td>
             </tr>
         {% endfor %}
 

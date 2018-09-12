@@ -12,35 +12,46 @@
   </head>
   <body>
     <div class="container">
-      <canvas id="myChart3" width="400" height="400"></canvas>
+      <canvas id="myClassCharts{{forloop.counter}}" width="400" height="400"></canvas>
     </div>
     
-    <script>
-    var ctx = document.getElementById("myChart3").getContext('2d');
+     <script>
+    var ctx = document.getElementById('myClassCharts{{forloop.counter}}').getContext('2d');
     var classLabel = [ {% for courseId in courses %}
+                        {% if course in courseId %}
                         '{{courses|get_item:courseId}}' ,
+                        {% endif %}
+                        
                         {% endfor %}
                     ]
 
     var classBadgesData = [{% for courseId in CourseTrailResults %}
+                            {% if course in courseId %}
+                        
+                        
                       {% with CourseTrailResults|get_item:courseId as courseDict%}   // custom django filter
                         {{ courseDict.Team_Information|getTotalClassBadges }} ,
                       {% endwith %} 
+                      {% endif %}
                     {% endfor %}]
     var classPointsData = [{% for courseId in CourseTrailResults %}
+                     {% if course in courseId %}                        
                       {% with CourseTrailResults|get_item:courseId as courseDict%}   // custom django filter
                         {{ courseDict.Team_Information|getTotalClassPoints }} ,
-                      {% endwith %} 
+                      {% endwith %}  
+                      {% endif %}
                     {% endfor %}]
 
     var classData = [{% for courseId in CourseTrailResults %}
+                    {% if course in courseId %}  
                       {% with CourseTrailResults|get_item:courseId as courseDict%}   // custom django filter
                         {{ courseDict.Students_Information|getTotalNumStudents }} ,
                       {% endwith %} 
+                    {% endif %}
                     {% endfor %}]
 
-
-    var myChart3 = new Chart(ctx, {
+    // to seperate multi classes
+    var myClassCharts{{forloop.counter}} = new Chart(ctx, {
         type: 'bar',
         data: {
             datasets: [

@@ -140,26 +140,29 @@ def faculty_Home(requests):
         previouscourse = "a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
-            if course_title not in courses:
-                courses[course_title]= {}
-                if previouscourse != "a":
-                    courses[previouscourse]["count"] = len(courseStudents)
-                    courses[previouscourse]["sectionCount"] = sectionCounter
-                courseStudents=[]
-                previoussection = "a"
-                previouscourse = course_title
-                sectionCounter = 0
+            if "G0" in (course_section.course_section_id): 
+                courses[course_title]= {"count" : 0, "sectionCount" : 0}
+            else: 
+                if course_title not in courses:
+                    courses[course_title]= {}
+                    if previouscourse != "a":
+                        courses[previouscourse]["count"] = len(courseStudents)
+                        courses[previouscourse]["sectionCount"] = sectionCounter
+                    courseStudents=[]
+                    previoussection = "a"
+                    previouscourse = course_title
+                    sectionCounter = 0
 
-            if previoussection != course_section:
-                sectionCounter += 1
+                if previoussection != course_section:
+                    sectionCounter += 1
 
-            classObj = Class.objects.all().filter(course_section=course_section)
+                classObj = Class.objects.all().filter(course_section=course_section)
 
-            for student in classObj:
-                students.append(student)
-                courseStudents.append(student)
+                for student in classObj:
+                    students.append(student)
+                    courseStudents.append(student)
 
-            previoussection = course_section
+                previoussection = course_section
 
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)
@@ -221,8 +224,18 @@ def faculty_Overview(requests):
         course_title = course_section[:-2]
 
     # Return sections that's related to the course
+<<<<<<< HEAD
     courseList_updated = requests.session['courseList_updated']
     context['course_sectionList'] = courseList_updated[course_title]
+=======
+    
+    course_sectionList = {course_title : {}}
+    courseList = requests.session['courseList']
+    for temp1,temp2 in courseList.items():
+        if course_title in temp1:
+            course_sectionList[course_title].update({temp1:temp2})
+    context['course_sectionList'] = course_sectionList
+>>>>>>> 27c2492d20389021b6138af71de62cbac6017c1d
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
@@ -240,6 +253,10 @@ def faculty_Overview(requests):
             studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
             studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
             studentInfo['badges'] = trailResults['CourseTrailResults']['class']['Students_Information']['badges'][studentPointsPosition]
+            try: 
+                studentInfo['link'] = Cloud_Learning_Tools.objects.get(id = studentUserName+"_Trailhead").website_link
+            except: 
+                studentInfo['link'] ="No link" #Exception which is caused by no cle linked
             classList.append(studentInfo)
         context['course']['classList'] = classList
 
