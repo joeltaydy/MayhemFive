@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <!--Class One Card-->   
+        <!--Class One Card-->
         {% for course,course_section in request.session.courseList.items %}
             <div class="col-md-6">
             <div class="card">
@@ -117,14 +117,14 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title"> Ranking</h4>
                             <p class="card-category">24 Hours performance</p>
                         </div>
-                        
+
                         <div class="card-body">
                             {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
                         </div>
@@ -133,17 +133,16 @@
                                 <i class="fa fa-history"></i> Updated "{{last_updated}}"
                             </div>
                         </div>
-                        
+
                     </div>
             </div>
 
         {% endfor %}
-        
+
         </br>
     </div>
 </div>
 
-{% endblock %}
 <script>
 var delay = 500;
 $(".progress-bar").each(function(i){
@@ -160,3 +159,5 @@ $(".progress-bar").each(function(i){
     });
 });
 </script>
+
+{% endblock %}
