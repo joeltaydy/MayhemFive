@@ -90,25 +90,7 @@ def home(requests):
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
-# Faculty Notification Page
-#@login_required(login_url='/')
-def ntmgmt(requests):
-    '''
-        Check if user is authenticated aka session
-    '''
-    context = {}
-    # Redirect user to login page if not authorized and student
-    try:
-        processLogin.studentVerification(requests)
-    except:
-        logout(requests)
-        return render(requests,'Module_Account/login.html',context)
-    context["noti_mgmt"] = "active"
-    return render(requests,"error404.html",context)
-    # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
-
-
-# Faculty Notification Page
+# Admin homepage
 #@login_required(login_url='/')
 def CLEAdmin(requests):
     '''
@@ -176,7 +158,7 @@ def faculty_Home(requests):
             for student in classObj:
                 students.append(student)
                 courseStudents.append(student)
-                
+
             previoussection = course_section
 
         if previouscourse != "a":
@@ -497,6 +479,15 @@ def configureDB_course(requests):
 #
 def configureDB_students(requests):
     response = {"configureDB_students" : "active"}
+
+    # Retrieve all the course
+    courseObject = Course.objects.all()
+    courseList = []
+
+    for course in courseObject:
+        courseList.append(course.course_title)
+    response['courses'] = courseList
+
     if requests.method == "GET":
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
