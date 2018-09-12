@@ -214,18 +214,14 @@ def faculty_Overview(requests):
     faculty_email = requests.user.email
 
     if requests.method == "GET":
-        course_section = requests.GET.get('module').replace(" ", "")
+        course_section = requests.GET.get('module')
         course_title = requests.GET.get('course_title')
     else:
         course_section = requests.POST.get('course_section')
-        course_title = ''
-
-        courseList_updated = requests.session['courseList_updated']
-        for temp1,temp2 in courseList_updated.items():
-            if temp2 == course_section:
-                course_title = temp1
+        course_title = course_section[:-2]
 
     # Return sections that's related to the course
+    print(course_title)
     course_sectionList = {course_title : {}}
     courseList = requests.session['courseList']
     for temp1,temp2 in courseList.items():
