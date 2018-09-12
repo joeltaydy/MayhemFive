@@ -221,7 +221,7 @@ def faculty_Overview(requests):
         course_title = course_section[:-2]
 
     # Return sections that's related to the course
-    print(course_title)
+    
     course_sectionList = {course_title : {}}
     courseList = requests.session['courseList']
     for temp1,temp2 in courseList.items():
