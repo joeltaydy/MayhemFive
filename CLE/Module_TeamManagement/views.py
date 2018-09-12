@@ -179,7 +179,7 @@ def faculty_Home(requests):
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
-    # context["courses"] = requests.session['courseList_updated']
+    #context["courses"] = requests.session['courseList_updated']
 
     # Get number of weeks since school term start and reamining weeks till school term ends
     past_weeks, remaining_weeks = utilities.getRemainingWeeks()
