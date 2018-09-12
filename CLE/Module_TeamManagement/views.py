@@ -240,13 +240,15 @@ def faculty_Overview(requests):
             studentInfo['team'] = enrolled_class.team_number
             studentInfo['info'] =  enrolled_class.student #Obtains student model from Foreign key
             studentUserName = enrolled_class.student.username
-            studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
-            studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
-            studentInfo['badges'] = trailResults['CourseTrailResults']['class']['Students_Information']['badges'][studentPointsPosition]
             try:
                 studentInfo['link'] = Cloud_Learning_Tools.objects.get(id = studentUserName+"_Trailhead").website_link
-            except:
+                studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
+                studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
+                studentInfo['badges'] = trailResults['CourseTrailResults']['class']['Students_Information']['badges'][studentPointsPosition]
+            except: 
                 studentInfo['link'] ="No link" #Exception which is caused by no cle linked
+                studentInfo['points'] = 0
+                studentInfo['badges'] = 0
             classList.append(studentInfo)
         context['course']['classList'] = classList
 
