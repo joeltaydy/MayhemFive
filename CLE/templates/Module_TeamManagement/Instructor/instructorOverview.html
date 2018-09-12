@@ -30,7 +30,9 @@
     <div class= "redirect">
         <span>
         {% for course_section in course_sectionList %}
+            {% if course_section.section_number != 'G0' %}
                 <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}';" type="button" class="btn btn-primary">{{ course_section.to_string }}</button>
+            {% endif %}
         {% endfor %}
         </span>
     <div>
@@ -41,9 +43,13 @@
                       <div class="card ">
                             <div class="card-header ">
                                 {% for course_section in course_sectionList %}
-                                    {% ifequal course_section.to_string module %}
-                                        <h4 class="card-title">Section {{course_section.section_number}}</h4>
-                                    {% endifequal %}
+                                    {% if course_section.section_number != 'G0' %}
+                                        {% ifequal course_section.to_string module %}
+                                            <h4 class="card-title">Section {{course_section.section_number}}</h4>
+                                        {% endifequal %}
+                                    {% else %}
+                                        <h4 class="card-title">Please upload some students</h4>
+                                    {% endif %}
                                 {% endfor %}
                               <!-- <span><button type="button" class="btn btn-info">G1</button> <button type="button" class="btn btn-info">G2</button> <button type="button" class="btn btn-info">G3</button></span> -->
                             </div>

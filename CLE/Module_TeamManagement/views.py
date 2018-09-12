@@ -179,7 +179,7 @@ def faculty_Home(requests):
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
 
-    # context["courses"] = requests.session['courseList_updated']
+    context["courses"] = requests.session['courseList_updated']
 
     # Get number of weeks since school term start and reamining weeks till school term ends
     past_weeks, remaining_weeks = utilities.getRemainingWeeks()
@@ -245,7 +245,7 @@ def faculty_Overview(requests):
                 studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)
                 studentInfo['points'] = trailResults['CourseTrailResults']['class']['Students_Information']['points'][studentPointsPosition]
                 studentInfo['badges'] = trailResults['CourseTrailResults']['class']['Students_Information']['badges'][studentPointsPosition]
-            except: 
+            except:
                 studentInfo['link'] ="No link" #Exception which is caused by no cle linked
                 studentInfo['points'] = 0
                 studentInfo['badges'] = 0

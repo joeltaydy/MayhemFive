@@ -14,39 +14,40 @@
     <div class="container">
       <canvas id="myClassCharts{{forloop.counter}}" width="400" height="400"></canvas>
     </div>
-    
+
      <script>
     var ctx = document.getElementById('myClassCharts{{forloop.counter}}').getContext('2d');
-    var classLabel = [ {% for courseId in courses %}
-                        {% if course in courseId %}
-                        '{{courses|get_item:courseId}}' ,
-                        {% endif %}
-                        
+    var classLabel = [ {% for course_title,course_sectionList in courses.items %}
+                            {% for course_section in course_sectionList %}
+                                {% if course in course_section.to_string %}
+                                    '{{course_section.to_string}}' ,
+                                {% endif %}
+                            {% endfor %}
                         {% endfor %}
                     ]
 
     var classBadgesData = [{% for courseId in CourseTrailResults %}
                             {% if course in courseId %}
-                        
-                        
+
+
                       {% with CourseTrailResults|get_item:courseId as courseDict%}   // custom django filter
                         {{ courseDict.Team_Information|getTotalClassBadges }} ,
-                      {% endwith %} 
+                      {% endwith %}
                       {% endif %}
                     {% endfor %}]
     var classPointsData = [{% for courseId in CourseTrailResults %}
-                     {% if course in courseId %}                        
+                     {% if course in courseId %}
                       {% with CourseTrailResults|get_item:courseId as courseDict%}   // custom django filter
                         {{ courseDict.Team_Information|getTotalClassPoints }} ,
-                      {% endwith %}  
+                      {% endwith %}
                       {% endif %}
                     {% endfor %}]
 
     var classData = [{% for courseId in CourseTrailResults %}
-                    {% if course in courseId %}  
+                    {% if course in courseId %}
                       {% with CourseTrailResults|get_item:courseId as courseDict%}   // custom django filter
                         {{ courseDict.Students_Information|getTotalNumStudents }} ,
-                      {% endwith %} 
+                      {% endwith %}
                     {% endif %}
                     {% endfor %}]
 
@@ -55,10 +56,10 @@
         type: 'bar',
         data: {
             datasets: [
-            { 
+            {
                 label: 'Number of Students ',
                 data: classData,
-                 
+
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -78,7 +79,7 @@
                 borderWidth: 1,
                 hoverBorderWidth:3,
                 hoverBorderColor:'#000'
-                
+
             }, {
                 label: 'Total Badges',
                 data: classBadgesData,
@@ -99,7 +100,7 @@
                 }]
             }
         }
-    }); 
+    });
     </script>
   </body>
 </html>
