@@ -140,26 +140,29 @@ def faculty_Home(requests):
         previouscourse = "a"
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
-            if course_title not in courses:
-                courses[course_title]= {}
-                if previouscourse != "a":
-                    courses[previouscourse]["count"] = len(courseStudents)
-                    courses[previouscourse]["sectionCount"] = sectionCounter
-                courseStudents=[]
-                previoussection = "a"
-                previouscourse = course_title
-                sectionCounter = 0
+            if "G0" in (course_section.course_section_id): 
+                courses[course_title]= {"count" : 0, "sectionCount" : 0}
+            else: 
+                if course_title not in courses:
+                    courses[course_title]= {}
+                    if previouscourse != "a":
+                        courses[previouscourse]["count"] = len(courseStudents)
+                        courses[previouscourse]["sectionCount"] = sectionCounter
+                    courseStudents=[]
+                    previoussection = "a"
+                    previouscourse = course_title
+                    sectionCounter = 0
 
-            if previoussection != course_section:
-                sectionCounter += 1
+                if previoussection != course_section:
+                    sectionCounter += 1
 
-            classObj = Class.objects.all().filter(course_section=course_section)
+                classObj = Class.objects.all().filter(course_section=course_section)
 
-            for student in classObj:
-                students.append(student)
-                courseStudents.append(student)
+                for student in classObj:
+                    students.append(student)
+                    courseStudents.append(student)
 
-            previoussection = course_section
+                previoussection = course_section
 
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)
