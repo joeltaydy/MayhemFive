@@ -94,9 +94,7 @@
         <!-- Modal body -->
         <div class="modal-body">
           <!--Form-->
-          <form action="{% url 'TMmod:telegram_setup' %}" method="POST" enctype="multipart/form-data" class="form-horizontal" id="phone_number_form">
-
-              {% csrf_token %}
+          <form action="." data-url="{% url 'TMmod:telegram_setup' %}" method="POST" id="phone_number_form">
 
               <label for="name">Please enter a valid phone number.</label>
               <div class="form-group row">
@@ -105,18 +103,15 @@
                   <input type="text" class="form-control" name="phone_number" id="phone_number" placeholder="Phone Number" onkeypress="return isNumberKey(event)">
                 </div>
               </div>
-
+<!--
               <input type="hidden" id="user" name="user" value="faculty">
-              <input type="hidden" id="action" name="action" value="batch">
-
-
+              <input type="hidden" id="action" name="action" value="batch"> -->
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button class="btn btn-primary TelegramModalstep2"> <span style="margin-right:5px;"></span>Next Step</button>
-          <!-- <button class="btn btn-primary TelegramModalstep2"> <span style="margin-right:5px;"></span>Send verification code</button> -->
+          <button class="btn btn-primary">Send verification code</button>
+          <!-- <button class="btn btn-primary TelegramModalstep2">Next Step</button> -->
         </div>
         </form>
           <!-- end of Form -->
@@ -161,9 +156,8 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button class="btn btn-primary TelegramModalstep1" data-dismiss="modal"> <span style="margin-right:5px;"></span>Previous Step</button>
-          <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure tools</button>
+          <button class="btn btn-primary TelegramModalstep1" data-dismiss="modal">Previous Step</button>
+          <button class="btn btn-primary">Configure tools</button>
         </div>
         </form>
           <!-- end of Form -->
@@ -181,18 +175,6 @@
     });
   });
 
-  $(document).on('submit','#phone_number_form',function(e){
-      e.preventDefault();
-
-      $a.jax({
-        type:'POST',
-        url:'/user/create/',
-        data:{
-          name:$('#name').val()
-        }
-      });
-  });
-
   function isNumberKey(evt)
 			{
 				var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -208,7 +190,70 @@
   }
 </script>
 
+<script>
+$(document).ready(function(){
+  var $myForm = $('#phone_number_form')
+  $myForm.submit(function(event){
+      event.preventDefault()
+      var $formData = $(this).serialize()
+      var $thisURL = $myForm.attr('data-url') || window.location.href // or set your own url
+      $.ajax({
+          method: "POST",
+          url: $thisURL,
+          data: $formData,
+          success: handleFormSuccess,
+          error: handleFormError,
+      })
+  })
 
+  function handleFormSuccess(data, textStatus, jqXHR){
+      console.log(data)
+      console.log(textStatus)
+      console.log(jqXHR)
+      $('#TelegramModalstep1').modal('hide')
+      $('#TelegramModalstep2').modal('show')
+  }
+
+  function handleFormError(jqXHR, textStatus, errorThrown){
+      console.log(jqXHR)
+      console.log(textStatus)
+      console.log(errorThrown)
+  }
+})
+</script>
+
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+</script>
 
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
 {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}

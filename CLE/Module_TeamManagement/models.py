@@ -42,7 +42,7 @@ class Student(models.Model):
         null=True,
     )
     loginCounts = models.IntegerField(
-        db_column='Number_of_Logins',
+        db_column='Number of Logins',
         default=0,
     )
 
