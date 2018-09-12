@@ -170,11 +170,15 @@ def faculty_Home(requests):
 
             if previoussection != course_section:
                 sectionCounter += 1
+
             classObj = Class.objects.all().filter(course_section=course_section)
+
             for student in classObj:
                 students.append(student)
                 courseStudents.append(student)
+                
             previoussection = course_section
+
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)
             courses[previouscourse]["sectionCount"] = sectionCounter
