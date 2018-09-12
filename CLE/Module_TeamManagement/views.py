@@ -219,6 +219,7 @@ def faculty_Overview(requests):
     if requests.method == "GET":
         course_section = requests.GET.get('module')
         course_title = requests.GET.get('course_title')
+        section_number = requests.GET.get('section_number')
     else:
         course_section = requests.POST.get('course_section')
         course_title = course_section[:-2]
@@ -258,6 +259,8 @@ def faculty_Overview(requests):
     else:
         context['module'] = course_section.course.course_title + " " + course_section.section_number
 
+    context['course_title'] = course_title    
+    context['section_number'] = section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)

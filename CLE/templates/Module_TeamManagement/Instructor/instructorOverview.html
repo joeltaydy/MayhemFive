@@ -4,7 +4,7 @@
 
 <div class="imp_message container">
     <p> <br> </p>
-    <h1> Student Managment for {{ module }}</h1>
+    <h1> Student Managment for {{ course_title }}</h1>
     <!--
         thinking of removing this part because it is pointless - Joel
     -->
@@ -12,8 +12,20 @@
         <div class="col-md-4">
             <div class="card ">
                 <div class="card-header ">
+                    <h4 align="center" class="card-title">Section</h4>
+                        {% if section_number == 'G0' %}
+                            <h1 align="center">None</h1>
+                        {% else %}
+                            <h1 align="center">{{ section_number }}</h1>
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card ">
+                <div class="card-header ">
                     <h4 align="center" class="card-title">Teams</h4>
-                        <h1 align="center">{{CourseTrailResults.class.Teams_Information | length }}</h1>
+                        <h1 align="center">{{ CourseTrailResults.class.Teams_Information | length }}</h1>
                 </div>
             </div>
         </div>
@@ -21,7 +33,7 @@
             <div class="card ">
                 <div class="card-header ">
                     <h4 align="center" class="card-title">Students</h4>
-                        <h1 align="center">{{CourseTrailResults.class.Students_Information.students | length }}</h1>
+                        <h1 align="center">{{ CourseTrailResults.class.Students_Information.students | length }}</h1>
                 </div>
             </div>
         </div>
@@ -31,7 +43,7 @@
         <span>
         {% for course_section in course_sectionList %}
             {% if course_section.section_number != 'G0' %}
-                <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}';" type="button" class="btn btn-primary">{{ course_section.to_string }}</button>
+                <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number  }}';" type="button" class="btn btn-primary">{{ course_section.section_number }}</button>
             {% endif %}
         {% endfor %}
         </span>
@@ -42,15 +54,7 @@
                   <div class="col-md-12">
                       <div class="card ">
                             <div class="card-header ">
-                                {% for course_section in course_sectionList %}
-                                    {% if course_section.section_number != 'G0' %}
-                                        {% ifequal course_section.to_string module %}
-                                            <h4 class="card-title">Section {{course_section.section_number}}</h4>
-                                        {% endifequal %}
-                                    {% else %}
-                                        <h4 class="card-title">Please upload some students</h4>
-                                    {% endif %}
-                                {% endfor %}
+                                <h4 class="card-title">Class Overview</h4>
                               <!-- <span><button type="button" class="btn btn-info">G1</button> <button type="button" class="btn btn-info">G2</button> <button type="button" class="btn btn-info">G3</button></span> -->
                             </div>
                             <br>
@@ -272,6 +276,7 @@
         <th>Team no.</th>
         <th>Grade</th>
         <th>Score</th>
+        <th>Link</th>
         </tr>
     </tfoot>
 </table>
