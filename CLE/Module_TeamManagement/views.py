@@ -215,8 +215,24 @@ def faculty_Overview(requests):
 
     if requests.method == "GET":
         course_section = requests.GET.get('module').replace(" ", "")
+        course_title = requests.GET.get('course_title')
     else:
         course_section = requests.POST.get('course_section')
+        course_title = ''
+
+        courseList_updated = requests.session['courseList_updated']
+        for temp1,temp2 in courseList_updated.items():
+            if temp2 == course_section:
+                course_title = temp1
+
+    # Return sections that's related to the course
+    course_sectionList = {}
+    courseList = requests.session['courseList']
+    for temp1,temp2 in courseList.items():
+        if course_title in temp1:
+            course_sectionList.update({temp1:temp2})
+    context['course_sectionList'] = course_sectionList
+
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
 
@@ -240,6 +256,7 @@ def faculty_Overview(requests):
         context['module'] = course_section.course.course_title
     else:
         context['module'] = course_section.course.course_title + " " + course_section.section_number
+
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)

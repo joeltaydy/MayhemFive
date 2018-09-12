@@ -5,17 +5,9 @@
 <div class="imp_message container">
     <p> <br> </p>
     <h1> Student Managment for {{ module }}</h1>
-    <!-- 
+    <!--
         thinking of removing this part because it is pointless - Joel
     -->
-    <div class= "redirect">
-        <span>
-        {% for course,course_section in request.session.courseList.items %}
-            <button type="button" class="btn btn-primary">{{ course_section }}</button>
-        {% endfor %}
-        </span>
-    <div>
-    
     <div class="row">
         <div class="col-md-4">
             <div class="card ">
@@ -34,6 +26,14 @@
             </div>
         </div>
     </div
+
+    <div class= "redirect">
+        <span>
+        {% for course,course_section in course_sectionList.items %}
+                <button type="button" class="btn btn-primary">{{ course_section }}</button>
+        {% endfor %}
+        </span>
+    <div>
 
     <div class="content">
               <div class="row">
@@ -70,7 +70,7 @@
                                             <h4 class="card-title"> Ranking</h4>
                                             <p class="card-category">24 Hours performance</p>
                                         </div>
-                                        
+
                                         <div class="card-body">
                                             {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
                                         </div>
@@ -101,7 +101,7 @@
                             </div>
 
                             -->
-                            
+
                           </div>
                   </div>
                 </div>
@@ -173,7 +173,7 @@
                                 <option value="Tableu">Tableu</option>
                                 <option value="Kahoot">Kahoot</option>
                           </select>
-                          
+
                         </br>
                                 <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
                                 <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">

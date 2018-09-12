@@ -21,14 +21,21 @@ from Module_TeamManagement.models import *
 # Populate relevant courses related to instructors/students from database
 def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     courseList = {}
+    courseList_updated = {}
+
     try:
         if instructorEmail != None:
             courseObject = Faculty.objects.get(email=instructorEmail).course_section.all()
-            for course in courseObject:
-                if course.section_number == 'G0':
-                    courseList[course.course_section_id] = course.course.course_title
+            for course_section in courseObject:
+                if course_section.section_number == 'G0':
+                    courseList[course_section.course_section_id] = course_section.course.course_title
                 else:
-                    courseList[course.course_section_id] = course.course.course_title + " " + course.section_number
+                    courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
+
+                try:
+                    courseList_updated[course_section.course.course_title].append([course_section.course_section_id])
+                except:
+                    courseList_updated[course_section.course.course_title] = [course_section.course_section_id]
 
         elif studentEmail != None:
             classObject = Class.objects.all().filter(student=studentEmail).distinct()
@@ -39,6 +46,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
         traceback.print_exc()
 
     requests.session['courseList'] = courseList
+    requests.session['courseList_updated'] = courseList_updated
     return
 
 # Returns all trailhead webscrapper info from tcsv():

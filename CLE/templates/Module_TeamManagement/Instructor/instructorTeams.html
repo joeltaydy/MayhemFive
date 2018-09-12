@@ -13,7 +13,9 @@
           <select class="form-control col-md-offset-3" id="course_section" name="course_section">
             <option value="" disabled selected>Select your course</option>
             {% for course,course_section in courses.items %}
-              <option value={{course}}>{{course_section}}</option>
+                {% if 'G' in course_section %}
+                    <option value={{course}}>{{course_section}}</option>
+                {% endif %}
           {% endfor %}
         </select>
 
