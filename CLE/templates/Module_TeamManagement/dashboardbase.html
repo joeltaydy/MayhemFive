@@ -24,10 +24,11 @@
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/datatables.css' %}"> -->
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.10/css/mdb.min.css" rel="stylesheet">
 </head>
 
 <body>
+
     <div class="wrapper">
         <div class="sidebar" data-color="black" data-image="{% static 'images/sidebar-5.jpg' %}">
             <!--
@@ -37,9 +38,9 @@
     -->
             <div class="sidebar-wrapper">
                 <div class="logo">
-                    <a href="{% url 'TMmod:home' %}" class="simple-text">
-                        <img class="d-block w-10 center" src="{% static 'images/thunderhead monkeys.png' %}">
-                    </a>
+                  <span>
+                    <img class="d-block w-10 center" src="{% static 'images/THMlogo.png' %}">
+                  </span>
                 </div>
                 {% block sideuserprofile %}
 
@@ -56,8 +57,10 @@
                     {% endblock %}
 
                 </ul>
+
             </div>
         </div>
+
         <div class="main-panel">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg" color-on-scroll="500">

@@ -26,38 +26,25 @@ Instructor page
         <p>Dashboard</p>
     </a>
 </li>
-<div id="accordion">
-  <li class="nav-item {{ team_list }}">
-      <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+<li class="nav-item {{ team_list }}">
+    <div class="dropdown dropright">
+      <a class="nav-link dropdown-toggle" href ="#" data-toggle="dropdown">
           <i class="fas fa-chalkboard-teacher"></i>
           <p>Student Mgmt</p>
       </a>
-  </li>
-  <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
+  <div class="dropdown-menu">
       {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-            <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionList.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionList.0.section_number }}">
+            <a class="nav-link dropdown-item" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionList.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionList.0.section_number }}">
                 <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
             </a>
       {% endfor %}
   </div>
-</div>
-<li class="nav-item {{ configureDB_course }}">
-  <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
-    <i class="fas fa-upload"></i>
-    <p>Course Setup</p>
-  </a>
+  </div>
 </li>
-<li class="nav-item {{ configureDB_teams }}">
-  <a class="nav-link" href="{% url 'TMmod:uploadteam' %}">
-    <i class="fa fa-users"></i>
-    <p>Teams Setup</p>
-  </a>
-</li>
-<li class="nav-item {{ configureDB_clt }}">
-      <a class="nav-link" href="{% url 'TMmod:uploadtools' %}?user=faculty">
-      <!-- <a class="nav-link" href="{% url 'TMmod:uploadtools' %}"> -->
-    <i class="fas fa-wrench"></i>
-    <p>Tools Setup</p>
-  </a>
-</li>
+  <li class="nav-item {{ configureDB_course }}">
+        <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <p>Course Mgmt</p>
+      </a>
+  </li>
 {% endblock %}

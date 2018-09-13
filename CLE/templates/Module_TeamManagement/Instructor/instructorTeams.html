@@ -1,9 +1,17 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 
 {% block bootstrapContent %}
+<div class= "redirect">
+    <span>
+      <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">1. Course Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">2. Teams Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark">3. Tools Setup</button>
+    </span>
+<div>
 
 <div class="col-md-8">
 <h1>Teams Setup</h1>
+
 <form action="{% url 'TMmod:uploadteam' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
