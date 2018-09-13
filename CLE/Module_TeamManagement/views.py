@@ -223,6 +223,7 @@ def faculty_Overview(requests):
     else:
         course_section = requests.POST.get('course_section')
         course_title = course_section[:-2]
+        section_number = course_section[-2:]
 
     # Return sections that's related to the course
     courseList_updated = requests.session['courseList_updated']
@@ -675,12 +676,15 @@ def configureDB_clt(requests):
         faculty_email = requests.user.email
         action = requests.POST.get("action")
         bootstrapFile = {}
+        cleToolName = requests.POST.get("type")
 
         if action == 'batch':
             course = requests.POST.get("course_title")
         else:
             course = requests.POST.get("course_section")
 
+        bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
+        
         if file.name.endswith('.xlsx'):
             if 'learning_tools' in file.name.lower():
                 bootstrapFile['faculty_email'] = faculty_email

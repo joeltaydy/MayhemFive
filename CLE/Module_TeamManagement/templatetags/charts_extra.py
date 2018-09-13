@@ -36,3 +36,7 @@ def describeSet(setValues):
         return [0,0,0,0] #min , max , median , average
     else:
         return [min(setValues), max(setValues), median(setValues),mean(setValues)]
+
+@register.filter
+def replaceSpace(string):
+    return string.replace(" ","")

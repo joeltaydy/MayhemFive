@@ -1,5 +1,6 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 {% load staticfiles %}
+{% load charts_extra %} <!-- django filter from charts_extra-->
 {% block classList %}
 
 <div class="imp_message container">
@@ -149,11 +150,9 @@
                               <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
                           </div>
                           <input type="hidden" id="username" name="username" value={{user.username}}>
-                          {% for course,course_section in request.session.courseList.items %}
-                            {% if course_section == module %}
-                                <input type="hidden" id="course_section" name="course_section" value={{course}}>
-                            {% endif %}
-                          {% endfor %}
+                          
+                            <input type="hidden" id="course_section" name="course_section" value={{module|replaceSpace}}>
+                           
                           <div class="form-group">
                             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
                                 <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
@@ -194,11 +193,8 @@
                             </div>
                             <input type="hidden" id="user" name="user" value="faculty">
                             <input type="hidden" id="action" name="action" value="individual">
-                            {% for course,course_section in request.session.courseList.items %}
-                              {% if course_section == module %}
-                                  <input type="hidden" id="course_section" name="course_section" value={{course}}>
-                              {% endif %}
-                            {% endfor %}
+                            <input type="hidden" id="course_section" name="course_section" value={{module|replaceSpace}}>
+                           
                             <div class="form-group">
                               <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
                                   <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
