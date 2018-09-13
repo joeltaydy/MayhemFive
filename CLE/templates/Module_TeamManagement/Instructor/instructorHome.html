@@ -93,17 +93,17 @@
                                     <br>
                                     <div class="col-md-12">
                                     <div class="row">
-                                        {# for toolImage in courseDetails.toolImage_list.items #}
-                                        {% with toolImage="Telegram Logo.png" %}
-                                        {% with 'images/'|add:toolImage as toolLink %}
+                                        {% for toolImage in courseDetails.toolImage_list %}
+                                        {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
 
                                         <div class="col-md-4" align="center">
                                             <img src="{% static toolLink %}" class="rounded-circle">
 
                                         {% endwith %}
-                                        {% endwith %}
                                         </div>
-                                        {# endfor #}
+                                        {% endfor %}
+                                        
+                                        
 
                                         <div class="col-md-4">
                                             <center>
