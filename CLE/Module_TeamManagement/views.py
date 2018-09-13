@@ -148,11 +148,13 @@ def faculty_Home(requests):
                     if previouscourse != "a":
                         courses[previouscourse]["count"] = len(courseStudents)
                         courses[previouscourse]["sectionCount"] = sectionCounter
+                        courses[previouscourse]["toolImage_list"] = toolsList
+                        
                     courseStudents=[]
                     previoussection = "a"
                     previouscourse = course_title
                     sectionCounter = 0
-
+                    toolsList=[]
                 if previoussection != course_section:
                     sectionCounter += 1
 
@@ -161,12 +163,16 @@ def faculty_Home(requests):
                 for student in classObj:
                     students.append(student)
                     courseStudents.append(student)
-
+                try: 
+                    toolsList.extend(course_section.learning_tools.split("_"))
+                except:
+                    pass
                 previoussection = course_section
 
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)
             courses[previouscourse]["sectionCount"] = sectionCounter
+            courses[previouscourse]["toolImage_list"] = toolsList
 
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
@@ -223,6 +229,7 @@ def faculty_Overview(requests):
     else:
         course_section = requests.POST.get('course_section')
         course_title = course_section[:-2]
+        section_number = course_section[-2:]
 
     # Return sections that's related to the course
     courseList_updated = requests.session['courseList_updated']
@@ -675,11 +682,14 @@ def configureDB_clt(requests):
         faculty_email = requests.user.email
         action = requests.POST.get("action")
         bootstrapFile = {}
+        cleToolName = requests.POST.get("type")
 
         if action == 'batch':
             course = requests.POST.get("course_title")
         else:
             course = requests.POST.get("course_section")
+
+        bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
 
         if file.name.endswith('.xlsx'):
             if 'learning_tools' in file.name.lower():

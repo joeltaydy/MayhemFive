@@ -51,6 +51,24 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             for individuaClass in classObject:
                 course_section = individuaClass.course_section
                 courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
+
+                try:
+                    courseList_updated[course_section.course.course_title].update(
+                        {
+                            'id':course_section.course_section_id,
+                            'course_title':course_section.course.course_title,
+                            'section_number':course_section.section_number,
+                            'to_string':course_section.course.course_title + " " + course_section.section_number,
+                        }
+                    )
+                except:
+                    courseList_updated[course_section.course.course_title] = {
+                        'id':course_section.course_section_id,
+                        'course_title':course_section.course.course_title,
+                        'section_number':course_section.section_number,
+                        'to_string':course_section.course.course_title + " " + course_section.section_number,
+                    }
+
     except :
         traceback.print_exc()
 

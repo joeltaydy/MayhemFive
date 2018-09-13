@@ -33,13 +33,13 @@
 <li class="nav-item {{ team_list }}">
     <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
         <i class="fa fa-users"></i>
-        <span class="no-icon"> My Teams</span>
+        <span class="no-icon"> My Sections</span>
     </a>
 </li>
         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
-            {% for course,course_section in request.session.courseList.items %}
-                <a class="nav-link" href="{% url 'TMmod:sTeam' %}?module={{course}}">
-                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{course_section}}</p>
+            {% for course_title,course_details in request.session.courseList_updated.items %}
+                <a class="nav-link" href="{% url 'TMmod:sTeam' %}?module={{course_details.id}}">
+                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{course_details.to_string}}</p>
                 </a>
             {% endfor %}
         </div>
