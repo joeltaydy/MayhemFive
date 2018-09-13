@@ -148,11 +148,13 @@ def faculty_Home(requests):
                     if previouscourse != "a":
                         courses[previouscourse]["count"] = len(courseStudents)
                         courses[previouscourse]["sectionCount"] = sectionCounter
+                        courses[previouscourse]["toolImage_list"] = toolsList
+                        
                     courseStudents=[]
                     previoussection = "a"
                     previouscourse = course_title
                     sectionCounter = 0
-
+                    toolsList=[]
                 if previoussection != course_section:
                     sectionCounter += 1
 
@@ -161,12 +163,16 @@ def faculty_Home(requests):
                 for student in classObj:
                     students.append(student)
                     courseStudents.append(student)
-
+                try: 
+                    toolsList.extend(course_section.learning_tools.split("_"))
+                except:
+                    pass
                 previoussection = course_section
 
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)
             courses[previouscourse]["sectionCount"] = sectionCounter
+            courses[previouscourse]["toolImage_list"] = toolsList
 
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
@@ -684,7 +690,7 @@ def configureDB_clt(requests):
             course = requests.POST.get("course_section")
 
         bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
-        
+
         if file.name.endswith('.xlsx'):
             if 'learning_tools' in file.name.lower():
                 bootstrapFile['faculty_email'] = faculty_email
