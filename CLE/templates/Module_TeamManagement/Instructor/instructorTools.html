@@ -77,7 +77,7 @@
               </div>
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch">
-              <input type="hidden" id="type" name="type" value="Trailhead">
+              <input type="hidden" id="toolType" name="type">
           <!-- end of Form -->
         </div>
 
@@ -163,6 +163,7 @@
 
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch">
+              <input type="hidden" id="toolType" name="type" value="Telegram">
 
 
         </div>
@@ -200,6 +201,8 @@
 
 
   function setTool(toolName) {
+    var tool = toolName;
+    document.getElementById('tooltype').value = tool; 
     document.querySelector(".modal-title").textContent = "Set up " + toolName;
   }
 </script>
