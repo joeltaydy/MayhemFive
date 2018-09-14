@@ -18,6 +18,8 @@ def getClient(username=None):
         session_file = username + '.session'
         tele_config.CLIENT = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
 
+    tele_config.CLIENT.connect()
+
     return tele_config.CLIENT
 
 
