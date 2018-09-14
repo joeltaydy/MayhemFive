@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
                 ('firstname', models.CharField(db_column='Firstname', max_length=255)),
                 ('lastname', models.CharField(db_column='Lastname', max_length=255)),
                 ('telegram_username', models.CharField(db_column='Student_Telegram_Username', max_length=255, null=True)),
-                ('loginCounts', models.IntegerField(db_column='Number of Logins', default=0)),
+                ('loginCounts', models.IntegerField(db_column='Number_of_Logins', default=0)),
             ],
             options={
                 'db_table': 'Student',

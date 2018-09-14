@@ -1,9 +1,17 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 {% load staticfiles %}
 {% block bootstrapContent %}
+<div class= "redirect">
+    <span>
+      <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">1. Course Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">2. Teams Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark">3. Tools Setup</button>
+    </span>
+<div>
 
 <div class="col-md-8">
 <h1>Course Setup</h1>
+
 <form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
@@ -22,26 +30,6 @@
         <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
     </div>
     <input type="hidden" id="username" name="username" value={{user.username}}>
-
-    <div class="custom-control custom-checkbox custom-control-inline">
-      <input type="checkbox" class="custom-control-input" id="customCheck1">
-      <label class="custom-control-label" for="customCheck1">Telegram</label>
-    </div>
-
-    <div class="custom-control custom-checkbox custom-control-inline">
-      <input type="checkbox" class="custom-control-input" id="customCheck2">
-      <label class="custom-control-label" for="customCheck2">Tableau</label>
-    </div>
-
-    <div class="custom-control custom-checkbox custom-control-inline">
-      <input type="checkbox" class="custom-control-input" id="customCheck3">
-      <label class="custom-control-label" for="customCheck3">Trailhead</label>
-    </div>
-
-    <div class="custom-control custom-checkbox custom-control-inline">
-      <input type="checkbox" class="custom-control-input" id="customCheck4">
-      <label class="custom-control-label" for="customCheck4">Kahoot</label>
-    </div>
 
     <div class="form-group">
       <div style="margin-bottom:10px;">

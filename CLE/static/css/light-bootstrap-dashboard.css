@@ -3041,11 +3041,11 @@ Copyright (c) 2015 Daniel Eden
 }
 
 .card-user .avatar {
-    width: 124px;
-    height: 124px;
+    width: 110px;
+    height: 110px;
     border: 5px solid #FFFFFF;
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .card-user .avatar.border-gray {
@@ -5381,4 +5381,11 @@ License - nucleoapp.com/license/
 
 .progress-bar {
   width: 0;
+}
+
+#shrinkMe{
+  -webkit-transform:scale(0.5);
+  -moz-transform:scale(0.5);
+  -ms-transform:scale(0.5);
+  transform:scale(0.5);
 }

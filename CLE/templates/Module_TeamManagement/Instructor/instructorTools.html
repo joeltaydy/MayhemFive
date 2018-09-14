@@ -4,7 +4,16 @@
 
 
 <!-- Button to Open the Modal -->
-<h1 style="margin-left:10px;">Tools Setup</h1>
+<div class= "redirect">
+    <span>
+      <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">1. Course Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">2. Teams Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark">3. Tools Setup</button>
+    </span>
+<div>
+
+<div class="col-md-8">
+<h1>Tools Setup</h1>
 
 <h3 style="margin-left:10px;">Select Tool:</h3>
 <span style ="margin-left:10px">
@@ -68,7 +77,7 @@
               </div>
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch">
-              <input type="hidden" id="type" name="type" value="Trailhead">
+              <input type="hidden" id="toolType" name="type">
           <!-- end of Form -->
         </div>
 
@@ -154,6 +163,7 @@
 
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch">
+              <input type="hidden" id="toolType" name="type" value="Telegram">
 
 
         </div>
@@ -168,6 +178,7 @@
       </div>
     </div>
   </div>
+</div>
 
 <script>
   $(function(){
@@ -190,6 +201,8 @@
 
 
   function setTool(toolName) {
+    var tool = toolName;
+    document.getElementById('tooltype').value = tool; 
     document.querySelector(".modal-title").textContent = "Set up " + toolName;
   }
 </script>
