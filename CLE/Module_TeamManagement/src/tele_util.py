@@ -67,6 +67,9 @@ def getMembers(client,dialog_name,type):
     valid_members = []
     entity = getEntity(client,dialog_name,type)
 
+    if entity == None:
+        return [],0
+
     if type == Channel:
         members = client(channels.GetParticipantsRequest(
             channel=entity,
@@ -179,6 +182,7 @@ def initialize_Group(client=None,course_title='',section_number='',team_number='
     results['group_link'] = invite_link.link
 
     return results
+
 
 def disconnectClient(client=None):
     if client == None:

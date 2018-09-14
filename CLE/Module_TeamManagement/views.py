@@ -8,6 +8,7 @@ from Module_TeamManagement.models import *
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
 from telethon.errors import PhoneNumberUnoccupiedError
+from telethon.tl.types import Channel, Chat
 
 from random import randint
 from django.views.generic import TemplateView
@@ -128,18 +129,21 @@ def faculty_Home(requests):
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
 
-    #print(requests.user.email)
     try:
         courseStudents = []
+
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
         facultyObj = Faculty.objects.get(email=requests.user.email)
         registered_course_section = facultyObj.course_section.all()
         courses = {}
         students = []
+        tele_data = {}
         previouscourse = "a"
+
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
+
             if "G0" in (course_section.course_section_id):
                 courses[course_title]= {"count" : 0, "sectionCount" : 0}
             else:
@@ -149,7 +153,7 @@ def faculty_Home(requests):
                         courses[previouscourse]["count"] = len(courseStudents)
                         courses[previouscourse]["sectionCount"] = sectionCounter
                         courses[previouscourse]["toolImage_list"] = toolsList
-                        
+
                     courseStudents=[]
                     previoussection = "a"
                     previouscourse = course_title
@@ -163,17 +167,27 @@ def faculty_Home(requests):
                 for student in classObj:
                     students.append(student)
                     courseStudents.append(student)
-                try: 
+                try:
                     toolsList.extend(course_section.learning_tools.split("_"))
                 except:
                     pass
                 previoussection = course_section
+
+            # For every course_section get telegram group member count
+            if course_section.learning_tools != None:
+                if 'Telegram' in course_section.learning_tools:
+                    tele_groupName = utilities.getFinancialYear() + " " + course_title[:-3] + " " + course_section.section_number
+                    tele_client = tele_util.getClient(requests.user.email.split('@')[0])
+                    tele_client.connect()
+                    valid_members,count = tele_util.getMembers(tele_client,tele_groupName,Channel)
+                    tele_data[course_section.to_string] = {'members_count':count}
 
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)
             courses[previouscourse]["sectionCount"] = sectionCounter
             courses[previouscourse]["toolImage_list"] = toolsList
 
+        context['telegram_data'] = tele_data
         context['section_count'] = len(registered_course_section)
         context['course_count'] = len(courses)
         context['course_list'] = courses
@@ -266,7 +280,7 @@ def faculty_Overview(requests):
     else:
         context['module'] = course_section.course.course_title + " " + course_section.section_number
 
-    context['course_title'] = course_title    
+    context['course_title'] = course_title
     context['section_number'] = section_number
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'

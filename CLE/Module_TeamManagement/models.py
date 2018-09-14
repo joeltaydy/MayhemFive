@@ -71,11 +71,16 @@ class Course_Section(models.Model):
         db_column='Teaching_Assistant',
         null=True,
     )
-
     learning_tools = models.TextField(
         db_column='Course_Section_Learning_Tools_List',
         null=True,
     )
+    to_string = models.CharField(
+        db_column='To_String',
+        max_length=255,
+        null=True,
+    )
+
 
     class Meta:
         managed = True

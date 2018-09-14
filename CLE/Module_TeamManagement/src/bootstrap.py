@@ -368,6 +368,7 @@ def bootstrap_Students(fileDict):
                     course_section_id=course_title+section_number,
                     course=courseObj,
                     section_number=section_number,
+                    to_string=course_title+" "+section_number,
                 )
                 course_sectionObj.save()
 
@@ -415,10 +416,10 @@ Configures the course section database to include list of tools into the course 
 Does not create the list of tools associated in the database
 '''
 def configureCourseToolsList(course, toolName):
-    courseSect = Course_Section.objects.get(course_section_id=course) 
+    courseSect = Course_Section.objects.get(course_section_id=course)
     if courseSect.learning_tools == None:
         courseSect.learning_tools = toolName
-    else: 
+    else:
         if toolName not in courseSect.learning_tools:
             courseSect.learning_tools = courseSect.learning_tools+ "_" + toolName
     courseSect.save()
