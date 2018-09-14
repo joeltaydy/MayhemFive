@@ -176,11 +176,14 @@ def faculty_Home(requests):
             # For every course_section get telegram group member count
             if course_section.learning_tools != None:
                 if 'Telegram' in course_section.learning_tools:
-                    tele_groupName = utilities.getFinancialYear() + " " + course_title[:-3] + " " + course_section.section_number
+                    tele_groupName = utilities.getFinancialYear() + " " + course_title + " " + course_section.section_number
                     tele_client = tele_util.getClient(requests.user.email.split('@')[0])
                     tele_client.connect()
                     valid_members,count = tele_util.getMembers(tele_client,tele_groupName,Channel)
-                    tele_data[course_section.to_string] = {'members_count':count}
+                    tele_data[course_section.to_string] = {
+                        'registered_count':count,
+                        'total_count':len(classObj)
+                    }
 
         if previouscourse != "a":
             courses[previouscourse]["count"] = len(courseStudents)

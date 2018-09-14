@@ -132,10 +132,9 @@
                                         <span align = "center">
                                             <br>
                                             <center>
-                                                <!-- <img src = "{% static 'images/Telegram Logo.png' %}" class="rounded-circle"> -->
+                                                <img src = "{% static 'images/Telegram Logo.png' %}" class="rounded-circle">
                                                 {% for course_section,telegram_details in telegram_data.items %}
-                                                    <h4><b>{{telegram_details.members_count}}/39</b></h4>
-                                                    <br>
+                                                    <h4><b>{{telegram_details.registered_count}}/{{telegram_details.total_count}}</b></h4>
                                                     <h5>Registered for <b>{{course_section}}</b></h5>
                                                 {% endfor %}
                                                 <button type="button" class="btn btn-sm btn-primary">Send reminder</button>
