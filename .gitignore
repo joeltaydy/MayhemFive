@@ -2,6 +2,7 @@
 bootstrap_files
 Diagrams
 *.session
+*.session.journal
 
 #ignore vscode
 CLE/.vscode/settings.json
