@@ -1,3 +1,3 @@
 #!/bin/bash
 clear
-redis-server
+redis-server --daemonize yes
