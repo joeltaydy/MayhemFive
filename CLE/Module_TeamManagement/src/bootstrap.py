@@ -477,8 +477,12 @@ def update_CLT(fileDict):
         for student_email,clt_list in bootstrapInfo.items():
             for clt in clt_list:
                 try:
+                    # Update link
                     cltObj = Cloud_Learning_Tools.objects.get(id=clt[0])
+                    cltObj.website_link = clt[2]
+                    cltObj.save()
                 except:
+                    # Create new object
                     cltObj = Cloud_Learning_Tools.objects.create(
                         id=clt[0],
                         type=clt[1],
