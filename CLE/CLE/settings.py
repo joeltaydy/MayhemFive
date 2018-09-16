@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import getpass
+import ipgetter
+
+# Get public ip of server
+PUBLIC_IP = ipgetter.myip()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +32,7 @@ AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.31.25.38',"cle-alb-433525205.ap-southeast-1.elb.amazonaws.com","localhost","127.0.0.1","52.76.46.177.xip.io","52.76.46.177"]
+ALLOWED_HOSTS = [PUBLIC_IP,'172.31.25.38',"cle-alb-433525205.ap-southeast-1.elb.amazonaws.com","localhost","127.0.0.1","52.76.46.177.xip.io"]
 
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
