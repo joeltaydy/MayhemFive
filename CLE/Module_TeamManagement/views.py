@@ -180,7 +180,7 @@ def faculty_Home(requests):
                     tele_client = tele_util.getClient(requests.user.email.split('@')[0])
                     valid_members,count = tele_util.getMembers(tele_client,tele_groupName,Channel)
                     tele_data[course_section.to_string] = {
-                        'registered_count':count,
+                        'registered_count':count-3,
                         'total_count':len(classObj)
                     }
                     tele_util.disconnectClient(tele_client)
