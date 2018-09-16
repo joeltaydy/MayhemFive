@@ -700,6 +700,7 @@ def configureDB_clt(requests):
         action = requests.POST.get("action")
         bootstrapFile = {}
         cleToolName = requests.POST.get("type")
+        print(cleToolName)
 
         if action == 'batch':
             course = requests.POST.get("course_title")
@@ -780,12 +781,14 @@ def configureDB_telegram(requests):
         username = requests.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
+        toolType = requests.POST.get('type')
+
+        registered_course = []
 
         if len(phone_number) == 8:
             phone_number = str('+65') + phone_number
 
         client = tele_util.getClient(username)
-        client.connect()
 
         if not client.is_user_authorized():
             if phone_number != None and login_code == None:
@@ -796,6 +799,8 @@ def configureDB_telegram(requests):
                 facultyObj.phone_number = encrypt_phone_number
                 facultyObj.save()
 
+                registered_course = facultyObj.course_section.all()
+
                 return HttpResponse('')
 
             elif phone_number != None and login_code != None:
@@ -803,6 +808,12 @@ def configureDB_telegram(requests):
                     client.sign_in(phone=phone_number, code=login_code)
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(phone=phone_number, code=login_code)
+
+        # Debug this tomorrow
+        print(registered_course)
+        for course_section in registered_course:
+            print(course_section.course_section_id)
+            bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
         # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
         action = requests.POST.get('action')
