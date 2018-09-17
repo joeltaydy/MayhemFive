@@ -308,7 +308,6 @@ def webScrapper():
     import pytz
     # encoding=utf8
     import sys
-    reload(sys)
     sys.setdefaultencoding('utf8')
 
     output_file = 'clt_files/trailhead-points.csv'
