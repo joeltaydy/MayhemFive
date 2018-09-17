@@ -26,7 +26,7 @@
             <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title" align="center">{{course_section}}</h2>
+                    <h2 class="card-title" align="center">{{course_section.courseDetails}}</h2>
                 </div>
                 <br>
 
@@ -36,7 +36,7 @@
                             <h5 align="center" class="card-title">Tools used</h5>
                             <br>
                             <div class="row">
-                                {% for toolImage in courseDetails.toolImage_list %}
+                                {% for toolImage in course_section.toolImage_list %}
                                     {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
                                 <div class="col-md-4" align="center">
                                     <img src="{% static toolLink %}" class="rounded-circle">

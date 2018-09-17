@@ -50,8 +50,16 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             classObject = Class.objects.all().filter(student=studentEmail).distinct()
             for individuaClass in classObject:
                 course_section = individuaClass.course_section
-                courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
-
+                courseList[course_section.course_section_id] = {"courseDetails" : course_section.course.course_title + " " + course_section.section_number}
+                toolsList=[]
+                try:
+                    currentCourseTools = course_section.learning_tools.split("_")
+                    for tools in currentCourseTools:
+                        if tools not in toolsList:
+                            toolsList.append(tools)
+                except:
+                    pass
+                courseList[course_section.course_section_id]["toolImage_list"] = toolsList
                 try:
                     courseList_updated[course_section.course.course_title].update(
                         {
@@ -68,6 +76,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                         'section_number':course_section.section_number,
                         'to_string':course_section.course.course_title + " " + course_section.section_number,
                     }
+                
 
     except :
         traceback.print_exc()
