@@ -212,7 +212,7 @@ CELERY_TIMEZONE = 'Asia/Makassar'
 CELERY_BEAT_SCHEDULE = {
     'task-number-one': { #name of scheduler
     'task': 'trailheadscrapper', #name of task
-    'schedule':  60.0 #period of running in seconds
+    'schedule':  100.0 #period of running in seconds
     #'arg's :  #if have args
     }
 }
