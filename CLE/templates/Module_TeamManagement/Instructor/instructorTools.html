@@ -17,14 +17,14 @@
 
 <h3 style="margin-left:10px;">Select Tool:</h3>
 <span style ="margin-left:10px">
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">
+<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead" onclick='setTool("Trailhead")'>
   <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle" align="center" onclick='setTool("Trailhead")'><br>Trailhead
 </button>
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">
+<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot" onclick='setTool("Kahoot")'>
     <img src="https://kahoot.com/files/2017/08/kahoot_logo_570x320.jpg" alt="..." class="rounded-circle" align="center" onclick='setTool("Kahoot")'><br>Kahoot</button>
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">
+<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau"  onclick='setTool("Tableau")'>
     <img src="https://pbs.twimg.com/profile_images/1019707946349969408/ZadESXl4_400x400.jpg" alt="..." class="rounded-circle" align="center" onclick='setTool("Tableau")'><br>Tableau</button>
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#TelegramModalstep1" data-whatever="Telegram" id="type" value="Telegram">
+<button type="button" class="btn btn-light" data-toggle="modal" data-target="#TelegramModalstep1" data-whatever="Telegram" id="type" value="Telegram" onclick='setTool("Telegram")'>
     <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle" align="center" onclick='setTool("Telegram")'><br>Telegram</button>
 </span>
 
@@ -198,9 +198,9 @@
 			}
 
 
-  function setTool(toolName) {
-    var tool = toolName;
-    document.getElementById('tooltype').value = tool;
+  function setTool(toolName) {}
+    var tool = toolName; 
+    document.getElementById('toolType').value = tool;
     document.querySelector(".modal-title").textContent = "Set up " + toolName;
   }
 </script>

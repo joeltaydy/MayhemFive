@@ -1,4 +1,5 @@
 {% extends 'Module_TeamManagement/Student/studentBase.html' %}
+{% load staticfiles %}
 
 {% block title %}
     My Stats
@@ -35,13 +36,21 @@
                             <h5 align="center" class="card-title">Tools used</h5>
                             <br>
                             <div class="row">
-                                <div class="col-md-4"align="center">
+                                {% for toolImage in courseDetails.toolImage_list %}
+                                    {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
+                                <div class="col-md-4" align="center">
+                                    <img src="{% static toolLink %}" class="rounded-circle">
+                                </div>
+                                    {% endwith %}
+                                {% endfor %}
+
+                                <!-- <div class="col-md-4"align="center">
                                     <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle">
                                 </div>
                                 <div class="col-md-4"align="center">
                                     <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle">
-                                </div>
-                                </div>
+                                </div> -->
+                            </div>
                                 <br>
 
                                 <p align="right">
