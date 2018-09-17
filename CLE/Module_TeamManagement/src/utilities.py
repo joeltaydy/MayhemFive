@@ -306,9 +306,6 @@ def webScrapper():
     from Module_TeamManagement.models import Cloud_Learning_Tools
     import datetime
     import pytz
-    # encoding=utf8
-    import sys
-    sys.setdefaultencoding('utf8')
 
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
@@ -352,6 +349,7 @@ def webScrapper():
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
     counter=0 #iterate in studentList
+    print(info)
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
