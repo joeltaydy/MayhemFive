@@ -306,6 +306,10 @@ def webScrapper():
     from Module_TeamManagement.models import Cloud_Learning_Tools
     import datetime
     import pytz
+    # encoding=utf8
+    import sys
+    reload(sys)
+    sys.setdefaultencoding('utf8')
 
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
@@ -352,7 +356,7 @@ def webScrapper():
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
-        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))])
+        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
         writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
         for link,content in info.items():
             to_write = [link,studentEmails[counter], content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
