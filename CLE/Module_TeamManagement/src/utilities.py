@@ -305,6 +305,7 @@ def webScrapper():
     from bs4 import BeautifulSoup
     from Module_TeamManagement.models import Cloud_Learning_Tools
     import datetime
+    import pytz
 
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
@@ -350,7 +351,8 @@ def webScrapper():
     counter=0 #iterate in studentList
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
-        writer.writerow(["last updated:" , str(datetime.datetime.now())])
+        tz = pytz.timezone('Asia/Singapore')
+        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))])
         writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
         for link,content in info.items():
             to_write = [link,studentEmails[counter], content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
