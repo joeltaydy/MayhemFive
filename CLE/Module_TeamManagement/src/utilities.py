@@ -408,10 +408,11 @@ def webScrapper_SingleLink(student_email,link):
         ]
     )
 
-    with open(output_file, mode='w', encoding='cp1252') as outputFile:
-        writer = csv.writer(outputFile, delimiter=',')
+    with (open(output_file, mode='w', newline='')) as outputFile:
+        writer = csv.writer(outputFile)
+        print(content)
         for row in content:
-            print(row)
+            print(type(row))
             writer.writerow(row)
 
 
