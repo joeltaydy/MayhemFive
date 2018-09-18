@@ -413,7 +413,7 @@ def webScrapper_SingleLink(student_email,link):
         for row in content:
             for word in row:
                 if isinstance(word, str):
-                    print(word)
+                    print(str(word.encode('utf-8').decode('ascii', 'ignore')))
 
 
 # Encrypt a 32-bit string
