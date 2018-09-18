@@ -428,7 +428,13 @@ def webScrapper_SingleLink(student_email,link):
 
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
-        for row in content[:-1]:
+        writer.writerow(
+            [
+                content[0][0].decode("utf-8"),
+                content[0][1].decode("utf-8"),
+            ]
+        )
+        for row in content[1:-1]:
             writer.writerow(
                 [
                     row[0].decode("utf-8"),
@@ -440,7 +446,7 @@ def webScrapper_SingleLink(student_email,link):
                     row[6].decode("utf-8"),
                 ]
             )
-        writer.writerow(content[-1][0])
+        writer.writerow(content[-1])
 
 
 # Encrypt a 32-bit string
