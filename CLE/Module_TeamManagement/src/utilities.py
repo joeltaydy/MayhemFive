@@ -395,13 +395,13 @@ def webScrapper_SingleLink(student_email,link):
                     if row[1] != student_email:
                         content.append(
                             [
-                                row[0].encode('utf-8').strip(),
-                                row[1].encode('utf-8').strip(),
-                                row[2].encode('utf-8').strip(),
-                                row[3].encode('utf-8').strip(),
-                                row[4].encode('utf-8').strip(),
-                                row[5].encode('utf-8').strip(),
-                                row[6].encode('utf-8').strip()
+                                row[0].encode('utf-8').strip().decode("utf-8"),
+                                row[1].encode('utf-8').strip().decode("utf-8"),
+                                row[2].encode('utf-8').strip().decode("utf-8"),
+                                row[3].encode('utf-8').strip().decode("utf-8"),
+                                row[4].encode('utf-8').strip().decode("utf-8"),
+                                row[5].encode('utf-8').strip().decode("utf-8"),
+                                row[6].encode('utf-8').strip().decode("utf-8")
                             ]
                         )
                 else:
