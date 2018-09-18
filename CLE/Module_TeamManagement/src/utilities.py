@@ -414,7 +414,7 @@ def webScrapper_SingleLink(student_email,link):
             new_row = []
             for word in row:
                 new_row.append(str(word.encode('utf-8').decode('ascii', 'ignore')))
-            writer = writerow(new_row)
+            writer.writerow(new_row)
 
 
 # Encrypt a 32-bit string
