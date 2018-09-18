@@ -395,7 +395,7 @@ def webScrapper_SingleLink(student_email,link):
                     content.append(row)
     else:
         content = [['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained']] + content
-
+    print(content)
     content.append(
         [
             link,
@@ -407,6 +407,8 @@ def webScrapper_SingleLink(student_email,link):
             '|'.join(titles)
         ]
     )
+
+    print(content)
 
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
