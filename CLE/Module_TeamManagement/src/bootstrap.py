@@ -304,7 +304,7 @@ def bootstrap_Faculty(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
 
     return results
@@ -337,7 +337,7 @@ def bootstrap_Students(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        #traceback.print_exc()
         raise Exception('Unsuccessful Upload. There was an error during the purging of the database')
     # ==========================================================================
 
@@ -405,7 +405,7 @@ def bootstrap_Students(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
     # ==========================================================================
 

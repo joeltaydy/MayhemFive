@@ -11,16 +11,22 @@
       <!-- classes, sections, students -->
       <div class="row">
       <div class="col-md-4">
-          <div class="card ">
-              <div class="card-header ">
+          <div class="card">
+              <div class="card-header">
+                <div class="float-left mt-10 d-none d-sm-block">
+                    <img src="{% static 'images/icons8-course-64.png' %}">
+                </div>
                   <h4 align="center" class="card-title">Courses</h4>
                     <h1 align="center">{{course_count}}</h1>
               </div>
           </div>
       </div>
       <div class="col-md-4">
-          <div class="card ">
-              <div class="card-header ">
+          <div class="card">
+              <div class="card-header">
+                <div class="float-left mt-10 d-none d-sm-block">
+                    <img src="{% static 'images/icons8-study-64.png' %}">
+                </div>
                   <h4 align="center" class="card-title">Sections</h4>
                     <h1 align="center">{{section_count}}</h1>
               </div>
@@ -29,6 +35,9 @@
       <div class="col-md-4">
           <div class="card ">
               <div class="card-header ">
+                <div class="float-left mt-10 d-none d-sm-block">
+                    <img src="{% static 'images/icons8-students-64.png' %}">
+                </div>
                   <h4 align="center" class="card-title">Students</h4>
                     <h1 align="center">{{student_count}}</h1>
               </div>
@@ -49,8 +58,6 @@
             </div>
         </div>
 
-
-
             <!--Class One Card-->
             <div class="row">
               {% for course, courseDetails in course_list.items %}
@@ -67,9 +74,6 @@
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header">
-                                    <div class="float-left mt-10 d-none d-sm-block">
-                                        <img src="https://png.icons8.com/dusk/50/000000/report-card.png">
-                                    </div>
                                     <h5 align="center" class="card-title">Students</h5>
                                     <h2 align="center">{{courseDetails.count}}</h2>
                                 </div>
@@ -155,8 +159,8 @@
                     <div class="col-md-12">
                         <div class="card ">
                             <div class="card-header ">
-                                    <h5 align="center" class="card-title">Class Ranking</h5>
-                                <p class="card-category" align="center">24 Hours performance</p>
+                                    <h5 align="center" class="card-title">Section Information</h5>
+                                <p class="card-category" align="center">Key Indicators</p>
                             </div>
                             <div class="card-body">
                                 <span align="center">
@@ -176,15 +180,15 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Ranking</h4>
-                                <p class="card-category">24 Hours performance</p>
+                                <h4 class="card-title">Section Ranking</h4>
+                                <p class="card-category">Tracking Section Performances</p>
                             </div>
                             <div class="card-body">
                                 {% include "Module_TeamManagement/Dashboard/courses_radarchart.html" %}
                             </div>
                             <div class="card-footer ">
                                 <div class="stats">
-                                    <i class="fa fa-history"></i> Updated 24 hours ago
+                                    <i class="fa fa-history"></i> Updated "{{last_updated}}"
                                 </div>
                             </div>
                         </div>

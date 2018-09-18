@@ -3,7 +3,8 @@
 {% load charts_extra %} <!-- django filter from charts_extra-->
 {% block classList %}
 
-<div class="imp_message container">
+<div class="content">
+  <div class="container-fluid">
     <p> <br> </p>
     <h1> Student Managment for {{ course_title }}</h1>
     <!--
@@ -38,9 +39,9 @@
                 </div>
             </div>
         </div>
-    </div
+    </div>
 
-    <div class= "redirect">
+    <div class="redirect">
         <span>
         {% for course_section in course_sectionList %}
             {% if course_section.section_number != 'G0' %}
@@ -48,7 +49,7 @@
             {% endif %}
         {% endfor %}
         </span>
-    <div>
+    </div>
 
     <div class="content">
               <div class="row">
@@ -56,7 +57,6 @@
                       <div class="card ">
                             <div class="card-header ">
                                 <h4 class="card-title">Class Overview</h4>
-                              <!-- <span><button type="button" class="btn btn-info">G1</button> <button type="button" class="btn btn-info">G2</button> <button type="button" class="btn btn-info">G3</button></span> -->
                             </div>
                             <br>
                              <!--inner card one-->
@@ -100,88 +100,7 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Modal for teams -->
-              <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">Upload excel file</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-
-                      <form action="{% url 'TMmod:uploadteam' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-                        {% csrf_token %}
-                              <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
-                              <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
-                          </div>
-                          <input type="hidden" id="username" name="username" value={{user.username}}>
-
-                            <input type="hidden" id="course_section" name="course_section" value={{module|replaceSpace}}>
-
-                          <div class="form-group">
-                            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
-                                <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
-                              </div>
-                          </div>
-                      </form>
-
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Modal for tools -->
-                <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModal2">Upload excel file</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-
-                        <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-                          {% csrf_token %}
-
-                        <label for="name" class="col-md-6 col-sm-6 col-xs-12 control-label">Learning Tools</label>
-                          <select class="form-control" id="type" name="type">
-                            <option value="" disabled selected>Select your tools</option>
-                                <option value="Trailhead">Trailhead</option>
-                                <option value="Tableu">Tableu</option>
-                                <option value="Kahoot">Kahoot</option>
-                          </select>
-
-                        </br>
-                                <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">File Input</label>
-                                <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
-                            </div>
-                            <input type="hidden" id="user" name="user" value="faculty">
-                            <input type="hidden" id="action" name="action" value="individual">
-                            <input type="hidden" id="course_section" name="course_section" value={{module|replaceSpace}}>
-
-                            <div class="form-group">
-                              <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
-                                  <button class="btn btn-primary"> <span style="margin-right:5px;"></span>Configure</button>
-                                </div>
-                            </div>
-                        </form>
-
-                      </div>
-                    </div>
-                  </div>
       </div>
-<!--
-<form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-  <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp"> -->
-
-</form>
-
-  </br>
 </br>
     <table class="table table-striped table-bordered table-hover" id="studentdata">
     <thead>
@@ -206,45 +125,19 @@
                 <td> {% if student.link ==  "No link" %} No Trailhead Account Linked {% else %}<a href='{{student.link}}'>Click here to acccess link</a> {% endif %}</td>
             </tr>
         {% endfor %}
-
-        <!--
-
-
-        {% for section,teams in results.items %}
-        {% for assistant in assistants %}
-            {% if assistant.section.section_number == section %}
-                <tr>
-                    <td>{{ section }}</td>
-                    <td>Teaching Assistant (TA)</td>
-                    <td>{{ assistant.email }}</td>
-                    <td>{{ assistant.firstname }}</td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        {% for team_number,students in teams.items %}
-            {% for student in students %}
-                <tr>
-                    <td>{{ section }}</td>
-                    <td>{{ team_number }}</td>
-                    <td>{{ student.email }}</td>
-                    <td>{{ student.firstname }}</td>
-                </tr>
-            {% endfor %}
-        {% endfor %}
-        {% endfor %}
-        -->
     </tbody>
     <tfoot>
         <tr>
-        <th>Email</th>
-        <th>First name</th>
-        <th>Team no.</th>
-        <th>Grade</th>
-        <th>Score</th>
-        <th>Link</th>
+          <th>Email</th>
+          <th>First name</th>
+          <th>Team no.</th>
+          <th>Points</th>
+          <th>Badges</th>
+          <th>Link</th>
         </tr>
     </tfoot>
 </table>
+</div>
 </div>
 
 {% endblock %}

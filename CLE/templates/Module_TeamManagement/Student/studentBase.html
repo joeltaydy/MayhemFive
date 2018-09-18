@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block sidenavBar %}
-<li class="nav-item {{ home_page }}">
+<li class="nav-item {{ home }}">
     <a class="nav-link" href="{% url 'TMmod:home' %}">
         <i class="fas fa-chart-pie"></i>
         <p>Dashboard</p>
@@ -30,7 +30,7 @@
 </li>
 
 <div id="accordion">
-<li class="nav-item {{ team_list }}">
+<li class="nav-item {{ student_Team }}">
     <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
         <i class="fa fa-users"></i>
         <span class="no-icon"> My Sections</span>
@@ -44,6 +44,7 @@
             {% endfor %}
         </div>
 </div>
+
 
 <li class="nav-item {{ configureDB_clt }}">
   <a class="nav-link" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">

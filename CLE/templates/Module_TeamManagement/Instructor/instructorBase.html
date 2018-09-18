@@ -20,31 +20,33 @@ Instructor page
 {% endblock %}
 
 {% block sidenavBar %}
-<li class="nav-item {{ home_page }}">
+<li class="nav-item {{ faculty_Home }}">
     <a class="nav-link" href="{% url 'TMmod:instHome' %}">
         <i class="fas fa-chart-pie"></i>
         <p>Dashboard</p>
     </a>
 </li>
-<li class="nav-item {{ team_list }}">
-    <div class="dropdown dropright">
-      <a class="nav-link dropdown-toggle" href ="#" data-toggle="dropdown">
-          <i class="fas fa-chalkboard-teacher"></i>
-          <p>Student Mgmt</p>
-      </a>
-  <div class="dropdown-menu">
-      {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-            <a class="nav-link dropdown-item" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionList.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionList.0.section_number }}">
-                <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
-            </a>
-      {% endfor %}
-  </div>
-  </div>
+
+<div id="accordion">
+<li class="nav-item {{ faculty_Overview }}">
+    <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+        <i class="fa fa-users"></i>
+        <span class="no-icon">Student Mgmt</span>
+    </a>
 </li>
-  <li class="nav-item {{ configureDB_course }}">
-        <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
-          <i class="fas fa-chalkboard-teacher"></i>
-          <p>Course Mgmt</p>
-      </a>
-  </li>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" aria-expanded="true" data-parent="#accordion">
+            {% for course_title,course_sectionList in request.session.courseList_updated.items %}
+                <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionList.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionList.0.section_number }}">
+                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
+                </a>
+            {% endfor %}
+        </div>
+</div>
+
+<li class="nav-item {{ configureDB_course }}">
+    <a class="nav-link" href="{% url 'TMmod:uploadcsv' %}">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <p>Course Mgmt</p>
+    </a>
+</li>
 {% endblock %}
