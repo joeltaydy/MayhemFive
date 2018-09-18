@@ -367,7 +367,7 @@ def webScrapper():
 
 # The webscrapper to scrap static info from website - single link
 def webScrapper_SingleLink(student_email,link):
-    from django.utils.encoding import smart_str, smart_unicode
+    from django.utils.encoding import smart_str
     from bs4 import BeautifulSoup
     import datetime
     import pytz
