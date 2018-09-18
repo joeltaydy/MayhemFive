@@ -411,9 +411,10 @@ def webScrapper_SingleLink(student_email,link):
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
         for row in content:
+            new_row = []
             for word in row:
-                if isinstance(word, str):
-                    print(str(word.encode('utf-8').decode('ascii', 'ignore')))
+                new_row.append(str(word.encode('utf-8').decode('ascii', 'ignore')))
+            writer = writerow(new_row)
 
 
 # Encrypt a 32-bit string
