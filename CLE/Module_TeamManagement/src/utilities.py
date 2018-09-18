@@ -408,9 +408,9 @@ def webScrapper_SingleLink(student_email,link):
         ]
     )
 
-    with (open(output_file, mode='w', newline='')) as outputFile:
+    with open(output_file, mode='w', encoding='utf-8') as outputFile:
         writer = csv.writer(outputFile)
-        for row in content.encode('utf-8'):
+        for row in content:
             print(row)
             writer.writerow(row)
 
