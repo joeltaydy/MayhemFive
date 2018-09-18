@@ -411,7 +411,7 @@ def webScrapper_SingleLink(student_email,link):
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
         for row in content:
-            print(row.encode('utf-8'))
+            print(row)
             writer.writerow(row)
 
 
