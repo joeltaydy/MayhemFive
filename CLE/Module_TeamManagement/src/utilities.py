@@ -77,14 +77,13 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     return
 
 # Returns all trailhead webscrapper info from tcsv():
-'''
-        final format should be
-        results = {
-            "joel.tay.2016@smu.edu.sg" : {'badge_count' : 4 , ...}
-            "shlye.2016@smu.edu.sg" :{'badge_count': '52', 'points_count': '29,650', 'trail_count': '3', 'badges_obtained': ['commerce_cloud_functional_consulting', .. }
-        }
-
-'''
+#
+# final format should be
+# results = {
+#     "joel.tay.2016@smu.edu.sg" : {'badge_count' : 4 , ...}
+#     "shlye.2016@smu.edu.sg" :{'badge_count': '52', 'points_count': '29,650', 'trail_count': '3', 'badges_obtained': ['commerce_cloud_functional_consulting', .. }
+# }
+#
 def getTrailheadInformation():
     file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results ={}
@@ -120,15 +119,15 @@ def getTrailheadInformation():
 
     return results
 
-# Main method to retreive all information of trailhead informations
-'''
-        final format should be
-        context = {
-            "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
-            "CourseTrailResults" : {'badge_count' : 4 , ...}
-        }
-'''
 
+# Main method to retreive all information of trailhead informations
+#
+# final format should be
+# context = {
+#     "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
+#     "CourseTrailResults" : {'badge_count' : 4 , ...}
+# }
+#
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
@@ -154,31 +153,31 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
     context["last_updated"] = trailHeadInfo["last_updated"]
     return context
 
+
 # Retrieve team info based on course
-'''
-    final format should be
-    'CourseTrailResults': {
-        BPAS210G4: {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
-
-        },
-        BPAS201G2: {
-            "Teams_Information" : {...}
-            "Students_Information" : {...}
-        }
-
-    }
-'''
-
+#
+# final format should be
+# 'CourseTrailResults': {
+#     BPAS210G4: {
+#         "Teams_Information" : {
+#             'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+#
+#             'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+#         },
+#         "Students_Information" : {
+#             "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
+#             "points" : [2323, 3333, 4445 ..]
+#             "badges" : [3, 5, 6...]
+#         }
+#
+#     },
+#     BPAS201G2: {
+#         "Teams_Information" : {...}
+#         "Students_Information" : {...}
+#     }
+#
+# }
+#
 def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor dashboard retrieval
     # SQL equivalent to order by course_section , team_number
     facultyObj = Faculty.objects.filter(email=instructorEmail)[0]
@@ -219,24 +218,25 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
 
     return classResult
 
+
 # Retrieve team info based on course for both students main page and instructor class page
-'''
-    final format should be
-    'CourseTrailResults': {
-        "class": {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
-        },
-        "studentLoopTimes" : range(0, number of students)
-    }
-'''
+#
+# final format should be
+# 'CourseTrailResults': {
+#     "class": {
+#         "Teams_Information" : {
+#             'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+#             'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+#         },
+#         "Students_Information" : {
+#             "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
+#             "points" : [2323, 3333, 4445 ..]
+#             "badges" : [3, 5, 6...]
+#         }
+#     },
+#     "studentLoopTimes" : range(0, number of students)
+# }
+
 def populateTeamTrailHeadInformation(results, studentemail=None, courseSection=None):
     if courseSection == None:
         classStudentObj = Class.objects.filter(student=studentemail)
@@ -246,21 +246,22 @@ def populateTeamTrailHeadInformation(results, studentemail=None, courseSection=N
     classResult["studentLoopTimes"] = range(len(classResult["class"]["Students_Information"]["points"]))
     return classResult
 
-# Retreive information from trailheadinformation of a certain course Section
-'''
-    "class": {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
 
-    }
-'''
+# Retreive information from trailheadinformation of a certain course Section
+#
+# "class": {
+#         "Teams_Information" : {
+#             'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+#             'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+#         },
+#         "Students_Information" : {
+#             "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
+#             "points" : [2323, 3333, 4445 ..]
+#             "badges" : [3, 5, 6...]
+#         }
+#
+# }
+#
 def classInformationRetrieval( results,courseSection):
     classes = Class.objects.filter(course_section= courseSection).order_by('team_number')
     classResult = {}
@@ -290,6 +291,7 @@ def classInformationRetrieval( results,courseSection):
                 classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
                 pass
     return classResult
+
 
 # The webscreapper to scrap static info from website
 def webScrapper():
