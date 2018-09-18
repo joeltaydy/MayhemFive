@@ -367,6 +367,7 @@ def webScrapper():
 
 # The webscrapper to scrap static info from website - single link
 def webScrapper_SingleLink(student_email,link):
+    from django.utils.encoding import smart_str, smart_unicode
     from bs4 import BeautifulSoup
     import datetime
     import pytz
@@ -395,20 +396,20 @@ def webScrapper_SingleLink(student_email,link):
                     if row[1] != student_email:
                         content.append(
                             [
-                                row[0].encode('utf-8').strip(),
-                                row[1].encode('utf-8').strip(),
-                                row[2].encode('utf-8').strip(),
-                                row[3].encode('utf-8').strip(),
-                                row[4].encode('utf-8').strip(),
-                                row[5].encode('utf-8').strip(),
-                                row[6].encode('utf-8').strip()
+                                smart_str(row[0]),
+                                smart_str(row[1]),
+                                smart_str(row[2]),
+                                smart_str(row[3]),
+                                smart_str(row[4]),
+                                smart_str(row[5]),
+                                smart_str(row[6])
                             ]
                         )
                 else:
                     content.append(
                         [
-                            row[0].encode('utf-8').strip(),
-                            row[1].encode('utf-8').strip()
+                            smart_str(row[0]),
+                            smart_str(row[1])
                         ]
                     )
     else:
