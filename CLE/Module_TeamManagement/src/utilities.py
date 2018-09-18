@@ -411,8 +411,8 @@ def webScrapper_SingleLink(student_email,link):
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
         for row in content:
-            for words in row:
-                if isinstance(words, str):
+            for word in row:
+                if isinstance(word, str):
                     print(word)
 
 
