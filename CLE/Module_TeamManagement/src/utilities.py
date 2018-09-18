@@ -76,7 +76,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                         'section_number':course_section.section_number,
                         'to_string':course_section.course.course_title + " " + course_section.section_number,
                     }
-                
+
 
     except :
         traceback.print_exc()
@@ -86,14 +86,13 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     return
 
 # Returns all trailhead webscrapper info from tcsv():
-'''
-        final format should be
-        results = {
-            "joel.tay.2016@smu.edu.sg" : {'badge_count' : 4 , ...}
-            "shlye.2016@smu.edu.sg" :{'badge_count': '52', 'points_count': '29,650', 'trail_count': '3', 'badges_obtained': ['commerce_cloud_functional_consulting', .. }
-        }
-
-'''
+#
+# final format should be
+# results = {
+#     "joel.tay.2016@smu.edu.sg" : {'badge_count' : 4 , ...}
+#     "shlye.2016@smu.edu.sg" :{'badge_count': '52', 'points_count': '29,650', 'trail_count': '3', 'badges_obtained': ['commerce_cloud_functional_consulting', .. }
+# }
+#
 def getTrailheadInformation():
     file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
     results ={}
@@ -129,18 +128,19 @@ def getTrailheadInformation():
 
     return results
 
-# Main method to retreive all information of trailhead informations
-'''
-        final format should be
-        context = {
-            "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
-            "CourseTrailResults" : {'badge_count' : 4 , ...}
-        }
-'''
 
+# Main method to retreive all information of trailhead informations
+#
+# final format should be
+# context = {
+#     "personal" : {'badge_count' : 4 , ...} # dependent on student if not will be missing
+#     "CourseTrailResults" : {'badge_count' : 4 , ...}
+# }
+#
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
+
     if requests.method == 'GET':
         moduleCode = requests.GET.get('module')
     else:
@@ -153,8 +153,8 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
 
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
-    if instructorEmail != None:
 
+    if instructorEmail != None:
         if moduleCode != None:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
         else:
@@ -163,33 +163,32 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
     context["last_updated"] = trailHeadInfo["last_updated"]
     return context
 
-# Retrieve team info based on course
-'''
-    final format should be
-    'CourseTrailResults': {
-        BPAS210G4: {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
 
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
-
-        },
-        BPAS201G2: {
-            "Teams_Information" : {...}
-            "Students_Information" : {...}
-        }
-
-    }
-'''
-
-def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor dashboard retrieval
-    # SQL equivalent to order by course_section , team_number
+# Retrieve team info based on course - For instructor dashboard retrieval
+#
+# final format should be
+# 'CourseTrailResults': {
+#     BPAS210G4: {
+#         "Teams_Information" : {
+#             'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+#
+#             'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+#         },
+#         "Students_Information" : {
+#             "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
+#             "points" : [2323, 3333, 4445 ..]
+#             "badges" : [3, 5, 6...]
+#         }
+#
+#     },
+#     BPAS201G2: {
+#         "Teams_Information" : {...}
+#         "Students_Information" : {...}
+#     }
+#
+# }
+#
+def populateTeamTrailHeadInformation_instructor(results, instructorEmail):
     facultyObj = Faculty.objects.filter(email=instructorEmail)[0]
     registered_course_section = facultyObj.course_section.all()
     courses = []
@@ -228,49 +227,52 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
 
     return classResult
 
-# Retrieve team info based on course for both students main page and instructor class page
-'''
-    final format should be
-    'CourseTrailResults': {
-        "class": {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
-        },
-        "studentLoopTimes" : range(0, number of students)
-    }
-'''
+
+# Retrieve team info based on course for both students main page and instructor class page - For student dashboard retrieval
+#
+# final format should be
+# 'CourseTrailResults': {
+#     "class": {
+#         "Teams_Information" : {
+#             'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+#             'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+#         },
+#         "Students_Information" : {
+#             "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
+#             "points" : [2323, 3333, 4445 ..]
+#             "badges" : [3, 5, 6...]
+#         }
+#     },
+#     "studentLoopTimes" : range(0, number of students)
+# }
+
 def populateTeamTrailHeadInformation(results, studentemail=None, courseSection=None):
     if courseSection == None:
         classStudentObj = Class.objects.filter(student=studentemail)
-        courseSection = classStudentObj[0].course_section.course_section_id #This is for student retrieval
+        courseSection = classStudentObj[0].course_section.course_section_id
+
     # SQL equivalent to filter by course section and order by team_number
     classResult = classInformationRetrieval(results, courseSection)
     classResult["studentLoopTimes"] = range(len(classResult["class"]["Students_Information"]["points"]))
     return classResult
 
-# Retreive information from trailheadinformation of a certain course Section
-'''
-    "class": {
-            "Teams_Information" : {
-                'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
-                'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
-            },
-            "Students_Information" : {
-                "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
-                "points" : [2323, 3333, 4445 ..]
-                "badges" : [3, 5, 6...]
-            }
 
-    }
-'''
-def classInformationRetrieval( results,courseSection):
+# Retreive information from trailheadinformation of a certain course Section
+#
+# "class": {
+#         "Teams_Information" : {
+#             'T1': {'badges': 185, 'points': 162700, 'trails': 15}, 'T2': {'badges': 392, 'points': 288475, 'trails': 51},
+#             'T3': {'badges': 280, 'points': 207475, 'trails': 26} ...
+#         },
+#         "Students_Information" : {
+#             "students" : [joel.tay.2016, shlye.2016, martin.teo.2016 ...]
+#             "points" : [2323, 3333, 4445 ..]
+#             "badges" : [3, 5, 6...]
+#         }
+#
+# }
+#
+def classInformationRetrieval(results, courseSection):
     classes = Class.objects.filter(course_section= courseSection).order_by('team_number')
     classResult = {}
     classResult["class"] = {}
@@ -300,7 +302,8 @@ def classInformationRetrieval( results,courseSection):
                 pass
     return classResult
 
-# The webscreapper to scrap static info from website
+
+# The webscrapper to scrap static info from website
 def webScrapper():
     from bs4 import BeautifulSoup
     from Module_TeamManagement.models import Cloud_Learning_Tools
@@ -360,6 +363,58 @@ def webScrapper():
             counter+=1
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
+
+
+# The webscrapper to scrap static info from website - single link
+def webScrapper_SingleLink(student_email,link):
+    from bs4 import BeautifulSoup
+    import datetime
+    import pytz
+
+    output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
+    content = []
+
+    req = requests.get(link)
+    soup = BeautifulSoup(req.text, 'html.parser')
+    broth = soup.find(attrs={'data-react-class': 'BadgesPanel'})
+
+    json_obj = json.loads(str(broth['data-react-props']))
+
+    titles = []
+    for i in json_obj['badges']:
+        titles.append(i['title'])
+
+    name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
+    stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
+
+    if os.path.isfile(output_file):
+        with open(output_file, mode='r', encoding='utf-8') as inputFile:
+            reader = csv.reader(inputFile, delimiter=',')
+            for row in reader:
+                if row[1] != student_email:
+                    content.append(row)
+    else:
+        content = [['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained']] + content
+
+    content.append(
+        [
+            link,
+            student_email,
+            json.loads(str(name['data-react-props']))['full_name'],
+            stats[0].text.strip(),
+            stats[1].text.strip(),
+            stats[2].text.strip(),
+            '|'.join(titles)
+        ]
+    )
+
+    with (open(output_file, mode='w', newline='')) as outputFile:
+        writer = csv.writer(outputFile)
+        for row in content:
+            new_row = []
+            for word in row:
+                new_row.append(str(word.encode('utf-8').decode('ascii', 'ignore')))
+            writer.writerow(new_row)
 
 
 # Encrypt a 32-bit string
