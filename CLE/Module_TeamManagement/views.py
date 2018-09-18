@@ -168,7 +168,10 @@ def faculty_Home(requests):
                     students.append(student)
                     courseStudents.append(student)
                 try:
-                    toolsList.extend(course_section.learning_tools.split("_"))
+                    currentCourseTools = course_section.learning_tools.split("_")
+                    for tools in currentCourseTools:
+                        if tools not in toolsList:
+                            toolsList.append(tools)
                 except:
                     pass
                 previoussection = course_section

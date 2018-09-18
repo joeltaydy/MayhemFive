@@ -50,8 +50,16 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
             classObject = Class.objects.all().filter(student=studentEmail).distinct()
             for individuaClass in classObject:
                 course_section = individuaClass.course_section
-                courseList[course_section.course_section_id] = course_section.course.course_title + " " + course_section.section_number
-
+                courseList[course_section.course_section_id] = {"courseDetails" : course_section.course.course_title + " " + course_section.section_number}
+                toolsList=[]
+                try:
+                    currentCourseTools = course_section.learning_tools.split("_")
+                    for tools in currentCourseTools:
+                        if tools not in toolsList:
+                            toolsList.append(tools)
+                except:
+                    pass
+                courseList[course_section.course_section_id]["toolImage_list"] = toolsList
                 try:
                     courseList_updated[course_section.course.course_title].update(
                         {
@@ -68,6 +76,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                         'section_number':course_section.section_number,
                         'to_string':course_section.course.course_title + " " + course_section.section_number,
                     }
+                
 
     except :
         traceback.print_exc()
@@ -296,6 +305,7 @@ def webScrapper():
     from bs4 import BeautifulSoup
     from Module_TeamManagement.models import Cloud_Learning_Tools
     import datetime
+    import pytz
 
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
@@ -341,7 +351,8 @@ def webScrapper():
     counter=0 #iterate in studentList
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
-        writer.writerow(["last updated:" , str(datetime.datetime.now())])
+        tz = pytz.timezone('Asia/Singapore')
+        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
         writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
         for link,content in info.items():
             to_write = [link,studentEmails[counter], content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
