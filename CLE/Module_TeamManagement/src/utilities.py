@@ -395,13 +395,13 @@ def webScrapper_SingleLink(student_email,link):
                     if row[1] != student_email:
                         content.append(
                             [
-                                row[0].encode('utf-8').strip().decode("utf-8"),
-                                row[1].encode('utf-8').strip().decode("utf-8"),
-                                row[2].encode('utf-8').strip().decode("utf-8"),
-                                row[3].encode('utf-8').strip().decode("utf-8"),
-                                row[4].encode('utf-8').strip().decode("utf-8"),
-                                row[5].encode('utf-8').strip().decode("utf-8"),
-                                row[6].encode('utf-8').strip().decode("utf-8")
+                                row[0].encode('utf-8').strip(),
+                                row[1].encode('utf-8').strip(),
+                                row[2].encode('utf-8').strip(),
+                                row[3].encode('utf-8').strip(),
+                                row[4].encode('utf-8').strip(),
+                                row[5].encode('utf-8').strip(),
+                                row[6].encode('utf-8').strip()
                             ]
                         )
                 else:
@@ -413,7 +413,7 @@ def webScrapper_SingleLink(student_email,link):
                     )
     else:
         content = [['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained']] + content
-    print(content)
+
     content.append(
         [
             link,
@@ -428,8 +428,19 @@ def webScrapper_SingleLink(student_email,link):
 
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
-        for row in content:
-            writer.writerow(row)
+        for row in content[:-1]:
+            writer.writerow(
+                [
+                    row[0].decode("utf-8"),
+                    row[1].decode("utf-8"),
+                    row[2].decode("utf-8"),
+                    row[3].decode("utf-8"),
+                    row[4].decode("utf-8"),
+                    row[5].decode("utf-8"),
+                    row[6].decode("utf-8"),
+                ]
+            )
+        writer.writerow(content[-1][0])
 
 
 # Encrypt a 32-bit string
