@@ -388,7 +388,7 @@ def webScrapper_SingleLink(student_email,link):
     stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
 
     if os.path.isfile(output_file):
-        with open(output_file, mode='r', encoding='utf16') as inputFile:
+        with open(output_file, mode='r', encoding='utf-8') as inputFile:
             reader = csv.reader(inputFile, delimiter=',')
             for row in reader:
                 if row[1] != student_email:
@@ -408,8 +408,8 @@ def webScrapper_SingleLink(student_email,link):
         ]
     )
 
-    with open(output_file, mode='w', encoding='utf8') as outputFile:
-        writer = csv.writer(outputFile, delimiter=',')
+    with (open(output_file, mode='w', newline='')) as outputFile:
+        writer = csv.writer(outputFile)
         for row in content:
             writer.writerow(row)
 
