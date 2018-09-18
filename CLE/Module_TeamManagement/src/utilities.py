@@ -392,7 +392,7 @@ def webScrapper_SingleLink(student_email,link):
             reader = csv.reader(inputFile, delimiter=',')
             for row in reader:
                 if row[1] != student_email:
-                    print(row)
+                    print(row[1])
                     content.append(row)
     else:
         content = [['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained']] + content
