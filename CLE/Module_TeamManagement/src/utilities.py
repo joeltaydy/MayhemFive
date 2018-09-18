@@ -391,6 +391,7 @@ def webScrapper_SingleLink(student_email,link):
         with open(output_file, mode='r', encoding='cp1252') as inputFile:
             reader = csv.reader(inputFile, delimiter=',')
             for row in reader:
+                print(len(row))
                 if len(row) == 6 and row[1] != student_email:
                     content.append([row[0],row[1],row[2],row[3],row[4],row[5],row[6]])
                 else:
