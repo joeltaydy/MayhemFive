@@ -410,7 +410,7 @@ def webScrapper_SingleLink(student_email,link):
 
     with (open(output_file, mode='w', newline='')) as outputFile:
         writer = csv.writer(outputFile)
-        print(content)
+        print(type(content))
         for row in content:
             print(type(row))
             writer.writerow(row)
