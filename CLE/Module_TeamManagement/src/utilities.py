@@ -76,7 +76,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                         'section_number':course_section.section_number,
                         'to_string':course_section.course.course_title + " " + course_section.section_number,
                     }
-                
+
 
     except :
         traceback.print_exc()
@@ -133,13 +133,14 @@ def getTrailheadInformation():
 #
 # final format should be
 # context = {
-#     "personal" : {'badge_count' : 4 , ...} #dependent on student if not will be missing
+#     "personal" : {'badge_count' : 4 , ...} # dependent on student if not will be missing
 #     "CourseTrailResults" : {'badge_count' : 4 , ...}
 # }
 #
 def populateTrailheadInformation(requests, student_email=None, instructorEmail=None):
     context = {}
     trailHeadInfo = getTrailheadInformation()
+
     if requests.method == 'GET':
         moduleCode = requests.GET.get('module')
     else:
@@ -152,8 +153,8 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
 
         context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
-    if instructorEmail != None:
 
+    if instructorEmail != None:
         if moduleCode != None:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
         else:
@@ -163,7 +164,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
     return context
 
 
-# Retrieve team info based on course
+# Retrieve team info based on course - For instructor dashboard retrieval
 #
 # final format should be
 # 'CourseTrailResults': {
@@ -187,8 +188,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
 #
 # }
 #
-def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This is for instructor dashboard retrieval
-    # SQL equivalent to order by course_section , team_number
+def populateTeamTrailHeadInformation_instructor(results, instructorEmail):
     facultyObj = Faculty.objects.filter(email=instructorEmail)[0]
     registered_course_section = facultyObj.course_section.all()
     courses = []
@@ -228,7 +228,7 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
     return classResult
 
 
-# Retrieve team info based on course for both students main page and instructor class page
+# Retrieve team info based on course for both students main page and instructor class page - For student dashboard retrieval
 #
 # final format should be
 # 'CourseTrailResults': {
@@ -249,7 +249,8 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail): #This
 def populateTeamTrailHeadInformation(results, studentemail=None, courseSection=None):
     if courseSection == None:
         classStudentObj = Class.objects.filter(student=studentemail)
-        courseSection = classStudentObj[0].course_section.course_section_id #This is for student retrieval
+        courseSection = classStudentObj[0].course_section.course_section_id
+
     # SQL equivalent to filter by course section and order by team_number
     classResult = classInformationRetrieval(results, courseSection)
     classResult["studentLoopTimes"] = range(len(classResult["class"]["Students_Information"]["points"]))
@@ -271,7 +272,7 @@ def populateTeamTrailHeadInformation(results, studentemail=None, courseSection=N
 #
 # }
 #
-def classInformationRetrieval( results,courseSection):
+def classInformationRetrieval(results, courseSection):
     classes = Class.objects.filter(course_section= courseSection).order_by('team_number')
     classResult = {}
     classResult["class"] = {}
@@ -302,7 +303,7 @@ def classInformationRetrieval( results,courseSection):
     return classResult
 
 
-# The webscreapper to scrap static info from website
+# The webscrapper to scrap static info from website
 def webScrapper():
     from bs4 import BeautifulSoup
     from Module_TeamManagement.models import Cloud_Learning_Tools
@@ -362,6 +363,55 @@ def webScrapper():
             counter+=1
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
+
+
+# The webscrapper to scrap static info from website - single link
+def webScrapper_SingleLink(student_email,link):
+    from bs4 import BeautifulSoup
+    import datetime
+    import pytz
+
+    output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
+    content = []
+
+    req = requests.get(link)
+    soup = BeautifulSoup(req.text, 'html.parser')
+    broth = soup.find(attrs={'data-react-class': 'BadgesPanel'})
+
+    json_obj = json.loads(str(broth['data-react-props']))
+
+    titles = []
+    for i in json_obj['badges']:
+        titles.append(i['title'])
+
+    name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
+    stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
+
+    if os.path.isfile(output_file):
+        with open(output_file, mode='r', encoding='cp1252') as inputFile:
+            reader = csv.reader(inputFile, delimiter=',')
+            for row in reader:
+                if row[1] != student_email:
+                    content.append(row)
+    else:
+        content = [['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained']] + content
+
+    content.append(
+        [
+            link,
+            student_email,
+            json.loads(str(name['data-react-props']))['full_name'],
+            stats[0].text.strip(),
+            stats[1].text.strip(),
+            stats[2].text.strip(),
+            '|'.join(titles)
+        ]
+    )
+
+    with (open(output_file, mode='w', newline='')) as outputFile:
+        writer = csv.writer(outputFile)
+        for row in content:
+            writer.writerow(row)
 
 
 # Encrypt a 32-bit string
