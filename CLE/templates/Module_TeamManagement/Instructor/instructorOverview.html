@@ -41,13 +41,15 @@
         </div>
     </div>
 
-    <ul class="nav nav-pills">
-      {% for course_section in course_sectionList %}
-          {% if course_section.section_number != 'G0' %}
-              <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number  }}';" type="button" class="btn btn-primary">{{ course_section.section_number }}</button>
-          {% endif %}
-      {% endfor %}
-    </ul>
+    <div class="redirect">
+        <span>
+        {% for course_section in course_sectionList %}
+            {% if course_section.section_number != 'G0' %}
+                <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number  }}';" type="button" class="btn btn-primary">{{ course_section.section_number }}</button>
+            {% endif %}
+        {% endfor %}
+        </span>
+    </div>
 
     <div class="content">
               <div class="row">

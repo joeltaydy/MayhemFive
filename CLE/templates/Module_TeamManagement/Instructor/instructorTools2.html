@@ -1,30 +1,24 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
-{% load staticfiles %}
+{% comment "template_location" %}
+    'forms/ajax.html'
+{% endcomment %}
 {% block bootstrapContent %}
 
-<!-- Button to Open the Modal -->
-<div class= "redirect">
-    <span>
-      <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">1. Course Setup</button>
-      <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">2. Teams Setup</button>
-      <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark">3. Tools Setup</button>
-    </span>
-<div>
 
-<div class="col-md-8">
-<h1>Tools Setup</h1>
+<!-- Button to Open the Modal -->
+<h1 style="margin-left:10px;">Tools Setup</h1>
 
 <h3 style="margin-left:10px;">Select Tool:</h3>
 <span style ="margin-left:10px">
 <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">
-  <img src="{% static 'images/Trailhead Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Trailhead")'><br>Trailhead
+  <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle" align="center" onclick='setTool("Trailhead")'><br>Trailhead
 </button>
 <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">
-    <img src="{% static 'images/Kahoot Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Kahoot")'><br>Kahoot</button>
+    <img src="https://kahoot.com/files/2017/08/kahoot_logo_570x320.jpg" alt="..." class="rounded-circle" align="center" onclick='setTool("Kahoot")'><br>Kahoot</button>
 <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">
-    <img src="{% static 'images/Tableau Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Tableau")'><br>Tableau</button>
+    <img src="https://pbs.twimg.com/profile_images/1019707946349969408/ZadESXl4_400x400.jpg" alt="..." class="rounded-circle" align="center" onclick='setTool("Tableau")'><br>Tableau</button>
 <button type="button" class="btn btn-light" data-toggle="modal" data-target="#TelegramModalstep1" data-whatever="Telegram" id="type" value="Telegram">
-    <img src="{% static 'images/Telegram Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Telegram")'><br>Telegram</button>
+    <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle" align="center" onclick='setTool("Telegram")'><br>Telegram</button>
 </span>
 
   <!-- The Modal -->
@@ -76,13 +70,13 @@
               </div>
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch">
-              <input type="hidden" id="toolType" name="type">
+
           <!-- end of Form -->
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
-        </br>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button class="btn btn-primary">Configure tools</button>
         </div>
         </form>
@@ -106,24 +100,28 @@
         <!-- Modal body -->
         <div class="modal-body">
           <!--Form-->
-          <form action="." data-url="{% url 'TMmod:telegram_setup' %}" method="POST" id="phone_number_form">
+          <form action='.' data-url='{{ request.build_absolute_uri|safe }}' method="POST" enctype="multipart/form-data" class="form-horizontal" id="phone_number_form">
 
-              <label for="name">Please enter a valid phone number.</label>
+              {% csrf_token %}
+              {{form.as_p|safe}}
+              <!-- <label for="name">Please enter a valid phone number.</label>
               <div class="form-group row">
                 <label for="phone_number" class="col-sm-2 col-form-label">+65</label>
                 <div class="col-sm-10">
                   <input type="text" class="form-control" name="phone_number" id="phone_number" placeholder="Phone Number" onkeypress="return isNumberKey(event)">
                 </div>
               </div>
-<!--
+
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch"> -->
+
+
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
-        </br>
-          <button class="btn btn-primary mr-right">Send verification code</button>
+          <button class="btn btn-primary TelegramModalstep2" data-dismiss="modal">Next Step</button>
+          <button type='submit'>Submit</button>
         </div>
         </form>
           <!-- end of Form -->
@@ -162,7 +160,8 @@
 
               <input type="hidden" id="user" name="user" value="faculty">
               <input type="hidden" id="action" name="action" value="batch">
-              <input type="hidden" id="toolType" name="type" value="Telegram">
+
+
         </div>
 
         <!-- Modal footer -->
@@ -175,7 +174,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <script>
   $(function(){
@@ -186,6 +184,35 @@
        $("#TelegramModalstep1").modal();
     });
   });
+
+  $(document).ready(function(){
+    var $myForm = $('.form-horizontal')
+    $myForm.submit(function(event){
+        event.preventDefault()
+        var $formData = $(this).serialize()
+        var $thisURL = $myForm.attr('data-url') || window.location.href // or set your own url
+        $.ajax({
+            method: "POST",
+            url: $thisURL,
+            data: $formData,
+            success: handleFormSuccess,
+            error: handleFormError,
+        })
+    })
+
+    function handleFormSuccess(data, textStatus, jqXHR){
+        console.log(data)
+        console.log(textStatus)
+        console.log(jqXHR)
+        $myForm.reset(); // reset form data
+    }
+
+    function handleFormError(jqXHR, textStatus, errorThrown){
+        console.log(jqXHR)
+        console.log(textStatus)
+        console.log(errorThrown)
+    }
+})
 
   function isNumberKey(evt)
 			{
@@ -198,77 +225,12 @@
 
 
   function setTool(toolName) {
-    var tool = toolName;
-    document.getElementById('toolType').value = tool;
     document.querySelector(".modal-title").textContent = "Set up " + toolName;
   }
 </script>
 
-<script>
-$(document).ready(function(){
-  var $myForm = $('#phone_number_form')
-  $myForm.submit(function(event){
-      event.preventDefault()
-      var $formData = $(this).serialize()
-      var $thisURL = $myForm.attr('data-url') || window.location.href // or set your own url
-      $.ajax({
-          method: "POST",
-          url: $thisURL,
-          data: $formData,
-          success: handleFormSuccess,
-          error: handleFormError,
-      })
-  })
 
-  function handleFormSuccess(data, textStatus, jqXHR){
-      console.log(data)
-      console.log(textStatus)
-      console.log(jqXHR)
-      $('#TelegramModalstep1').modal('hide')
-      $('#TelegramModalstep2').modal('show')
-  }
-
-  function handleFormError(jqXHR, textStatus, errorThrown){
-      console.log(jqXHR)
-      console.log(textStatus)
-      console.log(errorThrown)
-  }
-})
-</script>
-
-<script>
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-var csrftoken = getCookie('csrftoken');
-
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
-</script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
 {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
 
