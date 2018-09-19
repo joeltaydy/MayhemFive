@@ -10,14 +10,21 @@
     <div class="container-fluid">
       <!-- classes, sections, students -->
       <div class="row">
+          <div class="col-md-12">
+              <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info massive-font" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">{{ past_weeks }}</div>
+              </div>
+          </div>
+      </div>
+      <div class="row">
       <div class="col-md-4">
           <div class="card">
               <div class="card-header">
                 <div class="float-left mt-10 d-none d-sm-block">
                     <img src="{% static 'images/icons8-course-64.png' %}">
                 </div>
-                  <h4 align="center" class="card-title">Courses</h4>
-                    <h1 align="center">{{course_count}}</h1>
+                  <h2 align="center" class="card-title">Courses</h2>
+                    <h2 align="center">{{course_count}}</h2>
               </div>
           </div>
       </div>
@@ -27,103 +34,79 @@
                 <div class="float-left mt-10 d-none d-sm-block">
                     <img src="{% static 'images/icons8-study-64.png' %}">
                 </div>
-                  <h4 align="center" class="card-title">Sections</h4>
-                    <h1 align="center">{{section_count}}</h1>
+                  <h2 align="center" class="card-title">Sections</h2>
+                    <h2 align="center">{{section_count}}</h2>
               </div>
           </div>
       </div>
       <div class="col-md-4">
-          <div class="card ">
-              <div class="card-header ">
+          <div class="card">
+              <div class="card-header">
                 <div class="float-left mt-10 d-none d-sm-block">
                     <img src="{% static 'images/icons8-students-64.png' %}">
                 </div>
-                  <h4 align="center" class="card-title">Students</h4>
-                    <h1 align="center">{{student_count}}</h1>
+                  <h2 align="center" class="card-title">Students</h2>
+                    <h2 align="center">{{student_count}}</h2>
               </div>
           </div>
       </div>
         </div>
       <!-- end of classes, sections, students -->
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class=”progress”>
-                        <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width:50%">{{progress}}%</div>
-                        </div>
-
-                        <h3 align = "center"> {{ past_weeks }} / 16 WEEKS </h3>
-                </div>
-            </div>
-        </div>
-
             <!--Class One Card-->
             <div class="row">
               {% for course, courseDetails in course_list.items %}
-                <div class="col-md-6">
+                <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title" align="center">{{course}}</h2>
+                        <h1 class="card-title" align="center">{{course}}</h1>
                     </div>
                     <br>
 
                     <!--inner card row one-->
-                    <div class="col-md-12">
-                        <div class = "row">
-                        <div class="col-md-6">
+                    <div class="col-md-12 row">
+                        <div class="col-md-3">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 align="center" class="card-title">Students</h5>
-                                    <h2 align="center">{{courseDetails.count}}</h2>
+                                    <h3 align="center" class="card-title">Students</h3>
+                                    <h3 align="center">{{courseDetails.count}}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 align="center" class="card-title">Sections</h3>
+                                    <h3 align="center">{{courseDetails.sectionCount}}</h3>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 align="center" class="card-title">Sections</h5>
-                                    <h2 align="center">{{courseDetails.sectionCount}}</h2>
-                                </div>
-                            </div>
-                        </div>
+                              <div class="card">
+                                  <div class="card-header">
+                                      <h3 align="center" class="card-title">Tools used</h3>
+                                  </div>
+                                      <br>
+                                      <div class="col-md-12 row">
+                                          {% for toolImage in courseDetails.toolImage_list %}
+                                              {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
+                                              <div class="col-md-4" align="center">
+                                                  <img src="{% static toolLink %}" class="rounded-circle">
+                                              </div>
+                                              {% endwith %}
+                                          {% endfor %}
+
+                                          <div class="col-md-4">
+                                              <center>
+                                              <a href="{% url 'TMmod:uploadtools' %}?user=faculty"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle add"></a>
+                                              </center>
+                                              <h6 align = "center">Add Tools</h6>
+                                          </div>
+                                      </div>
+                                  <br>
+                              </div>
                         </div>
                     </div>
-                    <!--end of inner card row one-->
-
-                    <!--inner card row two-->
-                    <div class="col-md-12">
-                        <div class="row">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 align="center" class="card-title">Tools used</h5>
-                                </div>
-                                    <br>
-                                    <div class="col-md-12">
-                                    <div class="row">
-                                        {% for toolImage in courseDetails.toolImage_list %}
-                                            {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                                            <div class="col-md-4" align="center">
-                                                <img src="{% static toolLink %}" class="rounded-circle">
-                                            </div>
-                                            {% endwith %}
-                                        {% endfor %}
-
-                                        <div class="col-md-4">
-                                            <center>
-                                            <a href="{% url 'TMmod:uploadtools' %}?user=faculty"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle add"></a>
-                                            </center>
-                                            <h6 align = "center">Add Tools</h6>
-                                        </div>
-                                    </div>
-                                    </div>
-                                <br>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    <!--end of inner card row two-->
 
                     <!--inner card row three-->
                     {% if 'Telegram' in courseDetails.toolImage_list %}
@@ -131,7 +114,7 @@
                             <div class="row">
                             <div class="col-md-12">
                                 <div class="card ">
-                                    <div class="card-header ">
+                                    <div class="card-header">
                                         <h5 align="center" class="card-title">Telegram Status</h5>
                                         <span align = "center">
                                             <br>
@@ -153,50 +136,49 @@
                     {% endif %}
                     <!--end of inner card row three-->
 
-                    <!-- <div class="col-md-6">
-                              <div class='tableauPlaceholder' id='viz1534230322003' style='position: relative'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;fy&#47;fypdashboard2&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='fypdashboard2&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;fy&#47;fypdashboard2&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1534230322003');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='1000px';vizElement.style.height='827px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
-                   </div> -->
-                    <div class="col-md-12">
-                        <div class="card ">
-                            <div class="card-header ">
-                                    <h5 align="center" class="card-title">Section Information</h5>
-                                <p class="card-category" align="center">Key Indicators</p>
-                            </div>
-                            <div class="card-body">
-                                <span align="center">
+                    <div class="col-md-12 row">
+                      <div class="col-md-4">
+                          <div class="card">
+                              <div class="card-header">
+                                      <h5 align="center" class="card-title">Section Information</h5>
+                                  <p class="card-category" align="center">Key Indicators</p>
+                              </div>
+                              <div class="card-body">
+                                  <span align="center">
 
-                                     {% include "Module_TeamManagement/Dashboard/courses_linechart.html" %}
-                                </span>
-                            </div>
-                            <div class="card-footer ">
-                                <div class="stats">
+                                       {% include "Module_TeamManagement/Dashboard/courses_linechart.html" %}
+                                  </span>
+                              </div>
+                              <div class="card-footer ">
+                                  <div class="stats">
 
-                                    <i class="fa fa-history"></i> Updated "{{last_updated}}"
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                      <i class="fa fa-history"></i> Updated "{{last_updated}}"
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
 
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Section Ranking</h4>
-                                <p class="card-category">Tracking Section Performances</p>
-                            </div>
-                            <div class="card-body">
-                                {% include "Module_TeamManagement/Dashboard/courses_radarchart.html" %}
-                            </div>
-                            <div class="card-footer ">
-                                <div class="stats">
-                                    <i class="fa fa-history"></i> Updated "{{last_updated}}"
-                                </div>
-                            </div>
-                        </div>
+                      <div class="col-md-4">
+                          <div class="card">
+                              <div class="card-header">
+                                  <h4 class="card-title">Section Ranking</h4>
+                                  <p class="card-category">Tracking Section Performances</p>
+                              </div>
+                              <div class="card-body">
+                                  {% include "Module_TeamManagement/Dashboard/courses_radarchart.html" %}
+                              </div>
+                              <div class="card-footer ">
+                                  <div class="stats">
+                                      <i class="fa fa-history"></i> Updated "{{last_updated}}"
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                     </div>
                 </div>
-                </div>
+              </div>
             {% endfor %}
-            </div>
+        </div>
     </div>
 </div>
 
@@ -211,7 +193,7 @@ $(".progress-bar").each(function(i){
         duration: delay,
         easing: 'swing',
         step: function (now) {
-            $(this).text(Math.ceil(now)+'%');
+            $(this).text(Math.ceil(now)+'/16 Weeks');
         }
     });
 });
