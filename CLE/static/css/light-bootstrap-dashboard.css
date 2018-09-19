@@ -5379,8 +5379,8 @@ License - nucleoapp.com/license/
   margin-bottom: 10px;
 }
 
-.progress-bar {
-  width: 0;
+.massive-font{
+font-size: 18px;
 }
 
 #shrinkMe{
@@ -5388,4 +5388,10 @@ License - nucleoapp.com/license/
   -moz-transform:scale(0.5);
   -ms-transform:scale(0.5);
   transform:scale(0.5);
+}
+
+.card-img-top {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
 }

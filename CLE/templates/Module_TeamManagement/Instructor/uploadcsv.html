@@ -3,9 +3,9 @@
 {% block bootstrapContent %}
 <div class= "redirect">
     <span>
-      <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">1. Course Setup</button>
-      <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">2. Teams Setup</button>
-      <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark">3. Tools Setup</button>
+      <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">Course Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">Teams Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark">Tools Setup</button>
     </span>
 <div>
 
@@ -33,7 +33,7 @@
 
     <div class="form-group">
       <div style="margin-bottom:10px;">
-        <button class="btn btn-primary">Configure</button>
+        <button class="btn btn-primary">Submit</button>
       </div>
     </div>
 </form>
