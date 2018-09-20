@@ -33,7 +33,7 @@ AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1", 'cloudtopus.xyz']
+ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1", 'cloudtopus.xyz','www.cloudtopus.xyz']
 
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
