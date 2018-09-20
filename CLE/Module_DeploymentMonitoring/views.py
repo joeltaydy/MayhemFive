@@ -6,50 +6,90 @@ from Module_DeploymentMonitoring.models import *
 def run_UAT_Process(requests):
     response = {}
 
-    action = request.GET.get('action')
-    secret_key = 'm0nKEY'
-    image_id = ''
-    snapshot_id = ''
+    action = requests.GET.get('action')
+    SECRET_KEY = 'm0nKEY'
+    IMAGE_ID = 'ami-0b278e601db41f051'
+    SNAPSHOT_ID = 'snap-054b5b44115032c6e'
+    count = 5
 
     try:
         if action == 'Launch':
             url_elastic_ip_retrieve = 'http://52.76.46.177:8999/ec2/elastic_ip/list/'
             url_instance_launch = 'http://52.76.46.177:8999/ec2/instance/event/launch/'
-            payload = {'secret_key':secret_key, 'image_id':image_id, 'snapshot_id':snapshot_id}
+            payload = {'secret_key':SECRET_KEY, 'image_id':IMAGE_ID, 'snapshot_id':SNAPSHOT_ID, 'count':count}
 
-            r_instance = requests.get(url_instance_launch, params=payload)
-            response = r_instance.text
+            r_instance = req.get(url_instance_launch, params=payload)
+            res = r_instance.json()
+            print(res)
 
-            for instance in response['instance_ids']:
-                Instance.objects.create(
-                    instance_id=instance.instance_id
-                )
-
-            r_ids = requests.get(url_elastic_ip_retrieve)
-            response = r_ids.text
-
-            for elastic_ips in response['Elastic_IPs']:
-                for elastic_ip in elastic_ips['Unassigned']:
-                    Elastic_IPs.objects.create(
-                        allocation_id=elastic_ip.AllocationId
+            for instance in res['instance_ids']:
+                try:
+                    instanceObj = Instance.objects.create(
+                        instance_id=instance['instance_id']
                     )
+                    instanceObj.save()
+                except:
+                    pass
 
-        elif action == 'Associate':
-            pass
-            url_elastic_ip_associate = 'http://52.76.46.177:8999/ec2/ec2/elastic_ip/associate/'
-            payload = {'instance_id':secret_key, 'allocation_id':image_id,}
-            r_ips = requests.get(url_elastic_ip_associate, params=payload)
+            r_ids = req.get(url_elastic_ip_retrieve)
+            res = r_ids.json()
 
-            url_instance_stop = 'http://52.76.46.177:8999/ec2/instance/event/stop/'
-            r_stop = requests.get(url_instance_stop)
+            ips = []
+            if len(res['Elastic_IPs']['Unassgined']) > 0:
+                for elastic_ip in res['Elastic_IPs']['Unassgined']:
+                    ips.append(elastic_ip['AllocationId'])
 
-            url_instance_start = 'http://52.76.46.177:8999/ec2/instance/event/start/'
-            r_start = requests.get(url_instance_start)
+            for x in range(0,len(ips)):
+                allocation_id = ips[x]
+                try:
+                    ipsObj = Elastic_IPs.objects.create(
+                        id=x+1,
+                        allocation_id=allocation_id,
+                    )
+                    ipsObj.save()
+                except:
+                    pass
+
+        elif action == 'Stop':
+            instances = Instance.objects.all()
+            count = 1
+            for instance in instances:
+                try:
+                    elastic_ipObj = Elastic_IPs.objects.get(id=count)
+                    allocation_id = elastic_ipObj.allocation_id
+                    count += 1
+                except:
+                    pass
+
+                url_elastic_ip_associate = 'http://52.76.46.177:8999/ec2/elastic_ip/associate/'
+                payload = {'instance_id':instance.instance_id, 'allocation_id':allocation_id}
+
+                r_ips = req.get(url_elastic_ip_associate, params=payload)
+                res = r_ips.json()
+
+                instance.public_ip = res['Response']['instance_public_ip']
+                instance.save()
+
+                url_instance_stop = 'http://52.76.46.177:8999/ec2/instance/event/stop/'
+                payload = {'instance_id':instance.instance_id, 'secret_key':SECRET_KEY,}
+                r_stop = req.get(url_instance_stop, params=payload)
+
+        elif action == 'Start':
+            instances = Instance.objects.all()
+            for instance in instances:
+                url_instance_start = 'http://52.76.46.177:8999/ec2/instance/event/start/'
+                payload = {'instance_id':instance.instance_id, 'secret_key':SECRET_KEY,}
+                r_start = req.get(url_instance_start, params=payload)
 
         elif action == 'Terminate':
-            pass
-            url_instance_terminate = 'http://52.76.46.177:8999/ec2/instance/event/terminate/'
-            r_terminate = requests.get(url_instance_terminate)
+            instances = Instance.objects.all()
+            for instance in instances:
+                url_instance_terminate = 'http://52.76.46.177:8999/ec2/instance/event/terminate/'
+                payload = {'instance_id':instance.instance_id, 'secret_key':SECRET_KEY,}
+                r_terminate = req.get(url_instance_terminate, params=payload)
+
+            Instance.objects.all().delete()
+            Elastic_IPs.objects.all().delete()
 
         else:
             response['message'] = 'Please specify a message'

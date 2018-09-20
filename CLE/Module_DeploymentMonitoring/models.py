@@ -17,9 +17,13 @@ class Instance(models.Model):
         db_table = 'Instance'
 
 class Elastic_IPs(models.Model):
+    id = models.CharField(
+        db_column='ID',
+        primary_key=True,
+        max_length=255
+    )
     allocation_id = models.CharField(
         db_column='Allocation_ID',
-        primary_key=True,
         max_length=255
     )
 
