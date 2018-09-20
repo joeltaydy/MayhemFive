@@ -355,16 +355,24 @@ def webScrapper():
         counter+=1
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
-    
+
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
         writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
         for email,content in info.items():
-            to_write = [content['link'],email, content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
+            to_write = [
+                str(content['link'].encode('utf-8').decode('ascii', 'ignore')),
+                str(email.encode('utf-8').decode('ascii', 'ignore')),
+                str(content['name'].encode('utf-8').decode('ascii', 'ignore')),
+                str(content['badge-count'].encode('utf-8').decode('ascii', 'ignore')),
+                str(content['points-count'].encode('utf-8').decode('ascii', 'ignore')),
+                str(content['trail-count'].encode('utf-8').decode('ascii', 'ignore')),
+                str('|'.join(content['titles']).encode('utf-8').decode('ascii', 'ignore'))
+            ]
             writer.writerow(to_write)
-           
+
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
 
