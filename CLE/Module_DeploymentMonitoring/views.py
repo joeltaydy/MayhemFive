@@ -1,4 +1,4 @@
 from django.shortcuts import render
 
-def runUAT_Process(request):
+def run_UAT_Process(request):
     return render(requests,"Module_DeploymentMonitoring/Admin/<PAGE_NAME>.html",context)
