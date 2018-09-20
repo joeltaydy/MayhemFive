@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def runUAT_Process(request):
+    return render(requests,"Module_DeploymentMonitoring/Admin/<PAGE_NAME>.html",context)

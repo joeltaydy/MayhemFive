@@ -356,7 +356,7 @@ def webScrapper():
 
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
-    with open(output_file, mode='w', encoding='utf-8') as file:
+    with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
@@ -364,13 +364,13 @@ def webScrapper():
 
         for email,content in info.items():
             to_write = [
-                content['link'].encode("utf-8"),
+                content['link'],
                 email,
                 content['name'],
                 content['badge-count'],
                 content['points-count'],
                 content['trail-count'],
-                content['titles']
+                content['titles'] 
             ]
             writer.writerow(to_write)
 
