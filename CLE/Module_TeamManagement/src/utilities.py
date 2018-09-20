@@ -324,8 +324,8 @@ def webScrapper():
         studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
         studentLinks.append(clt.website_link)
 
-    # Removes headers
     print("read link from file : %.9f " % (time.time()-st) )
+
     info = {}
     counter=0 #iterate in studentList
     for link in studentLinks:
@@ -344,7 +344,7 @@ def webScrapper():
         name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
         stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
 
-        content['titles'] = titles
+        content['titles'] = '|'.join(titles)
         content['name'] = json.loads(str(name['data-react-props']))['full_name']
         content['badge-count'] = stats[0].text.strip()
         content['points-count'] = stats[1].text.strip()
@@ -353,26 +353,26 @@ def webScrapper():
 
         info[studentEmails[counter]] = content #key is student email, value is information
         counter+=1
-    print("scrapping info from  file : %.9f " % (time.time()-st) )
 
+    print("scrapping info from  file : %.9f " % (time.time()-st) )
 
     with (open(output_file, 'w', newline='')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
         writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+
         for email,content in info.items():
             to_write = [
-                str(content['link'].encode('utf-8').decode('ascii', 'ignore')),
-                str(email.encode('utf-8').decode('ascii', 'ignore')),
-                str(content['name'].encode('utf-8').decode('ascii', 'ignore')),
-                str(content['badge-count'].encode('utf-8').decode('ascii', 'ignore')),
-                str(content['points-count'].encode('utf-8').decode('ascii', 'ignore')),
-                str(content['trail-count'].encode('utf-8').decode('ascii', 'ignore')),
-                str('|'.join(content['titles']).encode('utf-8').decode('ascii', 'ignore'))
+                content['link'],
+                email,
+                content['name'],
+                content['badge-count'],
+                content['points-count'],
+                content['trail-count'],
+                content['titles']
             ]
             writer.writerow(to_write)
-
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
 
