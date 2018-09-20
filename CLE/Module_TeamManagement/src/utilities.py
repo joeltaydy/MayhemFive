@@ -364,7 +364,7 @@ def webScrapper():
 
         for email,content in info.items():
             to_write = [
-                content['link'],
+                content['link'].encode("utf-8"),
                 email,
                 content['name'],
                 content['badge-count'],
