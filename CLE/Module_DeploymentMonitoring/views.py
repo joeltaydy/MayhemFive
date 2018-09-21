@@ -8,8 +8,8 @@ def run_UAT_Process(requests):
 
     action = requests.GET.get('action')
     SECRET_KEY = 'm0nKEY'
-    IMAGE_ID = 'ami-0b69640de2d35498f'
-    SNAPSHOT_ID = 'snap-00786ae34603ea11d'
+    IMAGE_ID = '' # Harcode this
+    SNAPSHOT_ID = '' # Harcode this
     count = 22
 
     try:
