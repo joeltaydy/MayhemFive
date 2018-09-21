@@ -15,8 +15,8 @@
 <form action="{% url 'TMmod:uploadcsv' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 
     {% csrf_token %}
-
     <div class="form-group">
+          <div class="col-md-4">
       <label for="name" class="control-label">Course Code</label>
         <select class="form-control" id="course_title" name="course_title">
           <option value="" disabled selected>Select your course</option>
@@ -26,16 +26,19 @@
       </select>
 
       </br>
-        <label for="name" class="control-label">File Input (Optional)</label>
+        <label for="name" class="control-label">File Input</label>
         <input type="file" class="form-control" name="file" id="file" aria-describedby="fileHelp">
+      </div>
     </div>
     <input type="hidden" id="username" name="username" value={{user.username}}>
 
+    <div class="col-md-4">
     <div class="form-group">
       <div style="margin-bottom:10px;">
         <button class="btn btn-primary">Submit</button>
       </div>
     </div>
+  </div>
 </form>
 
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}

@@ -3029,6 +3029,11 @@ Copyright (c) 2015 Daniel Eden
     height: 110px;
 }
 
+.card-user .card-image-team {
+    height: 80px;
+    background-color: #428BCA;
+}
+
 .card-user .card-image-plain {
     height: 0;
     margin-top: 110px;
