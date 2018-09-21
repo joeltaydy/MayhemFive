@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Lobster');
 
 body{
-  background: url('../images/white.jpg') no-repeat center center fixed;
+  background: url('../images/mountain.jpg') no-repeat center center fixed;
   background-size: cover;
   font: 100%/1 'Lobster', cursive;
 }
@@ -24,7 +24,7 @@ body{
   width: 20rem;
   height: 20rem;
   padding: 3em;
-  background: url(../images/galaxy.gif);
+  /* background: url(../images/galaxy.gif); */
   border-radius: 50%;
   overflow: hidden;
   transition:all 1s ease;
