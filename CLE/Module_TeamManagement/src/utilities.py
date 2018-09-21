@@ -351,6 +351,7 @@ def webScrapper():
 
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
+    counter = 0
     with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
