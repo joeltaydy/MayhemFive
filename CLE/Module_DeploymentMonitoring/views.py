@@ -1,12 +1,15 @@
+import traceback
+import requests as req
 from django.shortcuts import render
+from Module_DeploymentMonitoring.models import *
 
 def run_UAT_Process(requests):
     response = {}
 
     action = requests.GET.get('action')
     SECRET_KEY = 'm0nKEY'
-    IMAGE_ID = '' # Harcode this
-    SNAPSHOT_ID = '' # Harcode this
+    IMAGE_ID = 'ami-0bdaee3d8772aaaa3' # Harcode this
+    SNAPSHOT_ID = 'snap-05ea29b72d19df93c' # Harcode this
     count = 20
 
     try:
