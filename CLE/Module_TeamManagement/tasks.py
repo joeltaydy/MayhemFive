@@ -8,13 +8,26 @@ logger = get_task_logger(__name__)
 
 @shared_task(name='trailheadscrapper')
 def webscrapper():
-    
+
     """
     Saves latest image from Flickr
     """
     utilities.webScrapper()
 
-    logger.info("trailhead last updated at ") 
+    logger.info("trailhead last updated at ")
 
 #if __name__ == "__main__":
  #   webscrapper()
+
+ @shared_task(name='tableaurefresh')
+ def tableaurefresh():
+
+     """
+     Saves latest image from Flickr
+     """
+     utilities.tableauRefresh()
+
+     logger.info("trailhead last updated at ")
+
+ #if __name__ == "__main__":
+  #   webscrapper()

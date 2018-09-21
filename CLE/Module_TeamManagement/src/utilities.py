@@ -498,3 +498,11 @@ def validateDate(date_text):
         return True
     except ValueError:
         return False
+
+
+def tableauRefresh():
+    from selenium import webdriver
+
+    chromedriver = "../setup/chromedriver"
+    driver = webdriver.Chrome(chromedriver)
+    driver.get("http:google.com")
