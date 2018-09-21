@@ -356,11 +356,7 @@ def webScrapper():
 
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
-<<<<<<< HEAD
-    with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
-=======
     with (open(output_file, 'w', newline='', encoding='utf-8')) as file:
->>>>>>> parent of 7bdf1bf... Revert "Merge branch 'master' of https://github.com/joeltaydy/MayhemFive"
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
@@ -374,7 +370,7 @@ def webScrapper():
                 content['badge-count'],
                 content['points-count'],
                 content['trail-count'],
-                content['titles'] 
+                content['titles']
             ]
             writer.writerow(to_write)
 
