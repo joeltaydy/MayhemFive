@@ -1,6 +1,5 @@
 from django.shortcuts import render
 
-<<<<<<< HEAD
 def run_UAT_Process(requests):
     response = {}
 
@@ -98,6 +97,3 @@ def run_UAT_Process(requests):
         return render(requests, "Administrator/uploadcsv.html", response)
 
     return render(requests,"Administrator/admindashboard.html",response)
-=======
-# Create your views here.
->>>>>>> 480fd087d8a7cb697fdaa9cb5254a5c8204aabb8
