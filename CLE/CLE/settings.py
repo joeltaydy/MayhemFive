@@ -33,7 +33,7 @@ AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1",]
+ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1"]
 
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
@@ -214,11 +214,6 @@ CELERY_BEAT_SCHEDULE = {
     'task-number-one': { #name of scheduler
     'task': 'trailheadscrapper', #name of task
     'schedule':  100.0 #period of running in seconds
-    #'arg's :  #if have args
-    },
-    'task-number-two': { #name of scheduler
-    'task': 'tableaurefresh', #name of task
-    'schedule':  10.0 #period of running in seconds
     #'arg's :  #if have args
     }
 }

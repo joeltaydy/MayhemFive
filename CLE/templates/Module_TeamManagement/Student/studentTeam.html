@@ -1,5 +1,5 @@
 {% extends 'Module_TeamManagement/Student/studentBase.html' %}
-{% load staticfiles %}
+
 {% block title %}
     {{module}} Team Information
 {% endblock %}
@@ -9,39 +9,33 @@
     <div class="container-fluid">
         {% if team != None %}
             <div class="row">
-            <div class="col-md-12">
-              <div class="card">
-                  <div class="card-header">
-                      <h1 class="card-title bg-dark text-white" align="center">{{ team }}</h1>
-                  </div>
-                </br>
-
-                <div class="col-md-12 row">
-                {% for teammembers in team %}
+            {% for teammembers in team %}
                 <div class="col-md-2">
-                    <div class="card h-100">
-                        <div class="card-body">
+                    <div class="card user">
+                        <div class="card-body ">
                         <div class="cardsidebar card-user">
-                            <div class="card-image-team">
+                            <div class="card-image">
                             </div>
                                 <div class="author">
+                                    <a href= "#">
                                         <img class="avatar border-gray" src="https://goo.gl/Lom4Jq" alt="...">
                                         <h5 class="title">{{teammembers.firstname}} {{teammembers.lastname}} </h5>
+                                    </a>
                                     <p class="emaildescription">
                                         {{teammembers.email}}
                                     </p>
                                 </div>
+                            <hr>
                         </div>
                         </div>
                     </div>
                 </div>
             {% endfor %}
-          </div>
 
 
 
-        </br>
-      <div class="col-md-8">
+
+      <div class="col-md-8">          
         <div class="card">
             <div class="card-header">
                 <h5 align="center" class="card-title">Team Ranking</h5>
@@ -59,8 +53,7 @@
             </div>
         </div>
       </div>
-    </div>
-</div>
+
 
       {% else %}
 
