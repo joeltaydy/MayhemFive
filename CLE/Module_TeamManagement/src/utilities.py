@@ -356,7 +356,7 @@ def webScrapper():
 
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
-    with (open(output_file, 'w', newline='', encoding='utf-8')) as file:
+    with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
