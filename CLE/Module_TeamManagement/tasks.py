@@ -20,7 +20,7 @@ def webscrapper():
  #   webscrapper()
 
 @shared_tasktwo(name='tableaurefresh')
- def tableaurefresh():
+def tableaurefresh():
 
      """
      Saves latest image from Flickr
