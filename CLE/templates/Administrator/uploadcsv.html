@@ -2,10 +2,6 @@
 
 {% block bootstrapContent %}
 <body>
-    <button onclick="location.href = 'run_UAT_process/?action=Launch';" type="button" class="btn btn-primary">Launch Instances</button>
-    <button onclick="location.href = 'run_UAT_process/?action=Stop';" type="button" class="btn btn-primary">Stop Instances</button>
-    <button onclick="location.href = 'run_UAT_process/?action=Start';" type="button" class="btn btn-primary">Start Instances</button>
-    <button onclick="location.href = 'run_UAT_process/?action=Terminate';" type="button" class="btn btn-primary">Terminate instances</button>
     <div class="col-md-8"><h1>Course/Faculty Setup</h1></div>
     <form action="{% url 'TMmod:modSu' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
         </br>
