@@ -10,7 +10,7 @@ def run_UAT_Process(requests):
     SECRET_KEY = 'm0nKEY'
     IMAGE_ID = '' # Harcode this
     SNAPSHOT_ID = '' # Harcode this
-    count = 22
+    count = 20
 
     try:
         if action == 'Launch':
