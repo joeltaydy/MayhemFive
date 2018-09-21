@@ -8,9 +8,9 @@ def run_UAT_Process(requests):
 
     action = requests.GET.get('action')
     SECRET_KEY = 'm0nKEY'
-    IMAGE_ID = 'ami-0b278e601db41f051'
-    SNAPSHOT_ID = 'snap-054b5b44115032c6e'
-    count = 5
+    IMAGE_ID = 'ami-0b69640de2d35498f'
+    SNAPSHOT_ID = 'snap-00786ae34603ea11d'
+    count = 22
 
     try:
         if action == 'Launch':
@@ -20,7 +20,6 @@ def run_UAT_Process(requests):
 
             r_instance = req.get(url_instance_launch, params=payload)
             res = r_instance.json()
-            print(res)
 
             for instance in res['instance_ids']:
                 try:
