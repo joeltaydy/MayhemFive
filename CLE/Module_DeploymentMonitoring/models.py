@@ -1,3 +1,32 @@
 from django.db import models
 
-# Create your models here.
+class Instance(models.Model):
+    instance_id = models.CharField(
+        db_column='Instance_ID',
+        primary_key=True,
+        max_length=255
+    )
+    public_ip = models.CharField(
+        db_column='Public_IP',
+        null=True,
+        max_length=255
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Instance'
+
+class Elastic_IPs(models.Model):
+    id = models.CharField(
+        db_column='ID',
+        primary_key=True,
+        max_length=255
+    )
+    allocation_id = models.CharField(
+        db_column='Allocation_ID',
+        max_length=255
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Elastic_IPs'

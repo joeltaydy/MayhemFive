@@ -33,7 +33,11 @@ AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1",]
+=======
+ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1", 'cloudtopus.xyz','www.cloudtopus.xyz']
+>>>>>>> 76c24f44b9b067cb264c665f554e7766b69fd7d9
 
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
@@ -204,8 +208,8 @@ from celery.schedules import crontab
 # CELERY STUFF
 # Celery application definition
 # http://docs.celeryproject.org/en/v4.0.2/userguide/configuration.html
-CELERY_BROKER_URL  = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL  = 'redis://52.76.221.221:6379'
+CELERY_RESULT_BACKEND = 'redis://52.76.221.221:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -213,7 +217,7 @@ CELERY_TIMEZONE = 'Asia/Makassar'
 CELERY_BEAT_SCHEDULE = {
     'task-number-one': { #name of scheduler
     'task': 'trailheadscrapper', #name of task
-    'schedule':  100.0 #period of running in seconds
+    'schedule':  40.0 #period of running in seconds
     #'arg's :  #if have args
     },
     'task-number-two': { #name of scheduler

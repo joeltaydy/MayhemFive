@@ -125,7 +125,6 @@ def getTrailheadInformation():
 
                 content['badges_obtained'] = new_badges_obtained
                 results[studId] = content #Key is student_email
-
     return results
 
 
@@ -161,6 +160,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["CourseTrailResults"] = populateTeamTrailHeadInformation_instructor(trailHeadInfo,instructorEmail ) # instructor dashboard
 
     context["last_updated"] = trailHeadInfo["last_updated"]
+    #print(context)
     return context
 
 
@@ -300,6 +300,8 @@ def classInformationRetrieval(results, courseSection):
             except:
                 classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
                 pass
+
+    print(classResult)
     return classResult
 
 
@@ -322,9 +324,10 @@ def webScrapper():
         studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
         studentLinks.append(clt.website_link)
 
-    # Removes headers
     print("read link from file : %.9f " % (time.time()-st) )
+
     info = {}
+    counter=0 #iterate in studentList
     for link in studentLinks:
         content = {}
 
@@ -341,25 +344,39 @@ def webScrapper():
         name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
         stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
 
-        content['titles'] = titles
+        content['titles'] = '|'.join(titles)
         content['name'] = json.loads(str(name['data-react-props']))['full_name']
         content['badge-count'] = stats[0].text.strip()
         content['points-count'] = stats[1].text.strip()
         content['trail-count'] = stats[2].text.strip()
+        content['link'] = link
 
-        info[link] = content
+        info[studentEmails[counter]] = content #key is student email, value is information
+        counter+=1
 
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 
+<<<<<<< HEAD
     with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
+=======
+    with (open(output_file, 'w', newline='', encoding='utf-8')) as file:
+>>>>>>> parent of 7bdf1bf... Revert "Merge branch 'master' of https://github.com/joeltaydy/MayhemFive"
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
         writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
-        for link,content in info.items():
-            to_write = [link,studentEmails[counter], content['name'], content['badge-count'], content['points-count'], content['trail-count'], '|'.join(content['titles'])]
+
+        for email,content in info.items():
+            to_write = [
+                content['link'],
+                email,
+                content['name'],
+                content['badge-count'],
+                content['points-count'],
+                content['trail-count'],
+                content['titles'] 
+            ]
             writer.writerow(to_write)
-            counter+=1
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
 
