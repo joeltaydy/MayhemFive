@@ -224,7 +224,7 @@ def parse_File_CLT(filePath,bootstrapInfo={}):
         email = rowData[index_email].strip()
         type = rowData[index_type].strip()
         link = rowData[index_link]
-        id = email.split('@')[0] + '_' + type
+        id = email.lower().split('@')[0] + '_' + type
 
         # Create clt : list
         clt = [id,type,link]
@@ -378,11 +378,12 @@ def bootstrap_Students(fileDict):
                 if user == 'students':
                     student_count += len(data)
                     for student in data:
+                        stuEmail = (student[0].split("@")[0]+ "@smu.edu.sg").lower()
                         try:
-                            studentObj = Student.objects.get(email=student[0])
+                            studentObj = Student.objects.get(email=stuEmail)
                         except:
                             studentObj = Student.objects.create(
-                                email=student[0],
+                                email=stuEmail,
                                 username=student[1],
                                 firstname=student[2],
                                 lastname=student[3],

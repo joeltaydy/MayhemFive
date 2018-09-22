@@ -325,13 +325,12 @@ def student_Team(requests):
     studentList = []
     module = requests.GET.get('module')
     student_email =requests.user.email
-    student_username = student_email.split('@')[0]
 
-    if student_username == None:
+    if student_email == None:
         context['message'] = 'Please specify a username'
         return render(requests,"Module_TeamManagement/Student/studentTeam.html", context)
 
-    studentObj = Student.objects.get(username=student_username)
+    studentObj = Student.objects.get(email=student_email)
     classObj = Class.objects.all().filter(student=studentObj , course_section = module ) #Will return queryset containing 1 row unless has multiple teams in same class
 
     for enrolled_class in classObj: #Should contain 1 row
@@ -570,6 +569,7 @@ def configureDB_students(requests):
 
     response['message'] = 'Successful Upload'
     # return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
+    utilities.webScrapper()
     return faculty_Home(requests)
 
 

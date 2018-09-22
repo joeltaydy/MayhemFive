@@ -215,10 +215,10 @@ CELERY_BEAT_SCHEDULE = {
     'task': 'trailheadscrapper', #name of task
     'schedule':  40.0 #period of running in seconds
     #'arg's :  #if have args
-    },
-    'task-number-two': { #name of scheduler
-    'task': 'tableaurefresh', #name of task
-    'schedule':  10.0 #period of running in seconds
+    #},
+    #'task-number-two': { #name of scheduler
+    #'task': 'tableaurefresh', #name of task
+    #'schedule':  100.0 #period of running in seconds
     #'arg's :  #if have args
     }
 }
