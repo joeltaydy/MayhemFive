@@ -1,0 +1,32 @@
+{% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
+{% load staticfiles %}
+
+{% block bootstrapContent %}
+<div class= "redirect">
+    <span>
+      <button onclick="location.href= '{% url 'TMmod:itopslab_setup' %}';" type="button" class="btn btn-dark">Setup</button>
+      <button onclick="location.href = '{% url 'TMmod:itopslab_monitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
+      <button onclick="location.href = '{% url 'TMmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
+    </span>
+<div>
+
+<div class="col-md-12">
+    <h1 align="center">IT Operations Lab</h1>
+    <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=300px height = 150px style="display: block;margin-left: auto;margin-right: auto;"><br>
+    <h3>Monitor</h3>
+
+    <!-- Insert Graphs-->
+
+
+    {% csrf_token %}
+
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+</div>
+
+{% endblock %}

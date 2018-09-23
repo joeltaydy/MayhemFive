@@ -21,4 +21,9 @@ urlpatterns = [
     # path('instructor/telegram_setup/', TelegramWizard.as_view([PhoneNumberForm, VerificationCodeForm]), name='telegram_setup'),
     path('instructor/telegram_setup/', views.configureDB_telegram, name='telegram_setup'),
     path('join/', PhoneNumberFormView.as_view(), name='phone_number_form'),
+    path('instructor/ITOperationsLab/setup',views.ITOpsLabSetup,name='itopslab_setup'),
+    path('instructor/ITOperationsLab/monitor',views.ITOpsLabMonitor,name='itopslab_monitor'),
+    path('instructor/ITOperationsLab/event',views.ITOpsLabEvent,name='itopslab_event'),
+    path('student/ITOperationsLab/deploy',views.ITOpsLabStudentDeploy,name='itopslab_studeploy'),
+    path('student/ITOperationsLab/monitor',views.ITOpsLabStudentMonitor,name='itopslab_stumonitor')
 ]
