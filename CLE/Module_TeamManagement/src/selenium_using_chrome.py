@@ -8,6 +8,7 @@ from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from sys import platform
+import os
 
 import unittest, time, re
 
@@ -17,13 +18,8 @@ class SeleniumTableau(unittest.TestCase):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=1920x1080")
 
-        chromedriver = "../../../setup/chromedriver"
-        if platform == "linux" or platform == "linux2":
-            chromedriver = "/home/ec2-user/Django_Application/MayhemFive/setup/chromedriver"
-        elif platform == "darwin":
-            chromedriver = "../../../setup/chromedriver"
-        elif platform == "win32":
-            chromedriver = "../../../setup/chromedriver"
+        print(platform)
+        chromedriver = os.path.join(os.getcwd(),"..","..","..","setup","chromedriver")
 
         self.driver = webdriver.Chrome(chromedriver,chrome_options=chrome_options)
 
