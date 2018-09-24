@@ -25,5 +25,7 @@ urlpatterns = [
     path('instructor/ITOperationsLab/monitor',views.ITOpsLabMonitor,name='itopslab_monitor'),
     path('instructor/ITOperationsLab/event',views.ITOpsLabEvent,name='itopslab_event'),
     path('student/ITOperationsLab/deploy',views.ITOpsLabStudentDeploy,name='itopslab_studeploy'),
-    path('student/ITOperationsLab/monitor',views.ITOpsLabStudentMonitor,name='itopslab_stumonitor')
+    path('student/ITOperationsLab/monitor',views.ITOpsLabStudentMonitor,name='itopslab_stumonitor'),
+    path('csv/clt_file.csv', views.clt_file_download),
+    path('admin/csv/clt_file.csv', views.clt_file_ouput, name = "clt_file")
 ]

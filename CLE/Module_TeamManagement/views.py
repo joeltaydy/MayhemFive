@@ -9,7 +9,8 @@ from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount
 from telethon.errors import PhoneNumberUnoccupiedError
 from telethon.tl.types import Channel, Chat
-
+from django.utils.encoding import smart_str
+import csv
 from random import randint
 from django.views.generic import TemplateView
 from formtools.wizard.views import SessionWizardView
@@ -939,3 +940,28 @@ def ITOpsLabStudentDeploy(requests):
 def ITOpsLabStudentMonitor(requests):
     response = {"ITOpsLabStudentMonitor" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
+
+# For exporting the file
+def clt_file_download(requests):
+
+    output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
+    with open(output_file, 'rb') as myfile:
+        response = HttpResponse(myfile, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=trailhead-points.csv'
+    return response
+
+
+def clt_file_ouput(requests):
+    context ={}
+    output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
+    with open(output_file, 'r',encoding='utf-8') as myfile:
+        fileValues = []
+        csv_reader = csv.reader(myfile, delimiter=',')
+        for row in csv_reader:
+            rowValue = ""
+            for value in row:
+                rowValue+= value+","
+
+            fileValues.append(rowValue[:-1])
+        context['csv_data'] = fileValues
+    return render(requests, "Administrator/dummycsvpage.html", context)
