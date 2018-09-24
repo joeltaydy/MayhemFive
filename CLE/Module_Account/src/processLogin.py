@@ -32,13 +32,13 @@ def validate(username,password):
 def studentVerification(requests):
     studentEmail = requests.user.email
     studentObj = Student.objects.get(email=studentEmail)
-    return
+    return 
 
 #Verification of student login credentials in database
 def InstructorVerification(requests):
     studentEmail = requests.user.email
     studentObj = Faculty.objects.get(email=studentEmail)
-    return
+    return 
 
 
 def changePassword(oldPassword,newPassword,studObj):
