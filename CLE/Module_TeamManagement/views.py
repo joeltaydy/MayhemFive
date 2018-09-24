@@ -954,9 +954,9 @@ def clt_file_download(requests):
 def clt_file_ouput(requests):
     context ={}
     output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
-    with open(output_file, 'r',encoding='utf-8-sig') as myfile:
+    with open(output_file, 'r',encoding='utf-8') as myfile:
         fileValues = []
-        csv_reader = csv.reader(myfile, delimiter=',')
+        csv_reader = csv.reader(myfile)
         for row in csv_reader:
             rowValue = ""
             for value in row:
