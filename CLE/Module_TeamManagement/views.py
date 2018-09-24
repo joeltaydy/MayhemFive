@@ -964,4 +964,5 @@ def clt_file_ouput(requests):
 
             fileValues.append(rowValue[:-1])
         context['csv_data'] = fileValues
+    print(context)
     return render(requests, "Administrator/dummycsvpage.html", context)
