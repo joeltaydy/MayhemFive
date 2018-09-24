@@ -4,6 +4,26 @@ from django.test import TestCase
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
 from Module_TeamManagement.models import *
 
+class DatabaseModelTest(TestCase):
+    def test_clearDbTest(self):
+        bootstrap.clear_Database()
+        
+        cltList = School_Term.objects.all()
+        self.assertTrue(cltList.count()== 0)
+        termList = School_Term.objects.all()
+        self.assertTrue(termList.count()== 0)
+        courseList = Course.objects.all()
+        self.assertTrue(courseList.count()== 0)
+        courseSectList = Course_Section.objects.all()
+        self.assertTrue(courseSectList.count()== 0)
+        classList = Class.objects.all()
+        self.assertTrue(classList.count()== 0)
+        facList = Faculty.objects.all()
+        self.assertTrue(facList.count()== 0)
+        stuList = Student.objects.all()
+        self.assertTrue(stuList.count()== 0)
+
+
 class CourseModelTest(TestCase):
     def create_Course(self, title="IS200", courseName = "Intro to Java", description = "Java"):
         return Course.objects.create(course_title = title, course_name= courseName, course_description=description)
