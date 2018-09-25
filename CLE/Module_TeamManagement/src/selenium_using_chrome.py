@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
@@ -9,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from sys import platform
 import os
+import chromedriver_binary
 
 import unittest, time, re
 
@@ -18,10 +18,7 @@ class SeleniumTableau(unittest.TestCase):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=1920x1080")
 
-        print(platform)
-        chromedriver = os.path.join(os.getcwd(),"..","..","..","setup","chromedriver")
-
-        self.driver = webdriver.Chrome(chromedriver,chrome_options=chrome_options)
+        self.driver = webdriver.Chrome(chrome_options=chrome_options)
 
         self.driver.implicitly_wait(30)
         self.base_url = "https://www.katalon.com/"
