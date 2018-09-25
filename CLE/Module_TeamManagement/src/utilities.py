@@ -368,9 +368,9 @@ def webScrapper():
                 content['link'],
                 email,
                 content['name'].replace("," , "").replace("_" , ""),
-                content['badge-count'],
-                content['points-count'],
-                content['trail-count'],
+                content['badge-count'].replace("," , ""),
+                content['points-count'].replace("," , ""),
+                content['trail-count'].replace("," , ""),
                 content['titles']
             ]
             writer.writerow(to_write)
