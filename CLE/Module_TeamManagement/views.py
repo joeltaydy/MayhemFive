@@ -625,8 +625,8 @@ def configureDB_teams(requests):
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['message'] = e.args[0]
-        # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-        return render(requests,'Module_TeamManagement/Instructor/configTeams/',response)
+        return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
+        #return faculty_Overview(requests)
 
     response['message'] = 'Teams Configured'
     # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
