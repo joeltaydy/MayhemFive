@@ -302,7 +302,6 @@ def classInformationRetrieval(results, courseSection):
                 classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
                 pass
 
-    print(classResult)
     return classResult
 
 

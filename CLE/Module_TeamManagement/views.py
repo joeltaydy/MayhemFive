@@ -88,7 +88,7 @@ def home(requests):
                 context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
-    #print(context)
+    print(requests.session['courseList'])
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -224,6 +224,7 @@ def faculty_Home(requests):
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
+    print(context)
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
@@ -336,11 +337,12 @@ def student_Team(requests):
 
     for enrolled_class in classObj: #Should contain 1 row
         if enrolled_class.team_number != None :
-            team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section).exclude(student=studentObj)
+            team_list = Class.objects.all().filter(team_number=enrolled_class.team_number).filter(course_section=enrolled_class.course_section)
             for student_class_model in team_list:
                 studentList.append(student_class_model.student) #List containing student models
 
             context['team'] = studentList
+            context['teamno'] = enrolled_class.team_number
 
     # Reads web scrapper results
     trailResults = utilities.populateTrailheadInformation(requests, student_email)
@@ -624,7 +626,7 @@ def configureDB_teams(requests):
         traceback.print_exc()
         response['message'] = e.args[0]
         # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
-        return faculty_Overview(requests)
+        return render(requests,'Module_TeamManagement/Instructor/configTeams/',response)
 
     response['message'] = 'Teams Configured'
     # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
@@ -964,5 +966,4 @@ def clt_file_ouput(requests):
 
             fileValues.append(rowValue[:-1])
         context['csv_data'] = fileValues
-    print(context)
     return render(requests, "Administrator/dummycsvpage.html", context)
