@@ -269,7 +269,7 @@ def faculty_Overview(requests):
             studentInfo = {}
             studentInfo['team'] = enrolled_class.team_number
             studentInfo['info'] =  enrolled_class.student #Obtains student model from Foreign key
-            studentUserName = enrolled_class.student.username
+            studentUserName = enrolled_class.student.email.split("@")[0]
             try:
                 studentInfo['link'] = Cloud_Learning_Tools.objects.get(id = studentUserName+"_Trailhead").website_link
                 studentPointsPosition = trailResults['CourseTrailResults']['class']['Students_Information']['students'].index(studentUserName)

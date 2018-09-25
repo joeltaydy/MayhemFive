@@ -367,7 +367,7 @@ def webScrapper():
             to_write = [
                 content['link'],
                 email,
-                content['name'],
+                content['name'].replace("," , "").replace("_" , ""),
                 content['badge-count'],
                 content['points-count'],
                 content['trail-count'],
