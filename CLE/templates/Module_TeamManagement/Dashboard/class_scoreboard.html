@@ -14,19 +14,19 @@
     <div class="container">
       <canvas id="myChart2" width="400" height="400"></canvas>
     </div>
-    
+
     <script>
     var ctx = document.getElementById("myChart2").getContext('2d');
     var classData = [{% for team_num in CourseTrailResults.class.Teams_Information %}
                       {% with CourseTrailResults.class.Teams_Information|get_item:team_num as teamDict%}   // custom django filter
                       {{teamDict|get_item:"badges" }} ,
-                      {% endwith %} 
+                      {% endwith %}
                       {% endfor %}]
     var myChart2 = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: [{% for team_num in CourseTrailResults.class.Teams_Information %}'{{team_num}}',{% endfor %}],
-            datasets: [{ 
+            datasets: [{
                 label: 'Teams Points',
                 data: classData,
                 backgroundColor: [
@@ -51,15 +51,22 @@
             }]
         },
         options: {
+          legend: {
+                display: false
+            },
             scales: {
                 yAxes: [{
+                  scaleLabel: {
+                      display: true,
+                      labelString: 'Points'
+                    },
                     ticks: {
                         beginAtZero:true
                     }
                 }]
             }
         }
-    }); 
+    });
     </script>
   </body>
 </html>

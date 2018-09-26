@@ -14,10 +14,10 @@
     <div class="container">
       <canvas id="myChart" width="1000" height="800"></canvas>
     </div>
-    
+
     <script>
     var ctx = document.getElementById("myChart").getContext('2d');
-    
+
     var myChart = new Chart(ctx, {
         type: 'bubble',
         data: {
@@ -38,17 +38,24 @@
                 {% endfor %}]
         },
         options: {
+          legend: {
+                display: false
+            },
             scales: {
                 yAxes: [{
+                  scaleLabel: {
+                      display: true,
+                      labelString: 'Points'
+                    },
                     ticks: {
                         beginAtZero:true
                     }
                 }]
             }
         }
-    }); 
+    });
 
-   
+
     </script>
   </body>
 </html>
