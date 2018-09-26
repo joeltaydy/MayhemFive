@@ -17,7 +17,7 @@ class SeleniumTableau(unittest.TestCase):
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=1920x1080")
-        chrome_options.binary_location = "/usr/bin/headless-chromium"
+        chrome_options.binary_location = "/usr/bin/google-chrome-stable"
 
         self.driver = webdriver.Chrome(chrome_options=chrome_options)
 
