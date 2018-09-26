@@ -38,13 +38,13 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
         email_address = sociallogin.account.extra_data["email"].split('@')[1]
 
         #use for team's test using any gmail account w/o numbers infront
-        isInstructor = re.findall(r"(^[a-zA-Z.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",sociallogin.account.extra_data["email"])
+        #isInstructor = re.findall(r"(^[a-zA-Z.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",sociallogin.account.extra_data["email"])
 
         #uncomment below for usage on staff email
-        #isInstructor = re.findall(r"(^[a-zA-Z.]+@smu.edu.sg+$)",sociallogin.account.extra_data["email"])
+        isInstructor = re.findall(r"(^[a-zA-Z.]+@smu.edu.sg+$)",sociallogin.account.extra_data["email"])
 
         # Pretty much hard code the login redirect url as the overwriting method above does not seem to be work
-        if isInstructor != [] :
+        if isInstructor != [] or email_address = "keagenkoi@gmail.com":
             #print("Pushing to instructor's home")
             settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
 
