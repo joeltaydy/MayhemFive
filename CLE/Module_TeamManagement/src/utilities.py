@@ -413,10 +413,10 @@ def webScrapper_SingleLink(student_email,link):
         [
             link,
             student_email,
-            json.loads(str(name['data-react-props']))['full_name'],
-            stats[0].text.strip(),
-            stats[1].text.strip(),
-            stats[2].text.strip(),
+            json.loads(str(name['data-react-props']))['full_name'].replace("," , "").replace("_" , ""),
+            stats[0].text.strip().replace("," , ""),
+            stats[1].text.strip().replace("," , ""),
+            stats[2].text.strip().replace("," , ""),
             '|'.join(titles)
         ]
     )
