@@ -109,8 +109,8 @@ elif 'posix' in os.name and 'ec2-user' in getpass.getuser():
     password = 'cle12345'
 
 # Checks if it's local developement or production
-# if PUBLIC_IP in PRODUCTION_SERVER_HOSTS:
-#     host = '52.76.221.221'
+if PUBLIC_IP in PRODUCTION_SERVER_HOSTS:
+    host = '52.76.221.221'
 
 DATABASES = {
     'default': {
