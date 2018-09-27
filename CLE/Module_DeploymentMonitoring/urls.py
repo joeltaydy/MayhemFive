@@ -3,5 +3,5 @@ from Module_DeploymentMonitoring import views
 from django.urls import path
 
 urlpatterns = [
-    path('CLEAdmin/run_UAT_process/', views.run_UAT_Process, name='run_UAT_Process'),
+
 ]
