@@ -11,12 +11,15 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import sys
 import getpass
 import ipgetter
 
 # Get public ip of server
 PUBLIC_IP = ipgetter.myip()
 PUBLIC_IP_GOOGLE = PUBLIC_IP + ".xip.io"
+PRODUCTION_DOMAIN = ['cloudtopus.xyz','www.cloudtopus.xyz']
+LOCALHOST_DOMAIN = ['localhost','127.0.0.1']
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,9 +34,10 @@ SECRET_KEY = '--2$vfi4$(vsdvf_@_(6x%$9^(-ea3h0gkr6p*8j)zf7!_y&je'
 AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (len(sys.argv) == 2)
 
-ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'172.31.25.38',"localhost","127.0.0.1", 'cloudtopus.xyz','www.cloudtopus.xyz']
+ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
+PRODUCTION_SERVER_HOSTS = ['52.76.46.177','52.76.46.177.xip.io'] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
 
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
@@ -92,28 +96,37 @@ WSGI_APPLICATION = 'CLE.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+# DB configuration
 password = ''
+host = 'localhost'
+default_DB = 'App_Data'
+cle_DB = 'CLE_Data'
 
+# Checks if it's production linux server
 if 'posix' in os.name and 'alfaried' in getpass.getuser():
     password = 'mysqldb12345'
 elif 'posix' in os.name and 'ec2-user' in getpass.getuser():
     password = 'cle12345'
 
+# Checks if it's local developement or production
+if PUBLIC_IP in PRODUCTION_SERVER_HOSTS:
+    host = '52.76.221.221'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'App_Data',
+        'NAME': default_DB,
         'USER': 'root',
         'PASSWORD': password,
-        'HOST': 'localhost',
+        'HOST': host,
         'PORT': '3306',
     },
     'CLE_Data': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'CLE_Data',
+        'NAME': cle_DB,
         'USER': 'root',
         'PASSWORD': password,
-        'HOST': 'localhost',
+        'HOST': host,
         'PORT': '3306',
     }
 }
