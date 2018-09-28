@@ -16,11 +16,6 @@ def webscrapper():
     utilities.webScrapper()
 
 
-@shared_task(name='tableaurefresh')
-def tableaurefresh():
-     selenium = SeleniumTableau()
-     selenium.run()
-
 
  #if __name__ == "__main__":
   #   webscrapper()
