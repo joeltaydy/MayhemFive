@@ -51,6 +51,8 @@ class Student(models.Model):
         db_table = 'Student'
 
 class Course_Section(models.Model):
+    #from Module_DeploymentMonitoring.models import AWS_Credentials
+
     course_section_id = models.CharField(
         db_column='Course_Section_ID',
         max_length=255,
@@ -69,6 +71,13 @@ class Course_Section(models.Model):
         Student,
         on_delete=models.CASCADE,
         db_column='Teaching_Assistant',
+        null=True,
+    )
+
+    awscredential = models.ForeignKey(
+        AWS_Credentials,
+        on_delete=models.CASCADE,
+        db_column='AWS_Credentials',
         null=True,
     )
     learning_tools = models.TextField(
