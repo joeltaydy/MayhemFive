@@ -36,7 +36,7 @@ def faculty_Setup_ShareAMI(requests):
 
 def student_Deploy_Base(requests):
 
-    return HttpResponse('')
+    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response) 
 
 def student_Deploy_GetAccount(requests):
 
