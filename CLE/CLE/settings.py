@@ -34,7 +34,7 @@ SECRET_KEY = '--2$vfi4$(vsdvf_@_(6x%$9^(-ea3h0gkr6p*8j)zf7!_y&je'
 AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = (len(sys.argv) == 2)
+DEBUG = True
 
 ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
 PRODUCTION_SERVER_HOSTS = ['52.76.46.177','52.76.46.177.xip.io'] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
