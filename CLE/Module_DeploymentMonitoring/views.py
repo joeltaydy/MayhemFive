@@ -59,16 +59,7 @@ def faculty_Setup_Base(requests):
                 try:
                     image_detailObj = Image_Details.objects.get(imageId=image_id)
                     account_numbers = image_detailObj.account_numbers
-
-                    for account_number in account_numbers:
-                        classObjs = Class.objects.filter(awscredential=account_number)
-                        team_name = classObjs[0].team_number
-
-                        image_list_w_account_numbers.update(
-                            {
-
-                            }
-                        )
+                    
                 except:
                     pass
 
@@ -117,19 +108,14 @@ def student_Deploy_Base(requests):
     try:
         processLogin.studentVerification(requests)
     except:
-        
+
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    
+
     response["studentDeployBase"] = "active"
 
-<<<<<<< HEAD
-    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
-=======
-        
-    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response) 
->>>>>>> 323fb8b1425b609f71324dc981d5817d02b4eda6
+    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 def student_Deploy_GetAccount(requests):
 
