@@ -39,6 +39,7 @@ class Image_Details(models.Model):
     )
     sharedAccNum = models.TextField(
         db_column='List_of_shared_account_number',
+        null = True 
     )
 
     class Meta:
@@ -69,9 +70,11 @@ class AWS_Credentials(models.Model):
     )
     access_key = models.TextField(
         db_column='Access_Key',
+        null= True
     )
     secret_access_key = models.TextField(
         db_column='Secret_Access_Key',
+        null= True
     )
     serverDetails = models.ForeignKey(
         Server_Details,
