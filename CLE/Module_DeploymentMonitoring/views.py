@@ -238,8 +238,8 @@ Retrieval and storing of AMI length from instructor
 returns to setup page
 '''
 def faculty_Setup_ShareAMI(requests):
-    response = {"faculty_Setup_GetAWSKeys" : "active"}
-    
+    response = {"faculty_Setup_ShareAMI" : "active"}
+
     # Redirect user to login page if not authorized and student
     try:
         processLogin.InstructorVerification(requests)
@@ -266,7 +266,7 @@ def student_Deploy_Base(requests):
 
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    
+
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
     for crse in courseList:
@@ -314,7 +314,7 @@ def student_Deploy_GetIP(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    
+
     ipAddress = requests.POST.get("ip") #string of IP address
     utilities.addAWS(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
