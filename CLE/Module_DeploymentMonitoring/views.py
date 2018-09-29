@@ -15,7 +15,7 @@ Retrieval and storing of github deployment package link from instructor
 returns to setup page
 '''
 def faculty_Setup_GetGitHub(requests):
-    
+
     return faculty_Setup_Base(requests)
 
 '''
@@ -23,7 +23,7 @@ Retrieval and storing of AWS keys from instructor
 returns to setup page
 '''
 def faculty_Setup_GetAWSKeys(requests):
-   
+
     return faculty_Setup_Base(requests)
 
 '''
@@ -31,12 +31,12 @@ Retrieval and storing of AMI length from instructor
 returns to setup page
 '''
 def faculty_Setup_ShareAMI(requests):
-    
+
     return faculty_Setup_Base(requests)
 
 def student_Deploy_Base(requests):
-
-    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response) 
+    response = {"ITOpsLabStudentDeploy" : "active"}
+    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 def student_Deploy_GetAccount(requests):
 
