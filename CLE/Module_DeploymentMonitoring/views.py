@@ -10,12 +10,13 @@ from Module_DeploymentMonitoring.src import *
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
 
+
 '''
 Main function for setup page on faculty.
 Will retrieve work products and render to http page
 '''
-def faculty_Setup_Base(requests):
-    response = {"ITOpsLabSetup" : "active"}
+def faculty_Setup_Base(requests,response=None):
+    response = {"faculty_Setup_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
@@ -28,9 +29,14 @@ def faculty_Setup_Base(requests):
     facultyObj = Faculty.objects.get(email=requests.user.email)
 
     try:
+        deployment_packageList = {}
+        account_number = ''
+        access_key = ''
+        secret_access_key = ''
+        section_imageList = {}
+
         # Retrieve GitHub link from Deployment_Package
         deployment_packageObjs = Deployment_Package.objects.all()
-        deployment_packageList = {}
 
         if len(deployment_packageObjs) > 0:
             for deployment_packageObj in deployment_packageObjs:
@@ -42,10 +48,6 @@ def faculty_Setup_Base(requests):
 
         # Retrieve Access_Key and Secret_Access_Key from AWS_Credentials
         aws_credentials = facultyObj.awscredential
-        account_number = ''
-        access_key = ''
-        secret_access_key = ''
-        section_imageList = {}
 
         if aws_credentials != None:
             account_number = aws_credentials.account_number
@@ -112,16 +114,18 @@ def faculty_Setup_Base(requests):
                 except:
                     image_details.delete()
 
+    except Exception as e:
+        traceback.print_exc()
+        response['message'] = 'Error during retrieval of information: ' + e.args[0]
+        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
+
+    finally:
         response['deployment_packages'] = deployment_packageList
         response['account_number'] = account_number
         response['access_key'] = access_key
         response['secret_access_key'] = secret_access_key
         response['image_list'] = image_list
         response['section_imageList'] = section_imageList
-
-    except:
-        traceback.print_exc()
-        # TO-DO: Put error messages here
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
@@ -131,6 +135,8 @@ Retrieval and storing of github deployment package link from instructor
 returns to setup page
 '''
 def faculty_Setup_GetGitHub(requests):
+    response = {"faculty_Setup_GetGitHub" : "active"}
+
     # Redirect user to login page if not authorized and student
     try:
         processLogin.InstructorVerification(requests)
@@ -142,6 +148,12 @@ def faculty_Setup_GetGitHub(requests):
     github_link = requests.GET.get('github_link')
 
     try:
+        if package_id == None:
+            raise Exception('Please input a valid package name')
+
+        if github_link == None:
+            raise Exception('Please input a valid GitHub link')
+
         # Save/Update GitHub link to Deployment_Package
         try:
             deployment_packageObj = Deployment_Package.objects.get(deploymentid=package_id)
@@ -154,11 +166,12 @@ def faculty_Setup_GetGitHub(requests):
             )
             Deployment_Package.save()
 
-    except:
+    except Exception as e:
         traceback.print_exc()
-        # TO-DO: Put error messages here
+        response['message'] = 'Error in Deployment Package form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
 
-    return faculty_Setup_Base(requests)
+    return faculty_Setup_Base(requests,response)
 
 
 '''
@@ -166,6 +179,8 @@ Retrieval and storing of AWS keys from instructor
 returns to setup page
 '''
 def faculty_Setup_GetAWSKeys(requests):
+    response = {"faculty_Setup_GetAWSKeys" : "active"}
+
     # Redirect user to login page if not authorized and student
     try:
         processLogin.InstructorVerification(requests)
@@ -178,13 +193,30 @@ def faculty_Setup_GetAWSKeys(requests):
     secret_access_key = requests.GET.get('secret_access_key')
 
     try:
+        if account_number == None:
+            raise Exception('Please input an account_number')
+
         # Save/Update Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
         try:
+            if access_key == None and secret_access_key == None:
+                raise Exception('Please input an access_key and/or secret_access_key')
+
             credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-            credentialsObj.access_key = access_key
-            credentialsObj.secret_access_key = secret_access_key
+
+            if access_key != None:
+                credentialsObj.access_key = access_key
+
+            if secret_access_key != None:
+                credentialsObj.secret_access_key = secret_access_key
+
             credentialsObj.save()
         except:
+            if access_key == None
+                raise Exception('Please input an access_key')
+
+            if secret_access_key == None:
+                raise Exception('Please input a secret_access_key')
+
             credentialsObj = AWS_Credentials.objects.create(
                 account_number=account_number,
                 access_key=access_key,
@@ -194,9 +226,10 @@ def faculty_Setup_GetAWSKeys(requests):
 
     except:
         traceback.print_exc()
-        # TO-DO: Put error messages here
+        response['message'] = 'Error in AWS Information form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
 
-    return faculty_Setup_Base(requests)
+    return faculty_Setup_Base(requests,response)
 
 
 '''
@@ -204,6 +237,8 @@ Retrieval and storing of AMI length from instructor
 returns to setup page
 '''
 def faculty_Setup_ShareAMI(requests):
+    response = {"faculty_Setup_GetAWSKeys" : "active"}
+    
     # Redirect user to login page if not authorized and student
     try:
         processLogin.InstructorVerification(requests)
@@ -211,7 +246,15 @@ def faculty_Setup_ShareAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    return faculty_Setup_Base(requests)
+    try:
+        pass
+
+    except:
+        traceback.print_exc()
+        response['message'] = 'Error in Share AMI form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
+
+    return faculty_Setup_Base(requests,response)
 
 
 def student_Deploy_Base(requests):
