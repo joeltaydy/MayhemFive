@@ -138,6 +138,26 @@ def faculty_Setup_GetGitHub(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
+    package_id = requests.GET.get('package_id')
+    github_link = requests.GET.get('github_link')
+
+    try:
+        # Save/Update GitHub link to Deployment_Package
+        try:
+            deployment_packageObj = Deployment_Package.objects.get(deploymentid=package_id)
+            deployment_packageObj.gitlink = github_link
+            deployment_packageObj.save()
+        except:
+            Deployment_Package.objects.create(
+                deploymentid=package_id,
+                gitlink=github_link,
+            )
+            Deployment_Package.save()
+
+    except:
+        traceback.print_exc()
+        # TO-DO: Put error messages here
+
     return faculty_Setup_Base(requests)
 
 
@@ -152,6 +172,29 @@ def faculty_Setup_GetAWSKeys(requests):
     except:
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
+
+    account_number = requests.GET.get('account_number')
+    access_key = requests.GET.get('access_key')
+    secret_access_key = requests.GET.get('secret_access_key')
+
+    try:
+        # Save/Update Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
+        try:
+            credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+            credentialsObj.access_key = access_key
+            credentialsObj.secret_access_key = secret_access_key
+            credentialsObj.save()
+        except:
+            credentialsObj = AWS_Credentials.objects.create(
+                account_number=account_number,
+                access_key=access_key,
+                secret_access_key=secret_access_key,
+            )
+            credentialsObj.save()
+
+    except:
+        traceback.print_exc()
+        # TO-DO: Put error messages here
 
     return faculty_Setup_Base(requests)
 
