@@ -2,6 +2,10 @@ import traceback
 from django.shortcuts import render
 from django.http import HttpResponse
 
+# Required for verification
+from Module_Account.src import processLogin
+from django.contrib.auth import logout
+
 '''
 Main function for setup page on faculty.
 Will retrieve work products and render to http page
@@ -35,7 +39,17 @@ def faculty_Setup_ShareAMI(requests):
     return faculty_Setup_Base(requests)
 
 def student_Deploy_Base(requests):
+    response = {}
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+    
+    response["studentDeployBase"] = "active"
 
+        
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response) 
 
 def student_Deploy_GetAccount(requests):
