@@ -51,23 +51,9 @@ def faculty_Setup_Base(requests):
             account_number = aws_credentials.account_number
             access_key = aws_credentials.access_key
             secret_access_key = aws_credentials.secret_access_key
-            section_list = {}
 
             # Retrieve the team_number and account_number for each section
-            esm_course_sectionList = requests.session['courseList_update']['ESM201']
-            for course_section in esm_course_sectionList:
-                section_number = course_section['section_number']
-                section_list[section_number] = {}
-
-                query = Class.objects.filter(course_section=course_section['id']).values('team_number','awscredential').annotate(dcount=Count('team_number'))
-                for team_details in query:
-                    team_name = team_details['team_number']
-                    account_number = team_details['awscredential']
-                    section_list[section_number].update(
-                        {
-                            account_number:team_name
-                        }
-                    )
+            section_list = utilities.getAllTeamDetails()
 
             # Retreive image_id and image_name from AWS using Boto3
             # IF exists in DB, PASS
