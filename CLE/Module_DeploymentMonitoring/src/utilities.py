@@ -4,7 +4,7 @@ from Module_DeploymentMonitoring.models import *
 import json
 import requests as req #for calling apis
 from Module_TeamManagement.src.utilities import encode,decode
-
+from Module_TeamManagement.models import *
 
 def getAllTeamDetails():
     section_list = {}
@@ -92,9 +92,9 @@ def addServerDetails(ipAddress,requests):
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
     sd = Server_Details.objects.create(
-        IP_address = ipAddress, 
-        instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'], 
-        instanceName = "Faried",  
+        IP_address = ipAddress,
+        instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
+        instanceName = "Faried",
         state = "Live",
 
     )
