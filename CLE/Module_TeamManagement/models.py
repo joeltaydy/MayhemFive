@@ -1,5 +1,5 @@
 from django.db import models
-#from Module_DeploymentMonitoring.models import AWS_Credentials
+from Module_DeploymentMonitoring.models import AWS_Credentials
 
 class Course(models.Model):
     course_title = models.CharField(
@@ -73,13 +73,7 @@ class Course_Section(models.Model):
         db_column='Teaching_Assistant',
         null=True,
     )
-
-    awscredential = models.ForeignKey(
-        AWS_Credentials,
-        on_delete=models.CASCADE,
-        db_column='AWS_Credentials',
-        null=True,
-    )
+    
     learning_tools = models.TextField(
         db_column='Course_Section_Learning_Tools_List',
         null=True,
@@ -128,6 +122,12 @@ class Faculty(models.Model):
         db_column='Course_Section',
         null=True,
     )
+    awscredential = models.ForeignKey(
+        AWS_Credentials,
+        on_delete=models.CASCADE,
+        db_column='AWS_Credentials',
+        null=True,
+    )    
 
     class Meta:
         managed = True
@@ -237,6 +237,12 @@ class Class(models.Model):
         on_delete=models.CASCADE,
         db_column='School_Term',
     )
+    awscredential = models.ForeignKey(
+        AWS_Credentials,
+        on_delete=models.CASCADE,
+        db_column='AWS_Credentials',
+        null=True,
+    )    
 
     class Meta:
         managed = True

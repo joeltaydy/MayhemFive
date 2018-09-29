@@ -1,27 +1,5 @@
 from django.db import models
-from Module_TeamManagement.models import Faculty
 
-class AWS_Credentials(models.Model):
-    account_number = models.CharField(
-        db_column='AccountNumber',
-        max_length=255,
-        primary_key=True,
-    )
-    access_key = models.TextField(
-        db_column='Access_Key',
-    )
-    secret_access_key = models.TextField(
-        db_column='Secret_Access_Key',
-    )
-    faculty = models.ForeignKey(
-        Faculty,
-        on_delete=models.CASCADE,
-        db_column='Faculty',
-    )
-
-    class Meta:
-        managed = True
-        db_table = 'AWS_Credentials'
 
 class Server_Details(models.Model):
     IP_address = models.CharField(
@@ -34,17 +12,13 @@ class Server_Details(models.Model):
         max_length=255,
     )
     instanceName = models.CharField(
-        db_column='Instance Name',
+        db_column='Instance_Name',
         max_length=255,
     )
     state = models.CharField(
-        db_column="Server State",
+        db_column="Server_State",
         max_length = 255,
-    )
-    credentials = models.ForeignKey(
-        AWS_Credentials,
-        on_delete= models.CASCADE,
-        db_column = 'AWS Credential linked'
+        null = True
     )
 
     class Meta:
@@ -53,17 +27,18 @@ class Server_Details(models.Model):
 
 
 class Image_Details(models.Model):
-    imageid = models.CharField(
+    imageId = models.CharField(
         db_column='Image_ID',
         max_length=255,
         primary_key=True,
     )
-    imagename = models.CharField(
-        db_column='Image Name',
+    imageName = models.CharField(
+        db_column='Image_Name',
         max_length=255,
+        null = True
     )
     sharedAccNum = models.TextField(
-        db_column='List of shared account number',
+        db_column='List_of_shared_account_number',
     )
 
     class Meta:
@@ -85,3 +60,32 @@ class Deployment_Package(models.Model):
     class Meta:
         managed = True
         db_table = 'Deployment_Package'
+
+class AWS_Credentials(models.Model):
+    account_number = models.CharField(
+        db_column='AccountNumber',
+        max_length=255,
+        primary_key=True,
+    )
+    access_key = models.TextField(
+        db_column='Access_Key',
+    )
+    secret_access_key = models.TextField(
+        db_column='Secret_Access_Key',
+    )
+    serverDetails = models.ForeignKey(
+        Server_Details,
+        on_delete= models.CASCADE,
+        db_column = 'Server_Details',
+        null=True,
+    )
+    imageDetails = models.ForeignKey(
+        Image_Details,
+        on_delete= models.CASCADE,
+        db_column = 'Image_Details',
+        null=True,
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'AWS_Credentials'
