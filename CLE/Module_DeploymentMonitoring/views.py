@@ -81,7 +81,7 @@ def faculty_Setup_Base(requests):
                     image_list[id] # RED HAIR-RING ;D
 
                     for section_number,section_details in section_list.items():
-                        section_imageList[section_number] = {'Image_IDs'[]}
+                        section_imageList[section_number] = {'Image_IDs':[]}
                         sharedList = []
                         nonsharedList = []
 
@@ -105,7 +105,7 @@ def faculty_Setup_Base(requests):
                             {
                                 'image_id':id,
                                 'image_name':name,
-                                'shared_account_number':sharedList
+                                'shared_account_number':sharedList,
                                 'non_shared_account_number':nonsharedList
                             }
                         )
