@@ -211,7 +211,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
             credentialsObj.save()
         except:
-            if access_key == None
+            if access_key == None:
                 raise Exception('Please input an access_key')
 
             if secret_access_key == None:
