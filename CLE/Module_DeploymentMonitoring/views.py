@@ -145,6 +145,12 @@ Retrieval and storing of github deployment package link from instructor
 returns to setup page
 '''
 def faculty_Setup_GetGitHub(requests):
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
 
     return faculty_Setup_Base(requests)
 
@@ -154,6 +160,12 @@ Retrieval and storing of AWS keys from instructor
 returns to setup page
 '''
 def faculty_Setup_GetAWSKeys(requests):
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
 
     return faculty_Setup_Base(requests)
 
@@ -163,6 +175,12 @@ Retrieval and storing of AMI length from instructor
 returns to setup page
 '''
 def faculty_Setup_ShareAMI(requests):
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
 
     return faculty_Setup_Base(requests)
 
