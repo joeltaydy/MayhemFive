@@ -125,7 +125,6 @@ def faculty_Setup_Base(requests,response=None):
         response['account_number'] = account_number
         response['access_key'] = access_key
         response['secret_access_key'] = secret_access_key
-        response['image_list'] = image_list
         response['section_imageList'] = section_imageList
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
@@ -238,11 +237,7 @@ Retrieval and storing of AMI length from instructor
 returns to setup page
 '''
 def faculty_Setup_ShareAMI(requests):
-<<<<<<< HEAD
     response = {"faculty_Setup_ShareAMI" : "active"}
-=======
-    response = {"faculty_Setup_GetAWSKeys" : "active"}
->>>>>>> b4b08dc583cd3223dcd3b1a8d2f45ee7c349f51e
 
     # Redirect user to login page if not authorized and student
     try:
