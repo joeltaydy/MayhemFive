@@ -12,10 +12,9 @@ from django.contrib.auth import logout
 import requests as req
 
 
-'''
-Main function for setup page on faculty.
-Will retrieve work products and render to http page
-'''
+# Main function for setup page on faculty.
+# Will retrieve work products and render to http page
+#
 def faculty_Setup_Base(requests,response=None):
     response = {"faculty_Setup_Base" : "active"}
 
@@ -130,10 +129,9 @@ def faculty_Setup_Base(requests,response=None):
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
 
-'''
-Retrieval and storing of github deployment package link from instructor
-returns to setup page
-'''
+# Retrieval and storing of github deployment package link from instructor
+# returns to faculty_Setup_Base
+#
 def faculty_Setup_GetGitHub(requests):
     response = {"faculty_Setup_GetGitHub" : "active"}
 
@@ -174,10 +172,9 @@ def faculty_Setup_GetGitHub(requests):
     return faculty_Setup_Base(requests,response)
 
 
-'''
-Retrieval and storing of AWS keys from instructor
-returns to setup page
-'''
+# Retrieval and storing of AWS keys from instructor
+# returns to faculty_Setup_Base
+#
 def faculty_Setup_GetAWSKeys(requests):
     response = {"faculty_Setup_GetAWSKeys" : "active"}
 
@@ -231,11 +228,10 @@ def faculty_Setup_GetAWSKeys(requests):
 
     return faculty_Setup_Base(requests,response)
 
-
-'''
-Retrieval and storing of AMI length from instructor
-returns to setup page
-'''
+# TO-DO
+# Retrieval and storing of AMI length from instructor
+# returns to faculty_Setup_Base
+#
 def faculty_Setup_ShareAMI(requests):
     response = {"faculty_Setup_ShareAMI" : "active"}
 
@@ -257,6 +253,9 @@ def faculty_Setup_ShareAMI(requests):
     return faculty_Setup_Base(requests,response)
 
 
+# Main function for deploy page on student.
+# Will check if images has been shared by faculty
+#
 def student_Deploy_Base(requests):
     response = {}
     try:
@@ -285,6 +284,8 @@ def student_Deploy_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
+# Storing of student user account number in database
+#
 def student_Deploy_GetAccount(requests):
     response = {}
     try:
@@ -301,7 +302,8 @@ def student_Deploy_GetAccount(requests):
 
     return HttpResponse('')
 
-
+# Storing and validating of student user IP address
+#
 def student_Deploy_GetIP(requests):
     response = {}
     try:
