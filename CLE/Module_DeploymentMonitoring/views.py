@@ -238,7 +238,11 @@ Retrieval and storing of AMI length from instructor
 returns to setup page
 '''
 def faculty_Setup_ShareAMI(requests):
+<<<<<<< HEAD
     response = {"faculty_Setup_ShareAMI" : "active"}
+=======
+    response = {"faculty_Setup_GetAWSKeys" : "active"}
+>>>>>>> b4b08dc583cd3223dcd3b1a8d2f45ee7c349f51e
 
     # Redirect user to login page if not authorized and student
     try:
