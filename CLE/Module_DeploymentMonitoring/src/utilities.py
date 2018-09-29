@@ -1,11 +1,13 @@
 import json
 import boto3
+import traceback
 import requests as req
 from Module_DeploymentMonitoring.src import aws_config
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.src.utilities import encode, decode
 from Module_TeamManagement.models import *
 
+# Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails():
     section_list = {}
 
@@ -26,6 +28,8 @@ def getAllTeamDetails():
 
     return section_list
 
+
+# Get all images from user account via Boto3
 def getAllImages(account_number,access_key,secret_access_key):
     images = {}
 
@@ -45,8 +49,10 @@ def getAllImages(account_number,access_key,secret_access_key):
 
     return images
 
+
+# Add AWS credentials for the relevant students
 def addAWSCredentials(accountNum, class_studentObj):
-    class_studentObj= addStudentClassObject(requests)
+    class_studentObj= getStudentClassObject(requests)
     try:
         awsC=AWS_Credentials.objects.get(account_number=accountNum)
     except:
@@ -57,18 +63,22 @@ def addAWSCredentials(accountNum, class_studentObj):
     class_studentObj.awscredential = awsC
     class_studentObj.save()
 
-def addStudentClassObject(requests):
+
+# Retrieve the Class object that belongs under the current student user
+def getStudentClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
-    for crse in courseList:
-        if crse.course_title == "EMS201":
-            coursesec = crse
-    class_studentObj = Class.objects.get(student= student_email).get(course_section=coursesec)
+    for course_title,course_details in courseList.items():
+        if course_title.course_title == "EMS201":
+            course_section_id = course_details.id
+    class_studentObj = Class.objects.get(student= student_email).get(course_section=course_section_id)
 
     return class_studentObj
 
+
+# Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(ipAddress,requests):
-    class_studentObj= addStudentClassObject(requests)
+    class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     try:
         url = ipAddress+":8999/account/get/?secret_key=m0nKEY"
@@ -78,11 +88,13 @@ def addAWSKeys(ipAddress,requests):
         awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
+        traceback.print_exc()
         print("something wrong with request = AMS")
 
 
+# Add the server details into the server details table
 def addServerDetails(ipAddress,requests):
-    class_studentObj= addStudentClassObject(requests)
+    class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     validity = validateAccountNumber(ipAddress, awsC)
     if validity == False:
@@ -94,13 +106,14 @@ def addServerDetails(ipAddress,requests):
     sd = Server_Details.objects.create(
         IP_address = ipAddress,
         instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
-        instanceName = "Faried",
+        instanceName = None,
         state = "Live",
 
     )
     sd.save()
 
 
+# Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials):
     url = ipAddress+":8999/account/get/?secret_key=m0nKEY"
     response = req.get(url)
