@@ -39,6 +39,7 @@ class Image_Details(models.Model):
     )
     sharedAccNum = models.TextField(
         db_column='List_of_shared_account_number',
+        null = True 
     )
 
     class Meta:

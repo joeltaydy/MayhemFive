@@ -8,6 +8,7 @@ from Module_DeploymentMonitoring.src import utilities
 # Required for verification
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
+import requests as req
 
 '''
 Main function for setup page on faculty.
@@ -142,22 +143,27 @@ def student_Deploy_GetAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    
-    student_email = requests.user.email
-    courseList = requests.session['courseList_updated']
-    for crse in courseList:
-        if crse.course_title == "EMS201":
-            coursesec = crse
-    class_studentObj = Class.objects.get(student= student_email).get(course_section=coursesec)
-
     accountNum = requests.POST.get("AWS_account_number") #string of account number
-    utilities.createAccount(accountNum, class_studentObj) #creates an incomplete account object
+    utilities.createAccount(accountNum, requests) #creates an incomplete account object
 
 
     return HttpResponse('')
 
 
 def student_Deploy_GetIP(requests):
+    response = {}
+    try:
+        processLogin.studentVerification(requests)
+        if requests.method == "GET" :
+            response['message'] = "Wrong entry to form"
+            return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+    
+    ipAddress = requests.POST.get("ip") #string of IP address
+    utilities.addAWS(ipAddress,requests)
+    utilities.addServerDetails(ipAddress,requests)
 
     return HttpResponse('')
 
