@@ -1,4 +1,5 @@
 from django.db import models
+#from Module_DeploymentMonitoring.models import AWS_Credentials
 
 class Course(models.Model):
     course_title = models.CharField(
@@ -51,7 +52,6 @@ class Student(models.Model):
         db_table = 'Student'
 
 class Course_Section(models.Model):
-    #from Module_DeploymentMonitoring.models import AWS_Credentials
 
     course_section_id = models.CharField(
         db_column='Course_Section_ID',

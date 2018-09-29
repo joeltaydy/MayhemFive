@@ -37,6 +37,15 @@ class Server_Details(models.Model):
         db_column='Instance Name',
         max_length=255,
     )
+    state = models.CharField(
+        db_column="Server State",
+        max_length = 255,
+    )
+    credentials = models.ForeignKey(
+        AWS_Credentials,
+        on_delete= models.CASCADE,
+        db_column = 'AWS Credential linked'
+    )
 
     class Meta:
         managed = True
