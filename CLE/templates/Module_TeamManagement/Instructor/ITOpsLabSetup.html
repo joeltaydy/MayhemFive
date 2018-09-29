@@ -2,6 +2,7 @@
 {% load staticfiles %}
 
 {% block bootstrapContent %}
+<<<<<<< HEAD
 <div class="redirect">
   <span>
     <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark active">Setup</button>
@@ -96,5 +97,96 @@ $(function(){
    });
 </script>
 
+=======
+<head>
+    <link rel="stylesheet" href="{% static 'css/itopssetup.css' %}">
+</head>
+
+<div class= "redirect">
+    <span>
+      <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark active">Setup</button>
+      <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}';" type="button" class="btn btn-dark">Monitor</button>
+      <button onclick="location.href = '{% url 'DMmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
+    </span>
+<div>
+
+<div class="col-md-12">
+    <h1 align="center">IT Operations Lab</h1>
+    <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=300px height = 150px style="display: block;margin-left: auto;margin-right: auto;"><br>
+    <h1 align="center"><i>Setup</i ></h3>
+
+    <div id="accordion" class="panel-group col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+        <div class="panel">
+        <div class="panel-heading">
+        <h4 class="panel-title">
+            <a href="#panelBodyOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
+            </h4>
+        </div>
+        
+         <!-- Request AWS Information-->
+        <div id="panelBodyOne" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <p>
+                    <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;"">
+                        <label for="name" class="control-label">Account Number</label>
+                        <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
+                        <br>
+                        <label for="name" class="control-label">AWS Access Key</label>
+                        <input class="form-control" type="text" name="accessKey" id="accessKey" aria-describedby="fileHelp">
+                        <br>
+                        <label for="name" class="control-label">AWS Secret Access Key</label>
+                        <input class="form-control" type="text" name="secretKey" id="secretKey" aria-describedby="fileHelp">
+
+                        <div class="col-md-12 form-group" style = "margin-bottom:40px;">
+                            <br>
+                            <button class="btn btn-dark pull-right" type="submit">Submit</button>
+                            <br>
+                        </div>
+                    </div>
+                </p>
+            </div>
+        </div>
+        </div>
+
+
+        <div class="panel">
+        <div class="panel-heading">
+        <h4 class="panel-title">
+            <a href="#panelBodyTwo" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Deployment Package</a>
+            </h4>
+        </div>
+         <!-- Deployment Package Table-->
+        <div id="panelBodyTwo" class="panel-collapse collapse">
+        <div class="panel-body">
+            <p>Energistically drive standardized communities through user friendly results. Phosfluorescently initiate superior technologies vis-a-vis low-risk high-yield solutions. Objectively facilitate clicks-and-mortar partnerships vis-a-vis superior partnerships. Continually generate long-term high-impact methodologies via wireless leadership. Holisticly seize resource maximizing solutions via user friendly outsourcing.</p>
+            </div>
+        </div>
+        </div>
+        <div class="panel">
+            <div class="panel-heading">
+            <h4 class="panel-title">
+                <a href="#panelBodyThree" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Approve & Send Image</a>
+                </h4>
+            </div>
+         <!-- Approve and Send Image Steps-->
+            <div id="panelBodyThree" class="panel-collapse collapse">
+                <div class="panel-body">
+            
+                {% include 'Module_TeamManagement/Instructor/ITOpsSetupForm.html' %}
+            
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    {% csrf_token %}
+
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
+
+>>>>>>> d60b74835a93260cabc74c2c8c10e9623654ed9a
 
 {% endblock %}
