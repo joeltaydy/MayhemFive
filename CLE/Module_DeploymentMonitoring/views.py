@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
+from django.db.models import Count
 from Module_DeploymentMonitoring.src import *
 
 # Required for verification
@@ -29,11 +30,11 @@ def faculty_Setup_Base(requests):
     try:
         # Retrieve GitHub link from Deployment_Package
         deployment_packageObjs = Deployment_Package.objects.all()
-        deployment_packageList = []
+        deployment_packageList = {}
 
         if len(deployment_packageObjs) > 0:
             for deployment_packageObj in deployment_packageObjs:
-                deployment_packageList.append(
+                deployment_packageList.update(
                     {
                         deployment_packageObj.deploymentid:deployment_packageObj.gitlink
                     }
@@ -44,34 +45,97 @@ def faculty_Setup_Base(requests):
         account_number = ''
         access_key = ''
         secret_access_key = ''
-        image_list_w_account_numbers = []
+        section_imageList = {}
 
         if aws_credentials != None:
             account_number = aws_credentials.account_number
             access_key = aws_credentials.access_key
             secret_access_key = aws_credentials.secret_access_key
+            section_list = {}
+
+            # Retrieve the team_number and account_number for each section
+            esm_course_sectionList = requests.session['courseList_update']['ESM201']
+            for course_section in esm_course_sectionList:
+                section_number = course_section['section_number']
+                section_list[section_number] = {}
+
+                query = Class.objects.filter(course_section=course_section['id']).values('team_number','awscredential').annotate(dcount=Count('team_number'))
+                for team_details in query:
+                    team_name = team_details['team_number']
+                    account_number = team_details['awscredential']
+                    section_list[section_number].update(
+                        {
+                            account_number:team_name
+                        }
+                    )
 
             # Retreive image_id and image_name from AWS using Boto3
+            # IF exists in DB, PASS
+            # ELSE, ADD into DB
             image_list = utilities.getAllImages(account_number,access_key,secret_access_key)
-
-            # Retrieve Shared Account Number from Image_Details
             for image_id,image_name in image_list.items():
                 try:
-                    image_detailObj = Image_Details.objects.get(imageId=image_id)
-                    account_numbers = image_detailObj.account_numbers
-                    
+                    Image_Details.objects.get(imageId=image_id)
                 except:
-                    pass
+                    image_detailsObj = Image_Details.objects.create(
+                        imageId=image_id,
+                        imageName=image_name,
+                    )
+                    image_detailsObj.save()
+
+            # Retrieve Shared Account Numbers from Image_Details (DB)
+            # IF does not exists in DB, DELETE
+            # ELSE, populate section_imageList with the right details
+            querySet = Image_Details.objects.all()
+            for image_details in querySet:
+                id = image_details.imageId
+                name = image_details.imageName
+
+                try:
+                    image_list[id] # RED HAIR-RING ;D
+
+                    for section_number,section_details in section_list.items():
+                        section_imageList[section_number] = {'Image_IDs'[]}
+                        sharedList = []
+                        nonsharedList = []
+
+                        for account_number,team_name in section_details.items():
+                            if account_number not in image_details.sharedAccNum:
+                                nonsharedList.append(
+                                    {
+                                        'account_number':account_number,
+                                        'team_name':team_name,
+                                    }
+                                )
+                            else:
+                                sharedList.append(
+                                    {
+                                        'account_number':account_number,
+                                        'team_name':team_name,
+                                    }
+                                )
+
+                        section_imageList[section_number]['Image_IDs'].append(
+                            {
+                                'image_id':id,
+                                'image_name':name,
+                                'shared_account_number':sharedList
+                                'non_shared_account_number':nonsharedList
+                            }
+                        )
+                except:
+                    image_details.delete()
 
         response['deployment_packages'] = deployment_packageList
         response['account_number'] = account_number
         response['access_key'] = access_key
         response['secret_access_key'] = secret_access_key
-        response['images'] = image_list_w_account_numbers
+        response['image_list'] = image_list
+        response['section_imageList'] = section_imageList
 
     except:
         traceback.print_exc()
-        # Put error messages here
+        # TO-DO: Put error messages here
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 

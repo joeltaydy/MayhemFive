@@ -16,10 +16,6 @@ def getAllImages(account_number,access_key,secret_access_key):
     )
 
     for image in results['Images']:
-        images.update(
-            {
-                image['ImageId']:image['Name']
-            }
-        )
+        images[image['ImageId']] = image['Name']
 
     return images
