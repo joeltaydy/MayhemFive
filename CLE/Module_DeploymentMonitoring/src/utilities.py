@@ -1,5 +1,6 @@
 import boto3
-import Module_DeploymentMonitoring.src import aws_config
+from Module_DeploymentMonitoring.src import aws_config
+from Module_DeploymentMonitoring.models import *
 
 def getAllImages(account_number,access_key,secret_access_key):
     images = {}
@@ -23,3 +24,14 @@ def getAllImages(account_number,access_key,secret_access_key):
         )
 
     return images
+
+def createAccount(accountNum, class_studentObj):
+    try:
+        awsC=AWS_Credentials.objects.get(account_number=accountNum)
+    except:
+        awsC = AWS_Credentials.objects.create(
+            account_number=accountNum,
+        )
+        awsC.save()
+    class_studentObj.awscredential = awsC
+    class_studentObj.save()

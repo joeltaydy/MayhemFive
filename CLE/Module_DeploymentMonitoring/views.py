@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
-from Module_DeploymentMonitoring.src import *
+from Module_DeploymentMonitoring.src import utilities
 
 # Required for verification
 from Module_Account.src import processLogin
@@ -24,7 +24,7 @@ def faculty_Setup_Base(requests):
         return render(requests, 'Module_Account/login.html', response)
 
     faculty_email = requests.user.email
-    facultyObj = Faculty.objects.get(email=requests.user.email)
+    facultyObj = Faculty.objects.get(email=faculty_email)
 
     try:
         # Retrieve GitHub link from Deployment_Package
@@ -111,13 +111,48 @@ def student_Deploy_Base(requests):
 
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
+    
+    student_email = requests.user.email
+    courseList = requests.session['courseList_updated']
+    for crse in courseList:
+        if crse.course_title == "EMS201":
+            coursesec = crse
+    class_studentObj = Class.objects.get(student= student_email).get(course_section=coursesec )
+
+    awsAccountNumber =  class_studentObj.awscredential
+    response['awsAccNum'] = awsAccountNumber #Could be None or aws credentials object
+    try:
+        awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
+        response['awsImage'] = awsImage
+    except:
+        response['awsImage'] = None
 
     response["studentDeployBase"] = "active"
-
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 def student_Deploy_GetAccount(requests):
+    response = {}
+    try:
+        processLogin.studentVerification(requests)
+        if requests.method == "GET" :
+            response['message'] = "Wrong entry to form"
+            return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    
+    student_email = requests.user.email
+    courseList = requests.session['courseList_updated']
+    for crse in courseList:
+        if crse.course_title == "EMS201":
+            coursesec = crse
+    class_studentObj = Class.objects.get(student= student_email).get(course_section=coursesec)
+
+    accountNum = requests.POST.get("AWS_account_number") #string of account number
+    utilities.createAccount(accountNum, class_studentObj) #creates an incomplete account object
+
 
     return HttpResponse('')
 
