@@ -1,9 +1,9 @@
+import json
 import boto3
+import requests as req
 from Module_DeploymentMonitoring.src import aws_config
 from Module_DeploymentMonitoring.models import *
-import json
-import requests as req #for calling apis
-from Module_TeamManagement.src.utilities import encode,decode
+from Module_TeamManagement.src.utilities import encode, decode
 from Module_TeamManagement.models import *
 
 def getAllTeamDetails():
@@ -45,8 +45,8 @@ def getAllImages(account_number,access_key,secret_access_key):
 
     return images
 
-def createAccount(accountNum, class_studentObj):
-    class_studentObj= retrievalStudentClassObject(requests)
+def addAWSCredentials(accountNum, class_studentObj):
+    class_studentObj= addStudentClassObject(requests)
     try:
         awsC=AWS_Credentials.objects.get(account_number=accountNum)
     except:
@@ -57,7 +57,7 @@ def createAccount(accountNum, class_studentObj):
     class_studentObj.awscredential = awsC
     class_studentObj.save()
 
-def retrievalStudentClassObject(requests):
+def addStudentClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
     for crse in courseList:
@@ -67,8 +67,8 @@ def retrievalStudentClassObject(requests):
 
     return class_studentObj
 
-def addAWS(ipAddress,requests):
-    class_studentObj= retrievalStudentClassObject(requests)
+def addAWSKeys(ipAddress,requests):
+    class_studentObj= addStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     try:
         url = ipAddress+":8999/account/get/?secret_key=m0nKEY"
@@ -82,9 +82,9 @@ def addAWS(ipAddress,requests):
 
 
 def addServerDetails(ipAddress,requests):
-    class_studentObj= retrievalStudentClassObject(requests)
+    class_studentObj= addStudentClassObject(requests)
     awsC = class_studentObj.awscredential
-    validity = validAccountNumber(ipAddress, awsC)
+    validity = validateAccountNumber(ipAddress, awsC)
     if validity == False:
         raise Exception("Account number do not match with given IP, please try again")
 
@@ -101,7 +101,7 @@ def addServerDetails(ipAddress,requests):
     sd.save()
 
 
-def validAccountNumber(ipAddress, awsCredentials):
+def validateAccountNumber(ipAddress, awsCredentials):
     url = ipAddress+":8999/account/get/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())

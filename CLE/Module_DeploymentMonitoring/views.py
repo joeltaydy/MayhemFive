@@ -297,8 +297,7 @@ def student_Deploy_GetAccount(requests):
         return render(requests,'Module_Account/login.html',response)
 
     accountNum = requests.POST.get("AWS_account_number") #string of account number
-    utilities.createAccount(accountNum, requests) #creates an incomplete account object
-
+    utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
     return HttpResponse('')
 
@@ -315,7 +314,7 @@ def student_Deploy_GetIP(requests):
         return render(requests,'Module_Account/login.html',response)
 
     ipAddress = requests.POST.get("ip") #string of IP address
-    utilities.addAWS(ipAddress,requests)
+    utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
 
     return HttpResponse('')
