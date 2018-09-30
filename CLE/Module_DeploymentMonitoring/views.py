@@ -1,15 +1,12 @@
 import traceback
+import requests as req
 from django.shortcuts import render
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
-from django.db.models import Count
 from Module_DeploymentMonitoring.src import *
-
-# Required for verification
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
-import requests as req
 
 
 # Main function for setup page on faculty.
@@ -60,7 +57,7 @@ def faculty_Setup_Base(requests,response=None):
             # Retreive image_id and image_name from AWS using Boto3
             # IF exists in DB, PASS
             # ELSE, ADD into DB
-            image_list = utilities.getAllImages(account_number,access_key,secret_access_key)
+            image_list = aws_util.getAllImages(account_number,access_key,secret_access_key)
             images = aws_credentials.imageDetails.all()
             for image_id,image_name in image_list.items():
                 isIn = False
@@ -258,11 +255,11 @@ def faculty_Setup_ShareAMI(requests):
         access_keys = aws_credentials.access_keys
         secret_access_keys = aws_credentials.secret_access_keys
 
-        client = getEC2Client(access_keys,secret_access_keys)
+        client = aws_util.getEC2Client(access_keys,secret_access_keys)
 
         for account_number in account_numbers:
             # Add the account number to the image permission on AWS
-            utilities.addUserToImage(client,image_id,account_number)
+            aws_util.addUserToImage(client,image_id,account_number)
 
             # Add the account number to DB side
             image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
