@@ -8,6 +8,20 @@ from Module_TeamManagement.src.utilities import encode, decode
 from Module_TeamManagement.models import *
 
 
+# Get and connects to AWS SDK via boto3
+def getEC2Client(access_key,secret_access_key,region_name=None):
+    if region_name == None:
+        region_name = aws_config.REGION
+
+    client = boto3.client('ec2',
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_access_key,
+        region_name=region_name
+    )
+
+    return client
+
+
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails():
     section_list = {}
@@ -31,14 +45,12 @@ def getAllTeamDetails():
 
 
 # Get all images from user account via Boto3
-def getAllImages(account_number,access_key,secret_access_key):
+def getAllImages(client=None,account_number,access_key,secret_access_key):
     images = {}
 
-    client = boto3.client('ec2',
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_access_key,
-        region_name=aws_config.REGION
-    )
+    if client == None:
+        client = getEC2Client(access_key,secret_access_key)
+
     results = client.describe_images(
         Owners=[
             account_number,
@@ -49,6 +61,36 @@ def getAllImages(account_number,access_key,secret_access_key):
         images[image['ImageId']] = image['Name']
 
     return images
+
+
+# Add user to Image launch permission
+def addUserToImage(client=None,image_id,account_number,access_key,secret_access_key):
+    if client == None:
+        client = getEC2Client(access_key,secret_access_key)
+
+    shared_response = client.modify_image_attribute(
+        Attribute='launchPermission',
+        ImageId=image_id,
+        OperationType='add',
+        UserIds=[
+            account_number,
+        ],
+    )
+
+
+# Remove user to Image launch permission
+def removeUserFromImage(client=None,image_id,account_number,access_key,secret_access_key):
+    if client == None:
+        client = getEC2Client(access_key,secret_access_key)
+
+    shared_response = client.modify_image_attribute(
+        Attribute='launchPermission',
+        ImageId=image_id,
+        OperationType='remove',
+        UserIds=[
+            account_number,
+        ],
+    )
 
 
 # Add AWS credentials for the relevant students

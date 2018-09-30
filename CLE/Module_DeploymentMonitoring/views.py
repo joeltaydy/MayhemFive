@@ -61,23 +61,30 @@ def faculty_Setup_Base(requests,response=None):
             # IF exists in DB, PASS
             # ELSE, ADD into DB
             image_list = utilities.getAllImages(account_number,access_key,secret_access_key)
+            images = aws_credentials.imageDetails.all()
             for image_id,image_name in image_list.items():
-                try:
-                    Image_Details.objects.get(imageId=image_id)
-                except:
+                isIn = False
+                for image_detailObj in images:
+                    if image_detailObj.imageId == image_id:
+                        available = True
+
+                if not isIn:
                     image_detailsObj = Image_Details.objects.create(
                         imageId=image_id,
                         imageName=image_name,
                     )
                     image_detailsObj.save()
 
+                    aws_credentials.imageDetails = image_detailsObj
+                    aws_credentials.save()
+
             # Retrieve Shared Account Numbers from Image_Details (DB)
             # IF does not exists in DB, DELETE
             # ELSE, populate section_imageList with the right details
-            querySet = Image_Details.objects.all()
-            for image_details in querySet:
-                id = image_details.imageId
-                name = image_details.imageName
+            images = aws_credentials.imageDetails.all()
+            for image_detailObj in images:
+                id = image_detailObj.imageId
+                name = image_detailObj.imageName
 
                 try:
                     image_list[id] # RED HAIR-RING ;D
@@ -228,7 +235,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
     return faculty_Setup_Base(requests,response)
 
-# TO-DO
+
 # Retrieval and storing of AMI length from instructor
 # returns to faculty_Setup_Base
 #
@@ -242,8 +249,35 @@ def faculty_Setup_ShareAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
+    account_numbers = requests.GET.get('account_numbers')
+    image_id = requests.GET.get('image_id')
+    faculty_email = requests.user.email
+    facultyObj = Faculty.objects.get(email=faculty_email)
+
     try:
-        pass
+        # Get the access_key and secret_access_key from DB
+        aws_credentials = facultyObj.awscredential
+        access_keys = aws_credentials.access_keys
+        secret_access_keys = aws_credentials.secret_access_keys
+
+        client = getEC2Client(access_keys,secret_access_keys)
+
+        for account_number in account_numbers:
+            # Add the account number to the image permission on AWS
+            utilities.addUserToImage(client,image_id,account_number)
+
+            # Add the account number to DB side
+            images = aws_credentials.imageDetails.all()
+            for image_detailObj in images:
+                if image_detailObj.imageId == image_id:
+                    account_numbers = image_detailObj.sharedAccNum
+
+                    if account_numbers == None:
+                        image_detailObj.sharedAccNum = account_number
+                    else:
+                        image_detailObj.sharedAccNum = '_' + account_number
+
+                    image_detailObj.save()
 
     except:
         traceback.print_exc()
@@ -284,6 +318,7 @@ def student_Deploy_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
+
 # Storing of student user account number in database
 #
 def student_Deploy_GetAccount(requests):
@@ -301,6 +336,7 @@ def student_Deploy_GetAccount(requests):
     utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
     return HttpResponse('')
+
 
 # Storing and validating of student user IP address
 #
