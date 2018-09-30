@@ -1,10 +1,10 @@
 import boto3
-from Module_DeploymentMonitoring.src import aws_config, server_util
+from Module_DeploymentMonitoring.src import config, server_util
 
 # Get and connects to AWS SDK via boto3
 def getEC2Client(access_key,secret_access_key,region_name=None):
     if region_name == None:
-        region_name = aws_config.REGION
+        region_name = config.REGION_NAME
 
     client = boto3.client('ec2',
         aws_access_key_id=access_key,
