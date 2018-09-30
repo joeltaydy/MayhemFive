@@ -66,7 +66,7 @@ def faculty_Setup_Base(requests,response=None):
                 isIn = False
                 for image_detailObj in images:
                     if image_detailObj.imageId == image_id:
-                        available = True
+                        isIn = True
 
                 if not isIn:
                     image_detailsObj = Image_Details.objects.create(
@@ -74,9 +74,7 @@ def faculty_Setup_Base(requests,response=None):
                         imageName=image_name,
                     )
                     image_detailsObj.save()
-
-                    aws_credentials.imageDetails = image_detailsObj
-                    aws_credentials.save()
+                    aws_credentials.imageDetails.add(image_detailsObj)
 
             # Retrieve Shared Account Numbers from Image_Details (DB)
             # IF does not exists in DB, DELETE
@@ -87,7 +85,7 @@ def faculty_Setup_Base(requests,response=None):
                 name = image_detailObj.imageName
 
                 try:
-                    image_list[id] # RED HAIR-RING ;D
+                    image_list[id] # Just to check if it DB info tallies with AWS
 
                     for section_number,section_details in section_list.items():
                         section_imageList[section_number] = {'Image_IDs':[]}
@@ -95,7 +93,7 @@ def faculty_Setup_Base(requests,response=None):
                         nonsharedList = []
 
                         for account_number,team_name in section_details.items():
-                            if account_number not in image_details.sharedAccNum:
+                            if account_number not in image_detailObj.sharedAccNum:
                                 nonsharedList.append(
                                     {
                                         'account_number':account_number,
@@ -119,7 +117,7 @@ def faculty_Setup_Base(requests,response=None):
                             }
                         )
                 except:
-                    image_details.delete()
+                    image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
@@ -267,17 +265,15 @@ def faculty_Setup_ShareAMI(requests):
             utilities.addUserToImage(client,image_id,account_number)
 
             # Add the account number to DB side
-            images = aws_credentials.imageDetails.all()
-            for image_detailObj in images:
-                if image_detailObj.imageId == image_id:
-                    account_numbers = image_detailObj.sharedAccNum
+            image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
+            account_numbers = image_detailObj.sharedAccNum
 
-                    if account_numbers == None:
-                        image_detailObj.sharedAccNum = account_number
-                    else:
-                        image_detailObj.sharedAccNum = '_' + account_number
+            if account_numbers == None:
+                image_detailObj.sharedAccNum = account_number
+            else:
+                image_detailObj.sharedAccNum = account_numbers + '_' + account_number
 
-                    image_detailObj.save()
+            image_detailObj.save()
 
     except:
         traceback.print_exc()
