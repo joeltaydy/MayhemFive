@@ -7,6 +7,7 @@ from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.src.utilities import encode, decode
 from Module_TeamManagement.models import *
 
+
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails():
     section_list = {}
@@ -69,8 +70,8 @@ def getStudentClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
     for course_title,course_details in courseList.items():
-        if course_title.course_title == "EMS201":
-            course_section_id = course_details.id
+        if course_title == "EMS201":
+            course_section_id = course_details['id']
     class_studentObj = Class.objects.get(student= student_email).get(course_section=course_section_id)
 
     return class_studentObj
