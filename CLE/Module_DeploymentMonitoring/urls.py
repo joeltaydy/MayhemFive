@@ -10,5 +10,7 @@ urlpatterns = [
     path('instructor/ITOperationsLab/monitor/',views.ITOpsLabMonitor,name='itopslab_monitor'),
     path('instructor/ITOperationsLab/event/',views.ITOpsLabEvent,name='itopslab_event'),
     path('student/ITOperationsLab/deploy/',views.student_Deploy_Base,name='itopslab_studeploy'),
+    path('student/ITOperationsLab/deploy/account/',views.student_Deploy_GetAccount,name='itopslab_studeploy_Account'),
+    path('student/ITOperationsLab/deploy/ip/',views.student_Deploy_GetIP,name='itopslab_studeploy_IP'),
     path('student/ITOperationsLab/monitor/',views.ITOpsLabStudentMonitor,name='itopslab_stumonitor'),
 ]
