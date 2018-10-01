@@ -30,16 +30,21 @@
                     <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <label for="name" class="control-label">Account Number</label>
                         <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
+
+                        Current Account Number submitted: --Insert account number-- (BACKEND)
                     </div>
                     <hr>
-                    <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" value="Submit"/>
+                    <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" style = "background-color:#f9b902" value="Submit"/>
+                    <input type="button" name="next" class="next action-button" id="afterAccNext" value="Next"/>
+                        
                 </fieldset>
-                <fieldset>
+                <fieldset id="approvalFS">
                         <h2 class="fs-title">Please wait for Approval</h2>
                         <h3 class="fs-subtitle">Please wait</h3>
                             Please look out for a telegram message once your instructor has approved your account. 
+                            You may go back to the previous step to re-submit your account number, if necessary. 
                           <hr>
-                        
+                          <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
                         <input type="button" name="next" class="next action-button" value="Next"/>
                     </fieldset>
                 <fieldset>
@@ -59,7 +64,7 @@
                     </div>
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
-                    <input type="submit" name="submitIP" id="submitIP" class="submit action-button" value="Submit"/>
+                    <input type="submit" name="submitIP" id="submitIP" class="submit action-button"  style = "background-color:#f9b902" value="Submit"/>
                 </fieldset>
 
             
@@ -74,6 +79,17 @@
     <script>
     $(".submit1").click(function(){
         $('#TelegramModalstep1').modal('hide')
+    })
+
+    $(function(){
+        var accNum = "{{submittedAccNum}}"; 
+        if (accNum==""){
+            document.getElementById("afterAccNext").disabled = true; 
+        }
+    });
+
+    $(function(){
+
     })
     </script>
 </body>

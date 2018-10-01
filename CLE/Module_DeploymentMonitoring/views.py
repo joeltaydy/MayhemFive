@@ -291,13 +291,13 @@ def student_Deploy_Base(requests):
 
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-
+    coursesec = ""
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
-    for crse in courseList:
-        if crse.course_title == "EMS201":
-            coursesec = crse
-    class_studentObj = Class.objects.get(student= student_email).get(course_section=coursesec )
+    for course_title, crse in courseList.items():
+        if course_title == "EMS201":
+            coursesec = crse['id']
+    class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
     awsAccountNumber =  class_studentObj.awscredential
     response['awsAccNum'] = awsAccountNumber #Could be None or aws credentials object

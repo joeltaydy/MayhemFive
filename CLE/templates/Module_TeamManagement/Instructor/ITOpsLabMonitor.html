@@ -2,14 +2,23 @@
 {% load staticfiles %}
 
 {% block bootstrapContent %}
-<div class="redirect">
-  <span>
-    <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark active">Setup</button>
-    <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}';" type="button" class="btn btn-dark">Monitor</button>
-    <button onclick="location.href = '{% url 'DMmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
-  </span>
-</div>
 
+<div class="col-md-12">
+    <h1 align="center">IT Operations Lab</h1>
+    <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
+   
+
+    <div class= "redirect">
+        <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
+          <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark" >Setup</button>
+          <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
+          <button onclick="location.href = '{% url 'DMmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
+        </div>
+    </div>
+  
+    <hr>
+    <h2 align="center"><i>Monitor</i></h2>
+</div>
     <ul class="navDiv">
       <!-- to remove once for loop is settled by backend -->
       <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number  }}';" type="button" class="btn btn-primary">G3</button>
@@ -24,8 +33,6 @@
 
     <div class="content">
       <div class="container-fluid">
-        <p> <br> </p>
-        <h1>IT Operations Lab</h1>
         <div class="content">
           <div class="row">
             <div class="col-md-12">

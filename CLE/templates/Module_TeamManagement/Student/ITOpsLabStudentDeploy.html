@@ -2,18 +2,24 @@
 {% load staticfiles %}
 
 {% block bootstrapContent %}
-<div class= "redirect">
-    <span>
-      <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Deploy</button>
-      <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
-    </span>
-<div>
+
 
 <div class="col-md-12">
-    <h1 align="center">IT Operations Lab</h1>
-    <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=300px height = 150px style="display: block;margin-left: auto;margin-right: auto;"><br>
-    <h1 align="center"><i>Deploy</i ></h3>
+        <h1 align="center">IT Operations Lab</h1>
+        <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
+       
     
+        <div class= "redirect">
+            <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Deploy</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
+            </div>
+        </div>
+      
+        <hr>
+        <h2 align="center"><i>Deploy</i></h2>
+</div>
+<div class ="col-md-12">
     <div class = "row">  
         <div class="col-md-6">
             <div class="card ">
@@ -54,7 +60,6 @@
 
 
     {% include 'Module_TeamManagement/Student/ITOpsStudentDeployForm.html' %}
-
 
 <script>
 $(document).ready(function(){
