@@ -1,21 +1,17 @@
 import traceback
+import requests as req
 from django.shortcuts import render
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
-from django.db.models import Count
 from Module_DeploymentMonitoring.src import *
-
-# Required for verification
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
-import requests as req
 
 
-'''
-Main function for setup page on faculty.
-Will retrieve work products and render to http page
-'''
+# Main function for setup page on faculty.
+# Will retrieve work products and render to http page
+#
 def faculty_Setup_Base(requests,response=None):
     response = {"faculty_Setup_Base" : "active"}
 
@@ -61,27 +57,32 @@ def faculty_Setup_Base(requests,response=None):
             # Retreive image_id and image_name from AWS using Boto3
             # IF exists in DB, PASS
             # ELSE, ADD into DB
-            image_list = utilities.getAllImages(account_number,access_key,secret_access_key)
+            image_list = aws_util.getAllImages(account_number,access_key,secret_access_key)
+            images = aws_credentials.imageDetails.all()
             for image_id,image_name in image_list.items():
-                try:
-                    Image_Details.objects.get(imageId=image_id)
-                except:
+                isIn = False
+                for image_detailObj in images:
+                    if image_detailObj.imageId == image_id:
+                        isIn = True
+
+                if not isIn:
                     image_detailsObj = Image_Details.objects.create(
                         imageId=image_id,
                         imageName=image_name,
                     )
                     image_detailsObj.save()
+                    aws_credentials.imageDetails.add(image_detailsObj)
 
             # Retrieve Shared Account Numbers from Image_Details (DB)
             # IF does not exists in DB, DELETE
             # ELSE, populate section_imageList with the right details
-            querySet = Image_Details.objects.all()
-            for image_details in querySet:
-                id = image_details.imageId
-                name = image_details.imageName
+            images = aws_credentials.imageDetails.all()
+            for image_detailObj in images:
+                id = image_detailObj.imageId
+                name = image_detailObj.imageName
 
                 try:
-                    image_list[id] # RED HAIR-RING ;D
+                    image_list[id] # Just to check if it DB info tallies with AWS
 
                     for section_number,section_details in section_list.items():
                         section_imageList[section_number] = {'Image_IDs':[]}
@@ -89,7 +90,7 @@ def faculty_Setup_Base(requests,response=None):
                         nonsharedList = []
 
                         for account_number,team_name in section_details.items():
-                            if account_number not in image_details.sharedAccNum:
+                            if account_number not in image_detailObj.sharedAccNum:
                                 nonsharedList.append(
                                     {
                                         'account_number':account_number,
@@ -113,7 +114,7 @@ def faculty_Setup_Base(requests,response=None):
                             }
                         )
                 except:
-                    image_details.delete()
+                    image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
@@ -125,16 +126,14 @@ def faculty_Setup_Base(requests,response=None):
         response['account_number'] = account_number
         response['access_key'] = access_key
         response['secret_access_key'] = secret_access_key
-        response['image_list'] = image_list
         response['section_imageList'] = section_imageList
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
 
-'''
-Retrieval and storing of github deployment package link from instructor
-returns to setup page
-'''
+# Retrieval and storing of github deployment package link from instructor
+# returns to faculty_Setup_Base
+#
 def faculty_Setup_GetGitHub(requests):
     response = {"faculty_Setup_GetGitHub" : "active"}
 
@@ -175,10 +174,9 @@ def faculty_Setup_GetGitHub(requests):
     return faculty_Setup_Base(requests,response)
 
 
-'''
-Retrieval and storing of AWS keys from instructor
-returns to setup page
-'''
+# Retrieval and storing of AWS keys from instructor
+# returns to faculty_Setup_Base
+#
 def faculty_Setup_GetAWSKeys(requests):
     response = {"faculty_Setup_GetAWSKeys" : "active"}
 
@@ -212,7 +210,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
             credentialsObj.save()
         except:
-            if access_key == None
+            if access_key == None:
                 raise Exception('Please input an access_key')
 
             if secret_access_key == None:
@@ -233,13 +231,12 @@ def faculty_Setup_GetAWSKeys(requests):
     return faculty_Setup_Base(requests,response)
 
 
-'''
-Retrieval and storing of AMI length from instructor
-returns to setup page
-'''
+# Retrieval and storing of AMI length from instructor
+# returns to faculty_Setup_Base
+#
 def faculty_Setup_ShareAMI(requests):
-    response = {"faculty_Setup_GetAWSKeys" : "active"}
-    
+    response = {"faculty_Setup_ShareAMI" : "active"}
+
     # Redirect user to login page if not authorized and student
     try:
         processLogin.InstructorVerification(requests)
@@ -247,8 +244,33 @@ def faculty_Setup_ShareAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
+    account_numbers = requests.GET.get('account_numbers')
+    image_id = requests.GET.get('image_id')
+    faculty_email = requests.user.email
+    facultyObj = Faculty.objects.get(email=faculty_email)
+
     try:
-        pass
+        # Get the access_key and secret_access_key from DB
+        aws_credentials = facultyObj.awscredential
+        access_keys = aws_credentials.access_keys
+        secret_access_keys = aws_credentials.secret_access_keys
+
+        client = aws_util.getEC2Client(access_keys,secret_access_keys)
+
+        for account_number in account_numbers:
+            # Add the account number to the image permission on AWS
+            aws_util.addUserToImage(client,image_id,account_number)
+
+            # Add the account number to DB side
+            image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
+            account_numbers = image_detailObj.sharedAccNum
+
+            if account_numbers == None:
+                image_detailObj.sharedAccNum = account_number
+            else:
+                image_detailObj.sharedAccNum = account_numbers + '_' + account_number
+
+            image_detailObj.save()
 
     except:
         traceback.print_exc()
@@ -258,6 +280,9 @@ def faculty_Setup_ShareAMI(requests):
     return faculty_Setup_Base(requests,response)
 
 
+# Main function for deploy page on student.
+# Will check if images has been shared by faculty
+#
 def student_Deploy_Base(requests):
     response = {}
     try:
@@ -266,7 +291,7 @@ def student_Deploy_Base(requests):
 
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    
+
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
     for crse in courseList:
@@ -286,6 +311,9 @@ def student_Deploy_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
+
+# Storing of student user account number in database
+#
 def student_Deploy_GetAccount(requests):
     response = {}
     try:
@@ -298,12 +326,13 @@ def student_Deploy_GetAccount(requests):
         return render(requests,'Module_Account/login.html',response)
 
     accountNum = requests.POST.get("AWS_account_number") #string of account number
-    utilities.createAccount(accountNum, requests) #creates an incomplete account object
-
+    utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
     return HttpResponse('')
 
 
+# Storing and validating of student user IP address
+#
 def student_Deploy_GetIP(requests):
     response = {}
     try:
@@ -314,9 +343,9 @@ def student_Deploy_GetIP(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    
+
     ipAddress = requests.POST.get("ip") #string of IP address
-    utilities.addAWS(ipAddress,requests)
+    utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
 
     return HttpResponse('')
