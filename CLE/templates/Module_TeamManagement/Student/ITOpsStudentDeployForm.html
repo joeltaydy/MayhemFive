@@ -14,49 +14,54 @@
    <div class="row">
         <div class="col-md-9 col-md-offset-3" style="display: block;margin-left: auto;margin-right: auto;">
               
-            <form id="msform" action="{% url 'DMmod:itopslab_monitor' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <form id="msform" action="{% url 'DMmod:itopslab_studeploy' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 {% csrf_token %}
                 <!-- progressbar -->
                 <ul id="progressbar">
-                    <li class="active">Select Class</li>
-                    <li>Select Image</li>
-                    <li>Approve Groups</li>
+                    <li class="active">Submit AWS Account Number</li>
+                    <li>Please Wait For Approval</li>
+                    <li>Launch server from AMI</li>
+                    <li>Submit IP Address</li>
                 </ul>
                 <!-- fieldsets -->
                 <fieldset>
-                    <h2 class="fs-title">Select Class</h2>
-                    <h3 class="fs-subtitle">--insert class list here--</h3>
-                    
-                      <hr>
-                    
-                    <input type="button" name="next" class="next action-button" value="Next"/>
-                </fieldset>
-                <fieldset>
-                    <h2 class="fs-title">Select Image</h2>
+                    <h2 class="fs-title">Submit AWS Account Number</h2>
                     <h3 class="fs-subtitle">(Insert Subtitle)</h3>
                     <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
-                        <select class="form-control" id="type" name="type">
-                            <option value="" disabled selected>Image Name</option>
-                            <option value="Trailhead">Image Option 1</option>
-                            <option value="Trailhead">Image Option 2</option>
-                        </select>
+                        <label for="name" class="control-label">Account Number</label>
+                        <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
                     </div>
-                    <!-- <input type="text" name="twitter" placeholder="Twitter"/>
-                    <input type="text" name="facebook" placeholder="Facebook"/>
-                    <input type="text" name="gplus" placeholder="Google Plus"/> -->
-                    <br><br><br><br><br>
+                    <hr>
+                    <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" value="Submit"/>
+                </fieldset>
+                <fieldset>
+                        <h2 class="fs-title">Please wait for Approval</h2>
+                        <h3 class="fs-subtitle">Please wait</h3>
+                            Please look out for a telegram message once your instructor has approved your account. 
+                          <hr>
+                        
+                        <input type="button" name="next" class="next action-button" value="Next"/>
+                    </fieldset>
+                <fieldset>
+                    <h2 class="fs-title">Launch server from AMI</h2>
+                    <h3 class="fs-subtitle">(Insert Subtitle)</h3>
+                    Please refer to the instructions above to launch server from AMI. Once completed, please press <b>NEXT</b> to submit the relevant information. 
+                    <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
                     <input type="button" name="next" class="next action-button" value="Next"/>
                 </fieldset>
                 <fieldset>
-                    <h2 class="fs-title">Approve Groups</h2>
-                    <h3 class="fs-subtitle">Please select the groups you would like to send the image to</h3>
-                    <!-- <input type="text" name="email" placeholder="Email"/>
-                    <input type="password" name="pass" placeholder="Password"/>
-                    <input type="password" name="cpass" placeholder="Confirm Password"/> -->
+                    <h2 class="fs-title">Submit IP Address</h2>
+                    <h3 class="fs-subtitle">(Insert Subtitle)</h3>
+                    <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
+                        <label for="name" class="control-label">IP Address</label>
+                        <input class="form-control" type="text" name="ipaddress" id="ipaddress" aria-describedby="fileHelp">
+                    </div>
+                    <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
-                    <input type="submit" name="submit" class="submit action-button" value="Submit"/>
+                    <input type="submit" name="submitIP" id="submitIP" class="submit action-button" value="Submit"/>
                 </fieldset>
+
             
             </form>
             
@@ -66,4 +71,9 @@
     
     <script src="{% static 'js/multistepform.js' %}" type="text/javascript"></script>
     <!-- <script src="../../../../CLE/static/js/multistepform.js" type="text/javascript"></script> -->
+    <script>
+    $(".submit1").click(function(){
+        $('#TelegramModalstep1').modal('hide')
+    })
+    </script>
 </body>
