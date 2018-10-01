@@ -21,6 +21,7 @@
       {% endfor %}
     </ul>
 
+
     <div class="content">
       <div class="container-fluid">
         <p> <br> </p>
@@ -70,6 +71,22 @@
                     </div>
                   </div>
 
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5 align="center" class="card-title">Deployment</h5>
+                        <p class="card-category" align="center">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                      </div>
+                      <div class="card-body">
+                        <span align="center">
+                              {% include "Module_TeamManagement/Datatables/duallistbox.html" %}
+                        </span>
+                      </div>
+                      <div class="card-footer">
+                      </br>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -90,6 +107,7 @@ $(function(){
             // console.log(link.attr("href") === pageUrl);
             if (href === pageUrl.substring(pageUrl.length-href.length)) {
               console.log("success");
+              console.log();
                 link.addClass("active");
             }
        });
