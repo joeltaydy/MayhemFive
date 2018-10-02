@@ -13,7 +13,8 @@ from django.contrib.auth import logout
 # Will retrieve work products and render to http page
 #
 def faculty_Setup_Base(requests,response=None):
-    response = {"faculty_Setup_Base" : "active"}
+    if response == None:
+        response = {"faculty_Setup_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
@@ -26,18 +27,18 @@ def faculty_Setup_Base(requests,response=None):
     facultyObj = Faculty.objects.get(email=faculty_email)
 
     try:
-        deployment_packageList = {}
-        account_number = ''
-        access_key = ''
-        secret_access_key = ''
-        section_imageList = {}
+        response['deployment_packages'] = {}
+        response['account_number'] = ''
+        response['access_key'] = ''
+        response['secret_access_key'] = ''
+        response['section_imageList'] = {}
 
         # Retrieve GitHub link from Deployment_Package
         deployment_packageObjs = Deployment_Package.objects.all()
 
         if len(deployment_packageObjs) > 0:
             for deployment_packageObj in deployment_packageObjs:
-                deployment_packageList.update(
+                response['deployment_packages'].update(
                     {
                         deployment_packageObj.deploymentid:deployment_packageObj.gitlink
                     }
@@ -47,87 +48,78 @@ def faculty_Setup_Base(requests,response=None):
         aws_credentials = facultyObj.awscredential
 
         if aws_credentials != None:
-            account_number = aws_credentials.account_number
-            access_key = aws_credentials.access_key
-            secret_access_key = aws_credentials.secret_access_key
+            response['account_number']  = aws_credentials.account_number
+            response['access_key'] = aws_credentials.access_key
+            response['secret_access_key'] = aws_credentials.secret_access_key
 
             # Retrieve the team_number and account_number for each section
             course_sectionList = requests.session['courseList_updated']
             section_list = utilities.getAllTeamDetails(course_sectionList)
 
-            # Retreive image_id and image_name from AWS using Boto3
-            # IF exists in DB, PASS
-            # ELSE, ADD into DB
-            image_list = aws_util.getAllImages(account_number,access_key,secret_access_key)
-            images = aws_credentials.imageDetails.all()
-            for image_id,image_name in image_list.items():
-                isIn = False
+            if len(section_list) > 0:
+                # Retreive image_id and image_name from AWS using Boto3 and compare itwith data in DB
+                image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
+                for image_id,image_name in image_list.items():
+                    if len(aws_credentials.imageDetails.all()) == 0:
+                        image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                        aws_credentials.imageDetails.add(image_detailsObj)
+                    else:
+                        try:
+                            aws_credentials.imageDetails.filter(imageId=image_id)
+                        except:
+                            image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                            aws_credentials.imageDetails.add(image_detailsObj)
+
+                # Retrieve Shared Account Numbers from Image_Details (DB) and compared it wil data in Boto3
+                images = aws_credentials.imageDetails.all()
                 for image_detailObj in images:
-                    if image_detailObj.imageId == image_id:
-                        isIn = True
+                    id = image_detailObj.imageId
+                    name = image_detailObj.imageName
 
-                if not isIn:
-                    image_detailsObj = Image_Details.objects.create(
-                        imageId=image_id,
-                        imageName=image_name,
-                    )
-                    image_detailsObj.save()
-                    aws_credentials.imageDetails.add(image_detailsObj)
+                    try:
+                        image_list[id] # Just to check if DB info tallies with AWS
+                        for section_number,section_details in section_list.items():
+                            response['section_imageList'][section_number] = {'Image_IDs':[]}
+                            sharedList = []
+                            nonsharedList = []
 
-            # Retrieve Shared Account Numbers from Image_Details (DB)
-            # IF does not exists in DB, DELETE
-            # ELSE, populate section_imageList with the right details
-            images = aws_credentials.imageDetails.all()
-            for image_detailObj in images:
-                id = image_detailObj.imageId
-                name = image_detailObj.imageName
+                            for team_name,account_number in section_details.items():
+                                shared_account_numbers = image_detailObj.sharedAccNum
+                                if shared_account_numbers == None:
+                                    shared_account_numbers = []
+                                else:
+                                    shared_account_numbers = shared_account_numbers.split('_')
 
-                try:
-                    image_list[id] # Just to check if it DB info tallies with AWS
+                                if account_number in shared_account_numbers:
+                                    sharedList.append(
+                                        {
+                                            'account_number':account_number,
+                                            'team_name':team_name,
+                                        }
+                                    )
+                                else:
+                                    nonsharedList.append(
+                                        {
+                                            'account_number':account_number,
+                                            'team_name':team_name,
+                                        }
+                                    )
 
-                    for section_number,section_details in section_list.items():
-                        section_imageList[section_number] = {'Image_IDs':[]}
-                        sharedList = []
-                        nonsharedList = []
-
-                        for account_number,team_name in section_details.items():
-                            if account_number not in image_detailObj.sharedAccNum:
-                                nonsharedList.append(
-                                    {
-                                        'account_number':account_number,
-                                        'team_name':team_name,
-                                    }
-                                )
-                            else:
-                                sharedList.append(
-                                    {
-                                        'account_number':account_number,
-                                        'team_name':team_name,
-                                    }
-                                )
-
-                        section_imageList[section_number]['Image_IDs'].append(
-                            {
-                                'image_id':id,
-                                'image_name':name,
-                                'shared_account_number':sharedList,
-                                'non_shared_account_number':nonsharedList
-                            }
-                        )
-                except:
-                    image_detailObj.delete()
+                            response['section_imageList'][section_number]['Image_IDs'].append(
+                                {
+                                    'image_id':id,
+                                    'image_name':name,
+                                    'shared_account_number':sharedList,
+                                    'non_shared_account_number':nonsharedList
+                                }
+                            )
+                    except:
+                         image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error during retrieval of information: ' + e.args[0]
+        response['message'] = 'Error during retrieval of information: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
-
-    finally:
-        response['deployment_packages'] = deployment_packageList
-        response['account_number'] = account_number
-        response['access_key'] = access_key
-        response['secret_access_key'] = secret_access_key
-        response['section_imageList'] = section_imageList
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
@@ -199,9 +191,15 @@ def faculty_Setup_GetAWSKeys(requests):
         faculty_email = requests.user.email
         facultyObj = Faculty.objects.get(email=faculty_email)
 
+        # Validate if account_number is a valid account_number
+        valid = aws_util.validateAccountNumber(account_number,access_key,secret_access_key)
+        if not valid:
+            raise Exception("Invalid parameters. Please specify a valid account number.")
+
         # try:UPDATE, except:SAVE Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
         try:
             credentialsObj = facultyObj.awscredential
+            credentialsObj.account_number = account_number
             credentialsObj.access_key = access_key
             credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
