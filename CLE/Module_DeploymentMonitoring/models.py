@@ -80,13 +80,12 @@ class AWS_Credentials(models.Model):
     serverDetails = models.ForeignKey(
         Server_Details,
         on_delete= models.CASCADE,
-        db_column = 'Server_Details',
+        db_column='Server_Details',
         null=True,
     )
-    imageDetails = models.ForeignKey(
+    imageDetails = models.ManyToManyField(
         Image_Details,
-        on_delete= models.CASCADE,
-        db_column = 'Image_Details',
+        db_column='Image_Details',
         null=True,
     )
 

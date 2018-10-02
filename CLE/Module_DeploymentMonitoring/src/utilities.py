@@ -11,10 +11,10 @@ from Module_TeamManagement.src import utilities
 def getAllTeamDetails(course_sectionList):
     section_list = {}
 
-    if len(course_sectionList) < 0 or 'ESM201' not in course_sectionList.keys():
+    if len(course_sectionList) < 0 and 'EMS201' not in course_sectionList.keys():
         return {}
 
-    for course_section in course_sectionList['ESM201']:
+    for course_section in course_sectionList['EMS201']:
         section_number = course_section['section_number']
         section_list[section_number] = {}
 
@@ -22,13 +22,21 @@ def getAllTeamDetails(course_sectionList):
         for team_details in query:
             team_name = team_details['team_number']
             account_number = team_details['awscredential']
-            section_list[section_number].update(
-                {
-                    account_number:team_name
-                }
-            )
+
+            if team_name != None and account_number != None:
+                section_list[section_number][team_name] = account_number
 
     return section_list
+
+
+# Add image detials into database. REturns an image_details object
+def addImageDetials(image_id,image_name):
+    image_detailsObj = Image_Details.objects.create(
+        imageId=image_id,
+        imageName=image_name,
+    )
+    image_detailsObj.save()
+    return image_detailsObj
 
 
 # Add AWS credentials for the relevant students
