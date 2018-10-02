@@ -1,13 +1,19 @@
 import json
 import traceback
 import requests as req
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.src import utilities,aws_util
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
+
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from Module_DeploymentMonitoring.forms import *
+
+
 
 
 # Main function for setup page on faculty.
@@ -442,3 +448,122 @@ def ITOpsLabStudentDeploy(requests):
 def ITOpsLabStudentMonitor(requests):
     response = {"ITOpsLabStudentMonitor" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
+
+#test forms
+def server_list(request):
+    servers = Server_Details.objects.all()
+    return render(request, 'Module_TeamManagement/Datatables/server_list.html', {'servers': servers})
+
+
+def save_server_form(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            servers = Server_Details.objects.all()
+            data['html_server_list'] = render_to_string('Module_TeamManagement/Datatables/partial_server_list.html', {
+                'servers': servers
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+def server_create(request):
+    if request.method == 'POST':
+        form = ServerForm(request.POST)
+    else:
+        form = ServerForm()
+    return save_server_form(request, form, 'Module_TeamManagement/Datatables/partial_server_create.html')
+
+
+def server_update(request, pk):
+    server = get_object_or_404(Server_Details, pk=pk)
+    if request.method == 'POST':
+        form = ServerForm(request.POST, instance=server)
+    else:
+        form = ServerForm(instance=server)
+    return save_server_form(request, form, 'Module_TeamManagement/Datatables/partial_server_update.html')
+
+
+def server_delete(request, pk):
+    server = get_object_or_404(Server_Details, pk=pk)
+    data = dict()
+    if request.method == 'POST':
+        server.delete()
+        data['form_is_valid'] = True  # This is just to play along with the existing code
+        servers = Server_Details.objects.all()
+        data['html_server_list'] = render_to_string('Module_TeamManagement/Datatables/partial_server_list.html', {
+            'servers': servers
+        })
+    else:
+        context = {'server': server}
+        data['html_form'] = render_to_string('Module_TeamManagement/Datatables/partial_server_delete.html',
+            context,
+            request=request,
+        )
+    return JsonResponse(data)
+#end of test forms
+
+
+#deployment package forms
+def deployment_package_list(request):
+    dps = Deployment_Package.objects.all()
+    return render(request, 'dataforms/deploymentpackage/dp_list.html', {'dps': dps})
+
+
+def save_dp_form(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            dps = Deployment_Package.objects.all()
+            data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+                'dps': dps
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+def dp_create(request):
+    if request.method == 'POST':
+        form = DeploymentForm(request.POST)
+    else:
+        form = DeploymentForm()
+    return save_dp_form(request, form, 'dataforms/deploymentpackage/partial_dp_create.html')
+
+
+def dp_update(request, pk):
+    dp = get_object_or_404(Deployment_Package, pk=pk)
+    if request.method == 'POST':
+        form = DeploymentForm(request.POST, instance=dp)
+    else:
+        form = DeploymentForm(instance=dp)
+    return save_dp_form(request, form, 'dataforms/deploymentpackage/partial_dp_update.html')
+
+
+def dp_delete(request, pk):
+    dp = get_object_or_404(Deployment_Package, pk=pk)
+    data = dict()
+    if request.method == 'POST':
+        dp.delete()
+        data['form_is_valid'] = True  # This is just to play along with the existing code
+        dps = Deployment_Package.objects.all()
+        data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+            'dps': dps
+        })
+    else:
+        context = {'dp': dp}
+        data['html_form'] = render_to_string('dataforms/deploymentpackage/partial_dp_delete.html',
+            context,
+            request=request,
+        )
+    return JsonResponse(data)
+#end of deployment package forms
