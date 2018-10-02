@@ -44,7 +44,7 @@ def faculty_Setup_Base(requests,response=None):
                 )
 
         # Retrieve Access_Key and Secret_Access_Key from AWS_Credentials
-        aws_credentials = facultyObj.awscredential4
+        aws_credentials = facultyObj.awscredential
 
         if aws_credentials != None:
             account_number = aws_credentials.account_number
