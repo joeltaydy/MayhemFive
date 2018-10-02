@@ -4,6 +4,7 @@
 {% block bootstrapContent %}
 <head>
     <link rel="stylesheet" href="{% static 'css/itopssetup.css' %}">
+
 </head>
 
 <div class="col-md-12">
@@ -24,41 +25,61 @@
     <div id="accordion" class="panel-group col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
         <div class="panel">
         <div class="panel-heading">
-        <h4 class="panel-title">
+        <h5 class="panel-title">
             <a href="#panelBodyOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
-            </h4>
+            </h5>
         </div>
 
          <!-- Request AWS Information-->
         <div id="panelBodyOne" class="panel-collapse collapse in">
             <div class="panel-body">
-                <p>
+
+                <form id="awsinfo" action="{% url 'DMmod:itopslab_setup_AWSKeys' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                    {% csrf_token %}
                     <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                         <label for="name" class="control-label">Account Number</label>
-                        <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="account_number" id="accountNum" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Access Key</label>
-                        <input class="form-control" type="text" name="accessKey" id="accessKey" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="access_key" id="accessKey" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Secret Access Key</label>
-                        <input class="form-control" type="text" name="secretKey" id="secretKey" aria-describedby="fileHelp">
-
-                        <div class="col-md-12 form-group" style = "margin-bottom:40px;">
-                            <br>
-                            <button class="btn btn-dark pull-right" type="submit">Submit</button>
-                            <br>
-                        </div>
+                        <input class="form-control" type="text" name="secret_access_key" id="secretKey" aria-describedby="fileHelp">
                     </div>
-                </p>
+                    <div class="col-md-9 form-group" style = "margin-bottom:40px;">
+                        <br>
+                        <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
+                    </div>
+                </form>
+                <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+                    {% if submittedAccountNumber != "" %}
+                        <h5><b>Submitted Account Number:</b> {{account_number}} </h5>
+                    {% else %}
+                        <h5><b>Submitted Account Number:</b> <i color = "red">No Account Number submitted</i></h5>
+                    {%endif %}
+
+                    {% if submittedAccessKey != "" %}
+                        <h5><b>Submitted AWS Access Key:</b> {{access_key}} </h5>
+                    {% else %}
+                        <h5><b>Submitted AWS Access Key:</b> <i color = "red">No Access Key submitted</i></h5>
+                    {%endif %}
+
+                    {% if submittedSecAccessKey != "" %}
+                        <h5><b>Submitted AWS Secret Access Key:</b> {{secret_access_key}}</h5>
+                    {% else %}
+                        <h5><b>Submitted AWS Secret Access Key:</b> <i color = "red">No Access Key submitted</i></h5>
+                    {%endif %}
+                </div>
+
             </div>
         </div>
         </div>
 
         <div class="panel">
         <div class="panel-heading">
-        <h4 class="panel-title">
+        <h5 class="panel-title">
             <a href="#panelBodyTwo" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Deployment Package</a>
-            </h4>
+            </h5>
         </div>
          <!-- Deployment Package Table-->
         <div id="panelBodyTwo" class="panel-collapse collapse">
@@ -71,9 +92,9 @@
         </div>
         <div class="panel">
             <div class="panel-heading">
-            <h4 class="panel-title">
+            <h5 class="panel-title">
                 <a href="#panelBodyThree" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Approve & Send Image</a>
-                </h4>
+                </h5>
             </div>
          <!-- Approve and Send Image Steps-->
             <div id="panelBodyThree" class="panel-collapse collapse">
@@ -86,10 +107,70 @@
         </div>
     </div>
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function(){
             $('[data-toggle="popover"]').popover();
         });
-    </script>
 
+        //validations for form fields
+        $("#awsinfo").validate({
+            rules: {
+                accountNum: {
+                    url: true, //checks account number if digits have been entered
+                    required: true
+                },
+                accessKey: {
+                    required: true
+                },
+                secretKey: {
+                    required: true
+                }
+            },
+            messages: {
+                accountNum: {
+                    digits: "Please enter a valid AWS Account Number.",
+                    required: "Please enter your AWS Account Number."
+                },
+                accessKey: {
+                    required: "Please enter your AWS Access Key."
+                },
+                secretKey: {
+                    required: "Please enter your AWS Secret Access Key."
+                }
+            }
+        });
+
+        // $(function(){
+        // var accNum = "{{submittedAccNum}}";
+        // var accKey =  "{{submittedAccKey}}";
+        // var secKey = "{{submittedSecKey}}";
+
+        //     if (accNum!=""){
+        //         document.forms['awsinfo'].elements['email'].value = accNum;
+        //     }
+        //     if (accKey!=""){
+        //         document.forms['awsinfo'].elements['accessKey'].value = accKey;
+        //     }
+        //     if (secKey!=""){
+        //         document.forms['awsinfo'].elements['secretKey'].value = secKey;
+        //     }
+        // });
+
+        // $( document ).ready(function() {
+        // // after the page elements are all loaded, then run the script
+        // // Set the input field with unique ID #email to a value
+
+        // $("#email").val('someone@test.com');
+    
+        // // Set the input field with unique ID #name
+
+        // $("#name").val('John Doe');
+
+        // });
+
+
+
+    </script>
 {% endblock %}

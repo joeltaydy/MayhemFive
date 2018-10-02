@@ -8,11 +8,13 @@ from Module_TeamManagement.src import utilities
 
 
 # Get all team number and account number for those enrolled in course ESM201
-def getAllTeamDetails():
+def getAllTeamDetails(course_sectionList):
     section_list = {}
 
-    esm_course_sectionList = requests.session['courseList_update']['ESM201']
-    for course_section in esm_course_sectionList:
+    if len(course_sectionList) < 0 and 'EMS201' not in course_sectionList.keys():
+        return {}
+
+    for course_section in course_sectionList['EMS201']:
         section_number = course_section['section_number']
         section_list[section_number] = {}
 
@@ -20,20 +22,30 @@ def getAllTeamDetails():
         for team_details in query:
             team_name = team_details['team_number']
             account_number = team_details['awscredential']
-            section_list[section_number].update(
-                {
-                    account_number:team_name
-                }
-            )
+
+            if team_name != None and account_number != None:
+                section_list[section_number][team_name] = account_number
 
     return section_list
 
 
+# Add image detials into database. REturns an image_details object
+def addImageDetials(image_id,image_name):
+    image_detailsObj = Image_Details.objects.create(
+        imageId=image_id,
+        imageName=image_name,
+    )
+    image_detailsObj.save()
+    return image_detailsObj
+
+
 # Add AWS credentials for the relevant students
-def addAWSCredentials(accountNum, class_studentObj):
+def addAWSCredentials(accountNum, requests):
     class_studentObj= getStudentClassObject(requests)
     try:
-        awsC=AWS_Credentials.objects.get(account_number=accountNum)
+        awsC=class_studentObj.awscredential
+        awsC.account_number = accountNum
+        awsC.save()
     except:
         awsC = AWS_Credentials.objects.create(
             account_number=accountNum,
@@ -50,7 +62,7 @@ def getStudentClassObject(requests):
     for course_title,course_details in courseList.items():
         if course_title == "EMS201":
             course_section_id = course_details['id']
-    class_studentObj = Class.objects.get(student= student_email).get(course_section=course_section_id)
+    class_studentObj = Class.objects.filter(student= student_email).get(course_section=course_section_id)
 
     return class_studentObj
 

@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
-from Module_DeploymentMonitoring.src import *
+from Module_DeploymentMonitoring.src import utilities,aws_util
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
 
@@ -19,7 +19,8 @@ from Module_DeploymentMonitoring.forms import *
 # Will retrieve work products and render to http page
 #
 def faculty_Setup_Base(requests,response=None):
-    response = {"faculty_Setup_Base" : "active"}
+    if response == None:
+        response = {"faculty_Setup_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
@@ -32,18 +33,18 @@ def faculty_Setup_Base(requests,response=None):
     facultyObj = Faculty.objects.get(email=faculty_email)
 
     try:
-        deployment_packageList = {}
-        account_number = ''
-        access_key = ''
-        secret_access_key = ''
-        section_imageList = {}
+        response['deployment_packages'] = {}
+        response['account_number'] = ''
+        response['access_key'] = ''
+        response['secret_access_key'] = ''
+        response['section_imageList'] = {}
 
         # Retrieve GitHub link from Deployment_Package
         deployment_packageObjs = Deployment_Package.objects.all()
 
         if len(deployment_packageObjs) > 0:
             for deployment_packageObj in deployment_packageObjs:
-                deployment_packageList.update(
+                response['deployment_packages'].update(
                     {
                         deployment_packageObj.deploymentid:deployment_packageObj.gitlink
                     }
@@ -53,86 +54,78 @@ def faculty_Setup_Base(requests,response=None):
         aws_credentials = facultyObj.awscredential
 
         if aws_credentials != None:
-            account_number = aws_credentials.account_number
-            access_key = aws_credentials.access_key
-            secret_access_key = aws_credentials.secret_access_key
+            response['account_number']  = aws_credentials.account_number
+            response['access_key'] = aws_credentials.access_key
+            response['secret_access_key'] = aws_credentials.secret_access_key
 
             # Retrieve the team_number and account_number for each section
-            section_list = utilities.getAllTeamDetails()
+            course_sectionList = requests.session['courseList_updated']
+            section_list = utilities.getAllTeamDetails(course_sectionList)
 
-            # Retreive image_id and image_name from AWS using Boto3
-            # IF exists in DB, PASS
-            # ELSE, ADD into DB
-            image_list = aws_util.getAllImages(account_number,access_key,secret_access_key)
-            images = aws_credentials.imageDetails.all()
-            for image_id,image_name in image_list.items():
-                isIn = False
+            if len(section_list) > 0:
+                # Retreive image_id and image_name from AWS using Boto3 and compare itwith data in DB
+                image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
+                for image_id,image_name in image_list.items():
+                    if len(aws_credentials.imageDetails.all()) == 0:
+                        image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                        aws_credentials.imageDetails.add(image_detailsObj)
+                    else:
+                        try:
+                            aws_credentials.imageDetails.filter(imageId=image_id)
+                        except:
+                            image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                            aws_credentials.imageDetails.add(image_detailsObj)
+
+                # Retrieve Shared Account Numbers from Image_Details (DB) and compared it wil data in Boto3
+                images = aws_credentials.imageDetails.all()
                 for image_detailObj in images:
-                    if image_detailObj.imageId == image_id:
-                        isIn = True
+                    id = image_detailObj.imageId
+                    name = image_detailObj.imageName
 
-                if not isIn:
-                    image_detailsObj = Image_Details.objects.create(
-                        imageId=image_id,
-                        imageName=image_name,
-                    )
-                    image_detailsObj.save()
-                    aws_credentials.imageDetails.add(image_detailsObj)
+                    try:
+                        image_list[id] # Just to check if DB info tallies with AWS
+                        for section_number,section_details in section_list.items():
+                            response['section_imageList'][section_number] = {'Image_IDs':[]}
+                            sharedList = []
+                            nonsharedList = []
 
-            # Retrieve Shared Account Numbers from Image_Details (DB)
-            # IF does not exists in DB, DELETE
-            # ELSE, populate section_imageList with the right details
-            images = aws_credentials.imageDetails.all()
-            for image_detailObj in images:
-                id = image_detailObj.imageId
-                name = image_detailObj.imageName
+                            for team_name,account_number in section_details.items():
+                                shared_account_numbers = image_detailObj.sharedAccNum
+                                if shared_account_numbers == None:
+                                    shared_account_numbers = []
+                                else:
+                                    shared_account_numbers = shared_account_numbers.split('_')
 
-                try:
-                    image_list[id] # Just to check if it DB info tallies with AWS
+                                if account_number in shared_account_numbers:
+                                    sharedList.append(
+                                        {
+                                            'account_number':account_number,
+                                            'team_name':team_name,
+                                        }
+                                    )
+                                else:
+                                    nonsharedList.append(
+                                        {
+                                            'account_number':account_number,
+                                            'team_name':team_name,
+                                        }
+                                    )
 
-                    for section_number,section_details in section_list.items():
-                        section_imageList[section_number] = {'Image_IDs':[]}
-                        sharedList = []
-                        nonsharedList = []
-
-                        for account_number,team_name in section_details.items():
-                            if account_number not in image_detailObj.sharedAccNum:
-                                nonsharedList.append(
-                                    {
-                                        'account_number':account_number,
-                                        'team_name':team_name,
-                                    }
-                                )
-                            else:
-                                sharedList.append(
-                                    {
-                                        'account_number':account_number,
-                                        'team_name':team_name,
-                                    }
-                                )
-
-                        section_imageList[section_number]['Image_IDs'].append(
-                            {
-                                'image_id':id,
-                                'image_name':name,
-                                'shared_account_number':sharedList,
-                                'non_shared_account_number':nonsharedList
-                            }
-                        )
-                except:
-                    image_detailObj.delete()
+                            response['section_imageList'][section_number]['Image_IDs'].append(
+                                {
+                                    'image_id':id,
+                                    'image_name':name,
+                                    'shared_account_number':sharedList,
+                                    'non_shared_account_number':nonsharedList
+                                }
+                            )
+                    except:
+                         image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error during retrieval of information: ' + e.args[0]
+        response['message'] = 'Error during retrieval of information: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
-
-    finally:
-        response['deployment_packages'] = deployment_packageList
-        response['account_number'] = account_number
-        response['access_key'] = access_key
-        response['secret_access_key'] = secret_access_key
-        response['section_imageList'] = section_imageList
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
@@ -193,35 +186,34 @@ def faculty_Setup_GetAWSKeys(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    account_number = requests.GET.get('account_number')
-    access_key = requests.GET.get('access_key')
-    secret_access_key = requests.GET.get('secret_access_key')
+    account_number = requests.POST.get('account_number')
+    access_key = requests.POST.get('access_key')
+    secret_access_key = requests.POST.get('secret_access_key')
 
     try:
-        if account_number == None:
-            raise Exception('Please input an account_number')
+        if account_number == None or access_key == None or secret_access_key == None:
+            raise Exception('Please input an account_number, access_key and secret_access_key')
 
-        # Save/Update Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
+        faculty_email = requests.user.email
+        facultyObj = Faculty.objects.get(email=faculty_email)
+
+        # Validate if account_number is a valid account_number
+        valid = aws_util.validateAccountNumber(account_number,access_key,secret_access_key)
+        if not valid:
+            raise Exception("Invalid parameters. Please specify a valid account number.")
+
+        # try:UPDATE, except:SAVE Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
         try:
-            if access_key == None and secret_access_key == None:
-                raise Exception('Please input an access_key and/or secret_access_key')
-
-            credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-
-            if access_key != None:
-                credentialsObj.access_key = access_key
-
-            if secret_access_key != None:
-                credentialsObj.secret_access_key = secret_access_key
-
+            credentialsObj = facultyObj.awscredential
+            credentialsObj.account_number = account_number
+            credentialsObj.access_key = access_key
+            credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
+
+            facultyObj.awscredential = credentialsObj
+            facultyObj.save()
+
         except:
-            if access_key == None:
-                raise Exception('Please input an access_key')
-
-            if secret_access_key == None:
-                raise Exception('Please input a secret_access_key')
-
             credentialsObj = AWS_Credentials.objects.create(
                 account_number=account_number,
                 access_key=access_key,
@@ -229,9 +221,12 @@ def faculty_Setup_GetAWSKeys(requests):
             )
             credentialsObj.save()
 
-    except:
+            facultyObj.awscredential = credentialsObj
+            facultyObj.save()
+
+    except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error in AWS Information form: ' + e.args[0]
+        response['message'] = 'Error in AWS Information form: ' + str(e.args[0])
         return faculty_Setup_Base(requests,response)
 
     return faculty_Setup_Base(requests,response)
@@ -265,7 +260,7 @@ def faculty_Setup_ShareAMI(requests):
 
         for account_number in account_numbers:
             # Add the account number to the image permission on AWS
-            aws_util.addUserToImage(client,image_id,account_number)
+            aws_util.addUserToImage(image_id,account_number,client)
 
             # Add the account number to DB side
             image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
@@ -306,7 +301,7 @@ def student_Deploy_Base(requests):
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
     awsAccountNumber =  class_studentObj.awscredential
-    response['awsAccNum'] = awsAccountNumber #Could be None or aws credentials object
+    response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
     try:
         awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
         response['awsImage'] = awsImage
@@ -314,13 +309,35 @@ def student_Deploy_Base(requests):
         response['awsImage'] = None
 
     response["studentDeployBase"] = "active"
-
+    print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+
+#processes form
+def student_Deploy_Upload(requests):
+    response = {}
+    try:
+        processLogin.studentVerification(requests)
+        if requests.method == "GET" :
+            response['message'] = "Wrong entry to form"
+            return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+    accountNum = requests.POST.get("accountNum") #string of account number
+    
+    ipAddress = requests.POST.get("ipaddress") #string of IP address
+    
+    if accountNum is not None:
+        student_Deploy_AddAccount(requests)
+    elif ipAddress is not None:
+        student_Deploy_AddIP(requests)
+
+    return HttpResponse('')
 
 
 # Storing of student user account number in database
 #
-def student_Deploy_GetAccount(requests):
+def student_Deploy_AddAccount(requests):
     response = {}
     try:
         processLogin.studentVerification(requests)
@@ -331,15 +348,15 @@ def student_Deploy_GetAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    accountNum = requests.POST.get("AWS_account_number") #string of account number
+    accountNum = requests.POST.get("accountNum") #string of account number
+    print(accountNum)
     utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
-    return HttpResponse('')
 
 
 # Storing and validating of student user IP address
 #
-def student_Deploy_GetIP(requests):
+def student_Deploy_AddIP(requests):
     response = {}
     try:
         processLogin.studentVerification(requests)
@@ -350,11 +367,10 @@ def student_Deploy_GetIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    ipAddress = requests.POST.get("ip") #string of IP address
+    ipAddress = requests.POST.get("ipaddress") #string of IP address
     utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
 
-    return HttpResponse('')
 
 
 def ITOpsLabMonitor(requests):

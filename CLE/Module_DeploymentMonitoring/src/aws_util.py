@@ -1,18 +1,33 @@
 import boto3
+from botocore.exceptions import ClientError
 from Module_DeploymentMonitoring.src import config, server_util
 
 # Get and connects to AWS SDK via boto3
-def getEC2Client(access_key,secret_access_key,region_name=None):
+def getEC2Client(access_key,secret_access_key,region_name=None,service=None):
     if region_name == None:
         region_name = config.REGION_NAME
 
-    client = boto3.client('ec2',
+    if service == None:
+        service = 'ec2'
+
+    client = boto3.client(service,
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_access_key,
         region_name=region_name
     )
 
     return client
+
+
+# Check if valid account number
+def validateAccountNumber(account_number,access_key,secret_access_key):
+    client = getEC2Client(access_key,secret_access_key,service='sts')
+    try:
+        account = client.get_caller_identity()
+    except ClientError as e:
+        raise Exception("Invalid parameters. Please specify a valid access key and secret access key.")
+
+    return account_number == account['Account']
 
 
 # Return public key : String
@@ -45,26 +60,29 @@ def deleteAWSKeyPair(username,access_key,secret_access_key):
 
 
 # Get all images from user account via Boto3
-def getAllImages(client=None,account_number,access_key,secret_access_key):
+def getAllImages(account_number,access_key,secret_access_key,client=None):
     images = {}
 
     if client == None:
         client = getEC2Client(access_key,secret_access_key)
 
-    results = client.describe_images(
-        Owners=[
-            account_number,
-        ],
-    )
+    try:
+        results = client.describe_images(
+            Owners=[
+                account_number,
+            ],
+        )
 
-    for image in results['Images']:
-        images[image['ImageId']] = image['Name']
+        for image in results['Images']:
+            images[image['ImageId']] = image['Name']
+    except ClientError as e:
+        raise Exception('Invalid Access_Key and Secret_Access_Key. Please key in a valid one')
 
     return images
 
 
 # Add user to Image launch permission
-def addUserToImage(client=None,image_id,account_number,access_key,secret_access_key):
+def addUserToImage(image_id,account_number,access_key,secret_access_key,client=None):
     if client == None:
         client = getEC2Client(access_key,secret_access_key)
 
@@ -79,7 +97,7 @@ def addUserToImage(client=None,image_id,account_number,access_key,secret_access_
 
 
 # Remove user to Image launch permission
-def removeUserFromImage(client=None,image_id,account_number,access_key,secret_access_key):
+def removeUserFromImage(image_id,account_number,access_key,secret_access_key,client=None):
     if client == None:
         client = getEC2Client(access_key,secret_access_key)
 

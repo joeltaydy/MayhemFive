@@ -14,6 +14,7 @@ class Server_Details(models.Model):
     instanceName = models.CharField(
         db_column='Instance_Name',
         max_length=255,
+        null = True
     )
     state = models.CharField(
         db_column="Server_State",
@@ -39,7 +40,7 @@ class Image_Details(models.Model):
     )
     sharedAccNum = models.TextField(
         db_column='List_of_shared_account_number',
-        null = True 
+        null = True
     )
 
     class Meta:
@@ -49,13 +50,12 @@ class Image_Details(models.Model):
 
 class Deployment_Package(models.Model):
     deploymentid = models.CharField(
-        db_column='Deployment ID',
+        db_column='Deployment_ID',
         max_length=255,
         primary_key=True,
     )
-    gitlink = models.CharField(
-        db_column='Git Hub Link',
-        max_length=255,
+    gitlink = models.TextField(
+        db_column='GitHub_Link',
     )
 
     class Meta:
@@ -79,13 +79,12 @@ class AWS_Credentials(models.Model):
     serverDetails = models.ForeignKey(
         Server_Details,
         on_delete= models.CASCADE,
-        db_column = 'Server_Details',
+        db_column='Server_Details',
         null=True,
     )
-    imageDetails = models.ForeignKey(
+    imageDetails = models.ManyToManyField(
         Image_Details,
-        on_delete= models.CASCADE,
-        db_column = 'Image_Details',
+        db_column='Image_Details',
         null=True,
     )
 
