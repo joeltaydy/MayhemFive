@@ -3,7 +3,7 @@ from botocore.exceptions import ClientError
 from Module_DeploymentMonitoring.src import config, server_util
 
 # Get and connects to AWS SDK via boto3
-def getEC2Client(access_key,secret_access_key,region_name=None,service=None):
+def getClient(access_key,secret_access_key,region_name=None,service=None):
     if region_name == None:
         region_name = config.REGION_NAME
 
@@ -21,7 +21,7 @@ def getEC2Client(access_key,secret_access_key,region_name=None,service=None):
 
 # Check if valid account number
 def validateAccountNumber(account_number,access_key,secret_access_key):
-    client = getEC2Client(access_key,secret_access_key,service='sts')
+    client = getClient(access_key,secret_access_key,service='sts')
     try:
         account = client.get_caller_identity()
     except ClientError as e:
@@ -33,7 +33,7 @@ def validateAccountNumber(account_number,access_key,secret_access_key):
 # Return public key : String
 # def generateKeyPair(username,access_key,secret_access_key):
 #     try:
-#         client = getEC2Client(access_key,secret_access_key)
+#         client = getClient(access_key,secret_access_key)
 #         response = client.create_key_pair(KeyName=username)
 #     except:
 #         results = delAWSKeyPair(username)
@@ -51,7 +51,7 @@ def validateAccountNumber(account_number,access_key,secret_access_key):
 # Return True is successful delete. ELSE False
 def deleteAWSKeyPair(username,access_key,secret_access_key):
     try:
-        client = getEC2Client(access_key,secret_access_key)
+        client = getClient(access_key,secret_access_key)
         response = client.delete_key_pair(KeyName=username)
     except Exception as e:
         return {'status':False,'message':e.args[0]}
@@ -64,7 +64,7 @@ def getAllImages(account_number,access_key,secret_access_key,client=None):
     images = {}
 
     if client == None:
-        client = getEC2Client(access_key,secret_access_key)
+        client = getClient(access_key,secret_access_key)
 
     try:
         results = client.describe_images(
@@ -84,7 +84,7 @@ def getAllImages(account_number,access_key,secret_access_key,client=None):
 # Add user to Image launch permission
 def addUserToImage(image_id,account_number,access_key,secret_access_key,client=None):
     if client == None:
-        client = getEC2Client(access_key,secret_access_key)
+        client = getClient(access_key,secret_access_key)
 
     shared_response = client.modify_image_attribute(
         Attribute='launchPermission',
@@ -99,7 +99,7 @@ def addUserToImage(image_id,account_number,access_key,secret_access_key,client=N
 # Remove user to Image launch permission
 def removeUserFromImage(image_id,account_number,access_key,secret_access_key,client=None):
     if client == None:
-        client = getEC2Client(access_key,secret_access_key)
+        client = getClient(access_key,secret_access_key)
 
     shared_response = client.modify_image_attribute(
         Attribute='launchPermission',
