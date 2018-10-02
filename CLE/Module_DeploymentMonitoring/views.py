@@ -250,12 +250,11 @@ def faculty_Setup_ShareAMI(requests):
         access_keys = aws_credentials.access_keys
         secret_access_keys = aws_credentials.secret_access_keys
 
-        client = aws_util.getEC2Client(access_keys,secret_access_keys)
+        # Add the account number to the image permission on AWS
+        client = aws_util.getClient(access_keys,secret_access_keys)
+        aws_util.addUserToImage(image_id,account_numbers,client)
 
         for account_number in account_numbers:
-            # Add the account number to the image permission on AWS
-            aws_util.addUserToImage(image_id,account_number,client)
-
             # Add the account number to DB side
             image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
             account_numbers = image_detailObj.sharedAccNum
@@ -266,6 +265,11 @@ def faculty_Setup_ShareAMI(requests):
                 image_detailObj.sharedAccNum = account_numbers + '_' + account_number
 
             image_detailObj.save()
+
+            # Add the image to the student AWS_Credentials using their account number
+            stu_credentials = AWS_Credentials.object.get(account_number=account_number)
+            stu_credentials.imageDetails.add(image_detailObj)
+            stu_credentials.save()
 
     except:
         traceback.print_exc()
@@ -318,9 +322,9 @@ def student_Deploy_Upload(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
     accountNum = requests.POST.get("accountNum") #string of account number
-    
+
     ipAddress = requests.POST.get("ipaddress") #string of IP address
-    
+
     if accountNum is not None:
         student_Deploy_AddAccount(requests)
     elif ipAddress is not None:
@@ -347,7 +351,6 @@ def student_Deploy_AddAccount(requests):
     utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
 
-
 # Storing and validating of student user IP address
 #
 def student_Deploy_AddIP(requests):
@@ -364,7 +367,6 @@ def student_Deploy_AddIP(requests):
     ipAddress = requests.POST.get("ipaddress") #string of IP address
     utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
-
 
 
 def ITOpsLabMonitor(requests):

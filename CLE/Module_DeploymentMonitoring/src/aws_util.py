@@ -60,7 +60,7 @@ def deleteAWSKeyPair(username,access_key,secret_access_key):
 
 
 # Get all images from user account via Boto3
-def getAllImages(account_number,access_key,secret_access_key,client=None):
+def getAllImages(account_number,access_key=None,secret_access_key=None,client=None):
     images = {}
 
     if client == None:
@@ -82,7 +82,7 @@ def getAllImages(account_number,access_key,secret_access_key,client=None):
 
 
 # Add user to Image launch permission
-def addUserToImage(image_id,account_number,access_key,secret_access_key,client=None):
+def addUserToImage(image_id,account_number_list,access_key=None,secret_access_key=None,client=None):
     if client == None:
         client = getClient(access_key,secret_access_key)
 
@@ -90,14 +90,12 @@ def addUserToImage(image_id,account_number,access_key,secret_access_key,client=N
         Attribute='launchPermission',
         ImageId=image_id,
         OperationType='add',
-        UserIds=[
-            account_number,
-        ],
+        UserIds=account_number_list,
     )
 
 
 # Remove user to Image launch permission
-def removeUserFromImage(image_id,account_number,access_key,secret_access_key,client=None):
+def removeUserFromImage(image_id,account_number_list,access_key=None,secret_access_key=None,client=None):
     if client == None:
         client = getClient(access_key,secret_access_key)
 
@@ -105,7 +103,5 @@ def removeUserFromImage(image_id,account_number,access_key,secret_access_key,cli
         Attribute='launchPermission',
         ImageId=image_id,
         OperationType='remove',
-        UserIds=[
-            account_number,
-        ],
+        UserIds=account_number_list,
     )
