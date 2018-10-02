@@ -26,7 +26,7 @@
                         <label for="name" class="control-label">Account Number</label>
                         <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
 
-                        <b><i>Account Number submitted:</i></b><br>  {% if submittedAccNum == None %}--Insert account number--{% else %} {{submittedAccNum.account_number}} {% endif %}
+                        <b><i>Account Number submitted:</i></b><br>  {% if submittedAccNum == None %} No account number found {% else %} {{submittedAccNum.account_number}} {% endif %}
                     </div>
                     <hr>
                     <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" style = "background-color:#f9b902" value="Submit"/>
