@@ -44,7 +44,7 @@
         <!-- Modal body -->
         <div class="modal-body">
           <!--Form-->
-           
+
 
               {% csrf_token %}
 
@@ -270,6 +270,7 @@ $.ajaxSetup({
 </script>
 
 {% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
+
 {% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
 
 <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">

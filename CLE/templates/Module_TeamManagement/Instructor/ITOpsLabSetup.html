@@ -9,7 +9,7 @@
 <div class="col-md-12">
     <h1 align="center">IT Operations Lab</h1>
     <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-   
+
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
           <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark active" >Setup</button>
@@ -63,7 +63,9 @@
          <!-- Deployment Package Table-->
         <div id="panelBodyTwo" class="panel-collapse collapse">
         <div class="panel-body">
-            <p>Energistically drive standardized communities through user friendly results. Phosfluorescently initiate superior technologies vis-a-vis low-risk high-yield solutions. Objectively facilitate clicks-and-mortar partnerships vis-a-vis superior partnerships. Continually generate long-term high-impact methodologies via wireless leadership. Holisticly seize resource maximizing solutions via user friendly outsourcing.</p>
+            <div class="container col-md-12" style="display: block;margin-left: auto;margin-right: auto;">
+            {% include "dataforms/deploymentpackage/dp_list.html" %}
+          </div>
             </div>
         </div>
         </div>
@@ -83,7 +85,6 @@
             </div>
         </div>
     </div>
-</div>
 
     <script>
         $(document).ready(function(){
@@ -91,8 +92,4 @@
         });
     </script>
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 7f102a91358753052420e906be495cc1b927c447
 {% endblock %}

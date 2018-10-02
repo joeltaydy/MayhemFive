@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google', # new
     'django_celery_beat', # new
     'formtools',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -202,7 +203,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    STATIC_DIR,  
+    STATIC_DIR,
     '/Thunderhead Monkeys/CLE/static',
 ]
 
