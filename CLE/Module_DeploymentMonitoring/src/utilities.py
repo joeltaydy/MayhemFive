@@ -8,11 +8,13 @@ from Module_TeamManagement.src import utilities
 
 
 # Get all team number and account number for those enrolled in course ESM201
-def getAllTeamDetails():
+def getAllTeamDetails(course_sectionList):
     section_list = {}
 
-    esm_course_sectionList = requests.session['courseList_update']['ESM201']
-    for course_section in esm_course_sectionList:
+    if len(course_sectionList) < 0 or 'ESM201' not in course_sectionList.keys():
+        return {}
+
+    for course_section in course_sectionList['ESM201']:
         section_number = course_section['section_number']
         section_list[section_number] = {}
 

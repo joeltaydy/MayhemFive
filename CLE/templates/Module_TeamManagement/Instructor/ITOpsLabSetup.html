@@ -4,12 +4,13 @@
 {% block bootstrapContent %}
 <head>
     <link rel="stylesheet" href="{% static 'css/itopssetup.css' %}">
+
 </head>
 
 <div class="col-md-12">
     <h1 align="center">IT Operations Lab</h1>
     <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-   
+
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
           <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark active" >Setup</button>
@@ -32,24 +33,44 @@
          <!-- Request AWS Information-->
         <div id="panelBodyOne" class="panel-collapse collapse in">
             <div class="panel-body">
-                <p>
+
+                <form id="awsinfo" action="{% url 'DMmod:itopslab_setup_AWSKeys' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                    {% csrf_token %}
                     <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                         <label for="name" class="control-label">Account Number</label>
-                        <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="account_number" id="accountNum" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Access Key</label>
-                        <input class="form-control" type="text" name="accessKey" id="accessKey" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="access_key" id="accessKey" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Secret Access Key</label>
-                        <input class="form-control" type="text" name="secretKey" id="secretKey" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="secret_access_key" id="secretKey" aria-describedby="fileHelp">
 
                         <div class="col-md-12 form-group" style = "margin-bottom:40px;">
                             <br>
+                            {% if submittedAccountNumber != "" %}
+                                Submitted Account Number: {{account_number}} <br>
+                            {% else %}
+                                Submitted Account Number: <i color = "red">No Account Number submitted</i><br>
+                            {%endif %}
+
+                            {% if submittedAccessKey != "" %}
+                                Submitted AWS Access Key: {{access_key}} <br>
+                            {% else %}
+                                Submitted AWS Access Key: <i color = "red">No Access Key submitted</i><br>
+                            {%endif %}
+
+                            {% if submittedSecAccessKey != "" %}
+                                Submitted AWS Secret Access Key: {{secret_access_key}}<br>
+                            {% else %}
+                                Submitted AWS Secret Access Key: <i color = "red">No Access Key submitted</i><br>
+                            {%endif %}
+
                             <button class="btn btn-dark pull-right" type="submit">Submit</button>
                             <br>
                         </div>
                     </div>
-                </p>
+                </form>
             </div>
         </div>
         </div>
@@ -85,14 +106,69 @@
     </div>
 </div>
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function(){
             $('[data-toggle="popover"]').popover();
         });
+
+
+        // $(function(){
+        // var accNum = "{{submittedAccNum}}";
+        // var accKey =  "{{submittedAccKey}}";
+        // var secKey = "{{submittedSecKey}}";
+
+        //     if (accNum!=""){
+        //         document.forms['awsinfo'].elements['email'].value = accNum;
+        //     }
+        //     if (accKey!=""){
+        //         document.forms['awsinfo'].elements['accessKey'].value = accKey;
+        //     }
+        //     if (secKey!=""){
+        //         document.forms['awsinfo'].elements['secretKey'].value = secKey;
+        //     }
+        // });
+
+        // $( document ).ready(function() {
+        // // after the page elements are all loaded, then run the script
+        // // Set the input field with unique ID #email to a value
+
+        // $("#email").val('someone@test.com');
+
+        // // Set the input field with unique ID #name
+
+        // $("#name").val('John Doe');
+
+        // });
+
+        //validations for form fields
+        $("#msform").validate({
+            rules: {
+                accountNum: {
+                    digits: true, //checks account number if digits have been entered
+                    required: true
+                },
+                accessKey: {
+                    required: true //checks ip address format
+                },
+                secretKey: {
+                    required: true
+                }
+            },
+            messages: {
+                accountNum: {
+                    digits: "Please enter a valid AWS Account Number."
+                },
+                accessKey: {
+                    required: "Please enter your AWS Access Key."
+                },
+                secretKey: {
+                    required: "Please enter your AWS Secret Access Key."
+                }
+            }
+        });
+
     </script>
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 7f102a91358753052420e906be495cc1b927c447
 {% endblock %}

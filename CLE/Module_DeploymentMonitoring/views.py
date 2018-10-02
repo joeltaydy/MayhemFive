@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
-from Module_DeploymentMonitoring.src import *
+from Module_DeploymentMonitoring.src import utilities,aws_util
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
 
@@ -52,7 +52,8 @@ def faculty_Setup_Base(requests,response=None):
             secret_access_key = aws_credentials.secret_access_key
 
             # Retrieve the team_number and account_number for each section
-            section_list = utilities.getAllTeamDetails()
+            course_sectionList = requests.session['courseList_updated']
+            section_list = utilities.getAllTeamDetails(course_sectionList)
 
             # Retreive image_id and image_name from AWS using Boto3
             # IF exists in DB, PASS
@@ -187,35 +188,28 @@ def faculty_Setup_GetAWSKeys(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    account_number = requests.GET.get('account_number')
-    access_key = requests.GET.get('access_key')
-    secret_access_key = requests.GET.get('secret_access_key')
+    account_number = requests.POST.get('account_number')
+    access_key = requests.POST.get('access_key')
+    secret_access_key = requests.POST.get('secret_access_key')
 
     try:
-        if account_number == None:
-            raise Exception('Please input an account_number')
+        if account_number == None or access_key == None or secret_access_key == None:
+            raise Exception('Please input an account_number, access_key and secret_access_key')
 
-        # Save/Update Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
+        faculty_email = requests.user.email
+        facultyObj = Faculty.objects.get(email=faculty_email)
+
+        # try:UPDATE, except:SAVE Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
         try:
-            if access_key == None and secret_access_key == None:
-                raise Exception('Please input an access_key and/or secret_access_key')
-
-            credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-
-            if access_key != None:
-                credentialsObj.access_key = access_key
-
-            if secret_access_key != None:
-                credentialsObj.secret_access_key = secret_access_key
-
+            credentialsObj = facultyObj.awscredential
+            credentialsObj.access_key = access_key
+            credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
+
+            facultyObj.awscredential = credentialsObj
+            facultyObj.save()
+
         except:
-            if access_key == None:
-                raise Exception('Please input an access_key')
-
-            if secret_access_key == None:
-                raise Exception('Please input a secret_access_key')
-
             credentialsObj = AWS_Credentials.objects.create(
                 account_number=account_number,
                 access_key=access_key,
@@ -223,9 +217,12 @@ def faculty_Setup_GetAWSKeys(requests):
             )
             credentialsObj.save()
 
-    except:
+            facultyObj.awscredential = credentialsObj
+            facultyObj.save()
+
+    except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error in AWS Information form: ' + e.args[0]
+        response['message'] = 'Error in AWS Information form: ' + str(e.args[0])
         return faculty_Setup_Base(requests,response)
 
     return faculty_Setup_Base(requests,response)
@@ -259,7 +256,7 @@ def faculty_Setup_ShareAMI(requests):
 
         for account_number in account_numbers:
             # Add the account number to the image permission on AWS
-            aws_util.addUserToImage(client,image_id,account_number)
+            aws_util.addUserToImage(image_id,account_number,client)
 
             # Add the account number to DB side
             image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
