@@ -50,13 +50,12 @@ class Image_Details(models.Model):
 
 class Deployment_Package(models.Model):
     deploymentid = models.CharField(
-        db_column='Deployment ID',
+        db_column='Deployment_ID',
         max_length=255,
         primary_key=True,
     )
-    gitlink = models.CharField(
-        db_column='Git Hub Link',
-        max_length=255,
+    gitlink = models.TextField(
+        db_column='GitHub_Link',
     )
 
     class Meta:
