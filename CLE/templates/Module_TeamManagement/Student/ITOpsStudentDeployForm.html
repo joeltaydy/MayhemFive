@@ -9,7 +9,7 @@
    <div class="row">
         <div class="col-md-9 col-md-offset-3" style="display: block;margin-left: auto;margin-right: auto;">
               
-            <form id="msform" action="{% url 'DMmod:itopslab_studeploy' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <form id="msform" action="." data-url="{% url 'DMmod:itopslab_studeployUpload' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 {% csrf_token %}
                 <!-- progressbar -->
                 <ul id="progressbar">
@@ -26,7 +26,7 @@
                         <label for="name" class="control-label">Account Number</label>
                         <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
 
-                        <b><i>Account Number submitted:</i></b><br> --Insert account number-- (BACKEND)
+                        <b><i>Account Number submitted:</i></b><br>  {% if submittedAccNum == None %}--Insert account number--{% else %} {{submittedAccNum.account_number}} {% endif %}
                     </div>
                     <hr>
                     <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" style = "background-color:#f9b902" value="Submit"/>
@@ -106,16 +106,16 @@
         return this.optional( element ) || /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress);
         }, 'Please enter a valid IP Address.');
 
-    // $(function(){
-    //     var accNum = "{{submittedAccNum}}"; 
-    //     if (accNum==""){
-    //         document.getElementById("accNext").disabled = true; 
-    //     } else {
-    //         window.onload = function(){
-    //             document.getElementById("accNext").click();
-    //         }
-    //     }
-    // });
+        $(function(){
+            var accNum = "{{submittedAccNum.account_number}}"; 
+            if (accNum=="None"){
+                document.getElementById("accNext").disabled = true; 
+            } else {
+                window.onload = function(){
+                    document.getElementById("accNext").click();
+                }
+            }
+        });
 
     // $(function(){
     //     var approve = "{{approvalStatus}}"; 
@@ -135,6 +135,34 @@
     //     alert("You have entered an invalid IP address!")  
     //     return (false)  
     //     }  
-    
+ 
+    $(document).ready(function(){
+        var $myForm = $('#msform')
+        $myForm.submit(function(event){
+            event.preventDefault()
+            var $formData = $(this).serialize()
+            var $thisURL = $myForm.attr('data-url') || window.location.href // or set your own url
+            $.ajax({
+                method: "POST",
+                url: $thisURL,
+                data: $formData,
+                success: handleFormSuccess,
+                error: handleFormError,
+            })
+        })
+    })
+
+    function handleFormSuccess(data, textStatus, jqXHR){
+        console.log(data)
+        console.log(textStatus)
+        console.log(jqXHR)
+       // $('#TelegramModalstep1').modal('hide')
+       // $('#TelegramModalstep2').modal('show')
+    }
+    function handleFormError(jqXHR, textStatus, errorThrown){
+      console.log(jqXHR)
+      console.log(textStatus)
+      console.log(errorThrown)
+  }
     </script>
 </body>

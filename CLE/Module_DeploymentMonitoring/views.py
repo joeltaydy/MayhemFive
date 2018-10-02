@@ -295,7 +295,7 @@ def student_Deploy_Base(requests):
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
     awsAccountNumber =  class_studentObj.awscredential
-    response['awsAccNum'] = awsAccountNumber #Could be None or aws credentials object
+    response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
     try:
         awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
         response['awsImage'] = awsImage
@@ -303,13 +303,35 @@ def student_Deploy_Base(requests):
         response['awsImage'] = None
 
     response["studentDeployBase"] = "active"
-
+    print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+
+#processes form
+def student_Deploy_Upload(requests):
+    response = {}
+    try:
+        processLogin.studentVerification(requests)
+        if requests.method == "GET" :
+            response['message'] = "Wrong entry to form"
+            return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+    accountNum = requests.POST.get("accountNum") #string of account number
+    
+    ipAddress = requests.POST.get("ipaddress") #string of IP address
+    
+    if accountNum is not None:
+        student_Deploy_AddAccount(requests)
+    elif ipAddress is not None:
+        student_Deploy_AddIP(requests)
+
+    return HttpResponse('')
 
 
 # Storing of student user account number in database
 #
-def student_Deploy_GetAccount(requests):
+def student_Deploy_AddAccount(requests):
     response = {}
     try:
         processLogin.studentVerification(requests)
@@ -320,15 +342,15 @@ def student_Deploy_GetAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    accountNum = requests.POST.get("AWS_account_number") #string of account number
+    accountNum = requests.POST.get("accountNum") #string of account number
+    print(accountNum)
     utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
-    return HttpResponse('')
 
 
 # Storing and validating of student user IP address
 #
-def student_Deploy_GetIP(requests):
+def student_Deploy_AddIP(requests):
     response = {}
     try:
         processLogin.studentVerification(requests)
@@ -339,11 +361,10 @@ def student_Deploy_GetIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    ipAddress = requests.POST.get("ip") #string of IP address
+    ipAddress = requests.POST.get("ipaddress") #string of IP address
     utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
 
-    return HttpResponse('')
 
 
 def ITOpsLabMonitor(requests):
