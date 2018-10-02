@@ -279,6 +279,20 @@ def faculty_Setup_ShareAMI(requests):
     return faculty_Setup_Base(requests,response)
 
 
+# Main function for monitor page on faculty.
+#
+def faculty_Monitor_Base(requests):
+    response = {"faculty_Monitor_Base" : "active"}
+    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
+
+
+# Main function for event configuration page on faculty.
+#
+def faculty_Event_Base(requests):
+    response = {"faculty_Event_Base" : "active"}
+    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+
+
 # Main function for deploy page on student.
 # Will check if images has been shared by faculty
 #
@@ -310,7 +324,9 @@ def student_Deploy_Base(requests):
     print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
-#processes form
+
+# Processes Form
+#
 def student_Deploy_Upload(requests):
     response = {}
     try:
@@ -368,14 +384,6 @@ def student_Deploy_AddIP(requests):
     utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
 
-
-def ITOpsLabMonitor(requests):
-    response = {"ITOpsLabMonitor" : "active"}
-    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-
-def ITOpsLabEvent(requests):
-    response = {"ITOpsLabEvent" : "active"}
-    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
 def ITOpsLabStudentDeploy(requests):
     response = {"ITOpsLabStudentDeploy" : "active"}
