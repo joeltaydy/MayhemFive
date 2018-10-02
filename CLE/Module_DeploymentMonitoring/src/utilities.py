@@ -32,10 +32,12 @@ def getAllTeamDetails(course_sectionList):
 
 
 # Add AWS credentials for the relevant students
-def addAWSCredentials(accountNum, class_studentObj):
+def addAWSCredentials(accountNum, requests):
     class_studentObj= getStudentClassObject(requests)
     try:
-        awsC=AWS_Credentials.objects.get(account_number=accountNum)
+        awsC=class_studentObj.awscredential
+        awsC.account_number = accountNum
+        awsC.save()
     except:
         awsC = AWS_Credentials.objects.create(
             account_number=accountNum,
@@ -52,7 +54,7 @@ def getStudentClassObject(requests):
     for course_title,course_details in courseList.items():
         if course_title == "EMS201":
             course_section_id = course_details['id']
-    class_studentObj = Class.objects.get(student= student_email).get(course_section=course_section_id)
+    class_studentObj = Class.objects.filter(student= student_email).get(course_section=course_section_id)
 
     return class_studentObj
 
