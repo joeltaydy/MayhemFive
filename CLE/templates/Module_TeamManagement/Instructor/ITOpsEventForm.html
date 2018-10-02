@@ -16,24 +16,39 @@
                 {% csrf_token %}
                 <!-- progressbar -->
                 <ul id="progressbar">
-                    <li class="active">Number of Events</li>
+                    <!-- <li class="active">Number of Events</li> -->
+                    <li class="active">Select class</li>
                     <li>Choose Event Type </li>
                     <li>Choose Date/Time</li>
                     <li>Summary</li>
                 </ul>
                 <!-- fieldsets -->
                 <fieldset>
-                    <h2 class="fs-title">Number of Events</h2>
+                    <!-- <h2 class="fs-title">Number of Events</h2>
                     <h3 class="fs-subtitle">(Up to 3 events concurrently only)</h3>
                     <div class="plusminus">
-                        <div class="plusminus stacked col-md-6" style="display: block;margin-left: auto;margin-right: auto; ">
+                        <div class="col-md-6" style="display: block;margin-left: auto;margin-right: auto; ">
                             <button></button>
-                            <input type="number" name="eventQty" value="1" min="1" max="3">
+                            <input type="number" name="eventQty" min="1" max="3" value="1" id="numEvents">
                             <button></button>
                       </div>
                       <hr>
                     </div>
-                    <input type="button" name="next" class="next action-button" value="Next"/>
+                    <input type="button"  name="next" class="next action-button" value="Next" onclick="storeNumEvents();" /> -->
+
+                    <h2 class="fs-title">Select Class</h2>
+                    <h3 class="fs-subtitle">--insert class list here--</h3> 
+                    <!-- Need backend data here -->
+                        {% for course_title,course_sectionList in courses.items %}
+                        {% for course_section in course_sectionList %}
+                            {% if course_section.section_number != 'G0' %}
+                                <input type="checkbox" name="{{course_section.id}}" value="{{course_section.id}}">{{ course_section.to_string }}<br>
+                            {% endif %}
+                        {% endfor %}
+                        {% endfor %}
+                        
+                    <hr>
+                    <input type="button"  name="next" class="next action-button" value="Next" />
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Choose Event Type</h2>
@@ -56,7 +71,9 @@
                     <h2 class="fs-title">Choose Date/Time</h2>
                     <h3 class="fs-subtitle">When do you want to launch your event?</h3>
     
-                    <input type="datetime-local" name="datetime" placeholder="Date Time"/>
+                    <input type="datetime-local" id="setDate" name="datetime" placeholder="Date Time"/>
+                    <input type="checkbox" id="dateNow" value="now" onclick="setDateTimeNow();">
+                    <label for="dateNow">Now</label>
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
                     <input type="button" name="next" class="next action-button" value="Next"/>
@@ -69,7 +86,8 @@
                     <input type="password" name="cpass" placeholder="Confirm Password"/>
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
-                    <input type="submit" name="submit" class="submit action-button" value="Submit"/>
+                    <input type="submit" name="submit" class="submit action-button" value="Submit"/> 
+                    <!-- Information Sent to backend here: Class, Event Type, Date/Time -->
                 </fieldset>
             </form>
         </div>
@@ -77,4 +95,34 @@
     <!-- /.MultiStep Form -->
     
     <script src="{% static 'js/multistepform.js' %}" type="text/javascript"></script>
+    <script>
+    numEvents = 0;
+
+    function storeNumEvents(){ 
+        numEvents= document.getElementById("numEvents");
+    }
+
+    function AddZero(num) {
+        return (num >= 0 && num < 10) ? "0" + num : num + "";
+    }
+    function setDateTimeNow(){ 
+        if (document.getElementById("dateNow").value=="now"){
+            // let today = new Date().toDateTimeLocal().toISOString().substr(0, 10);
+            if (document.getElementById("setDate").value==""){
+                var now = new Date();
+                let today = [
+                    [now.getFullYear(),
+                    AddZero(now.getMonth() + 1), 
+                    AddZero(now.getDate())].join("-"),
+                [AddZero(now.getHours()), 
+                AddZero(now.getMinutes())].join(":")].join("T");
+                document.querySelector("#setDate").value = today;
+            } else {
+                document.querySelector("#setDate").value="";
+            }
+        }
+        
+    }
+    
+    </script>
 </body>
