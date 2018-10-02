@@ -14,6 +14,7 @@ class Server_Details(models.Model):
     instanceName = models.CharField(
         db_column='Instance_Name',
         max_length=255,
+        null = True
     )
     state = models.CharField(
         db_column="Server_State",
@@ -39,7 +40,7 @@ class Image_Details(models.Model):
     )
     sharedAccNum = models.TextField(
         db_column='List_of_shared_account_number',
-        null = True 
+        null = True
     )
 
     class Meta:
