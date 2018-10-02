@@ -1,3 +1,4 @@
+import json
 import traceback
 import requests as req
 from django.shortcuts import render
@@ -118,7 +119,7 @@ def faculty_Setup_Base(requests,response=None):
 
     except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error during retrieval of information: ' + str(e.args[0])
+        response['error_message'] = 'Error during retrieval of information (Setup): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
@@ -161,7 +162,7 @@ def faculty_Setup_GetGitHub(requests):
 
     except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error in Deployment Package form: ' + e.args[0]
+        response['error_message'] = 'Error in Deployment Package form: ' + e.args[0]
         return faculty_Setup_Base(requests,response)
 
     return faculty_Setup_Base(requests,response)
@@ -220,7 +221,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
     except Exception as e:
         traceback.print_exc()
-        response['message'] = 'Error in AWS Information form: ' + str(e.args[0])
+        response['error_message'] = 'Error in AWS Information form: ' + str(e.args[0])
         return faculty_Setup_Base(requests,response)
 
     return faculty_Setup_Base(requests,response)
@@ -273,7 +274,7 @@ def faculty_Setup_ShareAMI(requests):
 
     except:
         traceback.print_exc()
-        response['message'] = 'Error in Share AMI form: ' + e.args[0]
+        response['error_message'] = 'Error in Share AMI form: ' + e.args[0]
         return faculty_Setup_Base(requests,response)
 
     return faculty_Setup_Base(requests,response)
@@ -283,13 +284,62 @@ def faculty_Setup_ShareAMI(requests):
 #
 def faculty_Monitor_Base(requests):
     response = {"faculty_Monitor_Base" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    section_num = requests.GET.get('section_number')
+    server_status = {}
+    webapp_status = {}
+
+    try:
+        # Retrieve the team_number and account_number for each section
+        course_sectionList = requests.session['courseList_updated']
+        section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
+
+        for team_number,account_number in section_details.items():
+            server = Server_Details.objects.filter(account_number=account_number)
+            server_ip = server.IP_address
+
+            # Rule of thumb, if webapp is alive, then server will most definitely be alive
+            # BUT if server is alive, there's no guarantee that webapp is alive
+            webapp_url = 'http://' + server_ip + ":8000/"
+            webapp_response = req.get(webapp_url)
+            webapp_jsonObj = json.loads(webapp_response.content.decode())
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
+
+    response['server_status'] = server_status
+    response['webapp_status'] = webapp_status
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
-
+# TO-DO!!!
 # Main function for event configuration page on faculty.
 #
 def faculty_Event_Base(requests):
     response = {"faculty_Event_Base" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    try:
+        pass
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during retrieval of information (Event Configuration): ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
 
@@ -332,7 +382,7 @@ def student_Deploy_Upload(requests):
     try:
         processLogin.studentVerification(requests)
         if requests.method == "GET" :
-            response['message'] = "Wrong entry to form"
+            response['error_message'] = "Wrong entry to form"
             return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
     except:
         logout(requests)
@@ -356,7 +406,7 @@ def student_Deploy_AddAccount(requests):
     try:
         processLogin.studentVerification(requests)
         if requests.method == "GET" :
-            response['message'] = "Wrong entry to form"
+            response['error_message'] = "Wrong entry to form"
             return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
     except:
         logout(requests)
@@ -374,7 +424,7 @@ def student_Deploy_AddIP(requests):
     try:
         processLogin.studentVerification(requests)
         if requests.method == "GET" :
-            response['message'] = "Wrong entry to form"
+            response['error_message'] = "Wrong entry to form"
             return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
     except:
         logout(requests)
