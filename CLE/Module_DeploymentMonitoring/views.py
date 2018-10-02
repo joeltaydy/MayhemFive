@@ -14,8 +14,6 @@ from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
 
 
-
-
 # Main function for setup page on faculty.
 # Will retrieve work products and render to http page
 #
@@ -130,7 +128,7 @@ def faculty_Setup_Base(requests,response=None):
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
-
+# TO-DO!!!
 # Retrieval and storing of github deployment package link from instructor
 # returns to faculty_Setup_Base
 #
@@ -285,7 +283,7 @@ def faculty_Setup_ShareAMI(requests):
 
     return faculty_Setup_Base(requests,response)
 
-
+# TO-DO!!!
 # Main function for monitor page on faculty.
 #
 def faculty_Monitor_Base(requests):
@@ -302,6 +300,9 @@ def faculty_Monitor_Base(requests):
     server_status = {}
     webapp_status = {}
 
+    if section_num == None:
+        raise Exception('Please specify a section_number')
+
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
@@ -310,12 +311,34 @@ def faculty_Monitor_Base(requests):
         for team_number,account_number in section_details.items():
             server = Server_Details.objects.filter(account_number=account_number)
             server_ip = server.IP_address
+            server_status = server.state
 
             # Rule of thumb, if webapp is alive, then server will most definitely be alive
             # BUT if server is alive, there's no guarantee that webapp is alive
-            webapp_url = 'http://' + server_ip + ":8000/"
-            webapp_response = req.get(webapp_url)
-            webapp_jsonObj = json.loads(webapp_response.content.decode())
+
+            # Step 1: Check if server is alive
+
+            # TO-DO!!!
+            # Additional json checking
+            server_status[team_number] = server_status
+
+            # Step 2: Update server.state on server status
+            server.state = status
+            Server_Details.save()
+
+            if status == 'Live':
+                # Step 3: IF server 'Live', then check if webapp is 'Live'
+                webapp_url = 'http://' + server_ip + ":8000/health_check/"
+                webapp_response = req.get(webapp_url)
+                webapp_jsonObj = json.loads(webapp_response.content.decode())
+
+                # TO-DO!!!
+                # Additional json checking
+                webapp_status[team_number] = {server_ip:'Live'}
+
+            else:
+                # Step 4: ELSE webapp is definitely 'Down'
+                webapp_status[team_number] = {server_ip:'Down'}
 
     except Exception as e:
         traceback.print_exc()
