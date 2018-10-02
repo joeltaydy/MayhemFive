@@ -2,7 +2,7 @@ import boto3
 from botocore.exceptions import ClientError
 from Module_DeploymentMonitoring.src import config, server_util
 
-# Get and connects to AWS SDK via boto3
+# Get and connects to AWS SDK via boto3, client
 def getClient(access_key,secret_access_key,region_name=None,service=None):
     if region_name == None:
         region_name = config.REGION_NAME
@@ -17,6 +17,23 @@ def getClient(access_key,secret_access_key,region_name=None,service=None):
     )
 
     return client
+
+
+# Get and connects to AWS SDK via boto3, resource
+def getResource(access_key,secret_access_key,region_name=None,service=None):
+    if region_name == None:
+        region_name = config.REGION_NAME
+
+    if service == None:
+        service = 'ec2'
+
+    resource = boto3.resource(service,
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_access_key,
+        region_name=region_name
+    )
+
+    return resource
 
 
 # Check if valid account number

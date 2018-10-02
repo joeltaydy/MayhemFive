@@ -283,7 +283,7 @@ def faculty_Setup_ShareAMI(requests):
 
     return faculty_Setup_Base(requests,response)
 
-# TO-DO!!!
+
 # Main function for monitor page on faculty.
 #
 def faculty_Monitor_Base(requests):
@@ -297,8 +297,8 @@ def faculty_Monitor_Base(requests):
         return render(requests, 'Module_Account/login.html', response)
 
     section_num = requests.GET.get('section_number')
-    server_status = {}
-    webapp_status = {}
+    response['server_status'] = {}
+    response['webapp_status'] = {}
 
     if section_num == None:
         raise Exception('Please specify a section_number')
@@ -311,19 +311,30 @@ def faculty_Monitor_Base(requests):
         for team_number,account_number in section_details.items():
             server = Server_Details.objects.filter(account_number=account_number)
             server_ip = server.IP_address
-            server_status = server.state
+            server_state = server.state
+            stu_credentials = server.account_number
 
             # Rule of thumb, if webapp is alive, then server will most definitely be alive
             # BUT if server is alive, there's no guarantee that webapp is alive
 
             # Step 1: Check if server is alive
+            resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
+            instance = resource.Instance(server.instanceid)
+            instance_state = instance.state
 
-            # TO-DO!!!
-            # Additional json checking
-            server_status[team_number] = server_status
+            if instance_state['code'] == 16:
+                server_state = 'Live'
+            elif instance_state['code'] == 0:
+                server_state = 'Pending'
+            elif instance_state['code'] == 32 or instance_state['code'] == 48:
+                server_state = 'Killed'
+            elif instance_state['code'] == 80 or instance_state['code'] == 64:
+                server_state = 'Down'
+
+            response['server_status'][team_number] = server_state
 
             # Step 2: Update server.state on server status
-            server.state = status
+            server.state = server_state
             Server_Details.save()
 
             if status == 'Live':
@@ -332,21 +343,17 @@ def faculty_Monitor_Base(requests):
                 webapp_response = req.get(webapp_url)
                 webapp_jsonObj = json.loads(webapp_response.content.decode())
 
-                # TO-DO!!!
-                # Additional json checking
-                webapp_status[team_number] = {server_ip:'Live'}
-
+                if webapp_jsonObj['HTTPStatusCode'] == 200:
+                    response['webapp_status'][team_number] = {server_ip:'Live'}
             else:
                 # Step 4: ELSE webapp is definitely 'Down'
-                webapp_status[team_number] = {server_ip:'Down'}
+                response['webapp_status'][team_number] = {server_ip:'Down'}
 
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
-    response['server_status'] = server_status
-    response['webapp_status'] = webapp_status
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 # TO-DO!!!
