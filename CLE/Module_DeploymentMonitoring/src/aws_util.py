@@ -45,26 +45,29 @@ def deleteAWSKeyPair(username,access_key,secret_access_key):
 
 
 # Get all images from user account via Boto3
-def getAllImages(client=None,account_number,access_key,secret_access_key):
+def getAllImages(account_number,access_key,secret_access_key,client=None):
     images = {}
 
     if client == None:
         client = getEC2Client(access_key,secret_access_key)
 
-    results = client.describe_images(
-        Owners=[
-            account_number,
-        ],
-    )
+    try:
+        results = client.describe_images(
+            Owners=[
+                account_number,
+            ],
+        )
 
-    for image in results['Images']:
-        images[image['ImageId']] = image['Name']
+        for image in results['Images']:
+            images[image['ImageId']] = image['Name']
+    except:
+        raise Exception('Invalid Access_Key and Secret_Access_Key. Please key in a valid one')
 
     return images
 
 
 # Add user to Image launch permission
-def addUserToImage(client=None,image_id,account_number,access_key,secret_access_key):
+def addUserToImage(image_id,account_number,access_key,secret_access_key,client=None):
     if client == None:
         client = getEC2Client(access_key,secret_access_key)
 
@@ -79,7 +82,7 @@ def addUserToImage(client=None,image_id,account_number,access_key,secret_access_
 
 
 # Remove user to Image launch permission
-def removeUserFromImage(client=None,image_id,account_number,access_key,secret_access_key):
+def removeUserFromImage(image_id,account_number,access_key,secret_access_key,client=None):
     if client == None:
         client = getEC2Client(access_key,secret_access_key)
 
