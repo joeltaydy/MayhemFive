@@ -38,13 +38,13 @@
                     {% csrf_token %}
                     <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                         <label for="name" class="control-label">Account Number</label>
-                        <input class="form-control" type="text" name="account_number" id="accountNum" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="account_number" id="account_number" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Access Key</label>
-                        <input class="form-control" type="text" name="access_key" id="accessKey" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="access_key" id="access_key" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Secret Access Key</label>
-                        <input class="form-control" type="text" name="secret_access_key" id="secretKey" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="secret_access_key" id="secret_access_key" aria-describedby="fileHelp">
                     </div>
                     <div class="col-md-9 form-group" style = "margin-bottom:40px;">
                         <br>
@@ -106,7 +106,7 @@
             </div>
         </div>
     </div>
-
+</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js" type="text/javascript"></script>
     <script>
@@ -117,26 +117,26 @@
         //validations for form fields
         $("#awsinfo").validate({
             rules: {
-                accountNum: {
-                    url: true, //checks account number if digits have been entered
+                account_number: {
+                    digits: true, //checks account number if digits have been entered
                     required: true
                 },
-                accessKey: {
+                access_key: {
                     required: true
                 },
-                secretKey: {
+                secret_access_key: {
                     required: true
                 }
             },
             messages: {
-                accountNum: {
+                account_number: {
                     digits: "Please enter a valid AWS Account Number.",
                     required: "Please enter your AWS Account Number."
                 },
-                accessKey: {
+                access_key: {
                     required: "Please enter your AWS Access Key."
                 },
-                secretKey: {
+                secret_access_key: {
                     required: "Please enter your AWS Secret Access Key."
                 }
             }
