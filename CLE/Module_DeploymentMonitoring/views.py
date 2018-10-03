@@ -532,6 +532,11 @@ def ITOpsLabStudentMonitor(requests):
     response = {"ITOpsLabStudentMonitor" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
+
+
+
+
+
 #test forms
 def server_list(request):
     servers = Server_Details.objects.all()
