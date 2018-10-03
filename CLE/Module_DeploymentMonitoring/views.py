@@ -339,12 +339,17 @@ def faculty_Monitor_Base(requests):
 
             if status == 'Live':
                 # Step 3: IF server 'Live', then check if webapp is 'Live'
-                webapp_url = 'http://' + server_ip + ":8000/health_check/"
-                webapp_response = req.get(webapp_url)
-                webapp_jsonObj = json.loads(webapp_response.content.decode())
+                try:
+                    webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
+                    webapp_response = req.get(webapp_url)
+                    webapp_jsonObj = json.loads(webapp_response.content.decode())
 
-                if webapp_jsonObj['HTTPStatusCode'] == 200:
-                    response['webapp_status'][team_number] = {server_ip:'Live'}
+                    if webapp_jsonObj['HTTPStatusCode'] == 200:
+                        response['webapp_status'][team_number] = {server_ip:'Live'}
+                        
+                except requests.ConnectionError:
+                    response['webapp_status'][team_number] = {server_ip:'Down'}
+
             else:
                 # Step 4: ELSE webapp is definitely 'Down'
                 response['webapp_status'][team_number] = {server_ip:'Down'}
