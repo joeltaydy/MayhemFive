@@ -29,8 +29,14 @@
             {% for team_name,team_details in webapp_status.items %}
             <tr>
                 <td>{{ team_name }}</td>
-                <td>{{ team_details.IP_Address }}</td>
-                <td><span class="badge badge-pill badge-danger">{{ team_details.State }}</span></td>
+                <td><a href="http://{{ team_details.IP_Address }}:8000">{{ team_details.IP_Address }}</a></td>
+                <td>
+                {% if team_details.State  == 'Live' %}
+                    <span class="badge badge-pill badge-success">{{ team_details.State  }}</span>
+                {% else %}
+                    <span class="badge badge-pill badge-danger">{{ team_details.State  }}</span>
+                {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

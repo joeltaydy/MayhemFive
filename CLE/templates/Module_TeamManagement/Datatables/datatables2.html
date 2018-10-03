@@ -31,10 +31,12 @@
                 <td>
                 {% if server_state == 'Live' %}
                     <span class="badge badge-pill badge-success">{{ server_state }}</span>
+                {% elif server_state == 'Pending' %}
+                    <span class="badge badge-pill badge-warning">{{ server_state }}</span>
                 {% else %}
                     <span class="badge badge-pill badge-danger">{{ server_state }}</span>
                 {% endif %}
-            </td>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
