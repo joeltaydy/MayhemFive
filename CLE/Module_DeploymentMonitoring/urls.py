@@ -4,10 +4,10 @@ from django.urls import path,re_path
 
 urlpatterns = [
     path('instructor/ITOperationsLab/setup/',views.faculty_Setup_Base,name='itopslab_setup'),
-    path('instructor/ITOperationsLab/dps/',views.faculty_Setup_GetGitHubLinks,name='dp_list'),
-    path('instructor/ITOperationsLab/dps/create/', views.faculty_Setup_AddGitHubLinks, name='dp_create'),
-    path('instructor/ITOperationsLab/dps/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
-    path('instructor/ITOperationsLab/dps/<str:pk>/delete/', views.faculty_Setup_DeleteGitHubLinks, name='dp_delete'),
+    path('instructor/ITOperationsLab/setup/deployment_package/',views.faculty_Setup_GetGitHubLinks,name='dp_list'),
+    path('instructor/ITOperationsLab/setup/deployment_package/create/', views.faculty_Setup_AddGitHubLinks, name='dp_create'),
+    path('instructor/ITOperationsLab/setup/deployment_package/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
+    path('instructor/ITOperationsLab/setup/deployment_package/<str:pk>/delete/', views.faculty_Setup_DeleteGitHubLinks, name='dp_delete'),
     path('instructor/ITOperationsLab/setup/awskeys/',views.faculty_Setup_GetAWSKeys,name='itopslab_setup_AWSKeys'),
     path('instructor/ITOperationsLab/setup/ami/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI'),
     path('instructor/ITOperationsLab/monitor/',views.faculty_Monitor_Base,name='itopslab_monitor'),
