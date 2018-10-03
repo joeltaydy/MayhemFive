@@ -330,6 +330,7 @@ def faculty_Monitor_Base(requests):
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
         section_details = utilities.getAllTeamDetails(course_sectionList)['G4']
+        
         for team_number,account_number in section_details.items():
             # Assumption that there's only one server for one account
             server = Server_Details.objects.filter(account_number=account_number)[0]
