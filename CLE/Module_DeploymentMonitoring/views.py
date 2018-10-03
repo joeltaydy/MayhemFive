@@ -299,9 +299,10 @@ def faculty_Monitor_Base(requests):
     section_num = requests.GET.get('section_number')
     response['server_status'] = {}
     response['webapp_status'] = {}
+    response['course_sectionList'] = requests.session['courseList_updated']['EMS201']
 
     if section_num == None:
-        raise Exception('Please specify a section_number')
+        section_num = response['course_sectionList'][0]['section_number']
 
     try:
         # Retrieve the team_number and account_number for each section
@@ -345,14 +346,14 @@ def faculty_Monitor_Base(requests):
                     webapp_jsonObj = json.loads(webapp_response.content.decode())
 
                     if webapp_jsonObj['HTTPStatusCode'] == 200:
-                        response['webapp_status'][team_number] = {server_ip:'Live'}
-                        
+                        response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
+
                 except requests.ConnectionError:
-                    response['webapp_status'][team_number] = {server_ip:'Down'}
+                    response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
 
             else:
                 # Step 4: ELSE webapp is definitely 'Down'
-                response['webapp_status'][team_number] = {server_ip:'Down'}
+                response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
 
     except Exception as e:
         traceback.print_exc()

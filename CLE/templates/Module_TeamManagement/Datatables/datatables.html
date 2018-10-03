@@ -21,30 +21,23 @@
         <thead>
             <tr>
                 <th>Team</th>
+                <th>IP Address</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-          <tr>
-              <td>Tiger Nixon</td>
-              <td><span class="badge badge-pill badge-danger">Down</span></td>
-          </tr>
-          <tr>
-              <td>Tiger Nixon</td>
-              <td><span class="badge badge-pill badge-success">Live</span></td>
-          </tr>
-          <tr>
-              <td>Tiger Nixon</td>
-              <td><span class="badge badge-pill badge-success">Live</span></td>
-          </tr>
-          <tr>
-              <td>Tiger Nixon</td>
-              <td><span class="badge badge-pill badge-success">Live</span></td>
-          </tr>
+            {% for team_name,team_details in webapp_status.items %}
+            <tr>
+                <td>{{ team_name }}</td>
+                <td>{{ team_details.IP_Address }}</td>
+                <td><span class="badge badge-pill badge-danger">{{ team_details.State }}</span></td>
+            </tr>
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>
               <th>Team</th>
+              <th>IP Address</th>
               <th>Status</th>
             </tr>
         </tfoot>
