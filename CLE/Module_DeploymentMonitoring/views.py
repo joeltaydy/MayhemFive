@@ -8,7 +8,6 @@ from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.src import utilities,aws_util
 from Module_Account.src import processLogin
 from django.contrib.auth import logout
-
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
@@ -32,7 +31,7 @@ def faculty_Setup_Base(requests,response=None):
     facultyObj = Faculty.objects.get(email=faculty_email)
 
     try:
-        response['deployment_packages'] = {}
+        response['deployment_packages'] = []
         response['account_number'] = ''
         response['access_key'] = ''
         response['secret_access_key'] = ''
@@ -43,9 +42,10 @@ def faculty_Setup_Base(requests,response=None):
 
         if len(deployment_packageObjs) > 0:
             for deployment_packageObj in deployment_packageObjs:
-                response['deployment_packages'].update(
+                response['deployment_packages'].append(
                     {
-                        deployment_packageObj.deploymentid:deployment_packageObj.gitlink
+                        'package_name':deployment_packageObj.deploymentid,
+                        'package_link':deployment_packageObj.gitlink
                     }
                 )
 
@@ -83,8 +83,12 @@ def faculty_Setup_Base(requests,response=None):
 
                     try:
                         image_list[id] # Just to check if DB info tallies with AWS
+                        counter = 1
                         for section_number,section_details in section_list.items():
-                            response['section_imageList'][section_number] = {'Image_IDs':[]}
+                            response['section_imageList'][section_number] = {
+                                'Checkbox_ID':'example-inline-checkbox' + str(counter),
+                                'Image_IDs':[]
+                            }
                             sharedList = []
                             nonsharedList = []
 
@@ -118,6 +122,7 @@ def faculty_Setup_Base(requests,response=None):
                                     'non_shared_account_number':nonsharedList
                                 }
                             )
+                            counter += 1
                     except:
                          image_detailObj.delete()
 
@@ -128,48 +133,57 @@ def faculty_Setup_Base(requests,response=None):
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabSetup.html", response)
 
-# TO-DO!!!
-# Retrieval and storing of github deployment package link from instructor
-# returns to faculty_Setup_Base
+
+# Retrieval of github deployment package link from DB
 #
-def faculty_Setup_GetGitHub(requests):
-    response = {"faculty_Setup_GetGitHub" : "active"}
+def faculty_Setup_GetGitHubLinks(request):
+    dps = Deployment_Package.objects.all()
+    return render(request, 'dataforms/deploymentpackage/dp_list.html', {'dps': dps})
 
-    # Redirect user to login page if not authorized and student
-    try:
-        processLogin.InstructorVerification(requests)
-    except:
-        logout(requests)
-        return render(requests, 'Module_Account/login.html', response)
 
-    package_id = requests.GET.get('package_id')
-    github_link = requests.GET.get('github_link')
+# Adding of github deployment package link to DB
+# returns a JsonResponse
+#
+def faculty_Setup_AddGitHubLinks(request):
+    if request.method == 'POST':
+        form = DeploymentForm(request.POST)
+    else:
+        form = DeploymentForm()
+    return utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_create.html')
 
-    try:
-        if package_id == None:
-            raise Exception('Please input a valid package name')
 
-        if github_link == None:
-            raise Exception('Please input a valid GitHub link')
+# Updating of github deployment package link to DB
+# returns a JsonResponse
+#
+def faculty_Setup_UpdateGitHubLinks(request, pk):
+    dp = get_object_or_404(Deployment_Package, pk=pk)
+    if request.method == 'POST':
+        form = DeploymentForm(request.POST, instance=dp)
+    else:
+        form = DeploymentForm(instance=dp)
+    return utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_update.html')
 
-        # Save/Update GitHub link to Deployment_Package
-        try:
-            deployment_packageObj = Deployment_Package.objects.get(deploymentid=package_id)
-            deployment_packageObj.gitlink = github_link
-            deployment_packageObj.save()
-        except:
-            Deployment_Package.objects.create(
-                deploymentid=package_id,
-                gitlink=github_link,
-            )
-            Deployment_Package.save()
 
-    except Exception as e:
-        traceback.print_exc()
-        response['error_message'] = 'Error in Deployment Package form: ' + e.args[0]
-        return faculty_Setup_Base(requests,response)
-
-    return faculty_Setup_Base(requests,response)
+# Deleting of github deployment package link from DB
+# returns a JsonResponse
+#
+def faculty_Setup_DeleteGitHubLinks(request, pk):
+    dp = get_object_or_404(Deployment_Package, pk=pk)
+    data = dict()
+    if request.method == 'POST':
+        dp.delete()
+        data['form_is_valid'] = True  # This is just to play along with the existing code
+        dps = Deployment_Package.objects.all()
+        data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+            'dps': dps
+        })
+    else:
+        context = {'dp': dp}
+        data['html_form'] = render_to_string('dataforms/deploymentpackage/partial_dp_delete.html',
+            context,
+            request=request,
+        )
+    return JsonResponse(data)
 
 
 # Retrieval and storing of AWS keys from instructor
@@ -244,39 +258,43 @@ def faculty_Setup_ShareAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    account_numbers = requests.GET.get('account_numbers')
-    image_id = requests.GET.get('image_id')
+    account_numbers = requests.POST.getlist('account_numbers')
+    image_id = requests.POST.get('image_id')
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
 
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
-        access_keys = aws_credentials.access_keys
-        secret_access_keys = aws_credentials.secret_access_keys
+        access_key = aws_credentials.access_key
+        secret_access_key = aws_credentials.secret_access_key
 
         # Add the account number to the image permission on AWS
-        client = aws_util.getClient(access_keys,secret_access_keys)
-        aws_util.addUserToImage(image_id,account_numbers,client)
+        client = aws_util.getClient(access_key,secret_access_key)
 
-        for account_number in account_numbers:
-            # Add the account number to DB side
-            image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
-            account_numbers = image_detailObj.sharedAccNum
+        if account_numbers != None:
+            if len(account_numbers) > 0:
+                aws_util.addUserToImage(image_id,account_numbers,client=client)
 
-            if account_numbers == None:
-                image_detailObj.sharedAccNum = account_number
-            else:
-                image_detailObj.sharedAccNum = account_numbers + '_' + account_number
+                for account_number in account_numbers:
+                    # Add the account number to DB side
+                    image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
+                    shared_account_numbers = image_detailObj.sharedAccNum
 
-            image_detailObj.save()
+                    if shared_account_numbers == None:
+                        image_detailObj.sharedAccNum = account_number
+                    else:
+                        if account_number not in shared_account_numbers:
+                            image_detailObj.sharedAccNum = shared_account_numbers + '_' + account_number
 
-            # Add the image to the student AWS_Credentials using their account number
-            stu_credentials = AWS_Credentials.object.get(account_number=account_number)
-            stu_credentials.imageDetails.add(image_detailObj)
-            stu_credentials.save()
+                    image_detailObj.save()
 
-    except:
+                    # Add the image to the student AWS_Credentials using their account number
+                    stu_credentials = AWS_Credentials.objects.get(account_number=account_number)
+                    stu_credentials.imageDetails.add(image_detailObj)
+                    stu_credentials.save()
+
+    except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error in Share AMI form: ' + e.args[0]
         return faculty_Setup_Base(requests,response)
@@ -307,10 +325,10 @@ def faculty_Monitor_Base(requests):
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-        section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
-
+        section_details = utilities.getAllTeamDetails(course_sectionList)['G4']
         for team_number,account_number in section_details.items():
-            server = Server_Details.objects.filter(account_number=account_number)
+            # Assumption that there's only one server for one account
+            server = Server_Details.objects.filter(account_number=account_number)[0]
             server_ip = server.IP_address
             server_state = server.state
             stu_credentials = server.account_number
@@ -323,22 +341,24 @@ def faculty_Monitor_Base(requests):
             instance = resource.Instance(server.instanceid)
             instance_state = instance.state
 
-            if instance_state['code'] == 16:
+            http_status_code = instance_state['Code']
+
+            if http_status_code == 16:
                 server_state = 'Live'
-            elif instance_state['code'] == 0:
+            elif http_status_code == 0:
                 server_state = 'Pending'
-            elif instance_state['code'] == 32 or instance_state['code'] == 48:
+            elif http_status_code == 32 or http_status_code == 48:
                 server_state = 'Killed'
-            elif instance_state['code'] == 80 or instance_state['code'] == 64:
+            elif http_status_code == 80 or http_status_code == 64:
                 server_state = 'Down'
 
             response['server_status'][team_number] = server_state
 
             # Step 2: Update server.state on server status
             server.state = server_state
-            Server_Details.save()
+            server.save()
 
-            if status == 'Live':
+            if server_state == 'Live':
                 # Step 3: IF server 'Live', then check if webapp is 'Live'
                 try:
                     webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
@@ -348,7 +368,7 @@ def faculty_Monitor_Base(requests):
                     if webapp_jsonObj['HTTPStatusCode'] == 200:
                         response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
 
-                except requests.ConnectionError:
+                except req.ConnectionError as e:
                     response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
 
             else:
@@ -543,63 +563,3 @@ def server_delete(request, pk):
         )
     return JsonResponse(data)
 #end of test forms
-
-
-#deployment package forms
-def deployment_package_list(request):
-    dps = Deployment_Package.objects.all()
-    return render(request, 'dataforms/deploymentpackage/dp_list.html', {'dps': dps})
-
-
-def save_dp_form(request, form, template_name):
-    data = dict()
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            data['form_is_valid'] = True
-            dps = Deployment_Package.objects.all()
-            data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
-                'dps': dps
-            })
-        else:
-            data['form_is_valid'] = False
-    context = {'form': form}
-    data['html_form'] = render_to_string(template_name, context, request=request)
-    return JsonResponse(data)
-
-
-def dp_create(request):
-    if request.method == 'POST':
-        form = DeploymentForm(request.POST)
-    else:
-        form = DeploymentForm()
-    return save_dp_form(request, form, 'dataforms/deploymentpackage/partial_dp_create.html')
-
-
-def dp_update(request, pk):
-    dp = get_object_or_404(Deployment_Package, pk=pk)
-    if request.method == 'POST':
-        form = DeploymentForm(request.POST, instance=dp)
-    else:
-        form = DeploymentForm(instance=dp)
-    return save_dp_form(request, form, 'dataforms/deploymentpackage/partial_dp_update.html')
-
-
-def dp_delete(request, pk):
-    dp = get_object_or_404(Deployment_Package, pk=pk)
-    data = dict()
-    if request.method == 'POST':
-        dp.delete()
-        data['form_is_valid'] = True  # This is just to play along with the existing code
-        dps = Deployment_Package.objects.all()
-        data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
-            'dps': dps
-        })
-    else:
-        context = {'dp': dp}
-        data['html_form'] = render_to_string('dataforms/deploymentpackage/partial_dp_delete.html',
-            context,
-            request=request,
-        )
-    return JsonResponse(data)
-#end of deployment package forms

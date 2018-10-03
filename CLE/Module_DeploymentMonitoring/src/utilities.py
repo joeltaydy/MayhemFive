@@ -2,7 +2,10 @@ import json
 import traceback
 import requests as req
 from django.db.models import Count
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.models import *
+from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src import utilities
 
@@ -110,3 +113,21 @@ def validateAccountNumber(ipAddress, awsCredentials):
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
     return awsCredentials.account_number == jsonObj['User']['Account']
+
+
+# Adds and Updates GitHub link via form
+def addGitHubLinkForm(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            dps = Deployment_Package.objects.all()
+            data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+                'dps': dps
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)

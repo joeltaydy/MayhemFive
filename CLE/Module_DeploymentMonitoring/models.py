@@ -24,7 +24,7 @@ class Image_Details(models.Model):
 
 class AWS_Credentials(models.Model):
     account_number = models.CharField(
-        db_column='AccountNumber',
+        db_column='Account_Number',
         max_length=255,
         primary_key=True,
     )

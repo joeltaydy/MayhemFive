@@ -4,7 +4,10 @@ from django.urls import path,re_path
 
 urlpatterns = [
     path('instructor/ITOperationsLab/setup/',views.faculty_Setup_Base,name='itopslab_setup'),
-    path('instructor/ITOperationsLab/setup/github/',views.faculty_Setup_GetGitHub,name='itopslab_setup_GitHub'),
+    path('instructor/ITOperationsLab/dps/',views.faculty_Setup_GetGitHubLinks,name='dp_list'),
+    path('instructor/ITOperationsLab/dps/create/', views.faculty_Setup_AddGitHubLinks, name='dp_create'),
+    path('instructor/ITOperationsLab/dps/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
+    path('instructor/ITOperationsLab/dps/<str:pk>/delete/', views.faculty_Setup_DeleteGitHubLinks, name='dp_delete'),
     path('instructor/ITOperationsLab/setup/awskeys/',views.faculty_Setup_GetAWSKeys,name='itopslab_setup_AWSKeys'),
     path('instructor/ITOperationsLab/setup/ami/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI'),
     path('instructor/ITOperationsLab/monitor/',views.faculty_Monitor_Base,name='itopslab_monitor'),
@@ -20,8 +23,5 @@ urlpatterns = [
     path('instructor/ITOperationsLab/servers/<int:pk>/update/', views.server_update, name='server_update'),
     path('instructor/ITOperationsLab/servers/<int:pk>/delete/', views.server_delete, name='server_delete'),
     #deployment package forms
-    path('instructor/ITOperationsLab/dps/',views.deployment_package_list,name='dp_list'),
-    path('instructor/ITOperationsLab/dps/create/', views.dp_create, name='dp_create'),
-    path('instructor/ITOperationsLab/dps/<int:pk>/update/', views.dp_update, name='dp_update'),
-    path('instructor/ITOperationsLab/dps/<int:pk>/delete/', views.dp_delete, name='dp_delete'),
+
 ]
