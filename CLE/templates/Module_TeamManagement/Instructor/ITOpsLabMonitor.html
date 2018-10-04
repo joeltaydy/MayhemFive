@@ -6,7 +6,7 @@
 <div class="col-md-12">
     <h1 align="center">IT Operations Lab</h1>
     <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-   
+
 
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
@@ -15,21 +15,18 @@
           <button onclick="location.href = '{% url 'DMmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
         </div>
     </div>
-  
+
     <hr>
     <h2 align="center"><i>Monitor</i></h2>
 </div>
     <ul class="navDiv">
       <!-- to remove once for loop is settled by backend -->
-      <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number  }}';" type="button" class="btn btn-primary">G3</button>
-      <button onclick="location.href = '/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number  }}';" type="button" class="btn btn-primary">G4</button>
       {% for course_section in course_sectionList %}
-      {% if course_section.section_number != 'G0' %}
-        <a href="/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
-      {% endif %}
+          {% if course_section.section_number != 'G0' %}
+            <a href="/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
+          {% endif %}
       {% endfor %}
     </ul>
-
 
     <div class="content">
       <div class="container-fluid">
@@ -86,7 +83,7 @@
                       </div>
                       <div class="card-body">
                         <span align="center">
-                              {% include "Module_TeamManagement/Datatables/duallistbox.html" %}
+
                         </span>
                       </div>
                       <div class="card-footer">

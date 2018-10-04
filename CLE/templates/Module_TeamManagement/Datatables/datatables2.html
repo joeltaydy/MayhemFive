@@ -25,22 +25,20 @@
             </tr>
         </thead>
         <tbody>
+            {% for team_name,server_state in server_status.items %}
             <tr>
-                <td>Tiger Nixon</td>
-                <td><span class="badge badge-pill badge-danger">Down</span></td>
+                <td>{{ team_name }}</td>
+                <td>
+                {% if server_state == 'Live' %}
+                    <span class="badge badge-pill badge-success">{{ server_state }}</span>
+                {% elif server_state == 'Pending' %}
+                    <span class="badge badge-pill badge-warning">{{ server_state }}</span>
+                {% else %}
+                    <span class="badge badge-pill badge-danger">{{ server_state }}</span>
+                {% endif %}
+                </td>
             </tr>
-            <tr>
-                <td>Tiger Nixon</td>
-                <td><span class="badge badge-pill badge-success">Live</span></td>
-            </tr>
-            <tr>
-                <td>Tiger Nixon</td>
-                <td><span class="badge badge-pill badge-success">Live</span></td>
-            </tr>
-            <tr>
-                <td>Tiger Nixon</td>
-                <td><span class="badge badge-pill badge-success">Live</span></td>
-            </tr>
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>

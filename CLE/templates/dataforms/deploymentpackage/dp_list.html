@@ -1,0 +1,45 @@
+{% extends 'dataforms/dataformbase.html' %}
+
+{% load static %}
+
+{% block javascript %}
+  <script src="{% static 'js/dataforms/dp.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  <!-- BUTTON TO TRIGGER THE ACTION -->
+  <p>
+    <button type="button"
+            class="btn btn-primary js-create-dp"
+            data-url="{% url 'DMmod:dp_create' %}">
+      <span class="glyphicon glyphicon-plus"></span>
+      New Deployment Package
+    </button>
+  </p>
+
+  <table class="table" id="dp-table">
+    <thead>
+      <tr>
+        <th>Deployment ID</th>
+        <th>Git Link</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% include 'dataforms/deploymentpackage/partial_dp_list.html' %}
+    </tbody>
+  </table>
+
+  <!-- THE MODAL WE WILL BE USING -->
+ <div class="modal fade" id="modal-dp">
+   <div class="modal-dialog">
+     <div class="modal-content">
+     </div>
+   </div>
+
+   <script>
+   $(document).ready(function() {
+      $( "#dp-table" ).load( "../setup/deployment_package/ #dp-table" );
+   });
+   </script>
+
+{% endblock %}

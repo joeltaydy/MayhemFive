@@ -25,9 +25,9 @@
     <div id="accordion" class="panel-group col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
         <div class="panel">
         <div class="panel-heading">
-        <h4 class="panel-title">
+        <h5 class="panel-title">
             <a href="#panelBodyOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
-            </h4>
+            </h5>
         </div>
 
          <!-- Request AWS Information-->
@@ -38,61 +38,63 @@
                     {% csrf_token %}
                     <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                         <label for="name" class="control-label">Account Number</label>
-                        <input class="form-control" type="text" name="account_number" id="accountNum" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="account_number" id="account_number" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Access Key</label>
-                        <input class="form-control" type="text" name="access_key" id="accessKey" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="access_key" id="access_key" aria-describedby="fileHelp">
                         <br>
                         <label for="name" class="control-label">AWS Secret Access Key</label>
-                        <input class="form-control" type="text" name="secret_access_key" id="secretKey" aria-describedby="fileHelp">
-
-                        <div class="col-md-12 form-group" style = "margin-bottom:40px;">
-                            <br>
-                            {% if submittedAccountNumber != "" %}
-                                Submitted Account Number: {{account_number}} <br>
-                            {% else %}
-                                Submitted Account Number: <i color = "red">No Account Number submitted</i><br>
-                            {%endif %}
-
-                            {% if submittedAccessKey != "" %}
-                                Submitted AWS Access Key: {{access_key}} <br>
-                            {% else %}
-                                Submitted AWS Access Key: <i color = "red">No Access Key submitted</i><br>
-                            {%endif %}
-
-                            {% if submittedSecAccessKey != "" %}
-                                Submitted AWS Secret Access Key: {{secret_access_key}}<br>
-                            {% else %}
-                                Submitted AWS Secret Access Key: <i color = "red">No Access Key submitted</i><br>
-                            {%endif %}
-
-                            <button class="btn btn-dark pull-right" type="submit">Submit</button>
-                            <br>
-                        </div>
+                        <input class="form-control" type="text" name="secret_access_key" id="secret_access_key" aria-describedby="fileHelp">
+                    </div>
+                    <div class="col-md-9 form-group" style = "margin-bottom:40px;">
+                        <br>
+                        <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
                     </div>
                 </form>
+                <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+                    {% if submittedAccountNumber != "" %}
+                        <h5><b>Submitted Account Number:</b> {{account_number}} </h5>
+                    {% else %}
+                        <h5><b>Submitted Account Number:</b> <i color = "red">No Account Number submitted</i></h5>
+                    {%endif %}
+
+                    {% if submittedAccessKey != "" %}
+                        <h5><b>Submitted AWS Access Key:</b> {{access_key}} </h5>
+                    {% else %}
+                        <h5><b>Submitted AWS Access Key:</b> <i color = "red">No Access Key submitted</i></h5>
+                    {%endif %}
+
+                    {% if submittedSecAccessKey != "" %}
+                        <h5><b>Submitted AWS Secret Access Key:</b> {{secret_access_key}}</h5>
+                    {% else %}
+                        <h5><b>Submitted AWS Secret Access Key:</b> <i color = "red">No Access Key submitted</i></h5>
+                    {%endif %}
+                </div>
+
             </div>
         </div>
         </div>
 
         <div class="panel">
         <div class="panel-heading">
-        <h4 class="panel-title">
+        <h5 class="panel-title">
             <a href="#panelBodyTwo" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Deployment Package</a>
-            </h4>
+            </h5>
         </div>
          <!-- Deployment Package Table-->
         <div id="panelBodyTwo" class="panel-collapse collapse">
         <div class="panel-body">
-            <p>Energistically drive standardized communities through user friendly results. Phosfluorescently initiate superior technologies vis-a-vis low-risk high-yield solutions. Objectively facilitate clicks-and-mortar partnerships vis-a-vis superior partnerships. Continually generate long-term high-impact methodologies via wireless leadership. Holisticly seize resource maximizing solutions via user friendly outsourcing.</p>
+            <div class="container col-md-12" style="display: block;margin-left: auto;margin-right: auto;">
+            {% include "dataforms/deploymentpackage/dp_list.html" %}
+          </div>
             </div>
         </div>
         </div>
         <div class="panel">
             <div class="panel-heading">
-            <h4 class="panel-title">
+            <h5 class="panel-title">
                 <a href="#panelBodyThree" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Approve & Send Image</a>
-                </h4>
+                </h5>
             </div>
          <!-- Approve and Send Image Steps-->
             <div id="panelBodyThree" class="panel-collapse collapse">
@@ -106,13 +108,39 @@
     </div>
 </div>
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function(){
             $('[data-toggle="popover"]').popover();
         });
 
+        //validations for form fields
+        $("#awsinfo").validate({
+            rules: {
+                account_number: {
+                    digits: true, //checks account number if digits have been entered
+                    required: true
+                },
+                access_key: {
+                    required: true
+                },
+                secret_access_key: {
+                    required: true
+                }
+            },
+            messages: {
+                account_number: {
+                    digits: "Please enter a valid AWS Account Number.",
+                    required: "Please enter your AWS Account Number."
+                },
+                access_key: {
+                    required: "Please enter your AWS Access Key."
+                },
+                secret_access_key: {
+                    required: "Please enter your AWS Secret Access Key."
+                }
+            }
+        });
 
         // $(function(){
         // var accNum = "{{submittedAccNum}}";
@@ -142,33 +170,7 @@
 
         // });
 
-        //validations for form fields
-        $("#msform").validate({
-            rules: {
-                accountNum: {
-                    digits: true, //checks account number if digits have been entered
-                    required: true
-                },
-                accessKey: {
-                    required: true //checks ip address format
-                },
-                secretKey: {
-                    required: true
-                }
-            },
-            messages: {
-                accountNum: {
-                    digits: "Please enter a valid AWS Account Number."
-                },
-                accessKey: {
-                    required: "Please enter your AWS Access Key."
-                },
-                secretKey: {
-                    required: "Please enter your AWS Secret Access Key."
-                }
-            }
-        });
+
 
     </script>
-
 {% endblock %}

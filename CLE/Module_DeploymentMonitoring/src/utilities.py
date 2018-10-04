@@ -2,7 +2,10 @@ import json
 import traceback
 import requests as req
 from django.db.models import Count
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.models import *
+from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src import utilities
 
@@ -11,10 +14,10 @@ from Module_TeamManagement.src import utilities
 def getAllTeamDetails(course_sectionList):
     section_list = {}
 
-    if len(course_sectionList) < 0 or 'ESM201' not in course_sectionList.keys():
+    if len(course_sectionList) < 0 and 'EMS201' not in course_sectionList.keys():
         return {}
 
-    for course_section in course_sectionList['ESM201']:
+    for course_section in course_sectionList['EMS201']:
         section_number = course_section['section_number']
         section_list[section_number] = {}
 
@@ -22,13 +25,21 @@ def getAllTeamDetails(course_sectionList):
         for team_details in query:
             team_name = team_details['team_number']
             account_number = team_details['awscredential']
-            section_list[section_number].update(
-                {
-                    account_number:team_name
-                }
-            )
+
+            if team_name != None and account_number != None:
+                section_list[section_number][team_name] = account_number
 
     return section_list
+
+
+# Add image detials into database. REturns an image_details object
+def addImageDetials(image_id,image_name):
+    image_detailsObj = Image_Details.objects.create(
+        imageId=image_id,
+        imageName=image_name,
+    )
+    image_detailsObj.save()
+    return image_detailsObj
 
 
 # Add AWS credentials for the relevant students
@@ -43,6 +54,7 @@ def addAWSCredentials(accountNum, requests):
     except:
         traceback.print_exc()
         awsC = AWS_Credentials.objects.create(
+            student_account=class_studentObj.student.email,
             account_number=accountNum,
         )
         awsC.save()
@@ -107,3 +119,61 @@ def validateAccountNumber(ipAddress, awsCredentials):
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
     return awsCredentials.account_number == jsonObj['User']['Account']
+
+
+# Adds and Updates GitHub link via form
+def addGitHubLinkForm(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            dps = Deployment_Package.objects.all()
+            data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+                'dps': dps
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+# TEMPORARY METHOD for mid-terms : Event Configuration
+def runEvent(server_ip,server_id,event_type):
+    payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
+    successful_stoppage = []
+    successful_count = 0
+
+    unsuccessful_stoppage = []
+    unsuccessful_count = 0
+
+    results = {}
+
+    if event_type == 'stop':
+        server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
+    elif event_type == 'ddos':
+        pass
+
+    server_response = req.get(server_url, params=payload)
+    server_jsonObj = json.loads(server_response.content.decode())
+
+    if server_jsonObj['HTTPStatusCode'] == 200:
+        successful_stoppage.append(server_id)
+        successful_count += 1
+    else:
+        unsuccessful_stoppage.append(server_id)
+        unsuccessful_count += 1
+
+    results = {
+        'successful':{
+            'ids':successful_stoppage,
+            'count':successful_count
+        },
+        'unsuccessful':{
+            'ids':unsuccessful_stoppage,
+            'count':unsuccessful_count
+        }
+    }
+
+    return results

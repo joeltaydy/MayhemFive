@@ -67,7 +67,7 @@ class AWS_Credentials(models.Model):
     account_number = models.CharField(
         db_column='AccountNumber',
         max_length=255,
-        null = True
+        primary_key=True,
     )
     access_key = models.TextField(
         db_column='Access_Key',

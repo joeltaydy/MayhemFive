@@ -6,42 +6,27 @@
   <script src="{% static 'js/jquery.bootstrap-duallistbox.js' %}"></script>
 </head>
 
-<div class="row">
+<!-- <div class="row">
   <div class="col-md-12">
     <form id="demoform" action="{% url 'DMmod:itopslab_monitor' %}" method="post">
-      {% csrf_token %}
-    <select multiple="multiple" size="10" name="duallistbox_demo2" class="demo2" title="duallistbox_demo2">
-      {% for course_title,course_sectionList in courses.items %}
-          {% for course_section in course_sectionList %}
-              {% if course_section.section_number != 'G0' %}
-                  <option value={{course_section.id}} selected="selected">{{ course_section.to_string }}</option>
-              {% endif %}
-          {% endfor %}
-      {% endfor %}
-      <option value="option1">Option 1</option>
-      <option value="option2">Option 2</option>
-      <option value="option3" selected="selected">Option 3</option>
-      <option value="option4">Option 4</option>
-      <option value="option5">Option 5</option>
-      <option value="option6" selected="selected">Option 6</option>
-      <option value="option7">Option 7</option>
-      <option value="option8">Option 8</option>
-      <option value="option9">Option 9</option>
-      <option value="option0">Option 10</option>
-      <option value="option0">Option 11</option>
-      <option value="option0">Option 12</option>
-      <option value="option0">Option 13</option>
-      <option value="option0">Option 14</option>
-      <option value="option0">Option 15</option>
-      <option value="option0">Option 16</option>
-      <option value="option0">Option 17</option>
-      <option value="option0">Option 18</option>
-      <option value="option0">Option 19</option>
-      <option value="option0">Option 20</option>
+      {% csrf_token %} -->
+    <select multiple="multiple" size="10" name="account_numbers" class="demo2" title="duallistbox_demo2">
+        {% for section_number,section_details in section_imageList.items %}
+            {% if section_number == 'G4' %}
+                {% for image in section_details.Image_IDs %}
+                    {% for shared_account in image.shared_account_number %}
+                        <option id={{shared_account.account_number}} value={{shared_account.account_number}} selected="selected">{{shared_account.team_name}}</option>
+                    {% endfor %}
+                    {% for non_shared_account in image.non_shared_account_number %}
+                        <option id={{non_shared_account.account_number}} value={{non_shared_account.account_number}} >{{non_shared_account.team_name}}</option>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
     </select>
-        <br>
+        <!-- <br>
       <button type="submit" class="btn btn-default btn-block">SHARE DEPLOYMENT INFO</button>
-    </form>
+    </form> -->
     <script>
       var demo2 = $('.demo2').bootstrapDualListbox({
         nonSelectedListLabel: 'Non-selected',
@@ -51,5 +36,6 @@
       });
 
     </script>
-  </div>
-</div>
+  <!-- </div>
+</div> -->
+</html>

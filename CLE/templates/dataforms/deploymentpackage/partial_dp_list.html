@@ -1,0 +1,22 @@
+{% for package_details in dps %}
+  <tr>
+      <td>{{ package_details.deploymentid }}</td>
+      <td>{{ package_details.gitlink }}</td>
+    <td style="width: 250px">
+      <button type="button"
+              class="btn btn-warning btn-sm js-update-dp"
+              data-url="{% url 'DMmod:dp_update' pk=package_details.deploymentid %}">
+        <span class="glyphicon glyphicon-pencil"></span> Edit
+      </button>
+      <button type="button"
+             class="btn btn-danger btn-sm js-delete-dp"
+             data-url="{% url 'DMmod:dp_delete' pk=package_details.deploymentid %}">
+       <span class="glyphicon glyphicon-trash"></span> Delete
+     </button>
+    </td>
+  </tr>
+{% empty %}
+  <tr>
+    <td colspan="8" class="text-center bg-warning">No deployment package</td>
+  </tr>
+{% endfor %}

@@ -5400,3 +5400,27 @@ font-size: 18px;
     height: 15vw;
     object-fit: cover;
 }
+
+
+.modal-dialog.msg {
+    width: 360px;
+}
+
+.modal-header.msg {
+    background-color: #b1112c;
+    padding:5px 5px;
+    color:#FFF;
+    border-bottom:10px dashed #BBBB00;
+ }
+
+.modal-content.msg {
+    /* 80% of window height */
+    height: 90%;
+    background-color:#ffffff;
+}
+
+.modal-footer.msg {
+  background-color:#ffffff;
+  padding: 1rem;
+  border-top: 1px solid #202224;
+}
