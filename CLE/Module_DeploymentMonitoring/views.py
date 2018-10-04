@@ -505,11 +505,13 @@ def ITOpsLabStudentMonitor(requests):
     response = {"ITOpsLabStudentDeploy" : "active"}
     response['server_status'] = {}
     response['webapp_status'] = {}
+    response['webapp_metric'] = {}
     studentClassObj = utilities.getStudentClassObject(requests)
     AWS_Credentials = studentClassObj.awscredential
     team_number= studentClassObj.team_number
     account_number = AWS_Credentials.account_number
     response = utilities.getServerStatus(account_number,team_number,response)
+    response = utilities.getMetric(account_number,response)
     tz = pytz.timezone('Asia/Singapore')
     response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
     print(response)

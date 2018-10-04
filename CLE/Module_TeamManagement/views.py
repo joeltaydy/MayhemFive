@@ -572,7 +572,7 @@ def configureDB_students(requests):
 
     response['message'] = 'Successful Upload'
     # return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
-    utilities.webScrapper()
+    #utilities.webScrapper()
     return faculty_Home(requests)
 
 
