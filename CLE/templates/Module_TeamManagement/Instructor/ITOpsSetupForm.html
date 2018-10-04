@@ -27,34 +27,36 @@
                         <div class="col-12">
                             {% for section_number,section_details in section_imageList.items %}
                             <div class="custom-control custom-checkbox custom-control-inline mb-5">
-                                <input class="custom-control-input" type="checkbox" name={{section_details.Checkbox_ID}} id={{section_details.Checkbox_ID}} value={{section_number}}>
+                                <input class="custom-control-input classselect" type="checkbox" name="classselect" id={{section_details.Checkbox_ID}} value={{section_number}}>
                                 <label class="custom-control-label" for={{section_details.Checkbox_ID}}>{{section_number}}</label>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
-                    <input type="button" name="next" class="next action-button" value="Next"/>
+                    <input type="button" name="next" class="next action-button" value="Next" onclick="sendData()"/>
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Select Image</h2>
+                    <h1  id="trylah">xxxxxxxx{{test}}</h1>
                     <h3 class="fs-subtitle">Please select the image and the groups you would like to send the image to</h3>
                     <div class="col-md-8"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <select class="form-control" id="image_id_list" name="image_id">
                             <option value="" disabled selected>Image Name</option>
                             {% for section_number,section_details in section_imageList.items %}
-                                {% if section_number == 'G4' %}
+                                {% if section_number == 'G10' %}
                                     {% for image in section_details.Image_IDs %}
                                         <option id={{image.image_id}} value={{image.image_id}}>{{image.image_name}}</option>
                                     {% endfor %}
                                 {% endif %}
                             {% endfor %}
                         </select>
+                      <table>
+                        {{ form.as_table }}
+                      </table>
                     </div>
-                    <!-- <input type="text" name="twitter" placeholder="Twitter"/>
-                    <input type="text" name="facebook" placeholder="Facebook"/>
-                    <input type="text" name="gplus" placeholder="Google Plus"/> -->
+
                     <br><br>
-                        {% include "Module_TeamManagement/Datatables/duallistbox.html" with section='G4' image_id='Test' %}
+                        {% include "Module_TeamManagement/Datatables/duallistbox.html" with section='G2' image_id='Test' %}
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
                     <input type="button" name="next" class="next action-button" value="Next"/>
@@ -73,6 +75,35 @@
 
         </div>
     </div>
+
+    <script type="text/javascript">
+      function sendData() {
+        var selected = $('input:checked').map(function(){
+          return $(this).val();
+      }).get();
+        //     $.each($(".classselect:checkbox:checked"), function(){
+        //         selected.push($(this).val());
+        //     });
+        // var data2 = $("custom-checkbox").serialize();
+          console.log(selected)
+          // console.log(data2)
+        $.ajax({
+           type: "GET",
+           url: "{% url 'DMmod:itopslab_setup_sections' %}",
+           dataType: "json",
+           async:true,
+           data: {
+             csrfmiddlewaretoken: "{{ csrf_token }}",
+             sectionNo: selected
+           },
+           success: function(msg){
+             // $('#output').html(json.message);
+             $("#trylah").load("/");
+             console.log("DOG")
+           }
+        });
+      }
+    </script>
 
     <!-- /.MultiStep Form -->
 

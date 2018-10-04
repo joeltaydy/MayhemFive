@@ -1,0 +1,57 @@
+<div class="modal fade" id="errorMessage" tabindex="-1" role="dialog" aria-labelledby="Modal-custom-demo-label" aria-hidden="true">
+<div class="modal-dialog msg" role="document">
+  <div class="modal-content msg">
+    <div class="modal-header msg">
+      <h5 class="modal-title" id="Modal-custom-demo-label">Oh Snap!</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      {{ error_message }}
+    </div>
+    <div class="modal-footer msg">
+    </br>
+    </br>
+      <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="successMessage" tabindex="-1" role="dialog" aria-labelledby="Modal-custom-demo-label" aria-hidden="true">
+<div class="modal-dialog msg" role="document">
+  <div class="modal-content msg">
+    <div class="modal-header msg">
+      <h5 class="modal-title" id="Modal-custom-demo-label">You're Okay!</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      {{ message }}
+    </div>
+    <div class="modal-footer msg">
+    </br>
+    </br>
+      <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+    {% if error_message %}
+    $('#errorMessage').modal('show');
+    {% endif %}
+
+    $('[data-toggle="popover"]').popover();
+    {% if message %}
+    $('#successMessage').modal('show');
+    {% endif %}
+});
+
+</script>

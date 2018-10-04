@@ -41,11 +41,8 @@
   </div>
 </form>
 
-{% if error %}<div class='imp_message'>{{ error }}</div>{% endif %}
-{% if message %}<div class='imp_message'>{{ message }}</div>{% endif %}
-
 <label for="name" class="control-label">
-  <a href="#" data-toggle="popover" data-html="true" data-content="<img src='{% static 'images/samplecourse.jpg' %}' width='800' />">Help <i class="far fa-question-circle"></i></a>
+  <a href="/images/myw3schoolsimage.jpg" download data-toggle="popover" data-html="true" data-trigger="hover" data-content="Click to download sample excel file.">Help <i class="far fa-question-circle"></i></a>
 </label>
 
 
@@ -54,6 +51,9 @@ $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
 });
 </script>
+
+{% include 'popupmessages/message.html' %}
+
 </div>
 
 {% endblock %}

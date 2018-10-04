@@ -244,6 +244,11 @@ def faculty_Setup_GetAWSKeys(requests):
 
     return faculty_Setup_Base(requests,response)
 
+# def faculty_GetSection(requests):
+#     response = {'test':'test'}
+#     section_number = requests.GET.get('sectionNo[]')
+#     return render(requests, 'Module_TeamManagement/Instructor/ITOpsLabMonitor.html', response)
+
 
 # Retrieval and storing of AMI length from instructor
 # returns to faculty_Setup_Base
@@ -262,7 +267,8 @@ def faculty_Setup_ShareAMI(requests):
     image_id = requests.POST.get('image_id')
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-
+    data = requests.GET.getlist("sectionNo[]")
+    print(data)
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
@@ -330,7 +336,7 @@ def faculty_Monitor_Base(requests):
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
         section_details = utilities.getAllTeamDetails(course_sectionList)['G4']
-        
+
         for team_number,account_number in section_details.items():
             # Assumption that there's only one server for one account
             server = Server_Details.objects.filter(account_number=account_number)[0]
