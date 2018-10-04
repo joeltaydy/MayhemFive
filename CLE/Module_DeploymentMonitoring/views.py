@@ -247,6 +247,11 @@ def faculty_Setup_GetAWSKeys(requests):
 
     return faculty_Setup_Base(requests,response)
 
+# def faculty_GetSection(requests):
+#     response = {'test':'test'}
+#     section_number = requests.GET.get('sectionNo[]')
+#     return render(requests, 'Module_TeamManagement/Instructor/ITOpsLabMonitor.html', response)
+
 
 # Retrieval and storing of AMI length from instructor
 # returns to faculty_Setup_Base
@@ -265,7 +270,8 @@ def faculty_Setup_ShareAMI(requests):
     image_id = requests.POST.get('image_id')
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-
+    data = requests.GET.getlist("sectionNo[]")
+    print(data)
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
@@ -508,11 +514,13 @@ def ITOpsLabStudentMonitor(requests):
     response = {"ITOpsLabStudentDeploy" : "active"}
     response['server_status'] = {}
     response['webapp_status'] = {}
+    response['webapp_metric'] = {}
     studentClassObj = utilities.getStudentClassObject(requests)
     AWS_Credentials = studentClassObj.awscredential
     team_number= studentClassObj.team_number
     account_number = AWS_Credentials.account_number
     response = utilities.getServerStatus(account_number,team_number,response)
+    response = utilities.getMetric(account_number,response)
     tz = pytz.timezone('Asia/Singapore')
     response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
     print(response)
