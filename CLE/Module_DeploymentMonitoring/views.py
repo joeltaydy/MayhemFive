@@ -3,6 +3,8 @@ import traceback
 import requests as req
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+import pytz
+import datetime
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.src import utilities,aws_util
@@ -11,7 +13,7 @@ from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
-
+from Module_TeamManagement.src.utilities import encode,decode
 
 # Main function for setup page on faculty.
 # Will retrieve work products and render to http page
@@ -335,56 +337,15 @@ def faculty_Monitor_Base(requests):
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
+<<<<<<< HEAD
         section_details = utilities.getAllTeamDetails(course_sectionList)['G4']
 
+=======
+        section_details = utilities.getAllTeamDetails(course_sectionList)['G1']
+        
+>>>>>>> 15f74445c331a7c672d7f0ffb633e5f653d2f0ec
         for team_number,account_number in section_details.items():
-            # Assumption that there's only one server for one account
-            server = Server_Details.objects.filter(account_number=account_number)[0]
-            server_ip = server.IP_address
-            server_state = server.state
-            stu_credentials = server.account_number
-
-            # Rule of thumb, if webapp is alive, then server will most definitely be alive
-            # BUT if server is alive, there's no guarantee that webapp is alive
-
-            # Step 1: Check if server is alive
-            resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
-            instance = resource.Instance(server.instanceid)
-            instance_state = instance.state
-
-            http_status_code = instance_state['Code']
-
-            if http_status_code == 16:
-                server_state = 'Live'
-            elif http_status_code == 0:
-                server_state = 'Pending'
-            elif http_status_code == 32 or http_status_code == 48:
-                server_state = 'Killed'
-            elif http_status_code == 80 or http_status_code == 64:
-                server_state = 'Down'
-
-            response['server_status'][team_number] = server_state
-
-            # Step 2: Update server.state on server status
-            server.state = server_state
-            server.save()
-
-            if server_state == 'Live':
-                # Step 3: IF server 'Live', then check if webapp is 'Live'
-                try:
-                    webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
-                    webapp_response = req.get(webapp_url)
-                    webapp_jsonObj = json.loads(webapp_response.content.decode())
-
-                    if webapp_jsonObj['HTTPStatusCode'] == 200:
-                        response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
-
-                except req.ConnectionError as e:
-                    response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
-
-            else:
-                # Step 4: ELSE webapp is definitely 'Down'
-                response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+            response = utilities.getServerStatus(account_number,team_number,response)
 
     except Exception as e:
         traceback.print_exc()
@@ -458,16 +419,19 @@ def student_Deploy_Base(requests):
             coursesec = crse['id']
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
-    awsAccountNumber =  class_studentObj.awscredential
-    response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
-    try:
-        awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
-        response['awsImage'] = awsImage
+    try: 
+        awsAccountNumber =  class_studentObj.awscredential
+        response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
     except:
-        response['awsImage'] = None
+        response['submittedAccNum'] = None
+    #try:
+    #    awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
+    #    response['awsImage'] = awsImage
+    #except:
+    #    response['awsImage'] = None
 
     response["studentDeployBase"] = "active"
-    print(response)
+    #print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
@@ -478,21 +442,22 @@ def student_Deploy_Upload(requests):
     try:
         processLogin.studentVerification(requests)
         if requests.method == "GET" :
-            response['error_message'] = "Wrong entry to form"
-            return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+            student_Deploy_Base(requests)
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
     accountNum = requests.POST.get("accountNum") #string of account number
+    ipAddress = requests.POST.get("ipaddress") #string of IP address  
 
-    ipAddress = requests.POST.get("ipaddress") #string of IP address
-
-    if accountNum is not None:
+    if accountNum != "" :
         student_Deploy_AddAccount(requests)
-    elif ipAddress is not None:
-        student_Deploy_AddIP(requests)
-
-    return HttpResponse('')
+    if ipAddress != "":
+        try :
+            student_Deploy_AddIP(requests)
+            return ITOpsLabStudentMonitor(requests)
+        except: 
+            traceback.print_exc()
+    return student_Deploy_Base(requests)
 
 
 # Storing of student user account number in database
@@ -509,7 +474,6 @@ def student_Deploy_AddAccount(requests):
         return render(requests,'Module_Account/login.html',response)
 
     accountNum = requests.POST.get("accountNum") #string of account number
-    print(accountNum)
     utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
 
@@ -532,11 +496,36 @@ def student_Deploy_AddIP(requests):
 
 
 def ITOpsLabStudentDeploy(requests):
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',{})
+
     response = {"ITOpsLabStudentDeploy" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 def ITOpsLabStudentMonitor(requests):
-    response = {"ITOpsLabStudentMonitor" : "active"}
+
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',{})
+
+    response = {"ITOpsLabStudentDeploy" : "active"}
+    response['server_status'] = {}
+    response['webapp_status'] = {}
+    response['webapp_metric'] = {}
+    studentClassObj = utilities.getStudentClassObject(requests)
+    AWS_Credentials = studentClassObj.awscredential
+    team_number= studentClassObj.team_number
+    account_number = AWS_Credentials.account_number
+    response = utilities.getServerStatus(account_number,team_number,response)
+    response = utilities.getMetric(account_number,response)
+    tz = pytz.timezone('Asia/Singapore')
+    response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
+    print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
 
