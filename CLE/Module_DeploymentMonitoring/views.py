@@ -296,8 +296,11 @@ def student_Deploy_Base(requests):
             coursesec = crse['id']
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
-    awsAccountNumber =  class_studentObj.awscredential
-    response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
+    try: 
+        awsAccountNumber =  class_studentObj.awscredential
+        response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
+    except:
+        response['submittedAccNum'] = None
     try:
         awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
         response['awsImage'] = awsImage
@@ -320,9 +323,9 @@ def student_Deploy_Upload(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
     accountNum = requests.POST.get("accountNum") #string of account number
-    
-    ipAddress = requests.POST.get("ipaddress") #string of IP address
-    
+    print(accountNum)
+    ipAddress = requests.POST.get("ipaddress") #string of IP address  
+    print(ipAddress)
     if accountNum is not None:
         student_Deploy_AddAccount(requests)
     elif ipAddress is not None:
@@ -345,7 +348,6 @@ def student_Deploy_AddAccount(requests):
         return render(requests,'Module_Account/login.html',response)
 
     accountNum = requests.POST.get("accountNum") #string of account number
-    print(accountNum)
     utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
 
 

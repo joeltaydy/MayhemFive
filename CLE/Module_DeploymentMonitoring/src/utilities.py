@@ -34,17 +34,21 @@ def getAllTeamDetails(course_sectionList):
 # Add AWS credentials for the relevant students
 def addAWSCredentials(accountNum, requests):
     class_studentObj= getStudentClassObject(requests)
+    print(class_studentObj)
     try:
         awsC=class_studentObj.awscredential
+        oldAccountNum = awsC.account_number
         awsC.account_number = accountNum
         awsC.save()
     except:
+        traceback.print_exc()
         awsC = AWS_Credentials.objects.create(
             account_number=accountNum,
         )
         awsC.save()
-    class_studentObj.awscredential = awsC
-    class_studentObj.save()
+        class_studentObj.awscredential = awsC
+        class_studentObj.save()
+    
 
 
 # Retrieve the Class object that belongs under the current student user
@@ -91,9 +95,10 @@ def addServerDetails(ipAddress,requests):
         instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
         instanceName = None,
         state = "Live",
-
     )
     sd.save()
+    awsC.serverDetails = sd 
+    awsC.save()
 
 
 # Validate if the IP address sent by the student user belongs under their account
