@@ -11,7 +11,7 @@ from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
-
+from Module_TeamManagement.src.utilities import encode,decode
 
 # Main function for setup page on faculty.
 # Will retrieve work products and render to http page
@@ -329,7 +329,7 @@ def faculty_Monitor_Base(requests):
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-        section_details = utilities.getAllTeamDetails(course_sectionList)['G4']
+        section_details = utilities.getAllTeamDetails(course_sectionList)['G1']
         
         for team_number,account_number in section_details.items():
             # Assumption that there's only one server for one account
@@ -342,7 +342,7 @@ def faculty_Monitor_Base(requests):
             # BUT if server is alive, there's no guarantee that webapp is alive
 
             # Step 1: Check if server is alive
-            resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
+            resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
             instance = resource.Instance(server.instanceid)
             instance_state = instance.state
 
@@ -457,14 +457,14 @@ def student_Deploy_Base(requests):
         response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
     except:
         response['submittedAccNum'] = None
-    try:
-        awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
-        response['awsImage'] = awsImage
-    except:
-        response['awsImage'] = None
+    #try:
+    #    awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
+    #    response['awsImage'] = awsImage
+    #except:
+    #    response['awsImage'] = None
 
     response["studentDeployBase"] = "active"
-    print(response)
+    #print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
@@ -475,21 +475,22 @@ def student_Deploy_Upload(requests):
     try:
         processLogin.studentVerification(requests)
         if requests.method == "GET" :
-            response['error_message'] = "Wrong entry to form"
-            return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+            student_Deploy_Base(requests)
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
     accountNum = requests.POST.get("accountNum") #string of account number
-    print(accountNum)
     ipAddress = requests.POST.get("ipaddress") #string of IP address  
-    print(ipAddress)
-    if accountNum is not None:
-        student_Deploy_AddAccount(requests)
-    elif ipAddress is not None:
-        student_Deploy_AddIP(requests)
 
-    return HttpResponse('')
+    if accountNum != "" :
+        student_Deploy_AddAccount(requests)
+    if ipAddress != "":
+        try :
+            student_Deploy_AddIP(requests)
+            return ITOpsLabStudentMonitor(requests)
+        except: 
+            traceback.print_exc()
+    return student_Deploy_Base(requests)
 
 
 # Storing of student user account number in database

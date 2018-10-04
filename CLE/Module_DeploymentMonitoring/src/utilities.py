@@ -45,21 +45,17 @@ def addImageDetials(image_id,image_name):
 # Add AWS credentials for the relevant students
 def addAWSCredentials(accountNum, requests):
     class_studentObj= getStudentClassObject(requests)
-    print(class_studentObj)
     try:
         awsC=class_studentObj.awscredential
-        oldAccountNum = awsC.account_number
         awsC.account_number = accountNum
         awsC.save()
     except:
-        traceback.print_exc()
         awsC = AWS_Credentials.objects.create(
-            student_account=class_studentObj.student.email,
             account_number=accountNum,
         )
         awsC.save()
-        class_studentObj.awscredential = awsC
-        class_studentObj.save()
+    class_studentObj.awscredential = awsC
+    class_studentObj.save()
     
 
 
@@ -80,7 +76,7 @@ def addAWSKeys(ipAddress,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     try:
-        url = ipAddress+":8999/account/get/?secret_key=m0nKEY"
+        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
         jsonObj = json.loads(response.content.decode())
         awsC.access_key = utilities.encode(jsonObj['User']['Results']['aws_access_key_id '])
@@ -99,23 +95,25 @@ def addServerDetails(ipAddress,requests):
     if validity == False:
         raise Exception("Account number do not match with given IP, please try again")
 
-    url = ipAddress+"/ec2/instance/get/current/?secret_key=m0nKEY"
+    url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
-    sd = Server_Details.objects.create(
-        IP_address = ipAddress,
-        instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
-        instanceName = None,
-        state = "Live",
-    )
-    sd.save()
-    awsC.serverDetails = sd 
-    awsC.save()
+    try: 
+        sd = Server_Details.objects.create(
+            IP_address = ipAddress,
+            instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
+            instanceName = None,
+            state = "Live",
+            account_number=awsC
+        )
+        sd.save()
+    except:
+        raise Exception('duplicate IP address found in Database')
 
 
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials):
-    url = ipAddress+":8999/account/get/?secret_key=m0nKEY"
+    url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
     return awsCredentials.account_number == jsonObj['User']['Account']
