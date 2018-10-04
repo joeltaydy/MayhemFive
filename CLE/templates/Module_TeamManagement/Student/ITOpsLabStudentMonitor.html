@@ -34,7 +34,18 @@
                     </div>
                     <div class="card-body">
                       <span align="center">
-                        <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt=""><span class="badge badge-pill badge-success">Live</span></p>
+                         {% for team_name,server_state in server_status.items %}
+                            <!--{{ team_name }}-->
+                              <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
+                            {% if server_state == 'Live' %}
+                                <span class="badge badge-pill badge-success">{{ server_state }}</span>
+                            {% elif server_state == 'Pending' %}
+                                <span class="badge badge-pill badge-warning">{{ server_state }}</span>
+                            {% else %}
+                                <span class="badge badge-pill badge-danger">{{ server_state }}</span>
+                            {% endif %}
+                        {% endfor %}
+
                       </span>
                     </div>
                     <div class="card-footer ">
@@ -52,7 +63,19 @@
                     </div>
                     <div class="card-body">
                       <span align="center">
-                        <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt=""><span class="badge badge-pill badge-danger">Down</span></p>
+                        <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
+                        
+                        {% for team_name,team_details in webapp_status.items %}
+                         {% comment %} {{ team_name }} {% endcomment %}
+                            {% if team_details.State  == 'Live' %}
+                                <span class="badge badge-pill badge-success">{{ team_details.State  }}</span>
+                            {% else %}
+                                <span class="badge badge-pill badge-danger">{{ team_details.State  }}</span>
+                            {% endif %}
+                            <a href="http://{{ team_details.IP_Address }}:8000">{{ team_details.IP_Address }}</a>
+                            <br>
+                        {% endfor %}
+                        
                       </span>
                     </div>
                     <div class="card-footer ">

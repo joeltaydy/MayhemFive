@@ -3,6 +3,8 @@ import traceback
 import requests as req
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+import pytz
+import datetime
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.src import utilities,aws_util
@@ -332,53 +334,7 @@ def faculty_Monitor_Base(requests):
         section_details = utilities.getAllTeamDetails(course_sectionList)['G1']
         
         for team_number,account_number in section_details.items():
-            # Assumption that there's only one server for one account
-            server = Server_Details.objects.filter(account_number=account_number)[0]
-            server_ip = server.IP_address
-            server_state = server.state
-            stu_credentials = server.account_number
-
-            # Rule of thumb, if webapp is alive, then server will most definitely be alive
-            # BUT if server is alive, there's no guarantee that webapp is alive
-
-            # Step 1: Check if server is alive
-            resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
-            instance = resource.Instance(server.instanceid)
-            instance_state = instance.state
-
-            http_status_code = instance_state['Code']
-
-            if http_status_code == 16:
-                server_state = 'Live'
-            elif http_status_code == 0:
-                server_state = 'Pending'
-            elif http_status_code == 32 or http_status_code == 48:
-                server_state = 'Killed'
-            elif http_status_code == 80 or http_status_code == 64:
-                server_state = 'Down'
-
-            response['server_status'][team_number] = server_state
-
-            # Step 2: Update server.state on server status
-            server.state = server_state
-            server.save()
-
-            if server_state == 'Live':
-                # Step 3: IF server 'Live', then check if webapp is 'Live'
-                try:
-                    webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
-                    webapp_response = req.get(webapp_url)
-                    webapp_jsonObj = json.loads(webapp_response.content.decode())
-
-                    if webapp_jsonObj['HTTPStatusCode'] == 200:
-                        response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
-
-                except req.ConnectionError as e:
-                    response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
-
-            else:
-                # Step 4: ELSE webapp is definitely 'Down'
-                response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+            response = utilities.getServerStatus(account_number,team_number,response)
 
     except Exception as e:
         traceback.print_exc()
@@ -529,11 +485,34 @@ def student_Deploy_AddIP(requests):
 
 
 def ITOpsLabStudentDeploy(requests):
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',{})
+
     response = {"ITOpsLabStudentDeploy" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 def ITOpsLabStudentMonitor(requests):
-    response = {"ITOpsLabStudentMonitor" : "active"}
+
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',{})
+
+    response = {"ITOpsLabStudentDeploy" : "active"}
+    response['server_status'] = {}
+    response['webapp_status'] = {}
+    studentClassObj = utilities.getStudentClassObject(requests)
+    AWS_Credentials = studentClassObj.awscredential
+    team_number= studentClassObj.team_number
+    account_number = AWS_Credentials.account_number
+    response = utilities.getServerStatus(account_number,team_number,response)
+    tz = pytz.timezone('Asia/Singapore')
+    response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
+    print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
 

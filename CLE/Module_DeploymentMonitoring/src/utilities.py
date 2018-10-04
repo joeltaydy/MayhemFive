@@ -7,7 +7,8 @@ from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
-from Module_TeamManagement.src import utilities
+from Module_TeamManagement.src.utilities import encode,decode
+from Module_DeploymentMonitoring.src import aws_util
 
 
 # Get all team number and account number for those enrolled in course ESM201
@@ -79,7 +80,7 @@ def addAWSKeys(ipAddress,requests):
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
         jsonObj = json.loads(response.content.decode())
-        awsC.access_key = utilities.encode(jsonObj['User']['Results']['aws_access_key_id '])
+        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
         awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
@@ -175,3 +176,57 @@ def runEvent(server_ip,server_id,event_type):
     }
 
     return results
+
+'''
+Obtain http status code and web server status of a group project based on account number. 
+Returns the response object along with the statuses of the server and webapplication 
+'''
+def getServerStatus(account_number, team_number, response):
+    # Assumption that there's only one server for one account
+    server = Server_Details.objects.filter(account_number=account_number)[0]
+    server_ip = server.IP_address
+    server_state = server.state
+    stu_credentials = server.account_number
+
+    # Rule of thumb, if webapp is alive, then server will most definitely be alive
+    # BUT if server is alive, there's no guarantee that webapp is alive
+
+    # Step 1: Check if server is alive
+    resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
+    instance = resource.Instance(server.instanceid)
+    instance_state = instance.state
+
+    http_status_code = instance_state['Code']
+
+    if http_status_code == 16:
+        server_state = 'Live'
+    elif http_status_code == 0:
+        server_state = 'Pending'
+    elif http_status_code == 32 or http_status_code == 48:
+        server_state = 'Killed'
+    elif http_status_code == 80 or http_status_code == 64:
+        server_state = 'Down'
+
+    response['server_status'][team_number] = server_state
+
+    # Step 2: Update server.state on server status
+    server.state = server_state
+    server.save()
+
+    if server_state == 'Live':
+        # Step 3: IF server 'Live', then check if webapp is 'Live'
+        try:
+            webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
+            webapp_response = req.get(webapp_url)
+            webapp_jsonObj = json.loads(webapp_response.content.decode())
+
+            if webapp_jsonObj['HTTPStatusCode'] == 200:
+                response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
+
+        except req.ConnectionError as e:
+            response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+
+    else:
+        # Step 4: ELSE webapp is definitely 'Down'
+        response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+    return response
