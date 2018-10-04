@@ -21,7 +21,6 @@
 
     <hr>
     <h2 align="center"><i>Setup</i></h2>
-
     <div id="accordion" class="panel-group col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
         <div class="panel">
         <div class="panel-heading">
@@ -38,13 +37,13 @@
                     {% csrf_token %}
                     <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                         <label for="name" class="control-label">Account Number</label>
-                        <input class="form-control" type="text" name="account_number" id="account_number" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="account_number" id="account_number" aria-describedby="fileHelp" placeholder="Account Number">
                         <br>
                         <label for="name" class="control-label">AWS Access Key</label>
-                        <input class="form-control" type="text" name="access_key" id="access_key" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="access_key" id="access_key" aria-describedby="fileHelp" placeholder="AWS Access Key">
                         <br>
                         <label for="name" class="control-label">AWS Secret Access Key</label>
-                        <input class="form-control" type="text" name="secret_access_key" id="secret_access_key" aria-describedby="fileHelp">
+                        <input class="form-control" type="text" name="secret_access_key" id="secret_access_key" aria-describedby="fileHelp" placeholder="AWS Secret Access Key">
                     </div>
                     <div class="col-md-9 form-group" style = "margin-bottom:40px;">
                         <br>
@@ -141,7 +140,16 @@
                 }
             }
         });
-
+        // var isClosed = true;
+        // var toggle = document.getElementById("accordion-toggle");
+        // var panel = document.getElementById("panelBodyOne")
+        // console.log(toggle);
+        // toggle.addEventListener("click", function() {
+        //     toggle.classList.add("collapsed");
+        //     panel.classList.remove("in");
+        //     panel.classList.remove("show");
+        //     console.log("heyo");
+        // })
         // $(function(){
         // var accNum = "{{submittedAccNum}}";
         // var accKey =  "{{submittedAccKey}}";
