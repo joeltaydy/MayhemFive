@@ -57,7 +57,7 @@ def addAWSCredentials(accountNum, requests):
         awsC.save()
     class_studentObj.awscredential = awsC
     class_studentObj.save()
-    
+
 
 
 # Retrieve the Class object that belongs under the current student user
@@ -80,7 +80,8 @@ def addAWSKeys(ipAddress,requests):
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
         jsonObj = json.loads(response.content.decode())
-        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        # awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
         awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
@@ -99,7 +100,7 @@ def addServerDetails(ipAddress,requests):
     url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
-    try: 
+    try:
         sd = Server_Details.objects.create(
             IP_address = ipAddress,
             instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
@@ -178,8 +179,8 @@ def runEvent(server_ip,server_id,event_type):
     return results
 
 '''
-Obtain http status code and web server status of a group project based on account number. 
-Returns the response object along with the statuses of the server and webapplication 
+Obtain http status code and web server status of a group project based on account number.
+Returns the response object along with the statuses of the server and webapplication
 '''
 def getServerStatus(account_number, team_number, response):
     # Assumption that there's only one server for one account
@@ -192,7 +193,8 @@ def getServerStatus(account_number, team_number, response):
     # BUT if server is alive, there's no guarantee that webapp is alive
 
     # Step 1: Check if server is alive
-    resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
+    # resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
+    resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
     instance = resource.Instance(server.instanceid)
     instance_state = instance.state
 

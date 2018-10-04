@@ -31,6 +31,7 @@ def faculty_Setup_Base(requests,response=None):
 
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
+    response['first_section'] = requests.session['courseList_updated']['EMS201'][0]['section_number']
 
     try:
         response['deployment_packages'] = []
@@ -323,16 +324,16 @@ def faculty_Monitor_Base(requests):
     section_num = requests.GET.get('section_number')
     response['server_status'] = {}
     response['webapp_status'] = {}
-    response['course_sectionList'] = requests.session['courseList_updated']['EMS201']
 
-    if section_num == None:
-        section_num = response['course_sectionList'][0]['section_number']
+    course_sectionList = requests.session['courseList_updated']
+    response['first_section'] = course_sectionList['EMS201'][0]['section_number']
+    response['course_sectionList'] = course_sectionList['EMS201']
 
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-        section_details = utilities.getAllTeamDetails(course_sectionList)['G1']
-        
+        section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
+
         for team_number,account_number in section_details.items():
             response = utilities.getServerStatus(account_number,team_number,response)
 
@@ -359,7 +360,9 @@ def faculty_Event_Base(requests):
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
     course_sectionList = requests.session['courseList_updated']
+
     response['course_sectionList'] = course_sectionList['EMS201']
+    response['first_section'] = course_sectionList['EMS201'][0]['section_number']
 
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
@@ -408,7 +411,7 @@ def student_Deploy_Base(requests):
             coursesec = crse['id']
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
-    try: 
+    try:
         awsAccountNumber =  class_studentObj.awscredential
         response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
     except:
@@ -436,7 +439,7 @@ def student_Deploy_Upload(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
     accountNum = requests.POST.get("accountNum") #string of account number
-    ipAddress = requests.POST.get("ipaddress") #string of IP address  
+    ipAddress = requests.POST.get("ipaddress") #string of IP address
 
     if accountNum != "" :
         student_Deploy_AddAccount(requests)
@@ -444,7 +447,7 @@ def student_Deploy_Upload(requests):
         try :
             student_Deploy_AddIP(requests)
             return ITOpsLabStudentMonitor(requests)
-        except: 
+        except:
             traceback.print_exc()
     return student_Deploy_Base(requests)
 

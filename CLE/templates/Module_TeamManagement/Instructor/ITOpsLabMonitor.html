@@ -11,7 +11,7 @@
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
           <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark" >Setup</button>
-          <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
+          <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}?section_number={{first_section}}';" type="button" class="btn btn-dark active">Monitor</button>
           <button onclick="location.href = '{% url 'DMmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
         </div>
     </div>
@@ -23,7 +23,7 @@
       <!-- to remove once for loop is settled by backend -->
       {% for course_section in course_sectionList %}
           {% if course_section.section_number != 'G0' %}
-            <a href="/instructor/overview/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
+            <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
           {% endif %}
       {% endfor %}
     </ul>

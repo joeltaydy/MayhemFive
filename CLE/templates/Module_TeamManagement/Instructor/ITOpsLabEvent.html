@@ -6,16 +6,16 @@
 <div class="col-md-12">
         <h1 align="center">IT Operations Lab</h1>
         <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-       
-    
+
+
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
               <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark" >Setup</button>
-              <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}';" type="button" class="btn btn-dark">Monitor</button>
+              <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}?section_number={{first_section}}';" type="button" class="btn btn-dark">Monitor</button>
               <button onclick="location.href = '{% url 'DMmod:itopslab_event' %}';" type="button" class="btn btn-dark active">Event Management</button>
             </div>
         </div>
-      
+
         <hr>
         <h2 align="center"><i>Event Management</i></h2>
 </div>
