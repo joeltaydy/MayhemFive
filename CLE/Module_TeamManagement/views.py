@@ -428,7 +428,7 @@ def configureDB_faculty(requests):
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
-        response['message'] = e.args[0]
+        response['error_message'] = e.args[0]
         return render(requests, "Administrator/uploadcsv.html", response)
 
     response['message'] = 'Successful Upload'
@@ -476,6 +476,10 @@ def configureDB_course(requests):
 
         course_title = requests.POST.get("course_title")
         facultyObj = Faculty.objects.get(email=requests.user.email)
+
+        if course_title == None:
+            raise Exception('Please enter a valid course title')
+
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
 
@@ -495,8 +499,8 @@ def configureDB_course(requests):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
-        response['message'] = e.args[0]
+        traceback.print_exc()
+        response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     # Reflush the nav bar
@@ -546,6 +550,12 @@ def configureDB_students(requests):
         course_title = requests.POST.get("course_title")
         bootstrapFile = {}
 
+        if course_title == None:
+            raise Exception('Please enter a valid course title')
+
+        if not file:
+            raise Exception('Please enter a valid file')
+
         if file.name.endswith('.xlsx'):
             if 'student_information' in file.name.lower():
                 bootstrapFile['course_title'] = course_title
@@ -564,7 +574,7 @@ def configureDB_students(requests):
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         # traceback.print_exc()
-        response['message'] = e.args[0]
+        response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
 
     # Reflush the nav bar
@@ -606,6 +616,12 @@ def configureDB_teams(requests):
         course_section = requests.POST.get("course_section")
         bootstrapFile = {}
 
+        if course_section == None:
+            raise Exception('Please enter a valid course section number')
+
+        if not file:
+            raise Exception('Please enter a valid file')
+
         if file.name.endswith('.xlsx'):
             if 'team_information' in file.name.lower():
                 bootstrapFile['faculty_email'] = faculty_email
@@ -624,7 +640,8 @@ def configureDB_teams(requests):
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
-        response['message'] = e.args[0]
+        response['error_message'] = e.args[0]
+        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
         #return faculty_Overview(requests)
 
@@ -735,7 +752,7 @@ def configureDB_clt(requests):
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
-        response['message'] = e.args[0]
+        response['error_message'] = e.args[0]
         if requests.POST.get("user") == "student":
             utilities.populateRelevantCourses(requests,studentEmail=requests.user.email)
             response['courses'] = requests.session['courseList_updated']
@@ -893,7 +910,7 @@ def configureDB_telegram(requests):
         traceback.print_exc()
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
         response['courses'] = requests.session['courseList_updated']
-        response['message'] = e.args[0]
+        response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     # Need to double confirm where to direct the user to once done.
