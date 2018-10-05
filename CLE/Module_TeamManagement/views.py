@@ -89,6 +89,7 @@ def home(requests):
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
     #print(context)
+
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
