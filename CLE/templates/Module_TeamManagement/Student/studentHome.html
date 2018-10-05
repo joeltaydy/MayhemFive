@@ -2,171 +2,187 @@
 {% load staticfiles %}
 
 {% block title %}
-    My Stats
+My Stats
 {% endblock %}
 
 {% block studentStats %}
 <div class="content">
-    <div class="container-fluid">
+  <div class="container-fluid">
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class=”progress”>
-                        <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width:50%">{{progress}}%</div>
-                        </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class=”progress”>
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width:50%">{{progress}}%</div>
+          </div>
 
-                        <h3 align = "center"> {{ past_weeks }} / 16 WEEKS </h3>
-                </div>
-            </div>
+          <h3 align="center"> {{ past_weeks }} / 16 WEEKS </h3>
         </div>
+      </div>
+    </div>
 
-        <!--Class One Card-->
-        {% for course,course_section in request.session.courseList.items %}
-            <div class="col-md-6">
+    <!--Class One Card-->
+    <div class="row">
+      {% for course,course_section in request.session.courseList.items %}
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h1 class="card-title bg-dark text-white" align="center">{{course_section.courseDetails}}</h2>
+          </div>
+          <br>
+
+          <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title" align="center">{{course_section.courseDetails}}</h2>
-                </div>
+              <div class="card-header">
+                <h5 align="center" class="card-title">Tools used</h5>
                 <br>
+                <div class="row">
+                  {% for toolImage in course_section.toolImage_list %}
+                  {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
+                  <div class="col-md-4" align="center">
+                    <img src="{% static toolLink %}" class="rounded-circle">
+                  </div>
+                  {% endwith %}
+                  {% endfor %}
 
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 align="center" class="card-title">Tools used</h5>
-                            <br>
-                            <div class="row">
-                                {% for toolImage in course_section.toolImage_list %}
-                                    {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                                <div class="col-md-4" align="center">
-                                    <img src="{% static toolLink %}" class="rounded-circle">
-                                </div>
-                                    {% endwith %}
-                                {% endfor %}
-
-                                <!-- <div class="col-md-4"align="center">
+                  <!-- <div class="col-md-4"align="center">
                                     <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle">
                                 </div>
                                 <div class="col-md-4"align="center">
                                     <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle">
                                 </div> -->
-                            </div>
-                                <br>
+                </div>
+                <br>
 
-                                <p align="right">
-                                    <a class="btn btn-dark btn-sm" role="button" href = "{% url 'TMmod:uploadtoolStudent' %}?user=student" >Initialise tools</a>
-                                </p>
+                <p align="right">
+                  <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">Initialise tools</a>
+                </p>
 
-                        </div>
-                    </div>
+              </div>
+            </div>
+          </div>
+
+          <!--Tool 1 Card-->
+
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title" align="right">Trailhead</h3>
+                <br>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <center><img src="https://png.icons8.com/dusk/50/000000/report-card.png">
+                    <h1>{{personal.points_count}}</h1>
+                    <h6>POINTS</h6>
+                  </center>
+                  <br>
                 </div>
 
-                <!--Tool 1 Card-->
-
-                <div class="col-md-12">
-                    <div class = "card">
-                        <div class="card-header">
-                                <h3 class="card-title" align="right">Trailhead</h3>
-                                <br>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                    <center><img src="https://png.icons8.com/dusk/50/000000/report-card.png"><h1>{{personal.points_count}}</h1><h6>POINTS</h6></center>
-                                    <br>
-                            </div>
-
-                            <div class="col-md-6">
-                                <center><img src="https://png.icons8.com/dusk/40/000000/waypoint-map.png"><h1>{{personal.trail_count}}</h1><h6>TRAILS COMPLETED</h6></center>
-                                <br>
-                            </div>
-
-                        </div>
-
-                        <div class = "col-md-12">
-                            <div class = "card">
-                                <p class="card-category"><Br><center><img src="https://png.icons8.com/dusk/50/000000/prize.png"><h1>{{personal.badge_count}}</h1> <h6>BADGES</h6></center></p>
-                                <div class="card-body">
-                                    <span align = "center"> {% include "Module_TeamManagement/Student/trailhead.html" %} </span>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
+                <div class="col-md-6">
+                  <center><img src="https://png.icons8.com/dusk/40/000000/waypoint-map.png">
+                    <h1>{{personal.trail_count}}</h1>
+                    <h6>TRAILS COMPLETED</h6>
+                  </center>
+                  <br>
                 </div>
 
-                <!--END Tool 1 Card-->
+              </div>
 
-                <!-- calendar-->
-                <!-- <div class="col-md-6">
+              <div class="col-md-12">
+                <div class="card">
+                  <p class="card-category"><Br>
+                    <center><img src="https://png.icons8.com/dusk/50/000000/prize.png">
+                      <h1>{{personal.badge_count}}</h1>
+                      <h6>BADGES</h6>
+                    </center>
+                  </p>
+                  <div class="card-body">
+                    <span align="center"> {% include "Module_TeamManagement/Student/trailhead.html" %} </span>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+
+          <!--END Tool 1 Card-->
+
+          <!-- calendar-->
+          <!-- <div class="col-md-6">
                     <div class="card card-tasks">
                     <div class="googleCalendar">
                         <iframe src="https://calendar.google.com/calendar/embed?title=Calendar&amp;height=600&amp;wkst=1&amp;bgcolor=%23ffffff&amp;src=martin.teo.2016%40smu.edu.sg&amp;color=%231B887A&amp;src=en.singapore%23holiday%40group.v.calendar.google.com&amp;color=%230F4B38&amp;ctz=Asia%2FSingapore" style="border-width:0" width="600" height="600" frameborder="0" scrolling="no" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
                     </div>
                     </div>
                 </div> -->
-                <!--end of calendar-->
+          <!--end of calendar-->
 
-                <!-- class ranking-->
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 align="center" class="card-title">Team Ranking</h5>
-                            <p class="card-category" align="center">24 Hours performance</p>
-                        </div>
-                        <div class="card-body">
-                                <span align="center">
-                                        {% include "Module_TeamManagement/Dashboard/class_scoreboard.html" %}
-                                </span>
-                            </div>
-                        <div class="card-footer ">
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
-                            </div>
-                        </div>
-                    </div>
-
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 align="center" class="card-title">Trailhead performance</h4>
-                            <p align="center" class="card-category">Points against Badges</p>
-                        </div>
-
-                        <div class="card-body">
-                            {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
-                        </div>
-                        <div class="card-footer ">
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated "{{last_updated}}"
-                            </div>
-                        </div>
-
-                    </div>
+          <!-- class ranking-->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 align="center" class="card-title">Team Ranking</h5>
+                <p class="card-category" align="center">24 Hours performance</p>
+              </div>
+              <div class="card-body">
+                <span align="center">
+                  {% include "Module_TeamManagement/Dashboard/class_scoreboard.html" %}
+                </span>
+              </div>
+              <div class="card-footer ">
+                <div class="stats">
+                  <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
+                </div>
+              </div>
             </div>
 
-        {% endfor %}
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4 align="center" class="card-title">Trailhead performance</h4>
+                  <p align="center" class="card-category">Points against Badges</p>
+                </div>
 
-        </br>
+                <div class="card-body">
+                  {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
+                </div>
+                <div class="card-footer ">
+                  <div class="stats">
+                    <i class="fa fa-history"></i> Updated "{{last_updated}}"
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
     </div>
+  </div>
 </div>
 
 <script>
-var delay = 500;
-$(".progress-bar").each(function(i){
-    $(this).delay( delay*i ).animate( { width: $(this).attr('aria-valuenow') + '%' }, delay );
+  var delay = 500;
+  $(".progress-bar").each(function(i) {
+    $(this).delay(delay * i).animate({
+      width: $(this).attr('aria-valuenow') + '%'
+    }, delay);
 
-    $(this).prop('Counter',0).animate({
-        Counter: $(this).text()
+    $(this).prop('Counter', 0).animate({
+      Counter: $(this).text()
     }, {
-        duration: delay,
-        easing: 'swing',
-        step: function (now) {
-            $(this).text(Math.ceil(now)+'%');
-        }
+      duration: delay,
+      easing: 'swing',
+      step: function(now) {
+        $(this).text(Math.ceil(now) + '%');
+      }
     });
-});
+  });
 </script>
 
 {% endblock %}
