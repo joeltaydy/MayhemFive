@@ -151,9 +151,11 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["personal"] = trailHeadInfo[student_email]
         except:
             context["personal"] = {'badge_count':0,'points_count':0,'trail_count':0, 'badges_obtained':[]}
-
-        context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
-
+        try:
+            context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
+        except:
+            context["CourseTrailResults"] = {"class" : {"Teams_Information": {}, "Students_Information": {"students" :[] , "points" : [] , "badges": []}}}
+    
     if instructorEmail != None:
         if moduleCode != None:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
