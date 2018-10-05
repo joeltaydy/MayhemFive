@@ -19,10 +19,10 @@
 <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">
   <img src="{% static 'images/Trailhead Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Trailhead")'><br>Trailhead
 </button>
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">
-    <img src="{% static 'images/Kahoot Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Kahoot")'><br>Kahoot</button>
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">
-    <img src="{% static 'images/Tableau Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Tableau")'><br>Tableau</button>
+<!-- <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">
+    <img src="{% static 'images/Kahoot Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Kahoot")'><br>Kahoot</button> -->
+<!-- <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Tableau" id="type" value="tableau">
+    <img src="{% static 'images/Tableau Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Tableau")'><br>Tableau</button> -->
 <button type="button" class="btn btn-light" data-toggle="modal" data-target="#TelegramModalstep1" data-whatever="Telegram" id="type" value="Telegram">
     <img src="{% static 'images/Telegram Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Telegram")'><br>Telegram</button>
 </span>
@@ -44,10 +44,8 @@
         <!-- Modal body -->
         <div class="modal-body">
           <!--Form-->
-
-
+          <form action="{% url 'TMmod:uploadtools' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
               {% csrf_token %}
-
               <div class="form-group">
                   <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Course Code</label>
                     <select class="form-control col-md-offset-3" id="course_title" name="course_title">
@@ -270,7 +268,7 @@ $.ajaxSetup({
 </script>
 
 
-<label for="name" class="control-label">
+<!-- <label for="name" class="control-label">
   <a href="/images/myw3schoolsimage.jpg" download data-toggle="popover" data-html="true" data-trigger="hover" data-content="Click to download sample excel file.">Help <i class="far fa-question-circle"></i></a>
 </label>
 
@@ -279,7 +277,7 @@ $.ajaxSetup({
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
 });
-</script>
+</script> -->
 
 {% include 'popupmessages/message.html' %}
 
