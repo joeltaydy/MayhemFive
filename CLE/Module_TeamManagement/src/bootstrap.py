@@ -5,12 +5,18 @@ import datetime
 from django.core.files import File
 from Module_TeamManagement.src import utilities
 from Module_TeamManagement.models import *
+from Module_DeploymentMonitoring.models import *
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Bootstrap Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
 def clear_Database():
+    
+    Deployment_Package.objects.all().delete()
+    Server_Details.objects.all().delete()
+    AWS_Credentials.objects.all().delete()
+    Image_Details.objects.all().delete()
     Class.objects.all().delete()
     School_Term.objects.all().delete()
     Cloud_Learning_Tools.objects.all().delete()
