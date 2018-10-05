@@ -62,7 +62,7 @@ def home(requests):
     if past_weeks != None and remaining_weeks != None:
         context['past_weeks'] = past_weeks
         context['remaining_weeks'] = remaining_weeks
-        context['progress'] = past_weeks/remaining_weeks * 100
+        context['progress'] =  (past_weeks/(past_weeks+remaining_weeks)) * 100
     else:
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
@@ -88,7 +88,7 @@ def home(requests):
                 context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
-    print(requests.session['courseList'])
+    print(context)
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -214,7 +214,7 @@ def faculty_Home(requests):
     if past_weeks != None and remaining_weeks != None:
         context['past_weeks'] = past_weeks
         context['remaining_weeks'] = remaining_weeks
-        context['progress'] = past_weeks/remaining_weeks * 100
+        context['progress'] = (past_weeks/(past_weeks+remaining_weeks)) * 100
     else:
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
