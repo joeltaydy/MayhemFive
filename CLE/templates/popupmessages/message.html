@@ -1,16 +1,16 @@
 <div class="modal fade" id="errorMessage" tabindex="-1" role="dialog" aria-labelledby="Modal-custom-demo-label" aria-hidden="true">
-<div class="modal-dialog msg" role="document">
-  <div class="modal-content msg">
-    <div class="modal-header msg">
+<div class="modal-dialog error" role="document">
+  <div class="modal-content error">
+    <div class="modal-header error">
       <h5 class="modal-title" id="Modal-custom-demo-label">Oh Snap!</h5>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">×</span>
+        <span aria-hidden="true">x</span>
       </button>
     </div>
     <div class="modal-body">
       {{ error_message }}
     </div>
-    <div class="modal-footer msg">
+    <div class="modal-footer error">
     </br>
     </br>
       <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
@@ -20,9 +20,9 @@
 </div>
 
 <div class="modal fade" id="successMessage" tabindex="-1" role="dialog" aria-labelledby="Modal-custom-demo-label" aria-hidden="true">
-<div class="modal-dialog msg" role="document">
-  <div class="modal-content msg">
-    <div class="modal-header msg">
+<div class="modal-dialog success" role="document">
+  <div class="modal-content success">
+    <div class="modal-header success">
       <h5 class="modal-title" id="Modal-custom-demo-label">You're Okay!</h5>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">×</span>
@@ -31,10 +31,10 @@
     <div class="modal-body">
       {{ message }}
     </div>
-    <div class="modal-footer msg">
+    <div class="modal-footer success">
     </br>
     </br>
-      <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+      <button type="button" class="btn btn-success" data-dismiss="modal">OK</button>
     </div>
   </div>
 </div>

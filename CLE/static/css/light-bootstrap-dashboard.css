@@ -5402,24 +5402,50 @@ font-size: 18px;
 }
 
 
-.modal-dialog.msg {
+.modal-dialog.error {
     width: 360px;
 }
 
-.modal-header.msg {
+.modal-header.error {
     background-color: #b1112c;
     padding:5px 5px;
     color:#FFF;
     border-bottom:10px dashed #BBBB00;
  }
 
-.modal-content.msg {
+.modal-content.error {
     /* 80% of window height */
     height: 90%;
     background-color:#ffffff;
 }
 
-.modal-footer.msg {
+.modal-footer.error {
+  background-color:#ffffff;
+  padding: 1rem;
+  border-top: 1px solid #202224;
+}
+
+
+
+
+.modal-dialog.success {
+    width: 360px;
+}
+
+.modal-header.success {
+    background-color: #1ba169;
+    padding:5px 5px;
+    color:#FFF;
+    border-bottom:10px dashed #BBBB00;
+ }
+
+.modal-content.success {
+    /* 80% of window height */
+    height: 90%;
+    background-color:#ffffff;
+}
+
+.modal-footer.success {
   background-color:#ffffff;
   padding: 1rem;
   border-top: 1px solid #202224;
