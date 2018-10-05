@@ -120,7 +120,8 @@
 
         $(function(){
             var approve = {{approvalStatus|yesno:"true,false" }};
-            if (approve==false){
+            //if (approve==false){
+            if (approve==true){
                 document.getElementById("appNext").disabled = true;
             } else {
                 window.onload = function(){

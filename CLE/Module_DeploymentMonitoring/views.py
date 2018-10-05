@@ -423,17 +423,17 @@ def student_Deploy_Base(requests):
     except:
         response['submittedAccNum'] = None
     try:
-        awsImageList = awsAccountNumber.imageDetails.all()[0] #Could be None or aws image object Currently take first
+        awsAccountNumber =  class_studentObj.awscredential
+        awsImageList = awsAccountNumber.imageDetails.all() #Could be None or aws image object Currently take first
         accountNumber = awsAccountNumber.account_number
         for image in awsImageList:
-            print(accountNumber)
-            print(image.sharedAccNum)
             if accountNumber in image.sharedAccNum:
-                awsImage = image
+                response['awsImage'] = image
+                response['approvalStatus']= True
                 break
-            
-        response['awsImage'] = awsImage
-        response['approvalStatus']= True
+        response['awsImage'] = None
+        response['approvalStatus']= False
+        
     except:
         response['awsImage'] = None
         response['approvalStatus']= False
