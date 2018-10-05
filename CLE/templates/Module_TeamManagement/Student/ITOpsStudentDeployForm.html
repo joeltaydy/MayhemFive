@@ -106,7 +106,7 @@
         jQuery.validator.addMethod("ipadd", function(ipaddress, element) {
         return this.optional( element ) || /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress);
         }, 'Please enter a valid IP Address.');
-
+        
         $(function(){
             var accNum = "{{submittedAccNum.account_number}}";
             if (accNum=="None"){
@@ -118,16 +118,16 @@
             }
         });
 
-    // $(function(){
-    //     var approve = "{{approvalStatus}}";
-    //     if (approve==false){
-    //         document.getElementById("appNext").disabled = true;
-    //     } else {
-    //         window.onload = function(){
-    //             document.getElementById("appNext").click();
-    //         }
-    //     }
-    // });
+        $(function(){
+            var approve = {{approvalStatus|yesno:"true,false" }};
+            if (approve==false){
+                document.getElementById("appNext").disabled = true;
+            } else {
+                window.onload = function(){
+                    document.getElementById("appNext").click();
+                }
+            }
+        });
 
     // function ValidateIPaddress(ipaddress) {
     //     if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {

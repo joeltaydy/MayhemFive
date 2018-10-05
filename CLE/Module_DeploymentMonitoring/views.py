@@ -422,14 +422,24 @@ def student_Deploy_Base(requests):
         response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
     except:
         response['submittedAccNum'] = None
-    #try:
-    #    awsImage = awsAccountNumber.imageDetails #Could be None or aws image object
-    #    response['awsImage'] = awsImage
-    #except:
-    #    response['awsImage'] = None
+    try:
+        awsImageList = awsAccountNumber.imageDetails.all()[0] #Could be None or aws image object Currently take first
+        accountNumber = awsAccountNumber.account_number
+        for image in awsImageList:
+            print(accountNumber)
+            print(image.sharedAccNum)
+            if accountNumber in image.sharedAccNum:
+                awsImage = image
+                break
+            
+        response['awsImage'] = awsImage
+        response['approvalStatus']= True
+    except:
+        response['awsImage'] = None
+        response['approvalStatus']= False
 
     response["studentDeployBase"] = "active"
-    #print(response)
+    print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
