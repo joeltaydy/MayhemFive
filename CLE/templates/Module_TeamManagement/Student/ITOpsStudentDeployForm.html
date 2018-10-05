@@ -45,7 +45,7 @@
                     </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Launch server from AMI</h2>
-                    <h3 class="fs-subtitle">(Insert Subtitle)</h3>
+                    <h3 class="fs-subtitle">Please follow the instructions above to launch the server</h3>
                     Please refer to the instructions above to launch server from AMI. Once completed, please press <b>NEXT</b> to submit the relevant information.
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
@@ -53,7 +53,7 @@
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Submit IP Address</h2>
-                    <h3 class="fs-subtitle">(Insert Subtitle)</h3>
+                    <h3 class="fs-subtitle">Please submit a valid IP address</h3>
                     <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <label for="name" class="control-label">IP Address</label>
                         <input class="form-control" type="text" name="ipaddress" id="ipaddress" aria-describedby="fileHelp">
@@ -106,7 +106,7 @@
         jQuery.validator.addMethod("ipadd", function(ipaddress, element) {
         return this.optional( element ) || /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress);
         }, 'Please enter a valid IP Address.');
-
+        
         $(function(){
             var accNum = "{{submittedAccNum.account_number}}";
             if (accNum=="None"){
@@ -118,16 +118,17 @@
             }
         });
 
-    // $(function(){
-    //     var approve = "{{approvalStatus}}";
-    //     if (approve==false){
-    //         document.getElementById("appNext").disabled = true;
-    //     } else {
-    //         window.onload = function(){
-    //             document.getElementById("appNext").click();
-    //         }
-    //     }
-    // });
+        $(function(){
+            var approve = {{approvalStatus|yesno:"true,false" }};
+            //if (approve==false){
+            if (approve==true){
+                document.getElementById("appNext").disabled = true;
+            } else {
+                window.onload = function(){
+                    document.getElementById("appNext").click();
+                }
+            }
+        });
 
     // function ValidateIPaddress(ipaddress) {
     //     if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
