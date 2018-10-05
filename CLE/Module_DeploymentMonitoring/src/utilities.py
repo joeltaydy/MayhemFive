@@ -280,7 +280,8 @@ def getCloudMetric(webapp_url):
         #Sorting out the values
         sortedKeyList = sorted(jsonResults)
         timeList = []
-        for key in sortedKeyList[:20]:
+        sortedKeyList=sorted(sortedKeyList[len(sortedKeyList)-20:])
+        for key in sortedKeyList:
             sortedValueList.append(jsonResults[key])
             timeList.append(key.split("T")[1][:-4])
         label = webapp_jsonObj["metric_statistics"]["Datapoints"][0]["Unit"]

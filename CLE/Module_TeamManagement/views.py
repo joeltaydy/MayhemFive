@@ -88,7 +88,7 @@ def home(requests):
                 context['telegram']['channel'].update({enrolled_class.course_section : channel_link})
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
-    print(context)
+    #print(context)
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -224,7 +224,7 @@ def faculty_Home(requests):
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
     context.update(trailResults)
     context['message'] = 'Successful retrieval of faculty\'s overview information'
-    print(context)
+    #print(context)
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
 
