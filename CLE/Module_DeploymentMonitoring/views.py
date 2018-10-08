@@ -523,19 +523,22 @@ def ITOpsLabStudentMonitor(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',{})
-
+    
     response = {"ITOpsLabStudentDeploy" : "active"}
-    response['server_status'] = {}
-    response['webapp_status'] = {}
-    response['webapp_metric'] = {}
-    studentClassObj = utilities.getStudentClassObject(requests)
-    AWS_Credentials = studentClassObj.awscredential
-    team_number= studentClassObj.team_number
-    account_number = AWS_Credentials.account_number
-    response = utilities.getServerStatus(account_number,team_number,response)
-    response = utilities.getMetric(account_number,response)
-    tz = pytz.timezone('Asia/Singapore')
-    response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
+    try:
+        response['server_status'] = {}
+        response['webapp_status'] = {}
+        response['webapp_metric'] = {}
+        studentClassObj = utilities.getStudentClassObject(requests)
+        AWS_Credentials = studentClassObj.awscredential
+        team_number= studentClassObj.team_number
+        account_number = AWS_Credentials.account_number
+        response = utilities.getServerStatus(account_number,team_number,response)
+        response = utilities.getMetric(account_number,response)
+        tz = pytz.timezone('Asia/Singapore')
+        response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
+    except:
+        pass
     print(response)
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
