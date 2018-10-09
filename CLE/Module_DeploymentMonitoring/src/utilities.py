@@ -76,8 +76,6 @@ def getStudentClassObject(requests):
 def addAWSKeys(ipAddress,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
-    print(class_studentObj)
-    print(awsC)
     try:
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
@@ -95,16 +93,13 @@ def addAWSKeys(ipAddress,requests):
 def addServerDetails(ipAddress,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
-    # validity = validateAccountNumber(ipAddress, awsC)
-    # if validity == False:
-    #     raise Exception("Account number do not match with given IP, please try again")
+    validity = validateAccountNumber(ipAddress, awsC)
+    if validity == False:
+        raise Exception("Account number do not match with given IP, please try again")
+
     url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
-    print(awsC)
-    print(ipAddress)
-    print('instanceid')
-    print(jsonObj['Reservations'][0]['Instances'][0]['InstanceId'])
     try:
         sd = Server_Details.objects.create(
             IP_address = ipAddress,
@@ -115,7 +110,9 @@ def addServerDetails(ipAddress,requests):
         )
         sd.save()
     except:
-        raise Exception('duplicate IP address found in Database')
+        sd = Server_Details.objects.get(IP_address = ipAddress)
+        sd.account_number =awsC
+        sd.save()
 
 
 # Validate if the IP address sent by the student user belongs under their account
@@ -123,9 +120,6 @@ def validateAccountNumber(ipAddress, awsCredentials):
     url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
-    print(jsonObj['User']['Account'])
-    print(awsCredentials.account_number)
-    print(awsCredentials.account_number == jsonObj['User']['Account'])
     return awsCredentials.account_number == jsonObj['User']['Account']
 
 
@@ -157,7 +151,6 @@ def runEvent(server_ip,server_id,event_type):
     unsuccessful_count = 0
 
     results = {}
-    server_url = ''
 
     if event_type == 'stop':
         server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
@@ -168,7 +161,7 @@ def runEvent(server_ip,server_id,event_type):
     server_jsonObj = json.loads(server_response.content.decode())
 
     if server_jsonObj['HTTPStatusCode'] == 200:
-        successful_stoppage.append(server_id)
+         .append(server_id)
         successful_count += 1
     else:
         unsuccessful_stoppage.append(server_id)
