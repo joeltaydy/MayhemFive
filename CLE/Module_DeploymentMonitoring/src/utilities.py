@@ -46,6 +46,7 @@ def addImageDetials(image_id,image_name):
 # Add AWS credentials for the relevant students
 def addAWSCredentials(accountNum, requests):
     class_studentObj= getStudentClassObject(requests)
+    teamAddition = requests.POST.get("isTeam") #if "" or None then is single add if not is a group add
     try:
         awsC=class_studentObj.awscredential
         awsC.account_number = accountNum
@@ -58,7 +59,25 @@ def addAWSCredentials(accountNum, requests):
     class_studentObj.awscredential = awsC
     class_studentObj.save()
 
+    #Add to rest of team
+    if teamAddition != None and teamAddition != "":
+        classTeam = getTeamClassObject(requests) #returns a list of class student objects based on current user (exclude current user)
+        for classStudent in classTeam:
+            awsC=classStudent.awscredential
+            awsC.account_number = accountNum
+            awsC.save()
+            classStudent.awscredential = awsC
+            classStudent.save()
 
+def getTeamClassObject(requests):
+    student_email = requests.user.email
+    courseList = requests.session['courseList_updated']
+    for course_title,course_details in courseList.items():
+        if course_title == "EMS201":
+            course_section_id = course_details['id']
+    class_studentObj = Class.objects.filter(student= student_email).get(course_section=course_section_id)
+    class_teamObj = Class.objects.filter(course_section=course_section_id).filter(team_number = class_studentObj.team_number).exclude(student =class_studentObj.student)
+    return class_teamObj
 
 # Retrieve the Class object that belongs under the current student user
 def getStudentClassObject(requests):
@@ -161,7 +180,7 @@ def runEvent(server_ip,server_id,event_type):
     server_jsonObj = json.loads(server_response.content.decode())
 
     if server_jsonObj['HTTPStatusCode'] == 200:
-         .append(server_id)
+        successful_stoppage.append(server_id)
         successful_count += 1
     else:
         unsuccessful_stoppage.append(server_id)

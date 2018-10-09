@@ -459,7 +459,6 @@ def student_Deploy_Upload(requests):
         return render(requests,'Module_Account/login.html',response)
     accountNum = requests.POST.get("accountNum") #string of account number
     ipAddress = requests.POST.get("ipaddress") #string of IP address
-
     if accountNum != "" :
         student_Deploy_AddAccount(requests)
     if ipAddress != "":

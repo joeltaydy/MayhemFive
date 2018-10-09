@@ -31,7 +31,7 @@ def login_view(requests):
 
     else:
         #HttpResponseRedirect(('TMmod:home'))
-        return render(requests, "Amod:login", result)
+        return render(requests, "Module_Account/login.html", result)
 
 # LOGOUT ---------------------------------------------------------------------#
 #@login_required(login_url='/')

@@ -54,7 +54,11 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
 
         else:
             #print("Pushing to student's home")
-            stu = Student.objects.get(email=sociallogin.account.extra_data["email"])
-            stu.loginCounts += 1
-            stu.save()
-            settings.LOGIN_REDIRECT_URL = "TMmod:home"
+            try: 
+                stu = Student.objects.get(email=sociallogin.account.extra_data["email"])
+                stu.loginCounts += 1
+                stu.save()
+                settings.LOGIN_REDIRECT_URL = "TMmod:home"
+            except:
+                messages.error(request, "SMU Account is not registered for Cloudtopus")
+                raise ImmediateHttpResponse(HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL))
