@@ -23,6 +23,6 @@ urlpatterns = [
 
     # For retrieving and sharing of AMI
     path('instructor/ITOperationsLab/setup/',views.faculty_Setup_Base,name='itopslab_setup'),
-    path('instructor/ITOperationsLab/setup/ami/get/',views.facutly_Setup_GetAMI,name='itopslab_setup_Images'),
+    path('instructor/ITOperationsLab/setup/ami/get/',views.faculty_Setup_GetAMI,name='itopslab_setup_Images'),
     path('instructor/ITOperationsLab/setup/ami/share/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI'),
 ]

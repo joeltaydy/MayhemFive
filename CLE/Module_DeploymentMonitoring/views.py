@@ -5,7 +5,6 @@ import traceback
 import requests as req
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from django.utils import simplejson
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.src import utilities,aws_util
@@ -208,8 +207,8 @@ def faculty_Setup_GetAWSKeys(requests):
 
 # Reteival of all the Images under the faculty account
 #
-def facutly_Setup_GetAMI():
-    images = []
+def faculty_Setup_GetAMI():
+    response = {"facutly_Setup_GetAMI" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
@@ -218,15 +217,16 @@ def facutly_Setup_GetAMI():
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_number = request.GET.getList('section_number')
-    print("Ajax test section_number: " + section_number)
+    section_numberList = request.GET.getList('section_number')
+    print("Ajax test section_numberList: " + section_numberList)
 
     faculty_email = request.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
     aws_credentialsObj = facultyObj.awscredential
 
-    images = aws_credentialsObj.imageDetails.all()
-    for image in images:
+    images_detailObjs = aws_credentialsObj.imageDetails.all()
+    images = []
+    for image in images_detailObjs:
         images.append(
             {
                 'image_name':image.imageName,
@@ -234,7 +234,10 @@ def facutly_Setup_GetAMI():
             }
         )
 
-    return HttpResponse(simplejson.dumps(images), mimetype='application/json', content_type='appllication/json')
+    response['images'] = images
+    response['section_numbers'] = section_numberList
+
+    return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
 
 
 # Retrieval and storing of AMI length from instructor
@@ -243,7 +246,12 @@ def facutly_Setup_GetAMI():
 def faculty_Setup_ShareAMI(requests):
     response = {"faculty_Setup_ShareAMI" : "active"}
 
-
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
 
     account_numbers = requests.POST.getlist('account_numbers')
     image_id = requests.POST.get('image_id')
