@@ -692,11 +692,13 @@ def configureDB_clt(requests):
             course = requests.POST.get("course_title")
 
             if course == None:
-                raise Exception('Please specfy a course.')
+                raise Exception('Please specify a course.')
             elif type == None:
-                raise Exception('Please specfy a learning tool type.')
+                raise Exception('Please specify a learning tool type.')
             elif len(link) == 0:
-                raise Exception('Please specfy a learning tool link.')
+                raise Exception('Please specify a learning tool link.')
+            elif "https://trailhead.salesforce.com/en/me/" not in link:
+                raise Exception('Please specify a valid learning tool link.')
 
             id = student_email.split('@')[0] + "_" + type
             class_studentObj = Class.objects.filter(student=student_email).filter(course_section=course)
@@ -742,7 +744,7 @@ def configureDB_clt(requests):
                 bootstrapFile['file_path'] = file.temporary_file_path()
 
             else:
-                raise Exception("Invalid file information. Please upload teams information only.")
+                raise Exception("Invalid file information. Please upload tools information only.")
 
         else:
             raise Exception("Invalid file type. Please upload .xlsx only")
