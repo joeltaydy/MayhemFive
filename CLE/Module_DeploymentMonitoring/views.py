@@ -207,7 +207,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
 # Reteival of all the Images under the faculty account
 #
-def faculty_Setup_GetAMI():
+def faculty_Setup_GetAMI(requests):
     response = {"facutly_Setup_GetAMI" : "active"}
 
     # Redirect user to login page if not authorized and student
@@ -236,6 +236,27 @@ def faculty_Setup_GetAMI():
 
     response['images'] = images
     response['section_numbers'] = section_numberList
+
+    return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
+
+
+# Reteival of shared and non-shared account numbers for specific section and image
+#
+def faculty_Setup_GetAccounts(requests):
+    response = {"faculty_Setup_GetAccounts" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    section_numberList = requests.GET.getList('section_number')
+    print("Ajax test section_numberList: " + section_numberList)
+
+    image_id = requests.Get.get('image_id')
+    print("Ajax test image_id: " + image_id) 
 
     return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
 
