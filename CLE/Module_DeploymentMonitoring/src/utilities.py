@@ -69,6 +69,7 @@ def addAWSCredentials(accountNum, requests):
             classStudent.awscredential = awsC
             classStudent.save()
 
+
 def getTeamClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
@@ -78,6 +79,7 @@ def getTeamClassObject(requests):
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=course_section_id)
     class_teamObj = Class.objects.filter(course_section=course_section_id).filter(team_number = class_studentObj.team_number).exclude(student =class_studentObj.student)
     return class_teamObj
+
 
 # Retrieve the Class object that belongs under the current student user
 def getStudentClassObject(requests):
@@ -199,16 +201,18 @@ def runEvent(server_ip,server_id,event_type):
 
     return results
 
-'''
-Obtain http status code and web server status of a group project based on account number.
-Returns the response object along with the statuses of the server and webapplication
-'''
-def getServerStatus(account_number, team_number, response):
+
+# Obtain http status code and web server status of a group project based on account number.
+# Returns the response object along with the statuses of the server and webapplication
+#
+def getMonitoringStatus(account_number, team_number, response):
     # Assumption that there's only one server for one account
     server = Server_Details.objects.filter(account_number=account_number)[0]
     server_ip = server.IP_address
     server_state = server.state
-    server_state = checkServerState(server)
+
+    # Step 1: Check if server is alive
+    server_state = getServerStatus(server)
     response['server_status'][team_number] = server_state
 
     # Step 2: Update server.state on server status
@@ -231,19 +235,19 @@ def getServerStatus(account_number, team_number, response):
     else:
         # Step 4: ELSE webapp is definitely 'Down'
         response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+
     return response
 
-'''
-Rule of thumb method
-'''
-def checkServerState(server):
+
+# Rule of thumb method - To check server status
+#
+def getServerStatus(server):
     server_state = server.state
     stu_credentials = server.account_number
 
     # Rule of thumb, if webapp is alive, then server will most definitely be alive
     # BUT if server is alive, there's no guarantee that webapp is alive
 
-    # Step 1: Check if server is alive
     # resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
     resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
     instance = resource.Instance(server.instanceid)
@@ -259,13 +263,15 @@ def checkServerState(server):
         server_state = 'Killed'
     elif http_status_code == 80 or http_status_code == 64:
         server_state = 'Down'
+
     return server_state
+
 
 def getMetric(account_number,response):
     server = Server_Details.objects.filter(account_number=account_number)[0]
     server_ip = server.IP_address
     server_state = server.state
-    server_state = checkServerState(server)
+    server_state = getServerStatus(server)
 
     # Step 2: Update server.state on server status
     server.state = server_state
@@ -282,11 +288,11 @@ def getMetric(account_number,response):
 
     return response
 
-'''
-collect cloud metrics based on cloudmetric list
-These tools can be found under /cloudwatch/metric/list/?namespace=AWS/EC2
-All have similiar structures
-'''
+
+# collect cloud metrics based on cloudmetric list
+# These tools can be found under /cloudwatch/metric/list/?namespace=AWS/EC2
+# All have similiar structures
+#
 def getCloudMetric(webapp_url):
     webapp_response = req.get(webapp_url)
     webapp_jsonObj = json.loads(webapp_response.content.decode())

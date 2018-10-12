@@ -65,7 +65,7 @@ def faculty_Setup_Base(requests,response=None):
             response['access_key'] = aws_credentials.access_key
             response['secret_access_key'] = aws_credentials.secret_access_key
 
-            # Compare AWS data with DB data; IF not in DB, add
+            # Compare AWS data with DB data; IF not in DB, add into DB
             image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
             for image_id,image_name in image_list.items():
                 if len(aws_credentials.imageDetails.all()) == 0:
@@ -78,13 +78,13 @@ def faculty_Setup_Base(requests,response=None):
                         image_detailsObj = utilities.addImageDetials(image_id,image_name)
                         aws_credentials.imageDetails.add(image_detailsObj)
 
-            # Compare DB data with AWS data: IF not in AWS, delete
+            # Compare DB data with AWS data: IF not in AWS, delete from DB
             images = aws_credentials.imageDetails.all()
-                for image_detailObj in images:
-                    try:
-                        image_list[image_detailObj.imageId]
-                    except:
-                        image_detailObj.delete()
+            for image_detailObj in images:
+                try:
+                    image_list[image_detailObj.imageId]
+                except:
+                    image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
@@ -246,8 +246,8 @@ def faculty_Setup_GetAMI(requests):
 
 # Reteival of shared and non-shared account numbers for specific section and image
 #
-def faculty_Setup_GetAccounts(requests):
-    response = {"faculty_Setup_GetAccounts" : "active"}
+def faculty_Setup_GetAMIAccounts(requests):
+    response = {"faculty_Setup_GetAMIAccounts" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
@@ -276,14 +276,14 @@ def faculty_Setup_GetAccounts(requests):
                 if account_number in shared_accounts:
                     response['shared_accounts_list'].append(
                         {
-                            'team_name':team_name
+                            'team_name':team_name,
                             'account_number':account_number
                         }
                     )
                 else:
                     response['nonshared_accounts_list'].append(
                         {
-                            'team_name':team_name
+                            'team_name':team_name,
                             'account_number':account_number
                         }
                     )
@@ -383,7 +383,7 @@ def faculty_Monitor_Base(requests):
         section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
         for team_number,account_number in section_details.items():
-            response = utilities.getServerStatus(account_number,team_number,response)
+            response = utilities.getMonitoringStatus(account_number,team_number,response)
 
     except Exception as e:
         traceback.print_exc()
@@ -558,6 +558,7 @@ def ITOpsLabStudentDeploy(requests):
     response = {"ITOpsLabStudentDeploy" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
+
 def ITOpsLabStudentMonitor(requests):
 
     try:
@@ -575,7 +576,7 @@ def ITOpsLabStudentMonitor(requests):
         AWS_Credentials = studentClassObj.awscredential
         team_number= studentClassObj.team_number
         account_number = AWS_Credentials.account_number
-        response = utilities.getServerStatus(account_number,team_number,response)
+        response = utilities.getMonitoringStatus(account_number,team_number,response)
         response = utilities.getMetric(account_number,response)
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
