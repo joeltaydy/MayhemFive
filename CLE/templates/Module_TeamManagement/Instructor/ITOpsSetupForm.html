@@ -13,11 +13,10 @@
 
                      data = {'section_number' : course_section };
                      ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",data,function(result){
-
                             console.log(result);
                             $("#image_id option").remove();
-                            for (var i = result.length - 1; i >= 0; i--) {
-                                $("#image_id").append('<option>'+ result[i].name +'</option>');
+                            for (var i = result.images.length - 1; i >= 0; i--) {
+                                $("#image_id").append('<option>'+ result.images[i].image_id +'</option>');
                             };
 
 
@@ -62,9 +61,7 @@
                             {% endfor %}
                       		</select>
 
-                          <select class="form-control" id="image_id" name="image_id">
 
-                          </select>
 
                         </div>
                     </div>
@@ -75,15 +72,7 @@
                     <h3 class="fs-subtitle">Please select the image and the groups you would like to send the image to</h3>
                     <div class="col-md-8"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <select class="form-control" id="image_id" name="image_id">
-                            <!-- <option value="" disabled selected>Image Name</option>
-                            {{ images }}
-                            {% for image in images %} -->
-                                <!-- {% if section_number == 'G10' %} -->
-                                    <!-- {% for image in section_details.Image_IDs %} -->
-                                        <!-- <option id={{image}} value={{image}}>{{image}}</option> -->
-                                    <!-- {% endfor %} -->
-                                <!-- {% endif %} -->
-                            <!-- {% endfor %} -->
+
                         </select>
                       <table>
                         {{ form.as_table }}

@@ -219,28 +219,31 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_numberList = requests.GET.get('section_number')
-    print("Ajax test section_numberList: " + section_numberList)
+    response['section_numbers'] = requests.GET.get('section_number')
+    print("Ajax test section_numberList: " + response['section_numbers'])
 
-    faculty_email = requests.user.email
-    facultyObj = Faculty.objects.get(email=faculty_email)
-    aws_credentialsObj = facultyObj.awscredential
-    print(aws_credentialsObj)
-    images_detailObjs = aws_credentialsObj.imageDetails.all()
-    print(images_detailObjs)
-    images = []
-    for image in images_detailObjs:
-        images.append(
-            {
-                'image_name':image.imageName,
-                'image_id':image.imageId
-            }
-        )
-    print(images)
-    response['images'] = images
-    response['section_numbers'] = section_numberList
+    try:
+        response['images'] = []
 
-    return HttpResponse(json.dumps(response), content_type='appllication/json')
+        faculty_email = requests.user.email
+        facultyObj = Faculty.objects.get(email=faculty_email)
+        aws_credentialsObj = facultyObj.awscredential
+        print(aws_credentialsObj)
+        images_detailObjs = aws_credentialsObj.imageDetails.all()
+        for image in images_detailObjs:
+            response['images'].append(
+                {
+                    'image_name':image.imageName,
+                    'image_id':image.imageId
+                }
+            )
+            print(image.imageName)
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error in Get AMI form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 
 # Reteival of shared and non-shared account numbers for specific section and image
@@ -258,8 +261,39 @@ def faculty_Setup_GetAccounts(requests):
     section_numberList = requests.GET.getList('section_number')
     print("Ajax test section_numberList: " + section_numberList)
 
-    image_id = requests.Get.get('image_id')
+    image_id = requests.GET.get('image_id')
     print("Ajax test image_id: " + image_id)
+
+    try:
+        response['shared_accounts_list'] = []
+        response['nonshared_accounts_list'] = []
+
+        imageObj = Image_Details.objects.get(imageId=image_id)
+        shared_accounts = imageObj.sharedAccNum
+
+        course_sectionList = requests.session['courseList_updated']
+        section_teamList = utilities.getAllTeamDetails(course_sectionList)
+        for section_number in section_numberList:
+            for team_name,account_number in section_teamList['section_number'].items():
+                if account_number in shared_accounts:
+                    response['shared_accounts_list'].append(
+                        {
+                            'team_name':team_name,
+                            'account_number':account_number
+                        }
+                    )
+                else:
+                    response['nonshared_accounts_list'].append(
+                        {
+                            'team_name':team_name,
+                            'account_number':account_number
+                        }
+                    )
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error in Get AMI-Accounts form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
 
     return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
 
@@ -281,7 +315,6 @@ def faculty_Setup_ShareAMI(requests):
     image_id = requests.POST.get('image_id')
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-    data = requests.GET.getlist("sectionNo[]")
 
     try:
         # Get the access_key and secret_access_key from DB
