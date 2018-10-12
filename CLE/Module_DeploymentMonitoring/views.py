@@ -217,10 +217,10 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_numberList = request.GET.getList('section_number')
+    section_numberList = requests.GET.getList('section_number')
     print("Ajax test section_numberList: " + section_numberList)
 
-    faculty_email = request.user.email
+    faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
     aws_credentialsObj = facultyObj.awscredential
 
@@ -256,7 +256,7 @@ def faculty_Setup_GetAccounts(requests):
     print("Ajax test section_numberList: " + section_numberList)
 
     image_id = requests.Get.get('image_id')
-    print("Ajax test image_id: " + image_id) 
+    print("Ajax test image_id: " + image_id)
 
     return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
 
