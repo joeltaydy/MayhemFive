@@ -3,13 +3,11 @@ from Module_DeploymentMonitoring import views
 from django.urls import path,re_path
 
 urlpatterns = [
-    path('instructor/ITOperationsLab/setup/',views.faculty_Setup_Base,name='itopslab_setup'),
     path('instructor/ITOperationsLab/setup/deployment_package/',views.faculty_Setup_GetGitHubLinks,name='dp_list'),
     path('instructor/ITOperationsLab/setup/deployment_package/create/', views.faculty_Setup_AddGitHubLinks, name='dp_create'),
     path('instructor/ITOperationsLab/setup/deployment_package/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
     path('instructor/ITOperationsLab/setup/deployment_package/<str:pk>/delete/', views.faculty_Setup_DeleteGitHubLinks, name='dp_delete'),
     path('instructor/ITOperationsLab/setup/awskeys/',views.faculty_Setup_GetAWSKeys,name='itopslab_setup_AWSKeys'),
-    path('instructor/ITOperationsLab/setup/ami/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI'),
     path('instructor/ITOperationsLab/monitor/',views.faculty_Monitor_Base,name='itopslab_monitor'),
     path('instructor/ITOperationsLab/event/',views.faculty_Event_Base,name='itopslab_event'),
     path('student/ITOperationsLab/deploy/',views.student_Deploy_Base,name='itopslab_studeploy'),
@@ -22,6 +20,9 @@ urlpatterns = [
     path('instructor/ITOperationsLab/servers/create/', views.server_create, name='server_create'),
     path('instructor/ITOperationsLab/servers/<int:pk>/update/', views.server_update, name='server_update'),
     path('instructor/ITOperationsLab/servers/<int:pk>/delete/', views.server_delete, name='server_delete'),
-    #deployment package forms
 
+    # For retrieving and sharing of AMI
+    path('instructor/ITOperationsLab/setup/',views.faculty_Setup_Base,name='itopslab_setup'),
+    path('instructor/ITOperationsLab/setup/ami/get/',views.facutly_Setup_GetAMI,name='itopslab_setup_Images'),
+    path('instructor/ITOperationsLab/setup/ami/share/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI'),
 ]
