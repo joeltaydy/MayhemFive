@@ -15,6 +15,8 @@ from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.src.utilities import encode,decode
 
+# from django.http import QueryDict
+
 # Main function for setup page on faculty.
 # Will retrieve work products and render to http page
 #
@@ -78,6 +80,7 @@ def faculty_Setup_Base(requests,response=None):
                         image_detailsObj = utilities.addImageDetials(image_id,image_name)
                         aws_credentials.imageDetails.add(image_detailsObj)
 
+<<<<<<< HEAD
             # Compare DB data with AWS data: IF not in AWS, delete from DB
             images = aws_credentials.imageDetails.all()
             for image_detailObj in images:
@@ -85,6 +88,15 @@ def faculty_Setup_Base(requests,response=None):
                     image_list[image_detailObj.imageId]
                 except:
                     image_detailObj.delete()
+=======
+            # Compare DB data with AWS data: IF not in AWS, delete
+            # images = aws_credentials.imageDetails.all()
+            # for image_detailObj in images:
+            #     try:
+            #         image_list[image_detailObj.imageId]
+            #     except:
+            #         image_detailObj.delete()
+>>>>>>> fea7295ad341d2149e628e470da4949960fd60aa
 
     except Exception as e:
         traceback.print_exc()
@@ -217,7 +229,7 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_numbers'] = requests.GET.getList('section_number')
+    response['section_numbers'] = requests.GET.get('section_number')
     print("Ajax test section_numberList: " + response['section_numbers'])
 
     try:
@@ -226,7 +238,7 @@ def faculty_Setup_GetAMI(requests):
         faculty_email = requests.user.email
         facultyObj = Faculty.objects.get(email=faculty_email)
         aws_credentialsObj = facultyObj.awscredential
-
+        print(aws_credentialsObj)
         images_detailObjs = aws_credentialsObj.imageDetails.all()
         for image in images_detailObjs:
             response['images'].append(
@@ -235,13 +247,13 @@ def faculty_Setup_GetAMI(requests):
                     'image_id':image.imageId
                 }
             )
-
+            print(image.imageName)
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error in Get AMI form: ' + e.args[0]
         return faculty_Setup_Base(requests,response)
 
-    return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 
 # Reteival of shared and non-shared account numbers for specific section and image
