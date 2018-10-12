@@ -15,6 +15,8 @@ from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.src.utilities import encode,decode
 
+# from django.http import QueryDict
+
 # Main function for setup page on faculty.
 # Will retrieve work products and render to http page
 #
@@ -79,12 +81,12 @@ def faculty_Setup_Base(requests,response=None):
                         aws_credentials.imageDetails.add(image_detailsObj)
 
             # Compare DB data with AWS data: IF not in AWS, delete
-            images = aws_credentials.imageDetails.all()
-                for image_detailObj in images:
-                    try:
-                        image_list[image_detailObj.imageId]
-                    except:
-                        image_detailObj.delete()
+            # images = aws_credentials.imageDetails.all()
+            # for image_detailObj in images:
+            #     try:
+            #         image_list[image_detailObj.imageId]
+            #     except:
+            #         image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
@@ -217,14 +219,15 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_numberList = requests.GET.getList('section_number')
+    section_numberList = requests.GET.get('section_number')
     print("Ajax test section_numberList: " + section_numberList)
 
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
     aws_credentialsObj = facultyObj.awscredential
-
+    print(aws_credentialsObj)
     images_detailObjs = aws_credentialsObj.imageDetails.all()
+    print(images_detailObjs)
     images = []
     for image in images_detailObjs:
         images.append(
@@ -233,11 +236,11 @@ def faculty_Setup_GetAMI(requests):
                 'image_id':image.imageId
             }
         )
-
+    print(images)
     response['images'] = images
     response['section_numbers'] = section_numberList
 
-    return HttpResponse(json.dumps(response), mimetype='application/json', content_type='appllication/json')
+    return HttpResponse(json.dumps(response), content_type='appllication/json')
 
 
 # Reteival of shared and non-shared account numbers for specific section and image
