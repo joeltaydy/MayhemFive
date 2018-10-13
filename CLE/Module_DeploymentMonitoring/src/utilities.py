@@ -11,7 +11,7 @@ from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
 import hashlib
 from CLE.settings import EVENT_SECRET_KEY
-
+import csv
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
     section_list = {}
@@ -331,8 +331,23 @@ def validate(secret_key):
         return False
     return True
 
+'''
+prepares log for event creation
+'''
+def writeEvent1Log(serverDetails):
+    output_file = 'clt_files/eventrecoverytime.csv'
+    with open(output_file, 'w', newline='') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerows(['IPAddress','EventStart','EventRecover','EventRecoveryTime'])
+        for server in serverDetails:
+            writer.writerows([server])
+
+
+'''
+Method to record recovery time based on IP
+Called by student server
+'''
 def writeRecoveryTime(ipAddress):
-    import csv
     from datetime import datetime
     import pytz
     output_file = 'clt_files/eventrecoverytime.csv'
