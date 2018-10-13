@@ -1,10 +1,10 @@
 import json
+import pytz
+import datetime
 import traceback
 import requests as req
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-import pytz
-import datetime
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.src import utilities,aws_util
@@ -14,6 +14,8 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.src.utilities import encode,decode
+
+# from django.http import QueryDict
 
 # Main function for setup page on faculty.
 # Will retrieve work products and render to http page
@@ -38,7 +40,12 @@ def faculty_Setup_Base(requests,response=None):
         response['account_number'] = ''
         response['access_key'] = ''
         response['secret_access_key'] = ''
-        response['section_imageList'] = {}
+        response['section_numbers'] = []
+
+        # Retrieve Setions that are under EMS201 for faculty
+        ems_course_sectionList = requests.session['courseList_updated']['EMS201']
+        for course_section in ems_course_sectionList:
+            response['section_numbers'].append(course_section['section_number'])
 
         # Retrieve GitHub link from Deployment_Package
         deployment_packageObjs = Deployment_Package.objects.all()
@@ -60,74 +67,27 @@ def faculty_Setup_Base(requests,response=None):
             response['access_key'] = aws_credentials.access_key
             response['secret_access_key'] = aws_credentials.secret_access_key
 
-            # Retrieve the team_number and account_number for each section
-            course_sectionList = requests.session['courseList_updated']
-            section_list = utilities.getAllTeamDetails(course_sectionList)
-
-            if len(section_list) > 0:
-                # Retreive image_id and image_name from AWS using Boto3 and compare itwith data in DB
-                image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
-                for image_id,image_name in image_list.items():
-                    if len(aws_credentials.imageDetails.all()) == 0:
+            # Compare AWS data with DB data; IF not in DB, add into DB
+            image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
+            for image_id,image_name in image_list.items():
+                if len(aws_credentials.imageDetails.all()) == 0:
+                    image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                    aws_credentials.imageDetails.add(image_detailsObj)
+                else:
+                    querySet = aws_credentials.imageDetails.filter(imageId=image_id)
+                    if len(querySet) == 0:
                         image_detailsObj = utilities.addImageDetials(image_id,image_name)
                         aws_credentials.imageDetails.add(image_detailsObj)
                     else:
-                        try:
-                            aws_credentials.imageDetails.filter(imageId=image_id)
-                        except:
-                            image_detailsObj = utilities.addImageDetials(image_id,image_name)
-                            aws_credentials.imageDetails.add(image_detailsObj)
+                        pass
 
-                # Retrieve Shared Account Numbers from Image_Details (DB) and compared it wil data in Boto3
-                images = aws_credentials.imageDetails.all()
-                for image_detailObj in images:
-                    id = image_detailObj.imageId
-                    name = image_detailObj.imageName
-
-                    try:
-                        image_list[id] # Just to check if DB info tallies with AWS
-                        counter = 1
-                        for section_number,section_details in section_list.items():
-                            response['section_imageList'][section_number] = {
-                                'Checkbox_ID':'example-inline-checkbox' + str(counter),
-                                'Image_IDs':[]
-                            }
-                            sharedList = []
-                            nonsharedList = []
-
-                            for team_name,account_number in section_details.items():
-                                shared_account_numbers = image_detailObj.sharedAccNum
-                                if shared_account_numbers == None:
-                                    shared_account_numbers = []
-                                else:
-                                    shared_account_numbers = shared_account_numbers.split('_')
-
-                                if account_number in shared_account_numbers:
-                                    sharedList.append(
-                                        {
-                                            'account_number':account_number,
-                                            'team_name':team_name,
-                                        }
-                                    )
-                                else:
-                                    nonsharedList.append(
-                                        {
-                                            'account_number':account_number,
-                                            'team_name':team_name,
-                                        }
-                                    )
-
-                            response['section_imageList'][section_number]['Image_IDs'].append(
-                                {
-                                    'image_id':id,
-                                    'image_name':name,
-                                    'shared_account_number':sharedList,
-                                    'non_shared_account_number':nonsharedList
-                                }
-                            )
-                            counter += 1
-                    except:
-                         image_detailObj.delete()
+            # Compare DB data with AWS data: IF not in AWS, delete from DB
+            images = aws_credentials.imageDetails.all()
+            for image_detailObj in images:
+                try:
+                    image_list[image_detailObj.imageId]
+                except:
+                    image_detailObj.delete()
 
     except Exception as e:
         traceback.print_exc()
@@ -247,10 +207,96 @@ def faculty_Setup_GetAWSKeys(requests):
 
     return faculty_Setup_Base(requests,response)
 
-# def faculty_GetSection(requests):
-#     response = {'test':'test'}
-#     section_number = requests.GET.get('sectionNo[]')
-#     return render(requests, 'Module_TeamManagement/Instructor/ITOpsLabMonitor.html', response)
+
+# Reteival of all the Images under the faculty account
+#
+def faculty_Setup_GetAMI(requests):
+    response = {"facutly_Setup_GetAMI" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    response['section_number'] = requests.GET.get('section_number').strip()
+    print("Ajax test section_numberList: " + response['section_number'])
+
+    try:
+        response['images'] = []
+
+        faculty_email = requests.user.email
+        facultyObj = Faculty.objects.get(email=faculty_email)
+        aws_credentialsObj = facultyObj.awscredential
+
+        images_detailObjs = aws_credentialsObj.imageDetails.all()
+        for image in images_detailObjs:
+            response['images'].append(
+                {
+                    'image_name':image.imageName,
+                    'image_id':image.imageId
+                }
+            )
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error in Get AMI form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
+
+
+# Reteival of shared and non-shared account numbers for specific section and image
+#
+def faculty_Setup_GetAMIAccounts(requests):
+    response = {"faculty_Setup_GetAMIAccounts" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    section_number = requests.GET.get('section_number').strip()
+    print("Ajax test section_number: " + section_number)
+
+    image_id = requests.GET.get('image_id').strip()
+    print("Ajax test image_id: " + image_id)
+
+    try:
+        response['shared_accounts_list'] = []
+        response['nonshared_accounts_list'] = []
+
+        imageObj = Image_Details.objects.get(imageId=image_id)
+        shared_accounts = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum
+
+        course_sectionList = requests.session['courseList_updated']
+        section_teamList = utilities.getAllTeamDetails(course_sectionList)
+
+        for team_name,account_number in section_teamList[section_number].items():
+            if account_number in shared_accounts:
+                response['shared_accounts_list'].append(
+                    {
+                        'team_name':team_name,
+                        'account_number':account_number
+                    }
+                )
+            else:
+                response['nonshared_accounts_list'].append(
+                    {
+                        'team_name':team_name,
+                        'account_number':account_number
+                    }
+                )
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error in Get AMI-Accounts form: ' + e.args[0]
+        return faculty_Setup_Base(requests,response)
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 
 # Retrieval and storing of AMI length from instructor
@@ -270,8 +316,7 @@ def faculty_Setup_ShareAMI(requests):
     image_id = requests.POST.get('image_id')
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-    data = requests.GET.getlist("sectionNo[]")
-    print(data)
+
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
@@ -341,7 +386,7 @@ def faculty_Monitor_Base(requests):
         section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
         for team_number,account_number in section_details.items():
-            response = utilities.getServerStatus(account_number,team_number,response)
+            response = utilities.getMonitoringStatus(account_number,team_number,response)
 
     except Exception as e:
         traceback.print_exc()
@@ -516,6 +561,7 @@ def ITOpsLabStudentDeploy(requests):
     response = {"ITOpsLabStudentDeploy" : "active"}
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
+
 def ITOpsLabStudentMonitor(requests):
 
     try:
@@ -523,7 +569,7 @@ def ITOpsLabStudentMonitor(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',{})
-    
+
     response = {"ITOpsLabStudentDeploy" : "active"}
     try:
         response['server_status'] = {}
@@ -533,7 +579,7 @@ def ITOpsLabStudentMonitor(requests):
         AWS_Credentials = studentClassObj.awscredential
         team_number= studentClassObj.team_number
         account_number = AWS_Credentials.account_number
-        response = utilities.getServerStatus(account_number,team_number,response)
+        response = utilities.getMonitoringStatus(account_number,team_number,response)
         response = utilities.getMetric(account_number,response)
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]

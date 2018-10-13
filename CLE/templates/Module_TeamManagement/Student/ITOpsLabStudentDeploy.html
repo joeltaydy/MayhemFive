@@ -7,34 +7,32 @@
 <div class="col-md-12">
         <h1 align="center">IT Operations Lab</h1>
         <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-       
-    
+
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
                 <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Deploy</button>
                 <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
             </div>
         </div>
-      
+
         <hr>
         <h2 align="center"><i>Deploy</i></h2>
 </div>
 <div class ="col-md-12">
-    <div class = "row">  
+    <div class = "row">
         <div class="col-md-6">
             <div class="card ">
                 <div class="card-header ">
                     <h4 align="center" class="card-title">Set up AWS Account</h4>
                 </div>
-            
+
                 <div class="card-body">
                     <span align="center">
-                        --Instructions to Set up AWS Account -- <br>
-                        Upon setting up your AWS Account, please submit your account number below
+                        {% include 'Module_TeamManagement/Instructions/AWScarousel.html' %}
                     </span>
                 </div>
                 <div class="card-footer ">
-                    
+
             </div>
             </div>
         </div>
@@ -44,15 +42,14 @@
                 <div class="card-header ">
                     <h4 align="center" class="card-title">Launch Server</h4>
                 </div>
-            
+
                 <div class="card-body">
                     <span align="center">
-                        --Instructions to Launch server from AMI -- <br>
-                        <br>
+                        {% include 'Module_TeamManagement/Instructions/LauchServercarousel.html' %}
                     </span>
                 </div>
                 <div class="card-footer ">
-                    
+
                 </div>
             </div>
         </div>
