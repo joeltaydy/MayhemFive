@@ -64,29 +64,50 @@ def faculty_Setup_Base(requests,response=None):
 
         if aws_credentials != None:
             response['account_number']  = aws_credentials.account_number
-            response['access_key'] = aws_credentials.access_key
-            response['secret_access_key'] = aws_credentials.secret_access_key
+            response['access_key'] = decode(aws_credentials.access_key)
+            response['secret_access_key'] = decode(aws_credentials.secret_access_key)
 
             # Compare AWS data with DB data; IF not in DB, add into DB
             image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
-            for image_id,image_name in image_list.items():
+            for image in image_list:
                 if len(aws_credentials.imageDetails.all()) == 0:
-                    image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                    image_detailsObj = utilities.addImageDetails(image)
                     aws_credentials.imageDetails.add(image_detailsObj)
                 else:
-                    querySet = aws_credentials.imageDetails.filter(imageId=image_id)
+                    querySet = aws_credentials.imageDetails.filter(imageId=image['Image_ID'])
                     if len(querySet) == 0:
-                        image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                        image_detailsObj = utilities.addImageDetails(image)
                         aws_credentials.imageDetails.add(image_detailsObj)
                     else:
-                        pass
+                        imageObj = querySet[0]
+                        shared_acct_nums = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum.split('_')
+                        registered_acct_nums = utilities.getRegisteredAccountNumbers(image['Launch_Permissions'])
+
+                        # Add Image to AWS_Credentials
+                        for acct in registered_acct_nums:
+                            utilities.addImageToUser(imageObj,acct)
+
+                        # Remove Image from AWS_Credentials
+                        for acct in shared_acct_nums:
+                            if acct not in registered_acct_nums:
+                                utilities.removeImageFromAUser(imageObj,acct)
+
+                        shared_acct_nums = '_'.join(registered_acct_nums)
+                        imageObj.sharedAccNum = None if len(shared_acct_nums) == 0 else shared_acct_nums
+                        imageObj.save()
 
             # Compare DB data with AWS data: IF not in AWS, delete from DB
             images = aws_credentials.imageDetails.all()
             for image_detailObj in images:
-                try:
-                    image_list[image_detailObj.imageId]
-                except:
+                db_image_id = image_detailObj.imageId
+                match = False
+                for image in image_list:
+                    aws_image_id = image['Image_ID']
+
+                    if db_image_id == aws_image_id:
+                        match = True
+
+                if not match:
                     image_detailObj.delete()
 
     except Exception as e:
@@ -182,14 +203,19 @@ def faculty_Setup_GetAWSKeys(requests):
         try:
             credentialsObj = facultyObj.awscredential
             credentialsObj.account_number = account_number
-            credentialsObj.access_key = access_key
-            credentialsObj.secret_access_key = secret_access_key
+            credentialsObj.access_key = encode(access_key)
+            credentialsObj.secret_access_key = encode(secret_access_key)
+            # credentialsObj.access_key = access_key
+            # credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
 
         except:
+            access_key = encode(access_key)
+            secret_access_key = encode(secret_access_key)
+
             credentialsObj = AWS_Credentials.objects.create(
                 account_number=account_number,
                 access_key=access_key,
@@ -320,8 +346,8 @@ def faculty_Setup_ShareAMI(requests):
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
-        access_key = aws_credentials.access_key
-        secret_access_key = aws_credentials.secret_access_key
+        access_key = decode(aws_credentials.access_key)
+        secret_access_key = decode(aws_credentials.secret_access_key)
 
         # Add the account number to the image permission on AWS
         client = aws_util.getClient(access_key,secret_access_key)
@@ -340,9 +366,9 @@ def faculty_Setup_ShareAMI(requests):
                     else:
                         shared_account_numbers = shared_account_numbers.split('_')
                         if account_number not in shared_account_numbers:
-                            shared_account_numbers = '-'.join(shared_account_numbers) + '_' + account_number
+                            shared_account_numbers = '_'.join(shared_account_numbers) + '_' + account_number
                         else:
-                            shared_account_numbers = '-'.join(shared_account_numbers)
+                            shared_account_numbers = '_'.join(shared_account_numbers)
 
                     image_detailObj.sharedAccNum = shared_account_numbers
                     image_detailObj.save()
@@ -662,5 +688,3 @@ def serverRecoveryCall(request):
     else:
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)
-        
-

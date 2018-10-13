@@ -1,4 +1,5 @@
 import json
+import hashlib
 import traceback
 import requests as req
 from django.db.models import Count
@@ -9,7 +10,6 @@ from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-import hashlib
 from CLE.settings import EVENT_SECRET_KEY
 import csv
 # Get all team number and account number for those enrolled in course ESM201
@@ -34,14 +34,61 @@ def getAllTeamDetails(course_sectionList):
     return section_list
 
 
-# Add image detials into database. REturns an image_details object
-def addImageDetials(image_id,image_name):
+# Add image detials into database. Returns an image_details object (FOR FIRST TIME)
+def addImageDetails(image):
+    image_id = image['Image_ID']
+    image_name = image['Image_Name']
+    permissions = image['Launch_Permissions']
+
+    account_numbers = getRegisteredAccountNumbers(permissions)
+
     image_detailsObj = Image_Details.objects.create(
         imageId=image_id,
         imageName=image_name,
+        sharedAccNum='_'.join(account_numbers),
     )
     image_detailsObj.save()
+
+    for account_number in account_numbers:
+        addImageToUser(image_detailsObj,account_number)
+
     return image_detailsObj
+
+
+# Add Image to AWS_Credentials
+def addImageToUser(image,account_number):
+    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
+    if len(temp_querySet) == 0:
+        credentialsObj.imageDetails.add(image)
+        credentialsObj.save()
+
+
+# Remove Image from AWS_Credentials
+def removeImageFromAUser(image,account_number):
+    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
+    if len(temp_querySet) != 0:
+        credentialsObj.imageDetails.remove(image)
+        credentialsObj.save()
+
+
+# Supplements addImageDetails function. Returns a list of all registered account numbers from AWS
+def getRegisteredAccountNumbers(permissions):
+    account_numbers = []
+
+    for permission in permissions:
+        user_id = permission['UserId']
+
+        try:
+            AWS_Credentials.objects.get(account_number=user_id)
+            if user_id not in account_numbers:
+                account_numbers.append(user_id)
+
+        except:
+            pass
+
+    return account_numbers
 
 
 # Add AWS credentials for the relevant students
@@ -102,9 +149,10 @@ def addAWSKeys(ipAddress,requests):
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
         jsonObj = json.loads(response.content.decode())
-        # awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-        awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
-        awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
+        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
+        # awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
+        # awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
         traceback.print_exc()
@@ -355,7 +403,7 @@ def writeRecoveryTime(ipAddress):
 
     with open(output_file, 'r') as f:
         reader= csv.reader(f)
-        
+
         for line in reader:
             if line[0] == ipAddress:
                 tz = pytz.timezone('Asia/Singapore')
