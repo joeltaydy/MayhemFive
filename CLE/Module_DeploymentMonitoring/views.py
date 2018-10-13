@@ -90,7 +90,7 @@ def faculty_Setup_Base(requests,response=None):
                         # Remove Image from AWS_Credentials
                         for acct in shared_acct_nums:
                             if acct not in registered_acct_nums:
-                                utilities.removeImageFromAccount(imageObj,shared_acct_nums,registered_acct_nums)
+                                utilities.removeImageFromAccount(imageObj,acct)
 
                         shared_acct_nums = '_'.join(registered_acct_nums)
                         imageObj.sharedAccNum = None if len(shared_acct_nums) == 0 else shared_acct_nums

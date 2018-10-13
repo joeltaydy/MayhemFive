@@ -57,18 +57,18 @@ def addImageDetails(image):
 # Add Image to AWS_Credentials
 def addImageToAccount(image,account_number):
     credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-    temp_querySet = credentialsObj.imageDetails.filter(imageId=image['Image_ID'])
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
     if len(temp_querySet) == 0:
-        credentialsObj.imageDetails.add(imageObj)
+        credentialsObj.imageDetails.add(image)
         credentialsObj.save()
 
 
 # Remove Image from AWS_Credentials
 def removeImageFromAccount(image,account_number):
     credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-    temp_querySet = credentialsObj.imageDetails.filter(imageId=image['Image_ID'])
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
     if len(temp_querySet) != 0:
-        credentialsObj.imageDetails.remove(imageObj)
+        credentialsObj.imageDetails.remove(image)
         credentialsObj.save()
 
 
