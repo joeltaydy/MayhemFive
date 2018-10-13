@@ -8,18 +8,30 @@
                  $('select#courseSection').change(function () {
                      var optionSelected = $(this).find("option:selected");
                      var valueSelected  = optionSelected.val();
-                     var course_section = optionSelected.text();
+                     var section_number = optionSelected.text();
 
+                     section_data = { 'section_number' : section_number };
+                     ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",section_data,function(section_result){
+                            console.log(section_result);
 
-                     data = {'section_number' : course_section };
-                     ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",data,function(result){
-                            console.log(result);
                             $("#image_id option").remove();
-                            for (var i = result.images.length - 1; i >= 0; i--) {
-                                $("#image_id").append('<option>'+ result.images[i].image_id +'</option>');
+                            $("#image_id").append('<option value="" selected disabled hidden>Select image here</option>');
+
+                            for (var i = section_result.images.length - 1; i >= 0; i--) {
+                                $("#image_id").append('<option value="' + section_result.images[i].image_id + '">'+ section_result.images[i].image_name +'</option>');
                             };
 
+                             $('select#image_id').change(function () {
+                                 var optionSelected = $(this).find("option:selected");
+                                 var image_id  = optionSelected.val();
+                                 var image_name = optionSelected.text();
 
+                                 image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number };
+                                 ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
+                                        console.log(image_result);
+
+                                     });
+                             });
                          });
                  });
             });
@@ -40,6 +52,7 @@
                 <!-- fieldsets -->
                 <fieldset>
                     <h2 class="fs-title">Select Class</h2>
+                    <h3 class="fs-subtitle">Please select a section</h3>
                     <div class="form-group row">
                         <div class="col-12">
 
@@ -52,16 +65,14 @@
                               {% endif %}
                           {% endfor %} -->
 
-
-                          <select name="courseSection" id="courseSection">
-                            {% for course_section in section_numbers %}
-                                {% if course_section != 'G0' %}
-                          			<option val="{{ course_section }}"> {{ course_section }} </option>
+                          <select class="form-control" name="courseSection" id="courseSection">
+                              <option value="" selected disabled hidden>Select section here</option>
+                            {% for section_number in section_numbers %}
+                                {% if section_number != 'G0' %}
+                          			<option value="{{ section_number }}"> {{ section_number }} </option>
                                 {% endif %}
                             {% endfor %}
-                      		</select>
-
-
+                      	  </select>
 
                         </div>
                     </div>
@@ -69,16 +80,15 @@
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Select Image</h2>
-                    <h3 class="fs-subtitle">Please select the image and the groups you would like to send the image to</h3>
+                    <h3 class="fs-subtitle">Please select the image that you would like to share with the section</h3>
                     <div class="col-md-8"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <select class="form-control" id="image_id" name="image_id">
 
                         </select>
-                      <table>
+                      <!-- <table>
                         {{ form.as_table }}
-                      </table>
+                      </table> -->
                     </div>
-
                     <br><br>
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>

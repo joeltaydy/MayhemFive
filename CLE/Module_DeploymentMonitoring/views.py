@@ -74,11 +74,12 @@ def faculty_Setup_Base(requests,response=None):
                     image_detailsObj = utilities.addImageDetials(image_id,image_name)
                     aws_credentials.imageDetails.add(image_detailsObj)
                 else:
-                    try:
-                        aws_credentials.imageDetails.filter(imageId=image_id)
-                    except:
+                    querySet = aws_credentials.imageDetails.filter(imageId=image_id)
+                    if len(querySet) == 0:
                         image_detailsObj = utilities.addImageDetials(image_id,image_name)
                         aws_credentials.imageDetails.add(image_detailsObj)
+                    else:
+                        pass
 
             # Compare DB data with AWS data: IF not in AWS, delete from DB
             images = aws_credentials.imageDetails.all()
@@ -219,8 +220,8 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_numbers'] = requests.GET.get('section_number')
-    print("Ajax test section_numberList: " + response['section_numbers'])
+    response['section_number'] = requests.GET.get('section_number').strip()
+    print("Ajax test section_numberList: " + response['section_number'])
 
     try:
         response['images'] = []
@@ -228,7 +229,7 @@ def faculty_Setup_GetAMI(requests):
         faculty_email = requests.user.email
         facultyObj = Faculty.objects.get(email=faculty_email)
         aws_credentialsObj = facultyObj.awscredential
-        print(aws_credentialsObj)
+
         images_detailObjs = aws_credentialsObj.imageDetails.all()
         for image in images_detailObjs:
             response['images'].append(
@@ -237,7 +238,7 @@ def faculty_Setup_GetAMI(requests):
                     'image_id':image.imageId
                 }
             )
-            print(image.imageName)
+
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error in Get AMI form: ' + e.args[0]
@@ -258,10 +259,10 @@ def faculty_Setup_GetAMIAccounts(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_numberList = requests.GET.getList('section_number')
-    print("Ajax test section_numberList: " + section_numberList)
+    section_number = requests.GET.get('section_number').strip()
+    print("Ajax test section_number: " + section_number)
 
-    image_id = requests.GET.get('image_id')
+    image_id = requests.GET.get('image_id').strip()
     print("Ajax test image_id: " + image_id)
 
     try:
@@ -269,26 +270,26 @@ def faculty_Setup_GetAMIAccounts(requests):
         response['nonshared_accounts_list'] = []
 
         imageObj = Image_Details.objects.get(imageId=image_id)
-        shared_accounts = imageObj.sharedAccNum
+        shared_accounts = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum
 
         course_sectionList = requests.session['courseList_updated']
         section_teamList = utilities.getAllTeamDetails(course_sectionList)
-        for section_number in section_numberList:
-            for team_name,account_number in section_teamList['section_number'].items():
-                if account_number in shared_accounts:
-                    response['shared_accounts_list'].append(
-                        {
-                            'team_name':team_name,
-                            'account_number':account_number
-                        }
-                    )
-                else:
-                    response['nonshared_accounts_list'].append(
-                        {
-                            'team_name':team_name,
-                            'account_number':account_number
-                        }
-                    )
+
+        for team_name,account_number in section_teamList[section_number].items():
+            if account_number in shared_accounts:
+                response['shared_accounts_list'].append(
+                    {
+                        'team_name':team_name,
+                        'account_number':account_number
+                    }
+                )
+            else:
+                response['nonshared_accounts_list'].append(
+                    {
+                        'team_name':team_name,
+                        'account_number':account_number
+                    }
+                )
 
     except Exception as e:
         traceback.print_exc()
