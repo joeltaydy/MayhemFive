@@ -263,6 +263,10 @@ def getMonitoringStatus(account_number, team_number, response):
 
         # Step 1: Check if server is alive
         server_state = getServerStatus(server)
+        if server_state == 'Killed':
+            server.delete()
+            continue
+
         response['server_status'].append(
             {
                 'team_name':team_number,
