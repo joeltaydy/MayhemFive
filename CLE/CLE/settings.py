@@ -20,7 +20,7 @@ STATIC_DIR = os.path.join(BASE_DIR,"static")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '--2$vfi4$(vsdvf_@_(6x%$9^(-ea3h0gkr6p*8j)zf7!_y&je'
 AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
-
+EVENT_SECRET_KEY = '4c81cc820321d84eb2963b3c5c85a11e77d3b9510790b326f42a66c35ee61b7b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

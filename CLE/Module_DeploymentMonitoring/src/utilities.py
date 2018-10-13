@@ -9,7 +9,8 @@ from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-
+import hashlib
+from CLE.settings import EVENT_SECRET_KEY
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
@@ -318,3 +319,42 @@ def getCloudMetric(webapp_url):
             timeList.append(time)
         label = webapp_jsonObj["metric_statistics"]["Datapoints"][0]["Unit"]
     return {'xValue': timeList, 'yValue': sortedValueList, 'Label':label}
+
+
+def hashPlainText(plaintext):
+    plaintext_byte = plaintext.encode('utf-8')
+    hashedtext = hashlib.sha256(plaintext_byte).hexdigest()
+    return hashedtext
+
+def validate(secret_key):
+    if hashPlainText(secret_key) != EVENT_SECRET_KEY:
+        return False
+    return True
+
+def writeRecoveryTime(ipAddress):
+    import csv
+    from datetime import datetime
+    import pytz
+    output_file = 'clt_files/eventrecoverytime.csv'
+    lines = []
+
+    with open(output_file, 'r') as f:
+        reader= csv.reader(f)
+        
+        for line in reader:
+            if line[0] == ipAddress:
+                tz = pytz.timezone('Asia/Singapore')
+                now = str(datetime.now(tz=tz))[:19]
+                line[2]= now
+                #print(line[2])
+                #print(datetime.strptime(line[1], '%Y-%m-%d %H:%M:%S'))
+                #print(datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S'))
+                #print((datetime.strptime(line[3], '%Y-%m-%d %H:%M:%S') - datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S')).total_seconds())
+                recoverytime = (datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S') - datetime.strptime(line[1], '%Y-%m-%d %H:%M:%S')).total_seconds()
+                #print(recoverytime)
+                line[3] = recoverytime
+            lines.append(line)
+
+    with open(output_file, 'w', newline='') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerows(lines)
