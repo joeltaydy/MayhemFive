@@ -155,7 +155,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,studentemail=student_email)
         except:
             context["CourseTrailResults"] = {"class" : {"Teams_Information": {}, "Students_Information": {"students" :[] , "points" : [] , "badges": []}}}
-    
+
     if instructorEmail != None:
         if moduleCode != None:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
@@ -442,10 +442,12 @@ def encode(plainText=''):
     if plainText == '':
         raise Exception('Please specify a 32 bit long plain text when encoding')
 
-    plainText = plainText.rjust(32)
-    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
-    return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
+    if len(plainText) <= 32:
+        plainText = plainText.rjust(32)
+        cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+        return base64.b64encode(cipher.encrypt(plainText.encode('utf-8'))).strip().decode('utf-8')
 
+    return encode(plainText[:int(len(plainText)/2)]) + encode(plainText[int(len(plainText)/2):])
 
 # Decrypt a 32-bit string
 # Accepts:
@@ -457,8 +459,11 @@ def decode(cipherText=''):
     if cipherText == '':
         raise Exception('Please specify a cipher text for decoding')
 
-    cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
-    return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
+    if len(cipherText) <= 44:
+        cipher = AES.new(AES_SECRET_KEY.encode('utf-8'),AES.MODE_ECB)
+        return cipher.decrypt(base64.b64decode(cipherText.encode('utf-8'))).strip().decode('utf-8')
+
+    return decode(cipherText[:44]) + decode(cipherText[44:])
 
 
 # Return a string of the current financial year

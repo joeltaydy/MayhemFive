@@ -1,4 +1,5 @@
 import json
+import hashlib
 import traceback
 import requests as req
 from django.db.models import Count
@@ -9,7 +10,6 @@ from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-import hashlib
 from CLE.settings import EVENT_SECRET_KEY
 
 # Get all team number and account number for those enrolled in course ESM201
@@ -149,9 +149,10 @@ def addAWSKeys(ipAddress,requests):
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
         jsonObj = json.loads(response.content.decode())
-        # awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-        awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
-        awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
+        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
+        # awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
+        # awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
         traceback.print_exc()
@@ -387,7 +388,7 @@ def writeRecoveryTime(ipAddress):
 
     with open(output_file, 'r') as f:
         reader= csv.reader(f)
-        
+
         for line in reader:
             if line[0] == ipAddress:
                 tz = pytz.timezone('Asia/Singapore')

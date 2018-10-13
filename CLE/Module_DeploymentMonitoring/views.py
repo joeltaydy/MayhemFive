@@ -64,8 +64,8 @@ def faculty_Setup_Base(requests,response=None):
 
         if aws_credentials != None:
             response['account_number']  = aws_credentials.account_number
-            response['access_key'] = aws_credentials.access_key
-            response['secret_access_key'] = aws_credentials.secret_access_key
+            response['access_key'] = decode(aws_credentials.access_key)
+            response['secret_access_key'] = decode(aws_credentials.secret_access_key)
 
             # Compare AWS data with DB data; IF not in DB, add into DB
             image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
@@ -203,14 +203,19 @@ def faculty_Setup_GetAWSKeys(requests):
         try:
             credentialsObj = facultyObj.awscredential
             credentialsObj.account_number = account_number
-            credentialsObj.access_key = access_key
-            credentialsObj.secret_access_key = secret_access_key
+            credentialsObj.access_key = encode(access_key)
+            credentialsObj.secret_access_key = encode(secret_access_key)
+            # credentialsObj.access_key = access_key
+            # credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
 
         except:
+            access_key = encode(access_key)
+            secret_access_key = encode(secret_access_key)
+
             credentialsObj = AWS_Credentials.objects.create(
                 account_number=account_number,
                 access_key=access_key,
@@ -341,8 +346,8 @@ def faculty_Setup_ShareAMI(requests):
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
-        access_key = aws_credentials.access_key
-        secret_access_key = aws_credentials.secret_access_key
+        access_key = decode(aws_credentials.access_key)
+        secret_access_key = decode(aws_credentials.secret_access_key)
 
         # Add the account number to the image permission on AWS
         client = aws_util.getClient(access_key,secret_access_key)
@@ -683,5 +688,3 @@ def serverRecoveryCall(request):
     else:
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)
-        
-
