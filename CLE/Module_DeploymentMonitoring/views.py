@@ -501,9 +501,9 @@ def student_Deploy_AddIP(requests):
         return render(requests,'Module_Account/login.html',response)
 
     ipAddress = requests.POST.get("ipaddress") #string of IP address
-    print(ipAddress)
     utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
+
 
 
 def ITOpsLabStudentDeploy(requests):

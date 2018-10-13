@@ -58,7 +58,7 @@ def addAWSCredentials(accountNum, requests):
         awsC.save()
     class_studentObj.awscredential = awsC
     class_studentObj.save()
-
+    print(teamAddition)
     #Add to rest of team
     if teamAddition != None and teamAddition != "":
         classTeam = getTeamClassObject(requests) #returns a list of class student objects based on current user (exclude current user)
