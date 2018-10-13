@@ -26,15 +26,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for team_name,team_details in webapp_status.items %}
+            {% for details in webapp_status %}
             <tr>
-                <td>{{ team_name }}</td>
-                <td><a href="http://{{ team_details.IP_Address }}:8000">{{ team_details.IP_Address }}</a></td>
+                <td>{{ details.team_name }}</td>
+                <td><a href="http://{{ details.ip_address }}:8000">{{ details.ip_address }}</a></td>
                 <td>
-                {% if team_details.State  == 'Live' %}
-                    <span class="badge badge-pill badge-success">{{ team_details.State  }}</span>
+                {% if details.webapp_state == 'Live' %}
+                    <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>
                 {% else %}
-                    <span class="badge badge-pill badge-danger">{{ team_details.State  }}</span>
+                    <span class="badge badge-pill badge-danger">{{ details.webapp_state   }}</span>
                 {% endif %}
                 </td>
             </tr>

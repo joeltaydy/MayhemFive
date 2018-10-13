@@ -81,7 +81,7 @@ def faculty_Setup_Base(requests,response=None):
                     else:
                         imageObj = querySet[0]
                         shared_acct_nums = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum.split('_')
-                        registered_acct_nums = utilities.getRegisteredAccountNumbers(image['Launch_Permissions'])
+                        registered_acct_nums = utilities.getRegisteredUsers(image['Launch_Permissions'])
 
                         # Add Image to AWS_Credentials
                         for acct in registered_acct_nums:
@@ -399,8 +399,8 @@ def faculty_Monitor_Base(requests):
         return render(requests, 'Module_Account/login.html', response)
 
     section_num = requests.GET.get('section_number')
-    response['server_status'] = {}
-    response['webapp_status'] = {}
+    response['server_status'] = []
+    response['webapp_status'] = []
 
     course_sectionList = requests.session['courseList_updated']
     response['first_section'] = course_sectionList['EMS201'][0]['section_number']
@@ -418,7 +418,7 @@ def faculty_Monitor_Base(requests):
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-
+    print(response)
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 

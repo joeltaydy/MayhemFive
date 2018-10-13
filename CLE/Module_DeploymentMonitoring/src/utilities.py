@@ -40,7 +40,7 @@ def addImageDetails(image):
     image_name = image['Image_Name']
     permissions = image['Launch_Permissions']
 
-    account_numbers = getRegisteredAccountNumbers(permissions)
+    account_numbers = getRegisteredUsers(permissions)
 
     image_detailsObj = Image_Details.objects.create(
         imageId=image_id,
@@ -74,7 +74,7 @@ def removeImageFromAUser(image,account_number):
 
 
 # Supplements addImageDetails function. Returns a list of all registered account numbers from AWS
-def getRegisteredAccountNumbers(permissions):
+def getRegisteredUsers(permissions):
     account_numbers = []
 
     for permission in permissions:
@@ -255,35 +255,68 @@ def runEvent(server_ip,server_id,event_type):
 # Returns the response object along with the statuses of the server and webapplication
 #
 def getMonitoringStatus(account_number, team_number, response):
-    # Assumption that there's only one server for one account
-    server = Server_Details.objects.filter(account_number=account_number)[0]
-    server_ip = server.IP_address
-    server_state = server.state
+    servers = Server_Details.objects.filter(account_number=account_number)
+    for server in servers:
+        server_ip = server.IP_address
+        server_state = server.state
 
-    # Step 1: Check if server is alive
-    server_state = getServerStatus(server)
-    response['server_status'][team_number] = server_state
+        # Step 1: Check if server is alive
+        server_state = getServerStatus(server)
+        response['server_status'].append(
+            {
+                'team_name':team_number,
+                'server_state':server_state
+            }
+        )
 
-    # Step 2: Update server.state on server status
-    server.state = server_state
-    server.save()
+        # Step 2: Update server.state on server status
+        server.state = server_state
+        server.save()
 
-    if server_state == 'Live':
-        # Step 3: IF server 'Live', then check if webapp is 'Live'
-        try:
-            webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
-            webapp_response = req.get(webapp_url)
-            webapp_jsonObj = json.loads(webapp_response.content.decode())
+        if server_state == 'Live':
+            # Step 3: IF server 'Live', then check if webapp is 'Live'
+            try:
+                webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
+                webapp_response = req.get(webapp_url)
+                
+                if webapp_response.status_code == 404:
+                    response['webapp_status'].append(
+                        {
+                            'team_name':team_number,
+                            'ip_address':server_ip,
+                            'webapp_state':'Down'
+                        }
+                    )
+                else:
+                    webapp_jsonObj = json.loads(webapp_response.content.decode())
 
-            if webapp_jsonObj['HTTPStatusCode'] == 200:
-                response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
+                    if webapp_jsonObj['HTTPStatusCode'] == 200:
+                        response['webapp_status'].append(
+                            {
+                                'team_name':team_number,
+                                'ip_address':server_ip,
+                                'webapp_state':'Live'
+                            }
+                        )
 
-        except req.ConnectionError as e:
-            response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+            except req.ConnectionError as e:
+                response['webapp_status'].append(
+                    {
+                        'team_name':team_number,
+                        'ip_address':server_ip,
+                        'webapp_state':'Down'
+                    }
+                )
 
-    else:
-        # Step 4: ELSE webapp is definitely 'Down'
-        response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+        else:
+            # Step 4: ELSE webapp is definitely 'Down'
+            response['webapp_status'].append(
+                {
+                    'team_name':team_number,
+                    'ip_address':server_ip,
+                    'webapp_state':'Down'
+                }
+            )
 
     return response
 
@@ -296,9 +329,10 @@ def getServerStatus(server):
 
     # Rule of thumb, if webapp is alive, then server will most definitely be alive
     # BUT if server is alive, there's no guarantee that webapp is alive
+    access_key = decode(stu_credentials.access_key)
+    secret_access_key = decode(stu_credentials.secret_access_key)
 
-    # resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
-    resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
+    resource = aws_util.getResource(access_key,secret_access_key,service='ec2')
     instance = resource.Instance(server.instanceid)
     instance_state = instance.state
 

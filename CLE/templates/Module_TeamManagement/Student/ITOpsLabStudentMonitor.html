@@ -5,7 +5,7 @@
 <div class="col-md-12">
     <h1 align="center">IT Operations Lab</h1>
     <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-   
+
 
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
@@ -13,7 +13,7 @@
             <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
         </div>
     </div>
-  
+
     <hr>
     <h2 align="center"><i>Monitor</i></h2>
 </div>
@@ -34,15 +34,15 @@
                     </div>
                     <div class="card-body">
                       <span align="center">
-                         {% for team_name,server_state in server_status.items %}
+                         {% for details in server_status %}
                             <!--{{ team_name }}-->
                               <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
-                            {% if server_state == 'Live' %}
-                                <span class="badge badge-pill badge-success">{{ server_state }}</span>
-                            {% elif server_state == 'Pending' %}
-                                <span class="badge badge-pill badge-warning">{{ server_state }}</span>
+                            {% if details.server_state == 'Live' %}
+                                <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
+                            {% elif details.server_state == 'Pending' %}
+                                <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
                             {% else %}
-                                <span class="badge badge-pill badge-danger">{{ server_state }}</span>
+                                <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
                             {% endif %}
                         {% endfor %}
 
@@ -64,18 +64,18 @@
                     <div class="card-body">
                       <span align="center">
                         <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
-                        
-                        {% for team_name,team_details in webapp_status.items %}
-                         {% comment %} {{ team_name }} {% endcomment %}
-                            {% if team_details.State  == 'Live' %}
-                                <span class="badge badge-pill badge-success">{{ team_details.State  }}</span>
+
+                        {% for details in webapp_status %}
+                         {% comment %} {{ details.team_name }} {% endcomment %}
+                            {% if details.webapp_state  == 'Live' %}
+                                <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>
                             {% else %}
-                                <span class="badge badge-pill badge-danger">{{ team_details.State  }}</span>
+                                <span class="badge badge-pill badge-danger">{{ details.webapp_state  }}</span>
                             {% endif %}
-                            <a href="http://{{ team_details.IP_Address }}:8000">{{ team_details.IP_Address }}</a>
+                            <a href="http://{{ details.ip_address }}:8000">{{ details.ip_address  }}</a>
                             <br>
                         {% endfor %}
-                        
+
                       </span>
                     </div>
                     <div class="card-footer ">
