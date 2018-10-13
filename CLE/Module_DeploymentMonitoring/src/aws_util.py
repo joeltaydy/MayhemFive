@@ -125,7 +125,7 @@ def addUserToImage(image_id,account_number_list,access_key=None,secret_access_ke
     )
 
 
-# Remove user to Image launch permission
+# Remove user from Image launch permission
 def removeUserFromImage(image_id,account_number_list,access_key=None,secret_access_key=None,client=None):
     if client == None:
         client = getClient(access_key,secret_access_key)

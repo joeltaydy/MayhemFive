@@ -50,13 +50,13 @@ def addImageDetails(image):
     image_detailsObj.save()
 
     for account_number in account_numbers:
-        addImageToAccount(image_detailsObj,account_number)
+        addImageToUser(image_detailsObj,account_number)
 
     return image_detailsObj
 
 
 # Add Image to AWS_Credentials
-def addImageToAccount(image,account_number):
+def addImageToUser(image,account_number):
     credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
     temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
     if len(temp_querySet) == 0:
@@ -65,7 +65,7 @@ def addImageToAccount(image,account_number):
 
 
 # Remove Image from AWS_Credentials
-def removeImageFromAccount(image,account_number):
+def removeImageFromAUser(image,account_number):
     credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
     temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
     if len(temp_querySet) != 0:
