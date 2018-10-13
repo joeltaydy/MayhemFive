@@ -2,7 +2,7 @@
 <head>
     <link rel="stylesheet" href="{% static 'css/itopssetup.css' %}">
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-	   <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
+    <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
     <script>
             $(document).ready(function(){
                  $('select#courseSection').change(function () {
@@ -30,12 +30,34 @@
                                  ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
                                         console.log(image_result);
 
+                                        var account_numbers_table = document.getElementById("account_numbers");
+                                        for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
+                                            var option = document.createElement("OPTION");
+                                            option.value = image_result.nonshared_accounts_list[i].account_number;
+
+                                            var text = document.createTextNode(image_result.nonshared_accounts_list[i].team_name);
+                                            option.appendChild(text);
+
+                                            account_numbers_table.appendChild(option);
+                                        };
+
+                                        for (var i = image_result.shared_accounts_list.length - 1; i >= 0; i--) {
+                                            var option = document.createElement("OPTION");
+                                            option.value = image_result.shared_accounts_list[i].account_number;
+
+                                            var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
+                                            option.appendChild(text);
+
+                                            account_numbers_table.appendChild(option);
+                                        };
+
+                                        console.log(account_numbers_table)
                                      });
                              });
                          });
                  });
             });
-        </script>
+    </script>
 </head>
    <!-- MultiStep Form -->
    <div class="row">

@@ -221,7 +221,7 @@ def faculty_Setup_GetAMI(requests):
         return render(requests, 'Module_Account/login.html', response)
 
     response['section_number'] = requests.GET.get('section_number').strip()
-    print("Ajax test section_numberList: " + response['section_number'])
+    print("Ajax test section_number (faculty_Setup_GetAMI): " + response['section_number'])
 
     try:
         response['images'] = []
@@ -260,10 +260,10 @@ def faculty_Setup_GetAMIAccounts(requests):
         return render(requests, 'Module_Account/login.html', response)
 
     section_number = requests.GET.get('section_number').strip()
-    print("Ajax test section_number: " + section_number)
+    print("Ajax test section_number (faculty_Setup_GetAMIAccounts): " + section_number)
 
     image_id = requests.GET.get('image_id').strip()
-    print("Ajax test image_id: " + image_id)
+    print("Ajax test image_id (faculty_Setup_GetAMIAccounts): " + image_id)
 
     try:
         response['shared_accounts_list'] = []
