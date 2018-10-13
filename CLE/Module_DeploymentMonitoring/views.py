@@ -418,7 +418,7 @@ def faculty_Monitor_Base(requests):
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-    print(response)
+
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 
@@ -535,7 +535,7 @@ def student_Deploy_Upload(requests):
     if ipAddress != "":
         try :
             student_Deploy_AddIP(requests)
-            return ITOpsLabStudentMonitor(requests)
+            return student_Monitor_Base(requests)
         except:
             traceback.print_exc()
     return student_Deploy_Base(requests)
@@ -588,7 +588,7 @@ def ITOpsLabStudentDeploy(requests):
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
-def ITOpsLabStudentMonitor(requests):
+def student_Monitor_Base(requests):
 
     try:
         processLogin.studentVerification(requests)
@@ -598,8 +598,8 @@ def ITOpsLabStudentMonitor(requests):
 
     response = {"ITOpsLabStudentDeploy" : "active"}
     try:
-        response['server_status'] = {}
-        response['webapp_status'] = {}
+        response['server_status'] = []
+        response['webapp_status'] = []
         response['webapp_metric'] = {}
         studentClassObj = utilities.getStudentClassObject(requests)
         AWS_Credentials = studentClassObj.awscredential
@@ -609,9 +609,12 @@ def ITOpsLabStudentMonitor(requests):
         response = utilities.getMetric(account_number,response)
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
-    except:
-        pass
-    print(response)
+        
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during retrieval of information (Student Monitoring): ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
+
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
 

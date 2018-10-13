@@ -63,9 +63,9 @@
                     </div>
                     <div class="card-body">
                       <span align="center">
-                        <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
-
+                          
                         {% for details in webapp_status %}
+                        <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
                          {% comment %} {{ details.team_name }} {% endcomment %}
                             {% if details.webapp_state  == 'Live' %}
                                 <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>

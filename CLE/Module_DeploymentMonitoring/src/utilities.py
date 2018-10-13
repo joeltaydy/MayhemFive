@@ -259,13 +259,15 @@ def getMonitoringStatus(account_number, team_number, response):
     for server in servers:
         server_ip = server.IP_address
         server_state = server.state
+        server_name = server.instanceName
 
         # Step 1: Check if server is alive
         server_state = getServerStatus(server)
         response['server_status'].append(
             {
                 'team_name':team_number,
-                'server_state':server_state
+                'server_state':server_state,
+                'server_name':server_name if server_name != None else ''
             }
         )
 
@@ -278,7 +280,7 @@ def getMonitoringStatus(account_number, team_number, response):
             try:
                 webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
                 webapp_response = req.get(webapp_url)
-                
+
                 if webapp_response.status_code == 404:
                     response['webapp_status'].append(
                         {

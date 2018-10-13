@@ -14,7 +14,7 @@ urlpatterns = [
     path('student/ITOperationsLab/deploy/2',views.student_Deploy_Upload,name='itopslab_studeployUpload'),
     #path('student/ITOperationsLab/deploy/account/',views.student_Deploy_GetAccount,name='itopslab_studeploy_Account'),
     #path('student/ITOperationsLab/deploy/ip/',views.student_Deploy_GetIP,name='itopslab_studeploy_IP'),
-    path('student/ITOperationsLab/monitor/',views.ITOpsLabStudentMonitor,name='itopslab_stumonitor'),
+    path('student/ITOperationsLab/monitor/',views.student_Monitor_Base,name='itopslab_stumonitor'),
     # test
     path('instructor/ITOperationsLab/servers/',views.server_list,name='server_list'),
     path('instructor/ITOperationsLab/servers/create/', views.server_create, name='server_create'),
