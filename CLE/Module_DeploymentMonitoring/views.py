@@ -567,9 +567,9 @@ def student_Deploy_AddIP(requests):
         return render(requests,'Module_Account/login.html',response)
 
     ipAddress = requests.POST.get("ipaddress") #string of IP address
-    print(ipAddress)
     utilities.addAWSKeys(ipAddress,requests)
     utilities.addServerDetails(ipAddress,requests)
+
 
 
 def ITOpsLabStudentDeploy(requests):
@@ -672,3 +672,16 @@ def server_delete(request, pk):
         )
     return JsonResponse(data)
 #end of test forms
+
+
+def serverRecoveryCall(request):
+    secret_key = request.GET.get('secret_key')
+    if utilities.validate(secret_key) == True:
+        response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+        ipAddress= request.GET.get('ip')
+        utilities.writeRecoveryTime(ipAddress)
+    else:
+        response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
+    return JsonResponse(response)
+        
+
