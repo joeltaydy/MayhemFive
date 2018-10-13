@@ -34,13 +34,43 @@ def getAllTeamDetails(course_sectionList):
 
 
 # Add image detials into database. REturns an image_details object
-def addImageDetials(image_id,image_name):
+def addImageDetails(image):
+    image_id = image['Image_ID']
+    image_name = image['Image_Name']
+    permissions = image['Launch_Permissions']
+
+    account_numbers = getRegisteredAccountNumbers(permissions)
+
     image_detailsObj = Image_Details.objects.create(
         imageId=image_id,
         imageName=image_name,
+        sharedAccNum='_'.join(account_numbers),
     )
     image_detailsObj.save()
+
+    for account_number in account_numbers:
+        credentialsObj = AWS_Credentials.objects.get(account_number=user_id)
+        credentialsObj.imageDetails.add(image_detailsObj)
+        credentialsObj.save()
+
     return image_detailsObj
+
+
+def getRegisteredAccountNumbers(permissions):
+    account_numbers = []
+
+    for permission in permissions:
+        user_id = permission['UserId']
+
+        try:
+            AWS_Credentials.objects.get(account_number=user_id)
+            if user_id not in account_numbers:
+                account_numbers.append(user_id)
+
+        except:
+            pass
+
+    return account_numbers
 
 
 # Add AWS credentials for the relevant students

@@ -69,24 +69,35 @@ def faculty_Setup_Base(requests,response=None):
 
             # Compare AWS data with DB data; IF not in DB, add into DB
             image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
-            for image_id,image_name in image_list.items():
+            for image in image_list:
                 if len(aws_credentials.imageDetails.all()) == 0:
-                    image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                    image_detailsObj = utilities.addImageDetails(image)
                     aws_credentials.imageDetails.add(image_detailsObj)
                 else:
-                    querySet = aws_credentials.imageDetails.filter(imageId=image_id)
+                    querySet = aws_credentials.imageDetails.filter(imageId=image['Image_ID'])
                     if len(querySet) == 0:
-                        image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                        image_detailsObj = utilities.addImageDetails(image)
                         aws_credentials.imageDetails.add(image_detailsObj)
                     else:
-                        pass
+                        imageObj = querySet[0]
+                        registered_acct_nums = utilities.getRegisteredAccountNumbers(image['Launch_Permissions'])
+
+                        shared_acct_nums = '_'.join(registered_acct_nums)
+                        imageObj.sharedAccNum = None if len(shared_acct_nums) == 0 else shared_acct_nums
+                        imageObj.save()
 
             # Compare DB data with AWS data: IF not in AWS, delete from DB
             images = aws_credentials.imageDetails.all()
             for image_detailObj in images:
-                try:
-                    image_list[image_detailObj.imageId]
-                except:
+                db_image_id = image_detailObj.imageId
+                match = False
+                for image in image_list:
+                    aws_image_id = image['Image_ID']
+
+                    if db_image_id == aws_image_id:
+                        match = True
+
+                if not match:
                     image_detailObj.delete()
 
     except Exception as e:
@@ -340,9 +351,9 @@ def faculty_Setup_ShareAMI(requests):
                     else:
                         shared_account_numbers = shared_account_numbers.split('_')
                         if account_number not in shared_account_numbers:
-                            shared_account_numbers = '-'.join(shared_account_numbers) + '_' + account_number
+                            shared_account_numbers = '_'.join(shared_account_numbers) + '_' + account_number
                         else:
-                            shared_account_numbers = '-'.join(shared_account_numbers)
+                            shared_account_numbers = '_'.join(shared_account_numbers)
 
                     image_detailObj.sharedAccNum = shared_account_numbers
                     image_detailObj.save()
