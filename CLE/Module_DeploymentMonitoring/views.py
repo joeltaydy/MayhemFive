@@ -80,7 +80,17 @@ def faculty_Setup_Base(requests,response=None):
                         aws_credentials.imageDetails.add(image_detailsObj)
                     else:
                         imageObj = querySet[0]
+                        shared_acct_nums = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum.split('_')
                         registered_acct_nums = utilities.getRegisteredAccountNumbers(image['Launch_Permissions'])
+
+                        # Add Image to AWS_Credentials
+                        for acct in registered_acct_nums:
+                            utilities.addImageToAccount(imageObj,acct)
+
+                        # Remove Image from AWS_Credentials
+                        for acct in shared_acct_nums:
+                            if acct not in registered_acct_nums:
+                                utilities.removeImageFromAccount(imageObj,shared_acct_nums,registered_acct_nums)
 
                         shared_acct_nums = '_'.join(registered_acct_nums)
                         imageObj.sharedAccNum = None if len(shared_acct_nums) == 0 else shared_acct_nums

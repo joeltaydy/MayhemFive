@@ -33,7 +33,7 @@ def getAllTeamDetails(course_sectionList):
     return section_list
 
 
-# Add image detials into database. REturns an image_details object
+# Add image detials into database. Returns an image_details object (FOR FIRST TIME)
 def addImageDetails(image):
     image_id = image['Image_ID']
     image_name = image['Image_Name']
@@ -49,13 +49,30 @@ def addImageDetails(image):
     image_detailsObj.save()
 
     for account_number in account_numbers:
-        credentialsObj = AWS_Credentials.objects.get(account_number=user_id)
-        credentialsObj.imageDetails.add(image_detailsObj)
-        credentialsObj.save()
+        addImageToAccount(image_detailsObj,account_number)
 
     return image_detailsObj
 
 
+# Add Image to AWS_Credentials
+def addImageToAccount(image,account_number):
+    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image['Image_ID'])
+    if len(temp_querySet) == 0:
+        credentialsObj.imageDetails.add(imageObj)
+        credentialsObj.save()
+
+
+# Remove Image from AWS_Credentials
+def removeImageFromAccount(image,account_number):
+    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image['Image_ID'])
+    if len(temp_querySet) != 0:
+        credentialsObj.imageDetails.remove(imageObj)
+        credentialsObj.save()
+
+
+# Supplements addImageDetails function. Returns a list of all registered account numbers from AWS
 def getRegisteredAccountNumbers(permissions):
     account_numbers = []
 
