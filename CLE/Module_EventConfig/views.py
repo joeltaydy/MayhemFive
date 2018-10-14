@@ -57,6 +57,9 @@ def faculty_Event_Base(requests):
     event_type = requests.POST.get('event_type')
     datetime = requests.POST.get('datetime')
 
+    if section_numberList == None or event_type == None or datetime == None:
+        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+
     try:
         serverList = []
         team_details = utilities_DM.getAllTeamDetails(course_sectionList)
@@ -66,12 +69,16 @@ def faculty_Event_Base(requests):
                 for server in querySet_serverList:
                     serverList.append(server)
 
-        tasks.stopServer(serverList, schedule=timedelta())
-        return views_DM.faculty_Monitor_Base(requests)
+        # period = 0
+        # if event_type == 'stop':
+        #     tasks.stopServer(server_list=serverList, schedule=timedelta(seconds=period))
+        # elif event_type == 'ddos':
+        #     tasks.ddosAttack(server_list=serverList, schedule=timedelta(seconds=period))
 
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during event execution: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
-    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+    requests.section_number = response['first_section']
+    return views_DM.faculty_Monitor_Base(requests)

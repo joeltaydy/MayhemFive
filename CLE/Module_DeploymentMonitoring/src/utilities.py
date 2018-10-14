@@ -16,14 +16,14 @@ from CLE.settings import EVENT_SECRET_KEY
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
-    section_list = []
+    section_list = {}
 
     if len(course_sectionList) < 0 and 'EMS201' not in course_sectionList.keys():
         return {}
 
     for course_section in course_sectionList['EMS201']:
         section_number = course_section['section_number']
-        section_list[section_number] = {}
+        section_list[section_number] = []
 
         query = Class.objects.filter(course_section=course_section['id']).values('team_number','awscredential').annotate(dcount=Count('team_number'))
         for team_details in query:

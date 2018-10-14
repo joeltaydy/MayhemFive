@@ -398,7 +398,11 @@ def faculty_Monitor_Base(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_num = requests.GET.get('section_number')
+    if requests.method == "GET":
+        section_num = requests.GET.get('section_number')
+    else:
+        section_num = requests.POST.get('section_number')
+
     response['server_status'] = []
     response['webapp_status'] = []
 
@@ -412,7 +416,7 @@ def faculty_Monitor_Base(requests):
         section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
         for details in section_details:
-            response = utilities.getMonitoringStatus(details["account_number"],details["team_number,response"])
+            response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
 
     except Exception as e:
         traceback.print_exc()
