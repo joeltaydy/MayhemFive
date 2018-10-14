@@ -422,53 +422,6 @@ def faculty_Monitor_Base(requests):
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 
-# Main function for event configuration page on faculty.
-#
-def faculty_Event_Base(requests):
-    response = {"faculty_Event_Base" : "active"}
-
-    # Redirect user to login page if not authorized and student
-    try:
-        processLogin.InstructorVerification(requests)
-    except:
-        logout(requests)
-        return render(requests, 'Module_Account/login.html', response)
-
-    faculty_email = requests.user.email
-    facultyObj = Faculty.objects.get(email=faculty_email)
-    course_sectionList = requests.session['courseList_updated']
-
-    response['course_sectionList'] = course_sectionList['EMS201']
-    response['first_section'] = course_sectionList['EMS201'][0]['section_number']
-
-    # Second round retrieval
-    section_numberList = requests.POST.getlist('section_number')
-    event_type = requests.POST.get('event_type')
-    datetime = requests.POST.get('datetime')
-
-    try:
-        team_details = utilities.getAllTeamDetails(course_sectionList)
-        for section_number in section_numberList:
-            for team_name,account_number in team_details[section_number].items():
-                querySet_serverList = Server_Details.objects.filter(account_number=account_number)
-                for server in querySet_serverList:
-                    server_ip = server.IP_address
-                    server_id = server.instanceid
-
-                    event_response = utilities.runEvent(server_ip,server_id,event_type)
-                    print(event_response)
-                    # Not sure what to do with the event_response yet
-
-                    return faculty_Monitor_Base(requests)
-
-    except Exception as e:
-        traceback.print_exc()
-        response['error_message'] = 'Error during retrieval of information (Event Configuration): ' + str(e.args[0])
-        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
-
-    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
-
-
 # Main function for deploy page on student.
 # Will check if images has been shared by faculty
 #
@@ -609,77 +562,13 @@ def student_Monitor_Base(requests):
         response = utilities.getMetric(account_number,response)
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
-        
+
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Student Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
-
-
-
-
-
-
-#test forms
-def server_list(request):
-    servers = Server_Details.objects.all()
-    return render(request, 'Module_TeamManagement/Datatables/server_list.html', {'servers': servers})
-
-
-def save_server_form(request, form, template_name):
-    data = dict()
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            data['form_is_valid'] = True
-            servers = Server_Details.objects.all()
-            data['html_server_list'] = render_to_string('Module_TeamManagement/Datatables/partial_server_list.html', {
-                'servers': servers
-            })
-        else:
-            data['form_is_valid'] = False
-    context = {'form': form}
-    data['html_form'] = render_to_string(template_name, context, request=request)
-    return JsonResponse(data)
-
-
-def server_create(request):
-    if request.method == 'POST':
-        form = ServerForm(request.POST)
-    else:
-        form = ServerForm()
-    return save_server_form(request, form, 'Module_TeamManagement/Datatables/partial_server_create.html')
-
-
-def server_update(request, pk):
-    server = get_object_or_404(Server_Details, pk=pk)
-    if request.method == 'POST':
-        form = ServerForm(request.POST, instance=server)
-    else:
-        form = ServerForm(instance=server)
-    return save_server_form(request, form, 'Module_TeamManagement/Datatables/partial_server_update.html')
-
-
-def server_delete(request, pk):
-    server = get_object_or_404(Server_Details, pk=pk)
-    data = dict()
-    if request.method == 'POST':
-        server.delete()
-        data['form_is_valid'] = True  # This is just to play along with the existing code
-        servers = Server_Details.objects.all()
-        data['html_server_list'] = render_to_string('Module_TeamManagement/Datatables/partial_server_list.html', {
-            'servers': servers
-        })
-    else:
-        context = {'server': server}
-        data['html_form'] = render_to_string('Module_TeamManagement/Datatables/partial_server_delete.html',
-            context,
-            request=request,
-        )
-    return JsonResponse(data)
-#end of test forms
 
 
 def serverRecoveryCall(request):
