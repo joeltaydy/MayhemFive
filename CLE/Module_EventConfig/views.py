@@ -1,3 +1,4 @@
+import datetime
 import traceback
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -8,6 +9,19 @@ from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring import views as views_DM
 from Module_DeploymentMonitoring.src import utilities as utilities_DM
 
+def test(requests):
+    dp_id = requests.GET.get('id')
+
+    if dp_id == None:
+        return HttpResponse('Please sepcify an id')
+
+    try:
+        tasks.test_tasks(str(dp_id))
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponse(str(e.args[0]))
+
+    return HttpResponse('It works!')
 
 # Main function for event configuration page on faculty.
 #

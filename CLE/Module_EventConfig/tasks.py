@@ -1,8 +1,17 @@
 import json
 import requests as req
 from background_task import background
+from Module_DeploymentMonitoring.models import *
 
 @background(schedule=30)
+def test_tasks(id):
+    print(id)
+    dp = Deployment_Package.objects.create(
+        deploymentid=id,
+        gitlink='test',
+    )
+    dp.save()
+
 def runEvent(server_ip,server_id,event_type):
     payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
     successful_stoppage = []
