@@ -55,9 +55,9 @@ def faculty_Event_Base(requests):
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
     event_type = requests.POST.get('event_type')
-    datetime = requests.POST.get('datetime')
+    scheduled_datetime = datetime.now() if requests.POST.get('datetime') == None else requests.POST.get('datetime')
 
-    if section_numberList == None or event_type == None or datetime == None:
+    if section_numberList == None or event_type == None:
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     try:
@@ -67,13 +67,19 @@ def faculty_Event_Base(requests):
             for details in team_details[section_number]:
                 querySet_serverList = Server_Details.objects.filter(account_number=details["account_number"])
                 for server in querySet_serverList:
-                    serverList.append(server)
+                    serverList.append(
+                        {
+                            'server_ip':server.IP_address,
+                            'server_id':server.instanceid,
+                            'server_account':server.account_number.account_number
+                        }
+                    )
 
-        # period = 0
-        # if event_type == 'stop':
-        #     tasks.stopServer(server_list=serverList, schedule=timedelta(seconds=period))
-        # elif event_type == 'ddos':
-        #     tasks.ddosAttack(server_list=serverList, schedule=timedelta(seconds=period))
+        period = scheduled_datetime - datetime.now()
+        if event_type == 'stop':
+            tasks.stopServer(server_list=serverList, schedule=period)
+        elif event_type == 'ddos':
+            tasks.ddosAttack(server_list=serverList, schedule=period)
 
     except Exception as e:
         traceback.print_exc()

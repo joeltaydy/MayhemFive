@@ -18,8 +18,11 @@ def stopServer(server_list=None,server=None):
 
     # If stopping only a server
     if server !=  None:
-        server_ip = server.IP_address
+        server_ip = server['server_ip']
+        server_id = server['server_id']
+
         server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
+        payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
         server_response = req.get(server_url, params=payload)
         server_jsonObj = json.loads(server_response.content.decode())
 
@@ -31,16 +34,16 @@ def stopServer(server_list=None,server=None):
     # If stopping multiple servers
     if server_list != None:
         for server in server_list:
-            credentialsObj = AWS_Credentials.objects.get(account_number=server.account_number)
+            credentialsObj = AWS_Credentials.objects.get(account_number=server['server_account'])
             access_key = decode(credentialsObj.access_key)
             secret_access_key = decode(credentialsObj.secret_access_key)
 
-            results = aws_util.stopServer(server.instanceid,access_key,secret_access_key)
+            results = aws_util.stopServer(server['server_id'],access_key,secret_access_key)
 
             if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
-                print('Successfully stopped server: ' + server.IP_address)
+                print('Successfully stopped server: ' + server['server_ip'])
             else:
-                print('Unsuccessfully stopped server: ' + server_ip)
+                print('Unsuccessfully stopped server: ' + server['server_ip'])
 
     print('--- Ending background event: Stop Server ---')
 
