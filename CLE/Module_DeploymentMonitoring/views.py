@@ -301,19 +301,19 @@ def faculty_Setup_GetAMIAccounts(requests):
         course_sectionList = requests.session['courseList_updated']
         section_teamList = utilities.getAllTeamDetails(course_sectionList)
 
-        for team_name,account_number in section_teamList[section_number].items():
+        for details in section_teamList[section_number]:
             if account_number in shared_accounts:
                 response['shared_accounts_list'].append(
                     {
-                        'team_name':team_name,
-                        'account_number':account_number
+                        'team_name':details["team_name"],
+                        'account_number':details["account_number"]
                     }
                 )
             else:
                 response['nonshared_accounts_list'].append(
                     {
-                        'team_name':team_name,
-                        'account_number':account_number
+                        'team_name':details["team_name"],
+                        'account_number':details["account_number"]
                     }
                 )
 
@@ -411,8 +411,8 @@ def faculty_Monitor_Base(requests):
         course_sectionList = requests.session['courseList_updated']
         section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
-        for team_number,account_number in section_details.items():
-            response = utilities.getMonitoringStatus(account_number,team_number,response)
+        for details in section_details:
+            response = utilities.getMonitoringStatus(details["account_number"],details["team_number,response"])
 
     except Exception as e:
         traceback.print_exc()

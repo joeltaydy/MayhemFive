@@ -16,7 +16,7 @@ from CLE.settings import EVENT_SECRET_KEY
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
-    section_list = {}
+    section_list = []
 
     if len(course_sectionList) < 0 and 'EMS201' not in course_sectionList.keys():
         return {}
@@ -31,7 +31,12 @@ def getAllTeamDetails(course_sectionList):
             account_number = team_details['awscredential']
 
             if team_name != None and account_number != None:
-                section_list[section_number][team_name] = account_number
+                section_list[section_number].append(
+                    {
+                        'team_name':team_name,
+                        'account_number':account_number
+                    }
+                )
 
     return section_list
 

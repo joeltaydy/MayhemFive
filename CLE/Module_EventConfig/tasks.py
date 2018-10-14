@@ -1,51 +1,59 @@
 import json
+import boto3
 import requests as req
 from background_task import background
 from Module_DeploymentMonitoring.models import *
+from Module_DeploymentMonitoring.src import aws_util
+from Module_TeamManagement.src.utilities import encode,decode
 
-@background(schedule=30)
-def test_tasks(id):
-    print(id)
-    dp = Deployment_Package.objects.create(
-        deploymentid=id,
-        gitlink='test',
-    )
-    dp.save()
 
-def runEvent(server_ip,server_id,event_type):
-    payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
-    successful_stoppage = []
-    successful_count = 0
+@background(schedule=0)
+def test_tasks(message):
+    print(message)
 
-    unsuccessful_stoppage = []
-    unsuccessful_count = 0
 
-    results = {}
+@background(schedule=0)
+def stopServer(server_list=None,server=None):
+    print('--- Running background event: Stop Server ---')
 
-    if event_type == 'stop':
-        server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
-    elif event_type == 'ddos':
-        pass
+    # If stopping only a server
+    if server !=  None:
+        try:
+            server_ip = server.IP_address
+            server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
+            server_response = req.get(server_url, params=payload)
+            server_jsonObj = json.loads(server_response.content.decode())
 
-    server_response = req.get(server_url, params=payload)
-    server_jsonObj = json.loads(server_response.content.decode())
+            if server_jsonObj['HTTPStatusCode'] == 200:
+                print('Successfully stopped server: ' + server_ip)
+            else:
+                raise Exception('Unsuccessfully stopped server: ' + server_ip + '\n' + server_jsonObj)
 
-    if server_jsonObj['HTTPStatusCode'] == 200:
-        successful_stoppage.append(server_id)
-        successful_count += 1
-    else:
-        unsuccessful_stoppage.append(server_id)
-        unsuccessful_count += 1
+        except Exception as e:
+            raise e
 
-    results = {
-        'successful':{
-            'ids':successful_stoppage,
-            'count':successful_count
-        },
-        'unsuccessful':{
-            'ids':unsuccessful_stoppage,
-            'count':unsuccessful_count
-        }
-    }
+    # If stopping multiple servers
+    if server_list != None:
+        try:
+            for server in server_list:
+                credentialsObj = AWS_Credentials.objects.get(account_number=server.account_number)
+                access_key = decode(credentialsObj.access_key)
+                secret_access_key = decode(credentialsObj.secret_access_key)
 
-    return results
+                results = aws_util.stopServer(server.instanceid,access_key,secret_access_key)
+
+                if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
+                    print('Successfully stopped server: ' + server.IP_address)
+                else:
+                    print('Unsuccessfully stopped server: ' + server_ip)
+
+        except Exception as e:
+            raise e
+
+    print('--- Ending background event: Stop Server ---')
+
+
+@background(schedule=0)
+def ddosAttack(server_list=None,server=None):
+    print('--- Running background task: DDOS Attack ---')
+    print('--- Ending background event: DDOS Attack ---')
