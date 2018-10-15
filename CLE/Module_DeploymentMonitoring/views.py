@@ -64,29 +64,50 @@ def faculty_Setup_Base(requests,response=None):
 
         if aws_credentials != None:
             response['account_number']  = aws_credentials.account_number
-            response['access_key'] = aws_credentials.access_key
-            response['secret_access_key'] = aws_credentials.secret_access_key
+            response['access_key'] = decode(aws_credentials.access_key)
+            response['secret_access_key'] = decode(aws_credentials.secret_access_key)
 
             # Compare AWS data with DB data; IF not in DB, add into DB
             image_list = aws_util.getAllImages(response['account_number'],response['access_key'],response['secret_access_key'])
-            for image_id,image_name in image_list.items():
+            for image in image_list:
                 if len(aws_credentials.imageDetails.all()) == 0:
-                    image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                    image_detailsObj = utilities.addImageDetails(image)
                     aws_credentials.imageDetails.add(image_detailsObj)
                 else:
-                    querySet = aws_credentials.imageDetails.filter(imageId=image_id)
+                    querySet = aws_credentials.imageDetails.filter(imageId=image['Image_ID'])
                     if len(querySet) == 0:
-                        image_detailsObj = utilities.addImageDetials(image_id,image_name)
+                        image_detailsObj = utilities.addImageDetails(image)
                         aws_credentials.imageDetails.add(image_detailsObj)
                     else:
-                        pass
+                        imageObj = querySet[0]
+                        shared_acct_nums = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum.split('_')
+                        registered_acct_nums = utilities.getRegisteredUsers(image['Launch_Permissions'])
+
+                        # Add Image to AWS_Credentials
+                        for acct in registered_acct_nums:
+                            utilities.addImageToUser(imageObj,acct)
+
+                        # Remove Image from AWS_Credentials
+                        for acct in shared_acct_nums:
+                            if acct not in registered_acct_nums:
+                                utilities.removeImageFromAUser(imageObj,acct)
+
+                        shared_acct_nums = '_'.join(registered_acct_nums)
+                        imageObj.sharedAccNum = None if len(shared_acct_nums) == 0 else shared_acct_nums
+                        imageObj.save()
 
             # Compare DB data with AWS data: IF not in AWS, delete from DB
             images = aws_credentials.imageDetails.all()
             for image_detailObj in images:
-                try:
-                    image_list[image_detailObj.imageId]
-                except:
+                db_image_id = image_detailObj.imageId
+                match = False
+                for image in image_list:
+                    aws_image_id = image['Image_ID']
+
+                    if db_image_id == aws_image_id:
+                        match = True
+
+                if not match:
                     image_detailObj.delete()
 
     except Exception as e:
@@ -182,14 +203,19 @@ def faculty_Setup_GetAWSKeys(requests):
         try:
             credentialsObj = facultyObj.awscredential
             credentialsObj.account_number = account_number
-            credentialsObj.access_key = access_key
-            credentialsObj.secret_access_key = secret_access_key
+            credentialsObj.access_key = encode(access_key)
+            credentialsObj.secret_access_key = encode(secret_access_key)
+            # credentialsObj.access_key = access_key
+            # credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
 
         except:
+            access_key = encode(access_key)
+            secret_access_key = encode(secret_access_key)
+
             credentialsObj = AWS_Credentials.objects.create(
                 account_number=account_number,
                 access_key=access_key,
@@ -275,19 +301,19 @@ def faculty_Setup_GetAMIAccounts(requests):
         course_sectionList = requests.session['courseList_updated']
         section_teamList = utilities.getAllTeamDetails(course_sectionList)
 
-        for team_name,account_number in section_teamList[section_number].items():
+        for details in section_teamList[section_number]:
             if account_number in shared_accounts:
                 response['shared_accounts_list'].append(
                     {
-                        'team_name':team_name,
-                        'account_number':account_number
+                        'team_name':details["team_name"],
+                        'account_number':details["account_number"]
                     }
                 )
             else:
                 response['nonshared_accounts_list'].append(
                     {
-                        'team_name':team_name,
-                        'account_number':account_number
+                        'team_name':details["team_name"],
+                        'account_number':details["account_number"]
                     }
                 )
 
@@ -320,8 +346,8 @@ def faculty_Setup_ShareAMI(requests):
     try:
         # Get the access_key and secret_access_key from DB
         aws_credentials = facultyObj.awscredential
-        access_key = aws_credentials.access_key
-        secret_access_key = aws_credentials.secret_access_key
+        access_key = decode(aws_credentials.access_key)
+        secret_access_key = decode(aws_credentials.secret_access_key)
 
         # Add the account number to the image permission on AWS
         client = aws_util.getClient(access_key,secret_access_key)
@@ -340,9 +366,9 @@ def faculty_Setup_ShareAMI(requests):
                     else:
                         shared_account_numbers = shared_account_numbers.split('_')
                         if account_number not in shared_account_numbers:
-                            shared_account_numbers = '-'.join(shared_account_numbers) + '_' + account_number
+                            shared_account_numbers = '_'.join(shared_account_numbers) + '_' + account_number
                         else:
-                            shared_account_numbers = '-'.join(shared_account_numbers)
+                            shared_account_numbers = '_'.join(shared_account_numbers)
 
                     image_detailObj.sharedAccNum = shared_account_numbers
                     image_detailObj.save()
@@ -372,9 +398,13 @@ def faculty_Monitor_Base(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_num = requests.GET.get('section_number')
-    response['server_status'] = {}
-    response['webapp_status'] = {}
+    if requests.method == "GET":
+        section_num = requests.GET.get('section_number')
+    else:
+        section_num = requests.POST.get('section_number')
+
+    response['server_status'] = []
+    response['webapp_status'] = []
 
     course_sectionList = requests.session['courseList_updated']
     response['first_section'] = course_sectionList['EMS201'][0]['section_number']
@@ -385,8 +415,8 @@ def faculty_Monitor_Base(requests):
         course_sectionList = requests.session['courseList_updated']
         section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
-        for team_number,account_number in section_details.items():
-            response = utilities.getMonitoringStatus(account_number,team_number,response)
+        for details in section_details:
+            response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
 
     except Exception as e:
         traceback.print_exc()
@@ -394,53 +424,6 @@ def faculty_Monitor_Base(requests):
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-
-
-# Main function for event configuration page on faculty.
-#
-def faculty_Event_Base(requests):
-    response = {"faculty_Event_Base" : "active"}
-
-    # Redirect user to login page if not authorized and student
-    try:
-        processLogin.InstructorVerification(requests)
-    except:
-        logout(requests)
-        return render(requests, 'Module_Account/login.html', response)
-
-    faculty_email = requests.user.email
-    facultyObj = Faculty.objects.get(email=faculty_email)
-    course_sectionList = requests.session['courseList_updated']
-
-    response['course_sectionList'] = course_sectionList['EMS201']
-    response['first_section'] = course_sectionList['EMS201'][0]['section_number']
-
-    # Second round retrieval
-    section_numberList = requests.POST.getlist('section_number')
-    event_type = requests.POST.get('event_type')
-    datetime = requests.POST.get('datetime')
-
-    try:
-        team_details = utilities.getAllTeamDetails(course_sectionList)
-        for section_number in section_numberList:
-            for team_name,account_number in team_details[section_number].items():
-                querySet_serverList = Server_Details.objects.filter(account_number=account_number)
-                for server in querySet_serverList:
-                    server_ip = server.IP_address
-                    server_id = server.instanceid
-
-                    event_response = utilities.runEvent(server_ip,server_id,event_type)
-                    print(event_response)
-                    # Not sure what to do with the event_response yet
-
-                    return faculty_Monitor_Base(requests)
-
-    except Exception as e:
-        traceback.print_exc()
-        response['error_message'] = 'Error during retrieval of information (Event Configuration): ' + str(e.args[0])
-        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
-
-    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
 
 # Main function for deploy page on student.
@@ -509,7 +492,7 @@ def student_Deploy_Upload(requests):
     if ipAddress != "":
         try :
             student_Deploy_AddIP(requests)
-            return ITOpsLabStudentMonitor(requests)
+            return student_Monitor_Base(requests)
         except:
             traceback.print_exc()
     return student_Deploy_Base(requests)
@@ -562,7 +545,7 @@ def ITOpsLabStudentDeploy(requests):
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
-def ITOpsLabStudentMonitor(requests):
+def student_Monitor_Base(requests):
 
     try:
         processLogin.studentVerification(requests)
@@ -572,8 +555,8 @@ def ITOpsLabStudentMonitor(requests):
 
     response = {"ITOpsLabStudentDeploy" : "active"}
     try:
-        response['server_status'] = {}
-        response['webapp_status'] = {}
+        response['server_status'] = []
+        response['webapp_status'] = []
         response['webapp_metric'] = {}
         studentClassObj = utilities.getStudentClassObject(requests)
         AWS_Credentials = studentClassObj.awscredential
@@ -583,74 +566,13 @@ def ITOpsLabStudentMonitor(requests):
         response = utilities.getMetric(account_number,response)
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
-    except:
-        pass
-    print(response)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during retrieval of information (Student Monitoring): ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
+
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
-
-
-
-
-
-
-#test forms
-def server_list(request):
-    servers = Server_Details.objects.all()
-    return render(request, 'Module_TeamManagement/Datatables/server_list.html', {'servers': servers})
-
-
-def save_server_form(request, form, template_name):
-    data = dict()
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            data['form_is_valid'] = True
-            servers = Server_Details.objects.all()
-            data['html_server_list'] = render_to_string('Module_TeamManagement/Datatables/partial_server_list.html', {
-                'servers': servers
-            })
-        else:
-            data['form_is_valid'] = False
-    context = {'form': form}
-    data['html_form'] = render_to_string(template_name, context, request=request)
-    return JsonResponse(data)
-
-
-def server_create(request):
-    if request.method == 'POST':
-        form = ServerForm(request.POST)
-    else:
-        form = ServerForm()
-    return save_server_form(request, form, 'Module_TeamManagement/Datatables/partial_server_create.html')
-
-
-def server_update(request, pk):
-    server = get_object_or_404(Server_Details, pk=pk)
-    if request.method == 'POST':
-        form = ServerForm(request.POST, instance=server)
-    else:
-        form = ServerForm(instance=server)
-    return save_server_form(request, form, 'Module_TeamManagement/Datatables/partial_server_update.html')
-
-
-def server_delete(request, pk):
-    server = get_object_or_404(Server_Details, pk=pk)
-    data = dict()
-    if request.method == 'POST':
-        server.delete()
-        data['form_is_valid'] = True  # This is just to play along with the existing code
-        servers = Server_Details.objects.all()
-        data['html_server_list'] = render_to_string('Module_TeamManagement/Datatables/partial_server_list.html', {
-            'servers': servers
-        })
-    else:
-        context = {'server': server}
-        data['html_form'] = render_to_string('Module_TeamManagement/Datatables/partial_server_delete.html',
-            context,
-            request=request,
-        )
-    return JsonResponse(data)
-#end of test forms
 
 
 def serverRecoveryCall(request):
@@ -662,5 +584,3 @@ def serverRecoveryCall(request):
     else:
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)
-        
-

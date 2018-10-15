@@ -2,6 +2,8 @@ import os
 import sys
 import getpass
 import ipgetter
+from celery.schedules import crontab
+
 
 # Get public ip of server
 PUBLIC_IP = ipgetter.myip()
@@ -9,26 +11,34 @@ PUBLIC_IP_GOOGLE = PUBLIC_IP + ".xip.io"
 PRODUCTION_DOMAIN = ['cloudtopus.xyz','www.cloudtopus.xyz']
 LOCALHOST_DOMAIN = ['localhost','127.0.0.1']
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR,"templates")
 STATIC_DIR = os.path.join(BASE_DIR,"static")
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '--2$vfi4$(vsdvf_@_(6x%$9^(-ea3h0gkr6p*8j)zf7!_y&je'
 AES_SECRET_KEY = 'A$4Hj8dhf3c@aj87'
 EVENT_SECRET_KEY = '4c81cc820321d84eb2963b3c5c85a11e77d3b9510790b326f42a66c35ee61b7b'
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
 
 ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
 PRODUCTION_SERVER_HOSTS = ['52.76.46.177','52.76.46.177.xip.io'] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
 
+
 ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
+
 
 # Application definition
 
@@ -42,6 +52,7 @@ INSTALLED_APPS = [
     'Module_TeamManagement',
     'Module_Account',
     'Module_DeploymentMonitoring',
+    'Module_EventConfig',
     'django.contrib.sites', # new
     'allauth', # new
     'allauth.account', # new
@@ -50,6 +61,7 @@ INSTALLED_APPS = [
     'django_celery_beat', # new
     'formtools',
     'widget_tweaks',
+    'background_task',
 ]
 
 MIDDLEWARE = [
@@ -82,10 +94,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CLE.wsgi.application'
 
-# Database
+
+# Database Initiation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-# DB configuration
+# Database configuration
 password = ''
 host = 'localhost'
 default_DB = 'App_Data'
@@ -122,6 +135,7 @@ DATABASES = {
 
 DATABASE_ROUTERS = ['CLE.router.TMRouter']
 
+
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -141,7 +155,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-#social authentications
+# Social Authentications
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -149,7 +163,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 SOCIALACCOUNT_ADAPTER = 'Module_Account.adapters.SocialAccountWhitelist'
-
 
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -167,9 +180,9 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SITE_ID = 2 # Check your Database to see site id
 
+
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
-
 
 
 # Internationalization
@@ -200,12 +213,11 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
-from celery.schedules import crontab
-# If you need to execute every n day
 
-# CELERY STUFF
+# Celery Configuration
 # Celery application definition
 # http://docs.celeryproject.org/en/v4.0.2/userguide/configuration.html
+
 CELERY_BROKER_URL  = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -224,3 +236,9 @@ CELERY_BEAT_SCHEDULE = {
     #'arg's :  #if have args
     }
 }
+
+
+# Django-Backgroun-Tasks configuration
+
+MAX_ATTEMPTS = 3
+BACKGROUND_TASK_RUN_ASYNC = True

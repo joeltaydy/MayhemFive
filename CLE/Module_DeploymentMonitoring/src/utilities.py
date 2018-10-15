@@ -1,4 +1,6 @@
+import csv
 import json
+import hashlib
 import traceback
 import requests as req
 from django.db.models import Count
@@ -9,8 +11,8 @@ from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-import hashlib
 from CLE.settings import EVENT_SECRET_KEY
+
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
@@ -21,7 +23,7 @@ def getAllTeamDetails(course_sectionList):
 
     for course_section in course_sectionList['EMS201']:
         section_number = course_section['section_number']
-        section_list[section_number] = {}
+        section_list[section_number] = []
 
         query = Class.objects.filter(course_section=course_section['id']).values('team_number','awscredential').annotate(dcount=Count('team_number'))
         for team_details in query:
@@ -29,19 +31,71 @@ def getAllTeamDetails(course_sectionList):
             account_number = team_details['awscredential']
 
             if team_name != None and account_number != None:
-                section_list[section_number][team_name] = account_number
+                section_list[section_number].append(
+                    {
+                        'team_name':team_name,
+                        'account_number':account_number
+                    }
+                )
 
     return section_list
 
 
-# Add image detials into database. REturns an image_details object
-def addImageDetials(image_id,image_name):
+# Add image detials into database. Returns an image_details object (FOR FIRST TIME)
+def addImageDetails(image):
+    image_id = image['Image_ID']
+    image_name = image['Image_Name']
+    permissions = image['Launch_Permissions']
+
+    account_numbers = getRegisteredUsers(permissions)
+
     image_detailsObj = Image_Details.objects.create(
         imageId=image_id,
         imageName=image_name,
+        sharedAccNum='_'.join(account_numbers),
     )
     image_detailsObj.save()
+
+    for account_number in account_numbers:
+        addImageToUser(image_detailsObj,account_number)
+
     return image_detailsObj
+
+
+# Add Image to AWS_Credentials
+def addImageToUser(image,account_number):
+    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
+    if len(temp_querySet) == 0:
+        credentialsObj.imageDetails.add(image)
+        credentialsObj.save()
+
+
+# Remove Image from AWS_Credentials
+def removeImageFromAUser(image,account_number):
+    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
+    if len(temp_querySet) != 0:
+        credentialsObj.imageDetails.remove(image)
+        credentialsObj.save()
+
+
+# Supplements addImageDetails function. Returns a list of all registered account numbers from AWS
+def getRegisteredUsers(permissions):
+    account_numbers = []
+
+    for permission in permissions:
+        user_id = permission['UserId']
+
+        try:
+            AWS_Credentials.objects.get(account_number=user_id)
+            if user_id not in account_numbers:
+                account_numbers.append(user_id)
+
+        except:
+            pass
+
+    return account_numbers
 
 
 # Add AWS credentials for the relevant students
@@ -102,9 +156,10 @@ def addAWSKeys(ipAddress,requests):
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
         jsonObj = json.loads(response.content.decode())
-        # awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-        awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
-        awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
+        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
+        # awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
+        # awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
         traceback.print_exc()
@@ -163,79 +218,78 @@ def addGitHubLinkForm(request, form, template_name):
     return JsonResponse(data)
 
 
-# TEMPORARY METHOD for mid-terms : Event Configuration
-def runEvent(server_ip,server_id,event_type):
-    payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
-    successful_stoppage = []
-    successful_count = 0
-
-    unsuccessful_stoppage = []
-    unsuccessful_count = 0
-
-    results = {}
-
-    if event_type == 'stop':
-        server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
-    elif event_type == 'ddos':
-        pass
-
-    server_response = req.get(server_url, params=payload)
-    server_jsonObj = json.loads(server_response.content.decode())
-
-    if server_jsonObj['HTTPStatusCode'] == 200:
-        successful_stoppage.append(server_id)
-        successful_count += 1
-    else:
-        unsuccessful_stoppage.append(server_id)
-        unsuccessful_count += 1
-
-    results = {
-        'successful':{
-            'ids':successful_stoppage,
-            'count':successful_count
-        },
-        'unsuccessful':{
-            'ids':unsuccessful_stoppage,
-            'count':unsuccessful_count
-        }
-    }
-
-    return results
-
-
 # Obtain http status code and web server status of a group project based on account number.
 # Returns the response object along with the statuses of the server and webapplication
 #
 def getMonitoringStatus(account_number, team_number, response):
-    # Assumption that there's only one server for one account
-    server = Server_Details.objects.filter(account_number=account_number)[0]
-    server_ip = server.IP_address
-    server_state = server.state
+    servers = Server_Details.objects.filter(account_number=account_number)
+    for server in servers:
+        server_ip = server.IP_address
+        server_state = server.state
+        server_name = server.instanceName
 
-    # Step 1: Check if server is alive
-    server_state = getServerStatus(server)
-    response['server_status'][team_number] = server_state
+        # Step 1: Check if server is alive
+        server_state = getServerStatus(server)
+        if server_state == 'Killed':
+            server.delete()
+            continue
 
-    # Step 2: Update server.state on server status
-    server.state = server_state
-    server.save()
+        response['server_status'].append(
+            {
+                'team_name':team_number,
+                'server_state':server_state,
+                'server_name':server_name if server_name != None else ''
+            }
+        )
 
-    if server_state == 'Live':
-        # Step 3: IF server 'Live', then check if webapp is 'Live'
-        try:
-            webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
-            webapp_response = req.get(webapp_url)
-            webapp_jsonObj = json.loads(webapp_response.content.decode())
+        # Step 2: Update server.state on server status
+        server.state = server_state
+        server.save()
 
-            if webapp_jsonObj['HTTPStatusCode'] == 200:
-                response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Live'}
+        if server_state == 'Live':
+            # Step 3: IF server 'Live', then check if webapp is 'Live'
+            try:
+                webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
+                webapp_response = req.get(webapp_url)
 
-        except req.ConnectionError as e:
-            response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+                if webapp_response.status_code == 404:
+                    response['webapp_status'].append(
+                        {
+                            'team_name':team_number,
+                            'ip_address':server_ip,
+                            'webapp_state':'Down'
+                        }
+                    )
+                else:
+                    webapp_jsonObj = json.loads(webapp_response.content.decode())
 
-    else:
-        # Step 4: ELSE webapp is definitely 'Down'
-        response['webapp_status'][team_number] = {'IP_Address':server_ip,'State':'Down'}
+                    if webapp_jsonObj['HTTPStatusCode'] == 200:
+                        response['webapp_status'].append(
+                            {
+                                'team_name':team_number,
+                                'ip_address':server_ip,
+                                'webapp_state':'Live'
+                            }
+                        )
+
+            except req.ConnectionError as e:
+                response['webapp_status'].append(
+                    {
+                        'team_name':team_number,
+                        'ip_address':server_ip,
+                        'webapp_state':'Down'
+                    }
+                )
+
+        else:
+            # Step 4: ELSE webapp is definitely 'Down'
+            response['webapp_status'].append(
+                {
+                    'team_name':team_number,
+                    'ip_address':server_ip,
+                    'webapp_state':'Down'
+                }
+            )
 
     return response
 
@@ -248,9 +302,10 @@ def getServerStatus(server):
 
     # Rule of thumb, if webapp is alive, then server will most definitely be alive
     # BUT if server is alive, there's no guarantee that webapp is alive
+    access_key = decode(stu_credentials.access_key)
+    secret_access_key = decode(stu_credentials.secret_access_key)
 
-    # resource = aws_util.getResource(decode(stu_credentials.access_key),stu_credentials.secret_access_key,service='ec2')
-    resource = aws_util.getResource(stu_credentials.access_key,stu_credentials.secret_access_key,service='ec2')
+    resource = aws_util.getResource(access_key,secret_access_key,service='ec2')
     instance = resource.Instance(server.instanceid)
     instance_state = instance.state
 
@@ -331,8 +386,23 @@ def validate(secret_key):
         return False
     return True
 
+'''
+prepares log for event creation
+'''
+def writeEvent1Log(serverDetails):
+    output_file = 'clt_files/eventrecoverytime.csv'
+    with open(output_file, 'w', newline='') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerows(['IPAddress','EventStart','EventRecover','EventRecoveryTime'])
+        for server in serverDetails:
+            writer.writerows([server])
+
+
+'''
+Method to record recovery time based on IP
+Called by student server
+'''
 def writeRecoveryTime(ipAddress):
-    import csv
     from datetime import datetime
     import pytz
     output_file = 'clt_files/eventrecoverytime.csv'
@@ -340,7 +410,7 @@ def writeRecoveryTime(ipAddress):
 
     with open(output_file, 'r') as f:
         reader= csv.reader(f)
-        
+
         for line in reader:
             if line[0] == ipAddress:
                 tz = pytz.timezone('Asia/Singapore')

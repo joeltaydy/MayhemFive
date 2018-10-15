@@ -12,7 +12,7 @@
    <!-- MultiStep Form -->
    <div class="row">
         <div class="col-md-9 col-md-offset-3" style="display: block;margin-left: auto;margin-right: auto;">
-            <form id="msform" action="{% url 'DMmod:itopslab_event' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <form id="msform" action="{% url 'ECmod:itopslab_event' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 {% csrf_token %}
                 <!-- progressbar -->
                 <ul id="progressbar">
@@ -49,6 +49,7 @@
 
 
                     <hr>
+                    WORK IN PROGRESS
                     <input type="button"  name="next" class="next action-button" value="Next" />
                 </fieldset>
                 <fieldset>
@@ -57,8 +58,8 @@
                     <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <select class="form-control" id="event_type" name="event_type">
                             <option value="" disabled selected>Event Type</option>
-                            <option id="stop_server" value="stop">Stop Server</option>
-                            <option id="send_ddos" value="ddos">Send DDOS Attack</option>
+                            <option value="stop">Stop Server</option>
+                            <option value="ddos">Send DDOS Attack</option>
                         </select>
                     </div>
                     <!-- <input type="text" name="twitter" placeholder="Twitter"/>

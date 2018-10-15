@@ -47,51 +47,36 @@ def validateAccountNumber(account_number,access_key,secret_access_key):
     return account_number == account['Account']
 
 
-# Return public key : String
-# def generateKeyPair(username,access_key,secret_access_key):
-#     try:
-#         client = getClient(access_key,secret_access_key)
-#         response = client.create_key_pair(KeyName=username)
-#     except:
-#         results = delAWSKeyPair(username)
-#         if results['status']:
-#             response = client.create_key_pair(KeyName=username)
-#         else:
-#             raise Exception(results['message'])
-#
-#     private_key = response['KeyMaterial']
-#     key_name = response['KeyName']
-#
-#     return {'key_name':key_name,'private_key':private_key}
-
-
-# Return True is successful delete. ELSE False
-def deleteAWSKeyPair(username,access_key,secret_access_key):
-    try:
-        client = getClient(access_key,secret_access_key)
-        response = client.delete_key_pair(KeyName=username)
-    except Exception as e:
-        return {'status':False,'message':e.args[0]}
-
-    return {'status':True,'message':None}
-
-
 # Get all images from user account via Boto3
 def getAllImages(account_number,access_key=None,secret_access_key=None,client=None):
-    images = {}
+    images = []
 
     if client == None:
         client = getClient(access_key,secret_access_key)
 
     try:
-        results = client.describe_images(
+        images_results = client.describe_images(
             Owners=[
                 account_number,
             ],
         )
 
-        for image in results['Images']:
-            images[image['ImageId']] = image['Name']
+        for image in images_results['Images']:
+            image_id = image['ImageId']
+
+            image_attribute_results = client.describe_image_attribute(
+                Attribute='launchPermission',
+                ImageId=image_id,
+            )
+
+            images.append(
+                {
+                    'Image_ID':image_id,
+                    'Image_Name':image['Name'],
+                    'Launch_Permissions':image_attribute_results['LaunchPermissions']
+                }
+            )
+
     except ClientError as e:
         raise Exception('Invalid Access_Key and Secret_Access_Key. Please key in a valid one')
 
@@ -111,7 +96,7 @@ def addUserToImage(image_id,account_number_list,access_key=None,secret_access_ke
     )
 
 
-# Remove user to Image launch permission
+# Remove user from Image launch permission
 def removeUserFromImage(image_id,account_number_list,access_key=None,secret_access_key=None,client=None):
     if client == None:
         client = getClient(access_key,secret_access_key)
@@ -122,3 +107,41 @@ def removeUserFromImage(image_id,account_number_list,access_key=None,secret_acce
         OperationType='remove',
         UserIds=account_number_list,
     )
+
+
+# Stop a server via AWS
+def stopServer(server_id,access_key=None,secret_access_key=None,client=None):
+    if client == None:
+        client = getClient(access_key,secret_access_key)
+
+    # Do a dryrun first to verify permissions
+    try:
+        client.stop_instances(InstanceIds=[server_id], DryRun=True)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'UnauthorizedOperation':
+            raise Exception('HTTPStatusCode: 401, HTTPStatus: Unauthorized, Message: Dry run failed, Error: ' + e.args[0])
+
+    # Dry run succeeded, call stop_instances without dryrun
+    try:
+        return client.stop_instances(InstanceIds=[server_id], DryRun=False)
+    except Exception as e:
+        raise e
+
+
+# Start a server via AWS
+def startServer(server_id,access_key=None,secret_access_key=None,client=None):
+    if client == None:
+        client = getClient(access_key,secret_access_key)
+
+    # Do a dryrun first to verify permissions
+    try:
+        client.terminate_instances(InstanceIds=[server_id], DryRun=True)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'UnauthorizedOperation':
+            raise Exception('HTTPStatusCode: 401, HTTPStatus: Unauthorized, Message: Dry run failed, Error: ' + e.args[0])
+
+    # Dry run succeeded, call stop_instances without dryrun
+    try:
+        return client.terminate_instances(InstanceIds=[server_id], DryRun=False)
+    except Exception as e:
+        raise e
