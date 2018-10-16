@@ -302,7 +302,7 @@ def faculty_Setup_GetAMIAccounts(requests):
         section_teamList = utilities.getAllTeamDetails(course_sectionList)
 
         for details in section_teamList[section_number]:
-            if account_number in shared_accounts:
+            if details["account_number"] in shared_accounts:
                 response['shared_accounts_list'].append(
                     {
                         'team_name':details["team_name"],
