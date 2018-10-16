@@ -51,7 +51,7 @@ def stopServer(server_list=None,server=None):
 
 
 @background(schedule=0)
-def ddosAttack(server_list=None,server=None):
+def dosAttack(server_list=None,server=None):
     print('--- Running background task: DDOS Attack ---')
 
     # If sending to one server
