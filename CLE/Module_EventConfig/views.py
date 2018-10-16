@@ -36,6 +36,11 @@ def test(requests):
 # Main function for event configuration page on faculty.
 #
 def faculty_Event_Base(requests):
+    events = {
+        'stop':tasks.stopServer,
+        'ddos':tasks.ddosAttack,
+    }
+
     response = {"faculty_Event_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
@@ -55,7 +60,7 @@ def faculty_Event_Base(requests):
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
     event_type = requests.POST.get('event_type')
-    scheduled_datetime = datetime.now() if requests.POST.get('datetime') == None else requests.POST.get('datetime')
+    scheduled_datetime = datetime.now() if requests.POST.get('datetime') == 'now' else requests.POST.get('datetime')
 
     if section_numberList == None or event_type == None:
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
@@ -76,10 +81,7 @@ def faculty_Event_Base(requests):
                     )
 
         period = scheduled_datetime - datetime.now()
-        if event_type == 'stop':
-            tasks.stopServer(server_list=serverList, schedule=period)
-        elif event_type == 'ddos':
-            tasks.ddosAttack(server_list=serverList, schedule=period)
+        events[event_type](server_list=serverList, schedule=period)
 
     except Exception as e:
         traceback.print_exc()
