@@ -573,14 +573,3 @@ def student_Monitor_Base(requests):
         return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
-
-
-def serverRecoveryCall(request):
-    secret_key = request.GET.get('secret_key')
-    if utilities.validate(secret_key) == True:
-        response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
-        ipAddress= request.GET.get('ip')
-        utilities.writeRecoveryTime(ipAddress)
-    else:
-        response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
-    return JsonResponse(response)

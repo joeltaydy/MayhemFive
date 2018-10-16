@@ -2,12 +2,14 @@ import traceback
 from django.shortcuts import render
 from django.http import HttpResponse
 from Module_EventConfig import tasks
+from Module_EventConfig.src import utilities
 from datetime import timedelta, datetime
 from Module_TeamManagement.models import *
 from Module_Account.src import processLogin
 from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring import views as views_DM
 from Module_DeploymentMonitoring.src import utilities as utilities_DM
+from django.http import JsonResponse
 
 # Test to see if django-background-tasks is wokring or not
 #
@@ -90,3 +92,28 @@ def faculty_Event_Base(requests):
 
     requests.section_number = response['first_section']
     return views_DM.faculty_Monitor_Base(requests)
+
+
+
+def serverRecoveryCall(request):
+    secret_key = request.GET.get('secret_key')
+    if utilities.validate(secret_key) == True:
+        response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+        ipAddress= request.GET.get('ip')
+        utilities.writeRecoveryTime(ipAddress)
+    else:
+        response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
+    return JsonResponse(response)
+
+# Method to call to log an event entry
+def serverCall(request):
+    secret_key = request.GET.get('secret_key')
+    if utilities.validate(secret_key) == True:
+        response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+        ipAddress= request.GET.get('ip')
+        event_type=request.GET.get('event')
+        factor = utilities.writeEventLog(event_type, ipAddress )
+        print(factor)
+    else:
+        response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
+    return JsonResponse(response)
