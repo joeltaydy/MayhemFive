@@ -20,5 +20,4 @@ urlpatterns = [
     path('instructor/ITOperationsLab/setup/ami/get/',views.faculty_Setup_GetAMI,name='itopslab_setup_AMI_get'),
     path('instructor/ITOperationsLab/setup/ami/accounts/get/',views.faculty_Setup_GetAMIAccounts,name='itopslab_setup_AMI_Accounts_get'),
     path('instructor/ITOperationsLab/setup/ami/accounts/share/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI_Accounts_share'),
-    path('event/recovery/', views.serverRecoveryCall),
 ]

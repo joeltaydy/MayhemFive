@@ -1,7 +1,7 @@
 # A router to control all database operations on models in the
 
 class TMRouter:
-    list_of_applications = ['Module_TeamManagement','Module_DeploymentMonitoring','Module_Account']
+    list_of_applications = ['Module_TeamManagement','Module_DeploymentMonitoring','Module_Account', 'Module_EventConfig']
 
     # Attempts to read Module_TeamManagement models, got to CLE_Data
     def db_for_read(self, model, **hints):
