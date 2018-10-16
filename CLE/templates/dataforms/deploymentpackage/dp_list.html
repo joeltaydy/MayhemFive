@@ -36,10 +36,12 @@
      </div>
    </div>
 
-   <script>
-   $(document).ready(function() {
-      $( "#dp-table" ).load( "../setup/deployment_package/ #dp-table" );
-   });
-   </script>
+<script>
+$(document).ready(function() {
+  console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/ #dp-table")
+   $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/ #dp-table");
+});
+</script>
+
 
 {% endblock %}
