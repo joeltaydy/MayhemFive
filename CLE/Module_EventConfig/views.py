@@ -38,7 +38,7 @@ def test(requests):
 def faculty_Event_Base(requests):
     events = {
         'stop':tasks.stopServer,
-        'ddos':tasks.ddosAttack,
+        'dos':tasks.dosAttack,
     }
 
     response = {"faculty_Event_Base" : "active"}

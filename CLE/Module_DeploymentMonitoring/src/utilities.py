@@ -64,20 +64,26 @@ def addImageDetails(image):
 
 # Add Image to AWS_Credentials
 def addImageToUser(image,account_number):
-    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
-    if len(temp_querySet) == 0:
-        credentialsObj.imageDetails.add(image)
-        credentialsObj.save()
+    try:
+        credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+        temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
+        if len(temp_querySet) == 0:
+            credentialsObj.imageDetails.add(image)
+            credentialsObj.save()
+    except:
+        pass
 
 
 # Remove Image from AWS_Credentials
 def removeImageFromAUser(image,account_number):
-    credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
-    temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
-    if len(temp_querySet) != 0:
-        credentialsObj.imageDetails.remove(image)
-        credentialsObj.save()
+    try:
+        credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+        temp_querySet = credentialsObj.imageDetails.filter(imageId=image.imageId)
+        if len(temp_querySet) != 0:
+            credentialsObj.imageDetails.remove(image)
+            credentialsObj.save()
+    except:
+        pass
 
 
 # Supplements addImageDetails function. Returns a list of all registered account numbers from AWS
