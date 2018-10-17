@@ -5,7 +5,7 @@ from background_task import background
 from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring.src import aws_util
 from Module_TeamManagement.src.utilities import encode,decode
-
+from Module_EventConfig.src import utilities
 
 @background(schedule=0)
 def test_tasks(message):
@@ -28,6 +28,7 @@ def stopServer(server_list=None,server=None):
 
         if server_jsonObj['HTTPStatusCode'] == 200:
             print('Successfully stopped server: ' + server_ip)
+            utilities.writeEventLog("stop", server_ip )
         else:
             print('Unsuccessfully stopped server: ' + server_ip + '\n' + server_jsonObj)
 
@@ -42,6 +43,7 @@ def stopServer(server_list=None,server=None):
 
             if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
                 print('Successfully stopped server: ' + server['server_ip'])
+                utilities.writeEventLog("stop", server['server_ip'] )
             else:
                 print('Unsuccessfully stopped server: ' + server['server_ip'])
 

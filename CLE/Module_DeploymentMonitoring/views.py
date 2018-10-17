@@ -338,7 +338,7 @@ def faculty_Setup_ShareAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    account_numbers = requests.POST.getlist('account_numbers')
+    choosen_account_list = requests.POST.getlist('account_numbers')
     image_id = requests.POST.get('image_id')
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
@@ -349,34 +349,33 @@ def faculty_Setup_ShareAMI(requests):
         access_key = decode(aws_credentials.access_key)
         secret_access_key = decode(aws_credentials.secret_access_key)
 
-        # Add the account number to the image permission on AWS
         client = aws_util.getClient(access_key,secret_access_key)
 
-        if account_numbers != None:
-            if len(account_numbers) > 0:
-                aws_util.addUserToImage(image_id,account_numbers,client=client)
+        if choosen_account_list != None and len(choosen_account_list) > 0:
+            imageObj = Image_Details.objects.get(imageId=image_id)
+            current_account_list = imageObj.sharedAccNum
 
-                for account_number in account_numbers:
-                    # Add the account number to DB side
-                    image_detailObj = aws_credentials.imageDetails.filter(imageId=image_id)[0]
-                    shared_account_numbers = image_detailObj.sharedAccNum
+            # Step 1: ADD the account number to the image permission on AWS
+            add_list = list(set(choosen_account_list)-set(current_account_list))
+            if len(add_list) > 0:
+                aws_util.addUserToImage(image_id,add_list,client=client)
 
-                    if shared_account_numbers == None:
-                        shared_account_numbers = account_number
-                    else:
-                        shared_account_numbers = shared_account_numbers.split('_')
-                        if account_number not in shared_account_numbers:
-                            shared_account_numbers = '_'.join(shared_account_numbers) + '_' + account_number
-                        else:
-                            shared_account_numbers = '_'.join(shared_account_numbers)
+            # Step 2: REMOVE ADD the account number from the image permission on AWS
+            remove_list = list(set(current_account_list)-set(choosen_account_list))
+            if len(remove_list) > 0:
+                aws_util.removeUserFromImage(image_id,remove_list,client=client)
 
-                    image_detailObj.sharedAccNum = shared_account_numbers
-                    image_detailObj.save()
+            # Step 3: UPDATE image_details table with the new set of shared account numbers
+            imageObj.sharedAccNum = choosen_account_list
+            imageObj.save()
 
-                    # Add the image to the student AWS_Credentials using their account number
-                    stu_credentials = AWS_Credentials.objects.get(account_number=account_number)
-                    stu_credentials.imageDetails.add(image_detailObj)
-                    stu_credentials.save()
+            # Step 4: ADD the image to AWS_Credentials (Student)
+            for account_number in add_list:
+                utilities.addImageToUser(imageObj,account_number)
+
+            # Step 5 REMOVE the image from AWS_Credentials (Student)
+            for account_number in remove_list:
+                utilities.removeImageFromAUser(imageObj,account_number)
 
     except Exception as e:
         traceback.print_exc()
@@ -573,14 +572,3 @@ def student_Monitor_Base(requests):
         return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
-
-
-def serverRecoveryCall(request):
-    secret_key = request.GET.get('secret_key')
-    if utilities.validate(secret_key) == True:
-        response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
-        ipAddress= request.GET.get('ip')
-        utilities.writeRecoveryTime(ipAddress)
-    else:
-        response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
-    return JsonResponse(response)
