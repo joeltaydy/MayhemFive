@@ -260,7 +260,7 @@ def faculty_Overview(requests):
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
-
+    
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
 
     context.update(trailResults)
