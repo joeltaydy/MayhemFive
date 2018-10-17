@@ -1,4 +1,10 @@
 from django import forms
+from Module_TeamManagement.models import *
+
+class TrailheadForm(forms.ModelForm):
+    class Meta:
+        model = Trailmix_Information
+        fields = ('name', 'link', 'description', 'badges','course', )
 
 # class InstructorToolsForm(forms.Form):
 #     tools = forms.ChoiceField(choices=[('Trailhead','Tableau','Kahoot')])

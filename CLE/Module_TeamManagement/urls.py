@@ -1,7 +1,7 @@
 from Module_TeamManagement import views
 from django.contrib import admin
 from django.urls import path
-from Module_TeamManagement.forms import PhoneNumberForm, VerificationCodeForm
+from Module_TeamManagement.forms import PhoneNumberForm, VerificationCodeForm,TrailheadForm
 from Module_TeamManagement.views import TelegramWizard, PhoneNumberFormView
 
 urlpatterns = [
@@ -22,5 +22,10 @@ urlpatterns = [
     path('instructor/telegram_setup/', views.configureDB_telegram, name='telegram_setup'),
     path('join/', PhoneNumberFormView.as_view(), name='phone_number_form'),
     path('csv/clt_file.csv', views.clt_file_download),
-    path('admin/csv/clt_file.csv', views.clt_file_ouput, name = "clt_file")
+    path('admin/csv/clt_file.csv', views.clt_file_ouput, name = "clt_file"),
+    #trailmixes
+    path('instructor/trailmix/',views.trailhead_list,name='trailhead_list'),
+    path('instructor/trailmix/create/', views.trailhead_create, name='trailhead_create'),
+    path('instructor/trailmix/<str:pk>/update/', views.trailhead_update, name='trailhead_update'),
+    path('instructor/trailmix/<str:pk>/delete/', views.trailhead_delete, name='trailhead_delete'),
 ]
