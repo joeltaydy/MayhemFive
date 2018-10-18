@@ -288,9 +288,9 @@ def classInformationRetrieval(results, courseSection):
     classResult["class"]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
     for classObj in classes:
         try:
-            student = Cloud_Learning_Tools.objects.get(id=classObj.student.email.split("@")[0]+"_TrailHead") #If there is no query, it will be zero
             #populate student results
             classResult["class"]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
+            student = Cloud_Learning_Tools.objects.get(id=classObj.student.email.split("@")[0]+"_TrailHead") #If there is no query, it will be zero
             classResult["class"]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
             classResult["class"]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
         except:
@@ -316,7 +316,7 @@ def classInformationRetrieval(results, courseSection):
 # The webscrapper to scrap static info from website
 def webScrapper():
     from bs4 import BeautifulSoup
-    from Module_TeamManagement.models import Cloud_Learning_Tools
+    from Module_TeamManagement.models import Cloud_Learning_Tools, Class
     import datetime
     import pytz
 
@@ -369,7 +369,7 @@ def webScrapper():
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
-        writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+        writer.writerow(['link','student_email','class_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
 
         for email,content in info.items():
             to_write = [

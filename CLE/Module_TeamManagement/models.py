@@ -146,7 +146,12 @@ class Cloud_Learning_Tools(models.Model):
     website_link = models.TextField(
         db_column='Website_Link',
     )
-
+    course_section = models.ForeignKey(
+        Course_Section,
+        on_delete=models.CASCADE,
+        db_column='Course_Section',
+        null=True,
+    )
     class Meta:
         managed = True
         db_table = 'Cloud_Learning_Tools'

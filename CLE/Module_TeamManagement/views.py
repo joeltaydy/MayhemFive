@@ -735,7 +735,6 @@ def configureDB_clt(requests):
             course = requests.POST.get("course_title")
         else:
             course = requests.POST.get("course_section")
-
         bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
 
         if file.name.endswith('.xlsx'):
@@ -752,7 +751,7 @@ def configureDB_clt(requests):
             raise Exception("Invalid file type. Please upload .xlsx only")
 
         # If file is .xlsx then proceed with processing
-        response['results'] = bootstrap.update_CLT(bootstrapFile)
+        response['results'] = bootstrap.update_CLT(bootstrapFile,course)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process

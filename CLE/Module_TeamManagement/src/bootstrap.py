@@ -465,15 +465,15 @@ def update_Teams(fileDict):
     return results
 
 
-def update_CLT(fileDict):
+def update_CLT(fileDict, course):
     bootstrapInfo = {}
     results = {}
-
+    course_section =  Course_Section.objects.get(course_section_id=course)
     bootstrapInfo = parse_File_CLT(fileDict['file_path'],bootstrapInfo)
     faculty_email = fileDict['faculty_email']
     course = fileDict['course']
     action = fileDict['action']
-
+    
     try:
         if len(bootstrapInfo) == 0:
             raise Exception
@@ -485,7 +485,7 @@ def update_CLT(fileDict):
             for clt in clt_list:
                 try:
                     # Update link
-                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0])
+                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0],course_section=course_section)
                     cltObj.website_link = clt[2]
                     cltObj.save()
                 except:
@@ -494,6 +494,7 @@ def update_CLT(fileDict):
                         id=clt[0],
                         type=clt[1],
                         website_link=clt[2],
+                        course_section=course_section
                     )
                     cltObj.save()
 
@@ -513,7 +514,7 @@ def update_CLT(fileDict):
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        # traceback.print_exc()
+        traceback.print_exc()
         raise Exception('Unsuccessful Upload. There was an error during the inserting of data into the database')
 
     return results
