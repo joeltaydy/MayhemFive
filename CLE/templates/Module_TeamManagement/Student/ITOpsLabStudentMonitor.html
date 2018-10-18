@@ -27,6 +27,23 @@
               <br>
               <!--inner card one-->
               <div class="col-md-12 row">
+
+                <div class="col-md-12">
+                  <ul class="navDiv">
+                    <!-- to remove once for loop is settled by backend -->
+                    <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">Server 1</a>
+                    <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">Server 2</a>
+
+
+                    {% for course_section in course_sectionList %}
+                        {% if course_section.section_number != 'G0' %}
+                          <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
+                        {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+
+
                 <div class="col-md-6">
                   <div class="card">
                     <div class="card-header">
@@ -63,7 +80,7 @@
                     </div>
                     <div class="card-body">
                       <span align="center">
-                          
+
                         {% for details in webapp_status %}
                         <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
                          {% comment %} {{ details.team_name }} {% endcomment %}
@@ -89,8 +106,9 @@
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-header">
-                      <h5 align="center" class="card-title">Statistics</h5>
+                      <h4 align="center" class="card-title">Statistics</h4>
                     </div>
+
                     <div class="card-body">
                       <span align="center">
 
@@ -146,5 +164,25 @@
       </div>
     </div>
   </div>
+
+
+  <script>
+  // Add active class to the current button (highlight it)
+  $(function(){
+         pageUrl = location.href;
+         // console.log(pageUrl)
+         $('.navDiv a').each(function () {
+              link = $(this);
+              var href = link.attr("href");
+              console.log(link);
+              // console.log(link.attr("href") === pageUrl);
+              if (href === pageUrl.substring(pageUrl.length-href.length)) {
+                console.log("success");
+                console.log();
+                  link.addClass("active");
+              }
+         });
+     });
+  </script>
 
 {% endblock %}
