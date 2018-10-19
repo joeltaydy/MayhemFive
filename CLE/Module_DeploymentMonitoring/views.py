@@ -484,8 +484,10 @@ def student_Deploy_Upload(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    accountNum = requests.POST.get("accountNum") #string of account number
-    ipAddress = requests.POST.get("ipaddress") #string of IP address
+
+    accountNum = requests.POST.get("accountNum")            #string of account number
+    ipAddress = requests.POST.get("ipaddress")              #string of IP address
+
     if accountNum != "" :
         student_Deploy_AddAccount(requests)
     if ipAddress != "":
@@ -527,10 +529,11 @@ def student_Deploy_AddIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    ipAddress = requests.POST.get("ipaddress") #string of IP address
-    utilities.addAWSKeys(ipAddress,requests)
-    utilities.addServerDetails(ipAddress,requests)
+    sever_type = requests.POST.get("sever_type")            #string of server_type; parent/slave
+    ipAddress = requests.POST.get("ipaddress")              #string of IP address
 
+    utilities.addAWSKeys(ipAddress,requests)
+    utilities.addServerDetails(ipAddress,sever_type,requests)
 
 
 def ITOpsLabStudentDeploy(requests):

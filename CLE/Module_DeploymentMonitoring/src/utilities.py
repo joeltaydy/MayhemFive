@@ -168,7 +168,7 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,requests):
+def addServerDetails(ipAddress,sever_type,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     validity = validateAccountNumber(ipAddress, awsC)
@@ -184,7 +184,8 @@ def addServerDetails(ipAddress,requests):
             instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
             instanceName = None,
             state = "Live",
-            account_number=awsC
+            account_number=awsC,
+            type=sever_type
         )
         sd.save()
     except:
@@ -375,5 +376,3 @@ def getCloudMetric(webapp_url):
             timeList.append(time)
         label = webapp_jsonObj["metric_statistics"]["Datapoints"][0]["Unit"]
     return {'xValue': timeList, 'yValue': sortedValueList, 'Label':label}
-
-
