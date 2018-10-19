@@ -29,18 +29,12 @@
               <div class="col-md-12 row">
 
                 <div class="col-md-12">
-                  <ul class="navDiv">
+
                     <!-- to remove once for loop is settled by backend -->
-                    <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">Server 1</a>
-                    <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">Server 2</a>
-
-
-                    {% for course_section in course_sectionList %}
-                        {% if course_section.section_number != 'G0' %}
-                          <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
-                        {% endif %}
+                    {% for details in server_status %}
+                        <a href="/student/ITOperationsLab/monitor/?server_ip={{ details.server_ip }}" role="button" class="btn btn-primary">{{ details.server_type|add:" - "|add:details.server_ip }}</a>
                     {% endfor %}
-                  </ul>
+
                 </div>
 
 
@@ -52,14 +46,15 @@
                     <div class="card-body">
                       <span align="center">
                          {% for details in server_status %}
-                            <!--{{ team_name }}-->
-                              <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
-                            {% if details.server_state == 'Live' %}
-                                <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
-                            {% elif details.server_state == 'Pending' %}
-                                <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
-                            {% else %}
-                                <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
+                            {% if details.server_ip == sever_ip %}
+                                  <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
+                                {% if details.server_state == 'Live' %}
+                                    <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
+                                {% elif details.server_state == 'Pending' %}
+                                    <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
+                                {% else %}
+                                    <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
 
@@ -82,15 +77,17 @@
                       <span align="center">
 
                         {% for details in webapp_status %}
-                        <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
-                         {% comment %} {{ details.team_name }} {% endcomment %}
-                            {% if details.webapp_state  == 'Live' %}
-                                <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>
-                            {% else %}
-                                <span class="badge badge-pill badge-danger">{{ details.webapp_state  }}</span>
+                            {% if details.ip_address == sever_ip %}
+                            <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
+                             {% comment %} {{ details.team_name }} {% endcomment %}
+                                {% if details.webapp_state  == 'Live' %}
+                                    <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>
+                                {% else %}
+                                    <span class="badge badge-pill badge-danger">{{ details.webapp_state  }}</span>
+                                {% endif %}
+                                <a href="http://{{ details.ip_address }}:8000">{{ details.ip_address  }}</a>
+                                <br>
                             {% endif %}
-                            <a href="http://{{ details.ip_address }}:8000">{{ details.ip_address  }}</a>
-                            <br>
                         {% endfor %}
 
                       </span>
