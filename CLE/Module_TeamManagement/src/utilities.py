@@ -213,6 +213,7 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail):
                 try:
                     #populate student results
                     classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
+                    student = Cloud_Learning_Tools.objects.get(id=classObj.student.email.split("@")[0]+"_TrailHead") #If there is no query, it will be zero
                     classResult[course_section_id]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
                     classResult[course_section_id]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
                 except:
@@ -222,9 +223,13 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail):
                 # populate team results
                     if classObj.team_number not in classResult[course_section_id]["Teams_Information"]:
                         classResult[course_section_id]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
-                    classResult[course_section_id]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
-                    classResult[course_section_id]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
-                    classResult[course_section_id]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+                    try:
+                        student = Cloud_Learning_Tools.objects.get(id=classObj.student.email.split("@")[0]+"_TrailHead") #If there is no query, it will be zero
+                        classResult[course_section_id]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+                        classResult[course_section_id]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+                        classResult[course_section_id]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+                    except:
+                        pass
             except:
                 pass # for cases where they dont have trail head links
 
@@ -285,6 +290,7 @@ def classInformationRetrieval(results, courseSection):
         try:
             #populate student results
             classResult["class"]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
+            student = Cloud_Learning_Tools.objects.get(id=classObj.student.email.split("@")[0]+"_TrailHead") #If there is no query, it will be zero
             classResult["class"]["Students_Information"]["badges"].append(int(results[classObj.student.email]['badge_count']))
             classResult["class"]["Students_Information"]["points"].append(int(results[classObj.student.email]['points_count'].replace(",","")))
         except:
@@ -294,14 +300,14 @@ def classInformationRetrieval(results, courseSection):
 
         if classObj.team_number != None : #Omit classes with no teams
         # populate team results
-            try:
-                if classObj.team_number not in classResult["class"]["Teams_Information"]:
-                    classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
-                    classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
-                    classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
-                    classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
-            except:
+            if classObj.team_number not in classResult["class"]["Teams_Information"]:
                 classResult["class"]["Teams_Information"][classObj.team_number] = {"badges": 0, "points":0, "trails":0 }
+            try:
+                student = Cloud_Learning_Tools.objects.get(id=classObj.student.email.split("@")[0]+"_TrailHead") #If there is no query, it will be zero
+                classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
+                classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
+                classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
+            except: 
                 pass
 
     return classResult
@@ -310,7 +316,7 @@ def classInformationRetrieval(results, courseSection):
 # The webscrapper to scrap static info from website
 def webScrapper():
     from bs4 import BeautifulSoup
-    from Module_TeamManagement.models import Cloud_Learning_Tools
+    from Module_TeamManagement.models import Cloud_Learning_Tools, Class
     import datetime
     import pytz
 
@@ -363,7 +369,7 @@ def webScrapper():
         writer = csv.writer(file)
         tz = pytz.timezone('Asia/Singapore')
         writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
-        writer.writerow(['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+        writer.writerow(['link','student_email','class_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
 
         for email,content in info.items():
             to_write = [

@@ -54,10 +54,33 @@
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Choose Event Type</h2>
-                    <h3 class="fs-subtitle">Please select an event to configure</h3>
-                    <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
+                    <h3 class="fs-subtitle">Please select event(s) to configure</h3>
+                    Number of concurrent events: 
+                    <div class="col-md-6"  style="display: block;margin-left: auto;margin-right: auto; ">
+                        <select class="form-control" id="event_num" name="event_num" onchange="populateEventSelection()">
+                            <option value="1" selected>1</option>
+                            <option value="2" >2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="col-md-6"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <select class="form-control" id="event_type" name="event_type">
-                            <option value="" disabled selected>Event Type</option>
+                            <option value="" disabled selected>Event 1 Type</option>
+                            <option value="stop">Stop Server</option>
+                            <option value="ddos">Send DDOS Attack</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6"  style="display: block;margin-left: auto;margin-right: auto; ">
+                        <select class="form-control" id="event_type2" name="event_type2" style="visibility:hidden;">
+                            <option value="" disabled selected>Event 2 Type</option>
+                            <option value="stop">Stop Server</option>
+                            <option value="ddos">Send DDOS Attack</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6"  style="display: block;margin-left: auto;margin-right: auto; " >
+                        <select class="form-control" id="event_type3" name="event_type3" style="visibility:hidden;">
+                            <option value="" disabled selected>Event 3 Type</option>
                             <option value="stop">Stop Server</option>
                             <option value="ddos">Send DDOS Attack</option>
                         </select>
@@ -83,9 +106,11 @@
                 <fieldset>
                     <h2 class="fs-title">Summary</h2>
                     <h3 class="fs-subtitle">Please ensure the event details are accurate</h3>
-                    <h5 class="summary-class"> </h5>
-                    <h5 class="summary-eventtype"></h5>
-                    <h5 class="summary-datetime"></h5>
+                    <div class="summary-class"> </div>
+                    <div class="summary-eventtype"></div>
+                    <div class="summary-eventtype2"></div>
+                    <div class="summary-eventtype3"></div>
+                    <div class="summary-datetime"></div>
 
                     </h3>
 
@@ -122,10 +147,21 @@
         }
 
         var event_type = document.getElementById("event_type").value;
+        var event_type2 = document.getElementById("event_type2").value;
+        var event_type3 = document.getElementById("event_type3").value;
         var datetime = document.getElementById("setDate").value;
-        document.querySelector(".summary-class").textContent = "Class(es): " + classes;
-        document.querySelector(".summary-eventtype").textContent = "Event Type: " + event_type;
-        document.querySelector(".summary-datetime").textContent = "Date Time: " + datetime;
+        document.querySelector(".summary-class").innerHTML = "<b>Class(es): </b>" + "<h5>" + classes + "</h5>";
+        if (event_type!=""){
+            document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" + "<h5>" + event_type + "</h5>";
+        }
+        if (event_type2!=""){
+            document.querySelector(".summary-eventtype2").innerHTML = "<b>Event Type 2: </b>" + "<h5>" + event_type2 + "</h5>";
+        }
+        if (event_type3!=""){
+            document.querySelector(".summary-eventtype3").innerHTML = "<b>Event Type 3: </b>" + "<h5>" + event_type3 + "</h5>";
+        }
+        
+        document.querySelector(".summary-datetime").innerHTML = "<b>Date Time: </b>" + "<h5>" + datetime.replace('T',' ') + "</h5>";
     }
 
     // function storeCourse(c){
@@ -152,6 +188,18 @@
             }
         }
 
+    }
+
+    function populateEventSelection() {
+        if (document.getElementById("event_num").value=="2") {
+            document.getElementById("event_type2").style.visibility='visible';
+        } else if (document.getElementById("event_num").value=="3"){
+            document.getElementById("event_type2").style.visibility='visible';
+            document.getElementById("event_type3").style.visibility='visible';
+        } else {
+            document.getElementById("event_type2").style.visibility='hidden';
+            document.getElementById("event_type3").style.visibility='hidden';
+        }
     }
 
     </script>

@@ -73,7 +73,7 @@ class Course_Section(models.Model):
         db_column='Teaching_Assistant',
         null=True,
     )
-    
+
     learning_tools = models.TextField(
         db_column='Course_Section_Learning_Tools_List',
         null=True,
@@ -127,7 +127,7 @@ class Faculty(models.Model):
         on_delete=models.CASCADE,
         db_column='AWS_Credentials',
         null=True,
-    )    
+    )
 
     class Meta:
         managed = True
@@ -146,7 +146,12 @@ class Cloud_Learning_Tools(models.Model):
     website_link = models.TextField(
         db_column='Website_Link',
     )
-
+    course_section = models.ForeignKey(
+        Course_Section,
+        on_delete=models.CASCADE,
+        db_column='Course_Section',
+        null=True,
+    )
     class Meta:
         managed = True
         db_table = 'Cloud_Learning_Tools'
@@ -242,9 +247,36 @@ class Class(models.Model):
         on_delete=models.CASCADE,
         db_column='AWS_Credentials',
         null=True,
-    )    
+    )
 
     class Meta:
         managed = True
         db_table = 'Class'
         unique_together = (('student','course_section','school_term'),)
+
+class Trailmix_Information(models.Model):
+    name = models.CharField(
+        db_column='Name',
+        max_length=255,
+        primary_key=True,
+    )
+    link = models.TextField(
+        db_column='Link',
+    )
+    description = models.TextField(
+        db_column='Description',
+        null=True,
+    )
+    badges = models.TextField(
+        db_column='Badges',
+        null=True,
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        db_column='Course',
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Trailmix_Information'

@@ -3,6 +3,8 @@
 {% load charts_extra %} <!-- django filter from charts_extra-->
 {% block classList %}
 
+
+
 <div class="content">
   <div class="container-fluid">
     <p> <br> </p>
@@ -97,41 +99,10 @@
               </div>
       </div>
 </br>
-    <table class="table table-striped table-bordered table-hover" id="studentdata">
-    <thead>
-        <tr>
-        <th>Email</th>
-        <th>First name</th>
-        <th>Team no.</th>
-        <th>Points</th>
-        <th>Badges</th>
-        <th>Link</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        {% for student in course.classList %}
-            <tr>
-                <td>{{ student.info.email }}</td>
-                <td>{{ student.info.firstname }}</td>
-                <td>{{ student.team }}</td>
-                <td>{{ student.points }}</td>
-                <td>{{ student.badges }}</td>
-                <td> {% if student.link ==  "No link" %} No Trailhead Account Linked {% else %}<a href='{{student.link}}'>Click here to acccess link</a> {% endif %}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-    <tfoot>
-        <tr>
-          <th>Email</th>
-          <th>First name</th>
-          <th>Team no.</th>
-          <th>Points</th>
-          <th>Badges</th>
-          <th>Link</th>
-        </tr>
-    </tfoot>
-</table>
+{% include "Module_TeamManagement/Datatables/instructorTableview.html" %}
+
+
 </div>
 </div>
 

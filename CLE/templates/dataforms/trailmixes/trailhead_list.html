@@ -1,0 +1,50 @@
+{% extends 'dataforms/dataformbase.html' %}
+
+{% load static %}
+
+{% block javascript %}
+  <script src="{% static 'js/dataforms/dp.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  <!-- BUTTON TO TRIGGER THE ACTION -->
+  <p>
+    <button type="button"
+            class="btn btn-primary js-create-trailhead"
+            data-url="{% url 'TMmod:trailhead_create' %}">
+      <span class="glyphicon glyphicon-plus"></span>
+      New Trailmix
+    </button>
+  </p>
+
+  <table class="table" id="trailhead-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Link</th>
+        <th>Description</th>
+        <th>Badges</th>
+        <th>Course</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% include 'dataforms/trailmixes/partial_trailhead_list.html' %}
+    </tbody>
+  </table>
+
+  <!-- THE MODAL WE WILL BE USING -->
+ <div class="modal fade" id="modal-dp">
+   <div class="modal-dialog">
+     <div class="modal-content">
+     </div>
+   </div>
+
+<!-- <script>
+$(document).ready(function() {
+  console.log("{% url 'TMmod:trailhead_list' %}deployment_package/ #t-table")
+   $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/ #dp-table");
+});
+</script> -->
+
+
+{% endblock %}

@@ -24,7 +24,9 @@ from Module_TeamManagement import forms
 import logging
 logr = logging.getLogger(__name__)
 #Async form submission
-from Module_TeamManagement.forms import PhoneNumberForm
+from Module_TeamManagement.forms import *
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.views.generic import FormView
 from Module_TeamManagement.mixins import AjaxFormMixin
 
@@ -260,7 +262,7 @@ def faculty_Overview(requests):
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
-
+    
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
 
     context.update(trailResults)
@@ -733,7 +735,6 @@ def configureDB_clt(requests):
             course = requests.POST.get("course_title")
         else:
             course = requests.POST.get("course_section")
-
         bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
 
         if file.name.endswith('.xlsx'):
@@ -750,7 +751,7 @@ def configureDB_clt(requests):
             raise Exception("Invalid file type. Please upload .xlsx only")
 
         # If file is .xlsx then proceed with processing
-        response['results'] = bootstrap.update_CLT(bootstrapFile)
+        response['results'] = bootstrap.update_CLT(bootstrapFile,course)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
@@ -967,3 +968,61 @@ def clt_file_ouput(requests):
             fileValues.append(rowValue[:-1])
         context['csv_data'] = fileValues
     return render(requests, "Administrator/dummycsvpage.html", context)
+
+
+
+
+
+def trailhead_list(request):
+    thm = Trailmix_Information.objects.all()
+    return render(request, 'dataforms/trailmixes/trailhead_list.html', {'thm': thm})
+
+
+def save_trailhead_form(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            thm = Trailmix_Information.objects.all()
+            data['html_trailhead_list'] = render_to_string('dataforms/trailmixes/partial_trailhead_list.html', {
+                'thm': thm
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+def trailhead_create(request):
+    if request.method == 'POST':
+        form = TrailheadForm(request.POST)
+    else:
+        form = TrailheadForm()
+    return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_create.html')
+
+
+def trailhead_update(request, pk):
+    trailhead = get_object_or_404(Trailmix_Information, pk=pk)
+    if request.method == 'POST':
+        form = TrailheadForm(request.POST, instance=trailhead)
+    else:
+        form = TrailheadForm(instance=trailhead)
+    return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_update.html')
+
+
+def trailhead_delete(request, pk):
+    trailhead = get_object_or_404(Trailmix_Information, pk=pk)
+    data = dict()
+    if request.method == 'POST':
+        trailhead.delete()
+        data['form_is_valid'] = True
+        thm = Trailmix_Information.objects.all()
+        data['html_trailhead_list'] = render_to_string('dataforms/trailmixes/partial_trailhead_list.html', {
+            'thm': thm
+        })
+    else:
+        context = {'trailhead': trailhead}
+        data['html_form'] = render_to_string('dataforms/trailmixes/partial_trailhead_delete.html', context, request=request)
+    return JsonResponse(data)

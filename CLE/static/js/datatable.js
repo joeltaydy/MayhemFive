@@ -1,5 +1,11 @@
 $(document).ready(function() {
     // Setup - add a text input to each footer cell
+    $('#studentdata').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+    } );
     $('#studentdata thead tr').clone(true).appendTo( '#studentdata thead' );
     $('#studentdata thead tr:eq(1) th').each( function (i) {
         var title = $(this).text();
