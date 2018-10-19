@@ -40,26 +40,25 @@
 
                 <div class="col-md-6">
                   <div class="card">
-                    <div class="card-header">
-                      <h5 align="center" class="card-title">Server Status</h5>
-                    </div>
-                    <div class="card-body">
-                      <span align="center">
-                         {% for details in server_status %}
-                            {% if details.server_ip == sever_ip %}
-                                  <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
-                                {% if details.server_state == 'Live' %}
-                                    <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
-                                {% elif details.server_state == 'Pending' %}
-                                    <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
-                                {% else %}
-                                    <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
-                                {% endif %}
+                    {% for details in server_status %}
+                        {% if details.server_ip == sever_ip %}
+                        <div class="card-header">
+                          <h5 align="center" class="card-title">{{details.server_type|add:" Server Status"}}</h5>
+                        </div>
+                        <div class="card-body">
+                          <span align="center">
+                            <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
+                            {% if details.server_state == 'Live' %}
+                                <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
+                            {% elif details.server_state == 'Pending' %}
+                                <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
+                            {% else %}
+                                <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
                             {% endif %}
-                        {% endfor %}
-
-                      </span>
-                    </div>
+                          </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                     <div class="card-footer ">
                       <div class="stats">
                         <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"

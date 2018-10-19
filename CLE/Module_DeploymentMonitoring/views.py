@@ -475,7 +475,7 @@ def student_Deploy_Base(requests):
         response['approvalStatus']= False
 
     response["studentDeployBase"] = "active"
-    print(response)
+
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
@@ -573,5 +573,5 @@ def student_Monitor_Base(requests):
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Student Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
-    print(response)
+
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
