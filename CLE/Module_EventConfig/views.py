@@ -61,11 +61,10 @@ def faculty_Event_Base(requests):
 
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
-    # server_type = requests.POST.get('server_type')
-    server_type = 'Parent'
+    server_type = requests.POST.get('server_type')
     event_type = requests.POST.get('event_type')
     scheduled_datetime = datetime.now() if requests.POST.get('datetime') == 'now' else requests.POST.get('datetime')
-
+    print(server_type)
     if section_numberList == None or event_type == None or server_type == None:
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
@@ -85,8 +84,9 @@ def faculty_Event_Base(requests):
                             }
                         )
 
-        period = scheduled_datetime - datetime.now()
-        events[event_type](server_list=serverList, schedule=period)
+        if len(serverList) > 0:
+            period = scheduled_datetime - datetime.now()
+            events[event_type](server_list=serverList, schedule=period)
 
     except Exception as e:
         traceback.print_exc()
