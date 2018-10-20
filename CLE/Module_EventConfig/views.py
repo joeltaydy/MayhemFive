@@ -61,10 +61,11 @@ def faculty_Event_Base(requests):
 
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
+    server_type = requests.POST.get('server_type')
     event_type = requests.POST.get('event_type')
     scheduled_datetime = datetime.now() if requests.POST.get('datetime') == 'now' else requests.POST.get('datetime')
-
-    if section_numberList == None or event_type == None:
+    print(server_type)
+    if section_numberList == None or event_type == None or server_type == None:
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     try:
@@ -74,16 +75,18 @@ def faculty_Event_Base(requests):
             for details in team_details[section_number]:
                 querySet_serverList = Server_Details.objects.filter(account_number=details["account_number"])
                 for server in querySet_serverList:
-                    serverList.append(
-                        {
-                            'server_ip':server.IP_address,
-                            'server_id':server.instanceid,
-                            'server_account':server.account_number.account_number
-                        }
-                    )
+                    if server.type == server_type:
+                        serverList.append(
+                            {
+                                'server_ip':server.IP_address,
+                                'server_id':server.instanceid,
+                                'server_account':server.account_number.account_number
+                            }
+                        )
 
-        period = scheduled_datetime - datetime.now()
-        events[event_type](server_list=serverList, schedule=period)
+        if len(serverList) > 0:
+            period = scheduled_datetime - datetime.now()
+            events[event_type](server_list=serverList, schedule=period)
 
     except Exception as e:
         traceback.print_exc()

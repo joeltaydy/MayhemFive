@@ -1,5 +1,6 @@
 import json
 import boto3
+from datetime import datetime
 import requests as req
 from background_task import background
 from Module_DeploymentMonitoring.models import *
@@ -14,7 +15,7 @@ def test_tasks(message):
 
 @background(schedule=0)
 def stopServer(server_list=None,server=None):
-    print('--- Running background event: Stop Server ---')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background event: Stop Server')
 
     # If stopping only a server
     if server !=  None:
@@ -42,17 +43,17 @@ def stopServer(server_list=None,server=None):
             results = aws_util.stopServer(server['server_id'],access_key,secret_access_key)
 
             if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
-                print('Successfully stopped server: ' + server['server_ip'])
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Successfully stopped server: ' + server['server_ip'])
                 utilities.writeEventLog("stop", server['server_ip'] )
             else:
                 print('Unsuccessfully stopped server: ' + server['server_ip'])
 
-    print('--- Ending background event: Stop Server ---')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Ending background event: Stop Server')
 
 
 @background(schedule=0)
 def dosAttack(server_list=None,server=None):
-    print('--- Running background task: DDOS Attack ---')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: DDOS Attack')
 
     # If sending to one server
     if server !=  None:
@@ -62,4 +63,4 @@ def dosAttack(server_list=None,server=None):
     if server_list != None:
         pass
 
-    print('--- Ending background event: DDOS Attack ---')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Ending background event: DDOS Attack')

@@ -433,26 +433,32 @@ def student_Deploy_Base(requests):
     try:
         processLogin.studentVerification(requests)
     except:
-
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
+
     coursesec = ""
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
+
     for course_title, crse in courseList.items():
         if course_title == "EMS201":
             coursesec = crse['id']
+
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
     try:
         awsAccountNumber =  class_studentObj.awscredential
-        response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
+        response['submittedAccNum'] = awsAccountNumber # Could be None or aws credentials object
     except:
         response['submittedAccNum'] = None
+
     try:
         awsAccountNumber =  class_studentObj.awscredential
-        awsImageList = awsAccountNumber.imageDetails.all() #Could be None or aws image object Currently take first
+        awsImageList = awsAccountNumber.imageDetails.all() # Could be None or aws image object Currently take first
         accountNumber = awsAccountNumber.account_number
+
+        response['first_server_ip'] = utilities.getAllServerIPs(accountNumber)[0]
+
         consistent = False
         for image in awsImageList:
             if accountNumber in image.sharedAccNum:
@@ -469,7 +475,7 @@ def student_Deploy_Base(requests):
         response['approvalStatus']= False
 
     response["studentDeployBase"] = "active"
-    print(response)
+
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 # Main function for standard deploy page for student.
@@ -530,8 +536,10 @@ def student_Deploy_Upload(requests):
     except:
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
-    accountNum = requests.POST.get("accountNum") #string of account number
-    ipAddress = requests.POST.get("ipaddress") #string of IP address
+
+    accountNum = requests.POST.get("accountNum")            #string of account number
+    ipAddress = requests.POST.get("ipaddress")              #string of IP address
+
     if accountNum != "" :
         student_Deploy_AddAccount(requests)
     if ipAddress != "":
@@ -573,24 +581,15 @@ def student_Deploy_AddIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    ipAddress = requests.POST.get("ipaddress") #string of IP address
+    sever_type = requests.POST.get("sever_type")            #string of server_type; parent/slave
+    ipAddress = requests.POST.get("ipaddress")              #string of IP address
+
     utilities.addAWSKeys(ipAddress,requests)
-    utilities.addServerDetails(ipAddress,requests)
-
-
-
-def ITOpsLabStudentDeploy(requests):
-    try:
-        processLogin.studentVerification(requests)
-    except:
-        logout(requests)
-        return render(requests,'Module_Account/login.html',{})
-
-    response = {"ITOpsLabStudentDeploy" : "active"}
-    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
+    utilities.addServerDetails(ipAddress,sever_type,requests)
 
 
 def student_Monitor_Base(requests):
+    response = {"student_Monitor_Base" : "active"}
 
     try:
         processLogin.studentVerification(requests)
@@ -598,17 +597,21 @@ def student_Monitor_Base(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',{})
 
-    response = {"ITOpsLabStudentDeploy" : "active"}
+    response['sever_ip'] = requests.GET.get('server_ip')
+
     try:
         response['server_status'] = []
         response['webapp_status'] = []
         response['webapp_metric'] = {}
         studentClassObj = utilities.getStudentClassObject(requests)
+
         AWS_Credentials = studentClassObj.awscredential
         team_number= studentClassObj.team_number
         account_number = AWS_Credentials.account_number
+
         response = utilities.getMonitoringStatus(account_number,team_number,response)
-        response = utilities.getMetric(account_number,response)
+        response = utilities.getMetric(response['sever_ip'],response)
+
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
 

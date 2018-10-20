@@ -168,7 +168,7 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,requests):
+def addServerDetails(ipAddress,sever_type,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     validity = validateAccountNumber(ipAddress, awsC)
@@ -184,7 +184,8 @@ def addServerDetails(ipAddress,requests):
             instanceid = jsonObj['Reservations'][0]['Instances'][0]['InstanceId'],
             instanceName = None,
             state = "Live",
-            account_number=awsC
+            account_number=awsC,
+            type=sever_type
         )
         sd.save()
     except:
@@ -228,6 +229,7 @@ def getMonitoringStatus(account_number, team_number, response):
         server_ip = server.IP_address
         server_state = server.state
         server_name = server.instanceName
+        server_type = server.type
 
         # Step 1: Check if server is alive
         server_state = getServerStatus(server)
@@ -238,8 +240,10 @@ def getMonitoringStatus(account_number, team_number, response):
         response['server_status'].append(
             {
                 'team_name':team_number,
+                'server_ip':server_ip,
                 'server_state':server_state,
-                'server_name':server_name if server_name != None else ''
+                'server_name':server_name if server_name != None else '',
+                'server_type':server_type
             }
         )
 
@@ -324,9 +328,8 @@ def getServerStatus(server):
     return server_state
 
 
-def getMetric(account_number,response):
-    server = Server_Details.objects.filter(account_number=account_number)[0]
-    server_ip = server.IP_address
+def getMetric(server_ip,response):
+    server = Server_Details.objects.get(IP_address=server_ip)
     server_state = server.state
     server_state = getServerStatus(server)
 
@@ -377,3 +380,15 @@ def getCloudMetric(webapp_url):
     return {'xValue': timeList, 'yValue': sortedValueList, 'Label':label}
 
 
+def getAllServerIPs(account_number):
+    server_ips = []
+
+    querySet = Server_Details.objects.filter(account_number=account_number)
+    for server in querySet:
+        server_ips.append(
+            {
+                'server_ip':server.IP_address
+            }
+        )
+
+    return server_ips
