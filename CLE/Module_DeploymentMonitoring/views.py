@@ -581,11 +581,11 @@ def student_Deploy_AddIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    sever_type = requests.POST.get("server_type")            #string of server_type; parent/slave
+    server_type = requests.POST.get("server_type")            #string of server_type; parent/slave
     ipAddress = requests.POST.get("ipaddress")              #string of IP address
 
     utilities.addAWSKeys(ipAddress,requests)
-    utilities.addServerDetails(ipAddress,sever_type,requests)
+    utilities.addServerDetails(ipAddress,server_type,requests)
 
 
 def student_Monitor_Base(requests):
