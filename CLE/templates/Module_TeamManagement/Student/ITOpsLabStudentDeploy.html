@@ -10,13 +10,20 @@
 
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Deploy</button>
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark active">Deploy</button>
                 <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
             </div>
         </div>
 
         <hr>
         <h2 align="center"><i>Deploy</i></h2>
+        <br>
+        <div class= "redirect">
+            <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark">Standard</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Step-By-Step</button>
+            </div>
+        </div>
 </div>
 <div class ="col-md-12">
     <div class = "row">

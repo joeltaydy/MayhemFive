@@ -1,0 +1,104 @@
+{% extends 'Module_TeamManagement/Student/studentBase.html' %}
+{% load staticfiles %}
+
+{% block bootstrapContent %}
+<head>
+    <link rel="stylesheet" href="{% static 'css/itopsstudentdeploystd.css' %}">
+
+</head>
+
+<div class="col-md-12">
+        <h1 align="center">IT Operations Lab</h1>
+        <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
+
+        <div class= "redirect">
+            <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark active">Deploy</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
+            </div>
+        </div>
+
+        <hr>
+        <h2 align="center"><i>Deploy</i></h2>
+        <br>
+        <div class= "redirect">
+            <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark active">Standard</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark">Step-By-Step</button>
+            </div>
+        </div>
+        <br>
+        <div id="accordion" class="panel-group col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+            <div class="panel">
+            <div class="panel-heading">
+            <h5 class="panel-title">
+                <a href="#panelBodyOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
+                </h5>
+            </div>
+    
+             <!-- Request AWS Information-->
+            <div id="panelBodyOne" class="panel-collapse collapse in">
+                <div class="panel-body">
+    
+                    <form id="awsinfo" action="{% url 'DMmod:itopslab_setup_AWSKeys' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        {% csrf_token %}
+                        <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
+                            <label for="name" class="control-label">Account Number</label>
+                            <input class="form-control" type="text" name="account_number" id="account_number" aria-describedby="fileHelp" placeholder="Account Number">
+                            <br>
+                        </div>
+                        <div class="col-md-9 form-group" style = "margin-bottom:40px;">
+                            <br>
+                            <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
+                        </div>
+                    </form>
+                    <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+                        {% if submittedAccountNumber != "" %}
+                            <h5><b>Submitted Account Number:</b> {{account_number}} </h5>
+                        {% else %}
+                            <h5><b>Submitted Account Number:</b> <i color = "red">No Account Number submitted</i></h5>
+                        {%endif %}
+    
+                    </div>
+
+                </div>
+            </div>
+            </div>
+            <div id="panelBodyTwo" class="panel-collapse collapse in">
+            <div class="panel">
+            <div class="panel-heading">
+            <h5 class="panel-title">
+                <a href="#panelBodyTwo" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">IP Address</a>
+            </h5>
+            <form id="ipaddress" action="{% url 'DMmod:itopslab_setup_AWSKeys' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                {% csrf_token %}
+                <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
+                    <label for="name" class="control-label">IP Address</label>
+                    <input class="form-control" type="text" name="ipaddress" id="ipaddress" aria-describedby="fileHelp" placeholder="IP Address">
+                    <br>
+                </div>
+                <div class="col-md-9 form-group" style = "margin-bottom:40px;">
+                    <br>
+                    <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
+                </div>
+            </form>
+                <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+                    will insert list of ip address table 
+                </div>
+            </div>                
+            </div>
+        
+        </div>
+        </div>
+        </div>
+</div>
+    
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+</div>
+
+{% endblock %}
