@@ -14,7 +14,7 @@
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
                 <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark active">Deploy</button>
-                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?server_ip={{ first_server_ip.server_ip }}';" type="button" class="btn btn-dark">Monitor</button>
             </div>
         </div>
 
@@ -75,50 +75,12 @@
                      <!-- Deployment Package Table-->
                     <div id="panelBodyTwo" class="panel-collapse collapse">
                         <div class="panel-body">
-
-                            <form id="ipaddress" action="{% url 'DMmod:itopslab_studeploy_standard' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-                                {% csrf_token %}
-                                <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
-                                    <label for="name" class="control-label">IP Address</label>
-                                    <input class="form-control" type="text" name="ipaddress" id="ipaddress" aria-describedby="fileHelp" placeholder="IP Address">
-                                    <br>
-                                </div>
-                                <div class="col-md-9 form-group" style = "margin-bottom:40px;">
-                                    <br>
-                                    <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
-                                </div>
-                            </form>
-                            <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
-                                <h3><b>Submitted IP Addresses </b></h3>
-                                {% if ipAddressList != "" %}
-                                    Will Insert Table with ip addresses
-                                    <table class="table" id="ip-table">
-                                    <thead>
-                                        <tr>
-                                        <th>S/N</th>
-                                        <th>IP Address</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>2</td>
-                                        </tr>
-                                    </tbody>
-                                    </table>
-                                {% else %}
-                                    <b><i color = "red">No IP Address submitted</i></b>
-                                {%endif %}
-
+                            <div class="container col-md-12" style="display: block;margin-left: auto;margin-right: auto;">
+                                {% include "dataforms/serverdetails/server_list.html" %}
                             </div>
-
                         </div>
                     </div>
             </div>
-
-
-
-
         </div>
 </div>
 

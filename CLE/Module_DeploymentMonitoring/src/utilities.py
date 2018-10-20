@@ -228,7 +228,7 @@ def addServerDetailsForm(request, form, template_name, account_number):
             form.save()
             data['form_is_valid'] = True
             servers = Server_Details.objects.filter(account_number=account_number)
-            data['html_server_list'] = render_to_string('<input link here>', {
+            data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
                 'servers': servers
             })
         else:

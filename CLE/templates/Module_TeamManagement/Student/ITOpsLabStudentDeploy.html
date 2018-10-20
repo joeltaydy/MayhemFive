@@ -12,7 +12,7 @@
 
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark active">Deploy</button>
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark active">Deploy</button>
                 <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?server_ip={{ first_server_ip.server_ip }}';" type="button" class="btn btn-dark">Monitor{{all_server_ips}}</button>
             </div>
         </div>
@@ -22,7 +22,7 @@
         <br>
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark">Standard</button>
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark">Standard</button>
                 <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Step-By-Step</button>
             </div>
         </div>
@@ -30,7 +30,7 @@
 <br>
     {% include 'Module_TeamManagement/Student/ITOpsStudentDeployForm.html' %}
     <br>
-    
+
     <div class ="col-md-12 text-center" style="display: block;margin-left: auto;margin-right: auto;">
             <div class = "row">
                 <div class="col-md-12">
@@ -38,7 +38,7 @@
                         <div class="card-header ">
                             <h4 align="center" class="card-title">Instructions</h4>
                         </div>
-        
+
                         <div class="card-body text-center">
                             <!-- <div class ="row text-center"> -->
                                 <a data-fancybox data-type="iframe" data-src="https://docs.google.com/document/d/e/2PACX-1vRryEZSP1wLHrlQMkSkJRgJCta4KbrVJNQdXAv4tqbEFjJsVhN6maWO6hTXhZ_3OmmbDrRabUM95Qb5/pub" href="javascript:;"><button type="button" class="btn btn-dark">1. Get Account Number</button></a>
@@ -52,7 +52,7 @@
                             <!-- </div> -->
                         </div>
                         <div class="card-footer ">
-        
+
                     </div>
                     </div>
                 </div>

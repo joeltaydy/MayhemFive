@@ -570,7 +570,8 @@ def student_Monitor_Base(requests):
         response = utilities.getMetric(response['sever_ip'],response)
 
         tz = pytz.timezone('Asia/Singapore')
-        response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
+        response['last_updated']= str(datetime.datetime.now(tz=tz))[:19]
+        response['first_server_ip'] = utilities.getAllServer(AWS_Credentials.account_number)[0]
 
     except Exception as e:
         traceback.print_exc()
@@ -579,7 +580,6 @@ def student_Monitor_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
-# ---------- Experimental ---------- #
 
 # Main function for deployment page on student.
 # Will retrieve work products and render to http page
@@ -597,67 +597,74 @@ def student_Deploy_Standard_Base(requests):
     classObj = Class.objects.get(student=student_email)
     credentialsObj = classObj.awscredential
 
-    response['account_number'] = credentialsObj.account_number,
-    response['servers'] = utilities.getAllServer(credentialsObj.account_number)
+    try:
+        response['account_number'] = credentialsObj.account_number,
+        response['servers'] = utilities.getAllServer(credentialsObj.account_number)
+        response['first_server_ip'] = utilities.getAllServer(credentialsObj.account_number)[0]
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during retrieval of information (Student Deploy Standard): ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
 
-# TO-DO: Adding of server to DB
+# Adding of server to DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_AddIP(requests):
+def student_Deploy_Standard_AddIPs(requests):
     student_email = requests.user.email
     classObj = Class.objects.get(student=student_email)
     credentialsObj = classObj.awscredential
 
-    if request.method == 'POST':
-        form = ServerForm(request.POST)
+    if requests.method == 'POST':
+        form = ServerForm_Add(requests.POST)
     else:
-        form = ServerForm()
+        form = ServerForm_Add()
 
-    return utilities.addServerDetailsForm(requests, form, '<input link here>', credentialsObj.account_number)
+    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html', credentialsObj.account_number)
 
 
-# TO-DO: Updating of server in DB
+# Updating of server in DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_UpdateIP(requests,pk):
+def student_Deploy_Standard_UpdateIPs(requests,pk):
     student_email = requests.user.email
     classObj = Class.objects.get(student=student_email)
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
 
-    if request.method == 'POST':
-        form = DeploymentForm(request.POST, instance=server)
+    if requests.method == 'POST':
+        form = ServerForm_Update(requests.POST, instance=server)
     else:
-        form = DeploymentForm(instance=server)
+        form = ServerForm_Update(instance=server)
 
-    return utilities.addServerDetailsForm(requests, form, '<input link here>', credentialsObj.account_number)
+    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html', credentialsObj.account_number)
 
 
-# TO-DO: Deleting of server from DB
+# Deleting of server from DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_DeleteIP(requests,pk):
+def student_Deploy_Standard_DeleteIPs(requests,pk):
     student_email = requests.user.email
     classObj = Class.objects.get(student=student_email)
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
     data = dict()
 
-    if request.method == 'POST':
+    if requests.method == 'POST':
         server.delete()
         data['form_is_valid'] = True
         servers = Server_Details.objects.filter(account_number=credentialsObj.account_number)
-        data['html_server_list'] = render_to_string('<input link here>', {
+        data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
             'servers': server
         })
     else:
         context = {'server': server}
-        data['html_form'] = render_to_string('<input link here>',
+        data['html_form'] = render_to_string('dataforms/serverdetails/partial_server_delete.html',
             context,
-            request=request,
+            request=requests,
         )
 
     return JsonResponse(data)
