@@ -598,7 +598,7 @@ def student_Deploy_Standard_Base(requests):
     credentialsObj = classObj.awscredential
 
     try:
-        response['account_number'] = credentialsObj.account_number,
+        response['account_number'] = credentialsObj.account_number
         response['servers'] = utilities.getAllServer(credentialsObj.account_number)
         response['first_server_ip'] = utilities.getAllServer(credentialsObj.account_number)[0]
 

@@ -220,7 +220,7 @@ def addGitHubLinkForm(request, form, template_name):
     return JsonResponse(data)
 
 
-# TO-DO: Adds and Updated Server Details via form
+# Adds and Updated Server Details via form
 def addServerDetailsForm(request, form, template_name, account_number):
     data = dict()
     if request.method == 'POST':
