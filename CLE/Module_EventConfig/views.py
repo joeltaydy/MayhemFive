@@ -10,6 +10,7 @@ from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring import views as views_DM
 from Module_DeploymentMonitoring.src import utilities as utilities_DM
 from django.http import JsonResponse
+from django.contrib.auth import logout
 
 # Test to see if django-background-tasks is wokring or not
 #
@@ -90,7 +91,7 @@ def faculty_Event_Base(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            # events[event_type](server_list=serverList, schedule=period)
+            events[event_type](server_list=serverList, schedule=period)
 
     except Exception as e:
         traceback.print_exc()

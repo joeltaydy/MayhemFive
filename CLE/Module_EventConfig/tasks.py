@@ -15,7 +15,7 @@ def test_tasks(message):
 
 @background(schedule=0)
 def stopServer(server_list=None,server=None):
-    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background event: Stop Server')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Stop Server')
 
     # If stopping only a server
     if server !=  None:
@@ -28,13 +28,14 @@ def stopServer(server_list=None,server=None):
         server_jsonObj = json.loads(server_response.content.decode())
 
         if server_jsonObj['HTTPStatusCode'] == 200:
-            print('Successfully stopped server: ' + server_ip)
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Successfully stopped single server: ' + server_ip)
             utilities.writeEventLog("stop", server_ip )
         else:
-            print('Unsuccessfully stopped server: ' + server_ip + '\n' + server_jsonObj)
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Unsuccessfully stopped single server: ' + server_ip + '\n' + server_jsonObj)
 
     # If stopping multiple servers
     if server_list != None:
+        counter = 1
         for server in server_list:
             credentialsObj = AWS_Credentials.objects.get(account_number=server['server_account'])
             access_key = decode(credentialsObj.access_key)
@@ -43,12 +44,13 @@ def stopServer(server_list=None,server=None):
             results = aws_util.stopServer(server['server_id'],access_key,secret_access_key)
 
             if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Successfully stopped server: ' + server['server_ip'])
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + counter + '. Successfully stopped server: ' + server['server_ip'])
                 utilities.writeEventLog("stop", server['server_ip'] )
             else:
-                print('Unsuccessfully stopped server: ' + server['server_ip'])
-
-    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Ending background event: Stop Server')
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + counter + '. Unsuccessfully stopped server: ' + server['server_ip'])
+            counter += 1
+            
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Stop Server')
 
 
 @background(schedule=0)
