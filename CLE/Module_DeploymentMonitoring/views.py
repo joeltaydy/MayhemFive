@@ -540,7 +540,7 @@ def student_Deploy_AddIP(requests):
     ipAddress = requests.POST.get("ipaddress")              #string of IP address
 
     utilities.addAWSKeys(ipAddress,requests)
-    utilities.addServerDetails(ipAddress,server_type,requests)
+    utilities.addServerDetails(ipAddress,server_type,requests=requests)
 
 
 # Retrieves student's server adn metrics
@@ -580,12 +580,16 @@ def student_Monitor_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
+#--------------------------------------#
+#--------------------------------------#
+#--------------------------------------#
 
 # Main function for deployment page on student.
 # Will retrieve work products and render to http page
 #
-def student_Deploy_Standard_Base(requests):
-    response = {'student_Deploy_Base' : 'active'}
+def student_Deploy_Standard_Base(requests,response=None):
+    if response == None:
+        response = {'student_Deploy_Base' : 'active'}
 
     try:
         processLogin.studentVerification(requests)
@@ -610,6 +614,30 @@ def student_Deploy_Standard_Base(requests):
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
 
+# TO:DO - Validates and add account number into DB
+#
+def student_Deploy_Standard_AddAccount(requests):
+    response = {'student_Deploy_Standard_AddAccount' : 'active'}
+
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    account_number = requests.POST.get('account_number')
+
+    try:
+        pass
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during validating of new account number (Student Deploy Standard): ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
+
+    return student_Deploy_Standard_Base(requests,response)
+
+
 # Retrieval of github deployment package link from DB
 #
 def student_Deploy_Standard_GetIPs(requests):
@@ -625,33 +653,27 @@ def student_Deploy_Standard_GetIPs(requests):
 # returns a JsonResponse
 #
 def student_Deploy_Standard_AddIPs(requests):
-    student_email = requests.user.email
-    classObj = Class.objects.get(student=student_email)
-    credentialsObj = classObj.awscredential
 
     if requests.method == 'POST':
         form = ServerForm_Add(requests.POST)
     else:
         form = ServerForm_Add()
-    print('Adding')
-    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html', credentialsObj.account_number)
+
+    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html')
 
 
 # Updating of server in DB
 # returns a JsonResponse
 #
 def student_Deploy_Standard_UpdateIPs(requests,pk):
-    student_email = requests.user.email
-    classObj = Class.objects.get(student=student_email)
-    credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
-    print(pk)
+
     if requests.method == 'POST':
         form = ServerForm_Update(requests.POST, instance=server)
     else:
         form = ServerForm_Update(instance=server)
 
-    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html', credentialsObj.account_number)
+    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html')
 
 
 # Deleting of server from DB
@@ -663,7 +685,7 @@ def student_Deploy_Standard_DeleteIPs(requests,pk):
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
     data = dict()
-    print(pk)
+
     if requests.method == 'POST':
         server.delete()
         data['form_is_valid'] = True
