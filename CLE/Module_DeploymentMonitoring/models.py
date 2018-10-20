@@ -77,7 +77,7 @@ class Server_Details(models.Model):
         db_column='Server_State',
         max_length=255,
         null=True,
-        choices=SEVER_STATE,
+        choices=SERVER_STATE,
     )
     account_number = models.ForeignKey(
         AWS_Credentials,
