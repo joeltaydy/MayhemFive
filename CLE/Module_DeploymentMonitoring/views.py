@@ -416,7 +416,7 @@ def faculty_Monitor_Base(requests):
 
         for details in section_details:
             response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
-
+            print(response)
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
@@ -536,11 +536,11 @@ def student_Deploy_AddIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    sever_type = requests.POST.get("sever_type")            #string of server_type; parent/slave
+    server_type = requests.POST.get("server_type")            #string of server_type; parent/slave
     ipAddress = requests.POST.get("ipaddress")              #string of IP address
 
     utilities.addAWSKeys(ipAddress,requests)
-    utilities.addServerDetails(ipAddress,sever_type,requests)
+    utilities.addServerDetails(ipAddress,server_type,requests)
 
 
 # Retrieves student's server adn metrics
@@ -554,7 +554,7 @@ def student_Monitor_Base(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',{})
 
-    response['sever_ip'] = requests.GET.get('server_ip')
+    response['server_ip'] = requests.GET.get('server_ip')
 
     try:
         response['server_status'] = []
@@ -567,7 +567,7 @@ def student_Monitor_Base(requests):
         account_number = AWS_Credentials.account_number
 
         response = utilities.getMonitoringStatus(account_number,team_number,response)
-        response = utilities.getMetric(response['sever_ip'],response)
+        response = utilities.getMetric(response['server_ip'],response)
 
         tz = pytz.timezone('Asia/Singapore')
         response['last_updated']= str(datetime.datetime.now(tz=tz))[:19]

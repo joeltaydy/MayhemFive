@@ -29,21 +29,33 @@ def writeEventLog(event_type, server_ip ):
 
 
 '''
-Method to record recovery time based on IP
+Method to record recovery time based on IP as well as start recording the initial start time of the IP
 Called by student server
 '''
-def writeRecoveryTime(ipAddress):
+def writeRecoveryTime(ipAddress):   
     eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="stop").order_by("id").reverse()
     tz = pytz.timezone('Asia/Singapore')
     now = str(datetime.now(tz=tz))[:19]
-    event = eventList[0]
-    event.event_endTime = now
-    event.event_recovery= recoveryTimeCaclulation(event.event_startTime , now)
-    event.save()
+    try :
+        event = eventList[0]
+        event.event_endTime = now
+        event.event_recovery= recoveryTimeCaclulation(event.event_startTime , now)
+        event.save()
+    except:
+        serverDetails = Server_Details.objects.get(IP_address=ipAddress)
+        event_Entry = Event_Details.objects.create(
+            event_type="start",
+            server_details=serverDetails,
+            event_startTime=now,
+            event_endTime=now,
+            event_recovery=0
+        )
+        event_Entry.save()
+        
     
-
+# return in minutes
 def recoveryTimeCaclulation(start_Time, end_Time):
-    return  (datetime.strptime(end_Time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(start_Time, '%Y-%m-%d %H:%M:%S')).total_seconds()
+    return  (datetime.strptime(end_Time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(start_Time, '%Y-%m-%d %H:%M:%S')).total_seconds()/60
 
 def hashPlainText(plaintext):
     plaintext_byte = plaintext.encode('utf-8')

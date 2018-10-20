@@ -42,9 +42,9 @@
                 {% endif %}
                 </td>
                 <td>{{ details.server_type }}</td>
-                <td>0</td>
-                <td>0</td>
-                <td>0</td>
+                <td> {{details.breakdowns}} </td>
+                <td> {{details.mtbf}} </td>
+                <td> {{details.mttr}} </td>
             </tr>
             {% endfor %}
         </tbody>

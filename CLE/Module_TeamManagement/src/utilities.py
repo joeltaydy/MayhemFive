@@ -360,7 +360,7 @@ def webScrapper():
         content['link'] = link
 
         info[studentEmails[counter]] = content #key is student email, value is information
-        counter+=1
+        counter+=1 
 
     print("scrapping info from  file : %.9f " % (time.time()-st) )
 

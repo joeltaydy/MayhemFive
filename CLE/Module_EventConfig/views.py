@@ -39,6 +39,7 @@ def test(requests):
 # Main function for event configuration page on faculty.
 #
 def faculty_Event_Base(requests):
+    import time
     events = {
         'stop':tasks.stopServer,
         'dos':tasks.dosAttack,
@@ -99,6 +100,7 @@ def faculty_Event_Base(requests):
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     requests.section_number = response['first_section']
+    time.sleep(15)
     return views_DM.faculty_Monitor_Base(requests)
 
 
@@ -108,7 +110,10 @@ def serverRecoveryCall(request):
     if utilities.validate(secret_key) == True:
         response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
         ipAddress= request.GET.get('ip')
-        utilities.writeRecoveryTime(ipAddress)
+        try: 
+            utilities.writeRecoveryTime(ipAddress)
+        except:
+            response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     else:
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)

@@ -168,7 +168,7 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,sever_type,requests):
+def addServerDetails(ipAddress,server_type,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     validity = validateAccountNumber(ipAddress, awsC)
@@ -185,7 +185,7 @@ def addServerDetails(ipAddress,sever_type,requests):
             instanceName = None,
             state = "Live",
             account_number=awsC,
-            type=sever_type
+            type=server_type
         )
         sd.save()
     except:
@@ -255,14 +255,16 @@ def getMonitoringStatus(account_number, team_number, response):
         if server_state == 'Killed':
             server.delete()
             continue
-
+        server_statistics = getServerStatistics(server_ip)
         response['server_status'].append(
             {
                 'team_name':team_number,
                 'server_ip':server_ip,
                 'server_state':server_state,
                 'server_name':server_name if server_name != None else '',
-                'server_type':server_type
+                'breakdowns': server_statistics['Breakdowns'],
+                'mtbf': server_statistics['MTBF'],
+                'mttr': server_statistics['MTTR']
             }
         )
 
@@ -316,7 +318,50 @@ def getMonitoringStatus(account_number, team_number, response):
             )
 
     return response
+'''
+Gets the statistics of a server based on ip_address against event_details table
+Statistics obtained includes MTTR, MTBF, Breakdowns
+'''
+def getServerStatistics(server_ip):
+    from Module_EventConfig.models import Event_Details
+    from Module_EventConfig.src.utilities import recoveryTimeCaclulation
+    import pytz
+    from datetime import datetime
 
+    try: 
+        serverInitiateTime = Event_Details.objects.filter(server_details=server_ip).get(event_type="start").event_startTime
+        tz = pytz.timezone('Asia/Singapore')
+        now = str(datetime.now(tz=tz))[:19]
+
+        serverEventList = Event_Details.objects.filter(server_details=server_ip).exclude(event_type="start")
+        totalDownTime = 0
+        for event in serverEventList:
+            totalDownTime = totalDownTime+float(event.event_recovery) #required for mttr
+        totalUpTime = max(recoveryTimeCaclulation(serverInitiateTime, now) - totalDownTime,0) #required for mtbf
+        mttr= str(totalDownTime/len(serverEventList))
+        mtbf = str(totalUpTime/len(serverEventList))
+        serverStatistics = {"Breakdowns": len(serverEventList), "MTTR": timeToString(mttr) , "MTBF" :timeToString(mtbf) }
+    except:
+        traceback.print_exc()
+        serverStatistics = {"Breakdowns": 0, "MTTR": 0, "MTBF" : 0}
+    return serverStatistics
+
+def timeToString(minutes):
+    minute = int(minutes.split(".")[0])
+    try:    
+        seconds = float("0."+minutes.split(".")[1])* 60
+    except:
+        seconds = 0
+    day=0
+    hours=0
+    while minute > 60:
+        if minute > 3600:
+            day = minute//3600
+            minute = minute % 3600
+        elif minute > 60: 
+            hours = minute//60
+            minute = minute % 60
+    return str(day)+" Days " + str(hours) + " Hours " + str(minute) + " Minutes " + str(seconds).split(".")[0] + " Seconds "
 
 # Rule of thumb method - To check server status
 #
