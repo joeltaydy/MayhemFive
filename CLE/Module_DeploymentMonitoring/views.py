@@ -425,7 +425,7 @@ def faculty_Monitor_Base(requests):
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 
-# Main function for deploy page on student.
+# Main function for ica deploy page for student.
 # Will check if images has been shared by faculty
 #
 def student_Deploy_Base(requests):
@@ -478,6 +478,52 @@ def student_Deploy_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
+# Main function for standard deploy page for student.
+# Will check if images has been shared by faculty
+#
+def student_Deploy_Base_std(requests):
+    response = {}
+    try:
+        processLogin.studentVerification(requests)
+    except:
+
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+    coursesec = ""
+    student_email = requests.user.email
+    courseList = requests.session['courseList_updated']
+    for course_title, crse in courseList.items():
+        if course_title == "EMS201":
+            coursesec = crse['id']
+    class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
+
+    try:
+        awsAccountNumber =  class_studentObj.awscredential
+        response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
+    except:
+        response['submittedAccNum'] = None
+    try:
+        awsAccountNumber =  class_studentObj.awscredential
+        awsImageList = awsAccountNumber.imageDetails.all() #Could be None or aws image object Currently take first
+        accountNumber = awsAccountNumber.account_number
+        consistent = False
+        for image in awsImageList:
+            if accountNumber in image.sharedAccNum:
+                response['awsImage'] = image
+                response['approvalStatus']= True
+                consistent = True
+                break
+        if consistent != True:
+            response['awsImage'] = None
+            response['approvalStatus']= False
+
+    except:
+        response['awsImage'] = None
+        response['approvalStatus']= False
+
+    response["studentDeployBase"] = "active"
+    print(response)
+    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
 # Processes Form
 #
