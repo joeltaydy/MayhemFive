@@ -224,10 +224,11 @@ def addGitHubLinkForm(request, form, template_name):
 def addServerDetailsForm(request, form, template_name, account_number):
     data = dict()
     if request.method == 'POST':
+        print(form.is_valid())
         if form.is_valid():
             form.save()
             data['form_is_valid'] = True
-            servers = Server_Details.objects.filter(account_number=account_number)
+            servers = getAllServer(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
                 'servers': servers
             })

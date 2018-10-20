@@ -610,6 +610,17 @@ def student_Deploy_Standard_Base(requests):
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
 
+# Retrieval of github deployment package link from DB
+#
+def student_Deploy_Standard_GetIPs(requests):
+    student_email = requests.user.email
+    classObj = Class.objects.get(student=student_email)
+    credentialsObj = classObj.awscredential
+    servers = utilities.getAllServer(credentialsObj.account_number)
+
+    return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers})
+
+
 # Adding of server to DB
 # returns a JsonResponse
 #
@@ -622,7 +633,7 @@ def student_Deploy_Standard_AddIPs(requests):
         form = ServerForm_Add(requests.POST)
     else:
         form = ServerForm_Add()
-
+    print('Adding')
     return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html', credentialsObj.account_number)
 
 
@@ -634,7 +645,7 @@ def student_Deploy_Standard_UpdateIPs(requests,pk):
     classObj = Class.objects.get(student=student_email)
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
-
+    print(pk)
     if requests.method == 'POST':
         form = ServerForm_Update(requests.POST, instance=server)
     else:
@@ -652,13 +663,13 @@ def student_Deploy_Standard_DeleteIPs(requests,pk):
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
     data = dict()
-
+    print(pk)
     if requests.method == 'POST':
         server.delete()
         data['form_is_valid'] = True
-        servers = Server_Details.objects.filter(account_number=credentialsObj.account_number)
+        servers = utilities.getAllServer(credentialsObj.account_number)
         data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
-            'servers': server
+            'servers': servers
         })
     else:
         context = {'server': server}
