@@ -416,7 +416,7 @@ def faculty_Monitor_Base(requests):
 
         for details in section_details:
             response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
-
+            print(response)
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])

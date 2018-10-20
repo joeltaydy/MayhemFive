@@ -40,6 +40,9 @@
                     <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
                 {% endif %}
                 </td>
+                <td> {{details.breakdowns}} </td>
+                <td> {{details.mtbf}} </td>
+                <td> {{details.mttr}} </td>
             </tr>
             {% endfor %}
         </tbody>
