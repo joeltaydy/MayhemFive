@@ -52,7 +52,6 @@ class Student(models.Model):
         db_table = 'Student'
 
 class Course_Section(models.Model):
-
     course_section_id = models.CharField(
         db_column='Course_Section_ID',
         max_length=255,

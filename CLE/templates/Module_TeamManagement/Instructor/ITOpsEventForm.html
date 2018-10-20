@@ -18,7 +18,7 @@
                 <ul id="progressbar">
                     <!-- <li class="active">Number of Events</li> -->
                     <li class="active">Select class</li>
-                    <li>Choose Event Type </li>
+                    <li>Choose Event</li>
                     <li>Choose Date/Time</li>
                     <li>Summary</li>
                 </ul>
@@ -49,17 +49,24 @@
 
 
                     <hr>
-                    WORK IN PROGRESS
                     <input type="button"  name="next" class="next action-button" value="Next" />
                 </fieldset>
                 <fieldset>
-                    <h2 class="fs-title">Choose Event Type</h2>
-                    <h3 class="fs-subtitle">Please select an event to configure</h3>
-                    <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
+                    <h2 class="fs-title">Choose Event and Server Type</h2>
+                    <h3 class="fs-subtitle">Please select event(s) to configure</h3>
+                    <div class="col-md-6"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <select class="form-control" id="event_type" name="event_type">
-                            <option value="" disabled selected>Event Type</option>
+                            <option value="" disabled selected>Select event type</option>
                             <option value="stop">Stop Server</option>
-                            <option value="ddos">Send DDOS Attack</option>
+                            <option value="ddos">Send DoS Attack</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="col-md-6"  style="display: block;margin-left: auto;margin-right: auto; ">
+                        <select class="form-control" id="server_type" name="server_type">
+                            <option value="" disabled selected>Select server type</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Slave">Slave</option>
                         </select>
                     </div>
                     <!-- <input type="text" name="twitter" placeholder="Twitter"/>
@@ -83,9 +90,10 @@
                 <fieldset>
                     <h2 class="fs-title">Summary</h2>
                     <h3 class="fs-subtitle">Please ensure the event details are accurate</h3>
-                    <h5 class="summary-class"> </h5>
-                    <h5 class="summary-eventtype"></h5>
-                    <h5 class="summary-datetime"></h5>
+                    <div class="summary-class"> </div>
+                    <div class="summary-eventtype"></div>
+                    <div class="summary-servertype"></div>
+                    <div class="summary-datetime"></div>
 
                     </h3>
 
@@ -122,10 +130,20 @@
         }
 
         var event_type = document.getElementById("event_type").value;
+        var server_type = document.getElementById("server_type").value;
         var datetime = document.getElementById("setDate").value;
-        document.querySelector(".summary-class").textContent = "Class(es): " + classes;
-        document.querySelector(".summary-eventtype").textContent = "Event Type: " + event_type;
-        document.querySelector(".summary-datetime").textContent = "Date Time: " + datetime;
+        document.querySelector(".summary-class").innerHTML = "<b>Class(es): </b>" + "<h5>" + classes + "</h5>";
+        if (event_type == "stop"){
+            document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" + "<h5>Stop Servers</h5>";
+        }
+        else if(event_type == "ddos"){
+            document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" + "<h5>Send DoS Attack on Servers</h5>";
+        }
+        if (server_type != ""){
+            document.querySelector(".summary-servertype").innerHTML = "<b>Server Type: </b>" + "<h5>" + server_type + "</h5>";
+        }
+
+        document.querySelector(".summary-datetime").innerHTML = "<b>Date Time: </b>" + "<h5>" + datetime.replace('T',' ') + "</h5>";
     }
 
     // function storeCourse(c){
@@ -153,6 +171,5 @@
         }
 
     }
-
     </script>
 </body>

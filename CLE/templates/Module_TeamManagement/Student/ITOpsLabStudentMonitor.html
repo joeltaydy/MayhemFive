@@ -9,7 +9,7 @@
 
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-            <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark">Deploy</button>
+            <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark">Deploy</button>
             <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
         </div>
     </div>
@@ -29,31 +29,25 @@
               <div class="col-md-12 row">
 
                 <div class="col-md-12">
-                  <ul class="navDiv">
+
                     <!-- to remove once for loop is settled by backend -->
-                    <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">Server 1</a>
-                    <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">Server 2</a>
-
-
-                    {% for course_section in course_sectionList %}
-                        {% if course_section.section_number != 'G0' %}
-                          <a href="/instructor/ITOperationsLab/monitor/?section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
-                        {% endif %}
+                    {% for details in server_status %}
+                        <a href="/student/ITOperationsLab/monitor/?server_ip={{ details.server_ip }}" role="button" class="btn btn-primary">{{ details.server_type|add:" - "|add:details.server_ip }}</a>
                     {% endfor %}
-                  </ul>
+
                 </div>
 
 
                 <div class="col-md-6">
                   <div class="card">
-                    <div class="card-header">
-                      <h5 align="center" class="card-title">Server Status</h5>
-                    </div>
-                    <div class="card-body">
-                      <span align="center">
-                         {% for details in server_status %}
-                            <!--{{ team_name }}-->
-                              <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
+                    {% for details in server_status %}
+                        {% if details.server_ip == sever_ip %}
+                        <div class="card-header">
+                          <h5 align="center" class="card-title">{{details.server_type|add:" Server Status"}}</h5>
+                        </div>
+                        <div class="card-body">
+                          <span align="center">
+                            <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
                             {% if details.server_state == 'Live' %}
                                 <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
                             {% elif details.server_state == 'Pending' %}
@@ -61,10 +55,10 @@
                             {% else %}
                                 <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
                             {% endif %}
-                        {% endfor %}
-
-                      </span>
-                    </div>
+                          </span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                     <div class="card-footer ">
                       <div class="stats">
                         <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
@@ -82,15 +76,17 @@
                       <span align="center">
 
                         {% for details in webapp_status %}
-                        <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
-                         {% comment %} {{ details.team_name }} {% endcomment %}
-                            {% if details.webapp_state  == 'Live' %}
-                                <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>
-                            {% else %}
-                                <span class="badge badge-pill badge-danger">{{ details.webapp_state  }}</span>
+                            {% if details.ip_address == sever_ip %}
+                            <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
+                             {% comment %} {{ details.team_name }} {% endcomment %}
+                                {% if details.webapp_state  == 'Live' %}
+                                    <span class="badge badge-pill badge-success">{{ details.webapp_state  }}</span>
+                                {% else %}
+                                    <span class="badge badge-pill badge-danger">{{ details.webapp_state  }}</span>
+                                {% endif %}
+                                <a href="http://{{ details.ip_address }}:8000">{{ details.ip_address  }}</a>
+                                <br>
                             {% endif %}
-                            <a href="http://{{ details.ip_address }}:8000">{{ details.ip_address  }}</a>
-                            <br>
                         {% endfor %}
 
                       </span>

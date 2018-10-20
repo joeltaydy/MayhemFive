@@ -48,6 +48,17 @@ class AWS_Credentials(models.Model):
 
 
 class Server_Details(models.Model):
+    SEVER_TYPE = (
+        ('Parent','Parent'),
+        ('Slave','Slave'),
+    )
+
+    SEVER_STATE = (
+        ('Live','Live'),
+        ('Pending','Pending'),
+        ('Down','Down'),
+    )
+
     IP_address = models.CharField(
         db_column='IP_Address',
         max_length=255,
@@ -60,18 +71,25 @@ class Server_Details(models.Model):
     instanceName = models.CharField(
         db_column='Instance_Name',
         max_length=255,
-        null = True
+        null=True
     )
     state = models.CharField(
         db_column="Server_State",
-        max_length = 255,
-        null = True
+        max_length=255,
+        null=True,
+        choices=SEVER_STATE,
     )
     account_number = models.ForeignKey(
         AWS_Credentials,
         on_delete= models.CASCADE,
         db_column='AWS_Account_Number',
         null=True,
+    )
+    type = models.CharField(
+        db_column='Server_Type',
+        max_length=255,
+        null=True,
+        choices=SEVER_TYPE,
     )
 
     class Meta:

@@ -10,6 +10,7 @@ from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring import views as views_DM
 from Module_DeploymentMonitoring.src import utilities as utilities_DM
 from django.http import JsonResponse
+from django.contrib.auth import logout
 
 # Test to see if django-background-tasks is wokring or not
 #
@@ -62,10 +63,15 @@ def faculty_Event_Base(requests):
 
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
+    server_type = requests.POST.get('server_type')
     event_type = requests.POST.get('event_type')
-    scheduled_datetime = datetime.now() if requests.POST.get('datetime') == 'now' else requests.POST.get('datetime')
 
-    if section_numberList == None or event_type == None:
+    if requests.POST.get('datetime') == 'now' or requests.POST.get('datetime') == None:
+        scheduled_datetime = datetime.now()
+    else:
+        scheduled_datetime = (datetime.strptime(requests.POST.get('datetime'),'%Y-%m-%dT%H:%M'))-timedelta(hours=8)
+
+    if section_numberList == None or event_type == None or server_type == None:
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     try:
@@ -75,16 +81,18 @@ def faculty_Event_Base(requests):
             for details in team_details[section_number]:
                 querySet_serverList = Server_Details.objects.filter(account_number=details["account_number"])
                 for server in querySet_serverList:
-                    serverList.append(
-                        {
-                            'server_ip':server.IP_address,
-                            'server_id':server.instanceid,
-                            'server_account':server.account_number.account_number
-                        }
-                    )
+                    if server.type == server_type:
+                        serverList.append(
+                            {
+                                'server_ip':server.IP_address,
+                                'server_id':server.instanceid,
+                                'server_account':server.account_number.account_number
+                            }
+                        )
 
-        period = scheduled_datetime - datetime.now()
-        events[event_type](server_list=serverList, schedule=period)
+        if len(serverList) > 0:
+            period = scheduled_datetime - datetime.now()
+            events[event_type](server_list=serverList, schedule=period)
 
     except Exception as e:
         traceback.print_exc()
