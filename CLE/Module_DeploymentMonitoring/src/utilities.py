@@ -168,7 +168,7 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,sever_type,requests):
+def addServerDetails(ipAddress,server_type,requests):
     class_studentObj= getStudentClassObject(requests)
     awsC = class_studentObj.awscredential
     validity = validateAccountNumber(ipAddress, awsC)
@@ -185,7 +185,7 @@ def addServerDetails(ipAddress,sever_type,requests):
             instanceName = None,
             state = "Live",
             account_number=awsC,
-            type=sever_type
+            type=server_type
         )
         sd.save()
     except:

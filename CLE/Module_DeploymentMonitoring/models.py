@@ -48,12 +48,12 @@ class AWS_Credentials(models.Model):
 
 
 class Server_Details(models.Model):
-    SEVER_TYPE = (
+    SERVER_TYPE = (
         ('Parent','Parent'),
         ('Slave','Slave'),
     )
 
-    SEVER_STATE = (
+    SERVER_STATE = (
         ('Live','Live'),
         ('Pending','Pending'),
         ('Down','Down'),
@@ -89,7 +89,7 @@ class Server_Details(models.Model):
         db_column='Server_Type',
         max_length=255,
         null=True,
-        choices=SEVER_TYPE,
+        choices=SERVER_TYPE,
     )
 
     class Meta:

@@ -597,7 +597,7 @@ def student_Monitor_Base(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',{})
 
-    response['sever_ip'] = requests.GET.get('server_ip')
+    response['server_ip'] = requests.GET.get('server_ip')
 
     try:
         response['server_status'] = []
@@ -610,7 +610,7 @@ def student_Monitor_Base(requests):
         account_number = AWS_Credentials.account_number
 
         response = utilities.getMonitoringStatus(account_number,team_number,response)
-        response = utilities.getMetric(response['sever_ip'],response)
+        response = utilities.getMetric(response['server_ip'],response)
 
         tz = pytz.timezone('Asia/Singapore')
         response["last_updated"]= str(datetime.datetime.now(tz=tz))[:19]
