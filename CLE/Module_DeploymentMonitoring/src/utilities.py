@@ -159,8 +159,6 @@ def addAWSKeys(ipAddress,requests):
         jsonObj = json.loads(response.content.decode())
         awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
         awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
-        # awsC.access_key = jsonObj['User']['Results']['aws_access_key_id ']
-        # awsC.secret_access_key = jsonObj['User']['Results']['aws_secret_access_key ']
         awsC.save()
     except:
         traceback.print_exc()
@@ -168,16 +166,22 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,server_type,requests):
-    class_studentObj= getStudentClassObject(requests)
-    awsC = class_studentObj.awscredential
-    validity = validateAccountNumber(ipAddress, awsC)
+def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
+    if requests != None:
+        class_studentObj= getStudentClassObject(requests)
+        awsC = class_studentObj.awscredential
+        validity = validateAccountNumber(ipAddress, awsCredentials=awsC)
+
+    if account_number != None:
+        validity = validateAccountNumber(ipAddress, account_number=account_number)
+
     if validity == False:
         raise Exception("Account number do not match with given IP, please try again")
 
     url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
+
     try:
         sd = Server_Details.objects.create(
             IP_address = ipAddress,
@@ -195,16 +199,22 @@ def addServerDetails(ipAddress,server_type,requests):
 
 
 # Validate if the IP address sent by the student user belongs under their account
-def validateAccountNumber(ipAddress, awsCredentials):
+def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
     url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
-    return awsCredentials.account_number == jsonObj['User']['Account']
+
+    if account_number != None:
+        return account_number == jsonObj['User']['Account']
+
+    if awsCredentials != None:
+        return awsCredentials.account_number == jsonObj['User']['Account']
 
 
 # Adds and Updates GitHub link via form
 def addGitHubLinkForm(request, form, template_name):
     data = dict()
+
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -215,25 +225,30 @@ def addGitHubLinkForm(request, form, template_name):
             })
         else:
             data['form_is_valid'] = False
+
     context = {'form': form}
     data['html_form'] = render_to_string(template_name, context, request=request)
     return JsonResponse(data)
 
 
 # Adds and Updated Server Details via form
-def addServerDetailsForm(request, form, template_name, account_number):
+def addServerDetailsForm(request, form, template_name):
     data = dict()
+
+    student_email = request.user.email
+    classObj = Class.objects.get(student=student_email)
+    credentialsObj = classObj.awscredential
+    account_number = credentialsObj.account_number
+
     if request.method == 'POST':
-        print(form.is_valid())
-        if form.is_valid():
+        if form.is_valid() and server_is_valid:
             form.save()
             data['form_is_valid'] = True
             servers = getAllServer(account_number)
-            data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
-                'servers': servers
-            })
+            data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers})
         else:
             data['form_is_valid'] = False
+
     context = {'form': form}
     data['html_form'] = render_to_string(template_name, context, request=request)
     return JsonResponse(data)
@@ -318,17 +333,18 @@ def getMonitoringStatus(account_number, team_number, response):
             )
 
     return response
-'''
-Gets the statistics of a server based on ip_address against event_details table
-Statistics obtained includes MTTR, MTBF, Breakdowns
-'''
+
+
+# Gets the statistics of a server based on ip_address against event_details table
+# Statistics obtained includes MTTR, MTBF, Breakdowns
+#
 def getServerStatistics(server_ip):
     from Module_EventConfig.models import Event_Details
     from Module_EventConfig.src.utilities import recoveryTimeCaclulation
     import pytz
     from datetime import datetime
 
-    try: 
+    try:
         serverInitiateTime = Event_Details.objects.filter(server_details=server_ip).get(event_type="start").event_startTime
         tz = pytz.timezone('Asia/Singapore')
         now = str(datetime.now(tz=tz))[:19]
@@ -346,9 +362,10 @@ def getServerStatistics(server_ip):
         serverStatistics = {"Breakdowns": 0, "MTTR": 0, "MTBF" : 0}
     return serverStatistics
 
+
 def timeToString(minutes):
     minute = int(minutes.split(".")[0])
-    try:    
+    try:
         seconds = float("0."+minutes.split(".")[1])* 60
     except:
         seconds = 0
@@ -358,7 +375,7 @@ def timeToString(minutes):
         if minute > 3600:
             day = minute//3600
             minute = minute % 3600
-        elif minute > 60: 
+        elif minute > 60:
             hours = minute//60
             minute = minute % 60
     return str(day)+" Days " + str(hours) + " Hours " + str(minute) + " Minutes " + str(seconds).split(".")[0] + " Seconds "
