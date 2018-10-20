@@ -22,6 +22,7 @@
             <tr>
                 <th>Team</th>
                 <th>Status</th>
+                <th>Type</th>
                 <th>Breakdowns</th>
                 <th>MTBF</th>
                 <th>MTTR</th>
@@ -40,6 +41,10 @@
                     <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
                 {% endif %}
                 </td>
+                <td>{{ details.server_type }}</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -47,6 +52,7 @@
             <tr>
               <th>Team</th>
               <th>Status</th>
+              <th>Type</th>
               <th>Breakdowns</th>
               <th>MTBF</th>
               <th>MTTR</th>
