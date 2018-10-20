@@ -4,7 +4,7 @@ from Module_DeploymentMonitoring.models import *
 class ServerForm(forms.ModelForm):
     class Meta:
         model = Server_Details
-        fields = ('IP_address', 'instanceid', 'instanceName', 'state', )
+        fields = ('IP_address', 'instanceid', 'instanceName', 'state', 'account_number', 'type', )
 
 class DeploymentForm(forms.ModelForm):
     class Meta:

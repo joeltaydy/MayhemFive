@@ -220,6 +220,24 @@ def addGitHubLinkForm(request, form, template_name):
     return JsonResponse(data)
 
 
+# TO-DO: Adds and Updated Server Details via form
+def addServerDetailsForm(request, form, template_name, account_number):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            servers = Server_Details.objects.filter(account_number=account_number)
+            data['html_server_list'] = render_to_string('<input link here>', {
+                'servers': servers
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
 # Obtain http status code and web server status of a group project based on account number.
 # Returns the response object along with the statuses of the server and webapplication
 #
@@ -328,6 +346,8 @@ def getServerStatus(server):
     return server_state
 
 
+# Retrieve metric of the specific server
+#
 def getMetric(server_ip,response):
     server = Server_Details.objects.get(IP_address=server_ip)
     server_state = server.state
@@ -380,14 +400,19 @@ def getCloudMetric(webapp_url):
     return {'xValue': timeList, 'yValue': sortedValueList, 'Label':label}
 
 
-def getAllServerIPs(account_number):
+# Get all server ip registered under that account number
+#
+def getAllServer(account_number):
     server_ips = []
 
     querySet = Server_Details.objects.filter(account_number=account_number)
     for server in querySet:
         server_ips.append(
             {
-                'server_ip':server.IP_address
+                'server_ip':server.IP_address,
+                'server_id':server.instanceid,
+                'server_name':server.instanceName,
+                'server_type':server.type
             }
         )
 

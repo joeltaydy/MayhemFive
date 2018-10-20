@@ -139,7 +139,7 @@ def faculty_Setup_AddGitHubLinks(request):
 # Updating of github deployment package link to DB
 # returns a JsonResponse
 #
-def faculty_Setup_UpdateGitHubLinks(request, pk):
+def faculty_Setup_UpdateGitHubLinks(request,pk):
     dp = get_object_or_404(Deployment_Package, pk=pk)
     if request.method == 'POST':
         form = DeploymentForm(request.POST, instance=dp)
@@ -151,7 +151,7 @@ def faculty_Setup_UpdateGitHubLinks(request, pk):
 # Deleting of github deployment package link from DB
 # returns a JsonResponse
 #
-def faculty_Setup_DeleteGitHubLinks(request, pk):
+def faculty_Setup_DeleteGitHubLinks(request,pk):
     dp = get_object_or_404(Deployment_Package, pk=pk)
     data = dict()
     if request.method == 'POST':
@@ -429,7 +429,8 @@ def faculty_Monitor_Base(requests):
 # Will check if images has been shared by faculty
 #
 def student_Deploy_Base(requests):
-    response = {}
+    response = {'student_Deploy_Base' : 'active'}
+
     try:
         processLogin.studentVerification(requests)
     except:
@@ -457,7 +458,7 @@ def student_Deploy_Base(requests):
         awsImageList = awsAccountNumber.imageDetails.all() # Could be None or aws image object Currently take first
         accountNumber = awsAccountNumber.account_number
 
-        response['first_server_ip'] = utilities.getAllServerIPs(accountNumber)[0]
+        response['first_server_ip'] = utilities.getAllServer(accountNumber)[0]
 
         consistent = False
         for image in awsImageList:
@@ -478,52 +479,6 @@ def student_Deploy_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
-# Main function for standard deploy page for student.
-# Will check if images has been shared by faculty
-#
-def student_Deploy_Base_std(requests):
-    response = {}
-    try:
-        processLogin.studentVerification(requests)
-    except:
-
-        logout(requests)
-        return render(requests,'Module_Account/login.html',response)
-    coursesec = ""
-    student_email = requests.user.email
-    courseList = requests.session['courseList_updated']
-    for course_title, crse in courseList.items():
-        if course_title == "EMS201":
-            coursesec = crse['id']
-    class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
-
-    try:
-        awsAccountNumber =  class_studentObj.awscredential
-        response['submittedAccNum'] = awsAccountNumber #Could be None or aws credentials object
-    except:
-        response['submittedAccNum'] = None
-    try:
-        awsAccountNumber =  class_studentObj.awscredential
-        awsImageList = awsAccountNumber.imageDetails.all() #Could be None or aws image object Currently take first
-        accountNumber = awsAccountNumber.account_number
-        consistent = False
-        for image in awsImageList:
-            if accountNumber in image.sharedAccNum:
-                response['awsImage'] = image
-                response['approvalStatus']= True
-                consistent = True
-                break
-        if consistent != True:
-            response['awsImage'] = None
-            response['approvalStatus']= False
-
-    except:
-        response['awsImage'] = None
-        response['approvalStatus']= False
-
-    response["studentDeployBase"] = "active"
-    print(response)
-    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
 # Processes Form
 #
@@ -588,6 +543,8 @@ def student_Deploy_AddIP(requests):
     utilities.addServerDetails(ipAddress,sever_type,requests)
 
 
+# Retrieves student's server adn metrics
+#
 def student_Monitor_Base(requests):
     response = {"student_Monitor_Base" : "active"}
 
@@ -621,3 +578,86 @@ def student_Monitor_Base(requests):
         return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
+
+# ---------- Experimental ---------- #
+
+# Main function for deployment page on student.
+# Will retrieve work products and render to http page
+#
+def student_Deploy_Standard_Base(requests):
+    response = {'student_Deploy_Base' : 'active'}
+
+    try:
+        processLogin.studentVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    student_email = requests.user.email
+    classObj = Class.objects.get(student=student_email)
+    credentialsObj = classObj.awscredential
+
+    response['account_number'] = credentialsObj.account_number,
+    response['servers'] = utilities.getAllServer(credentialsObj.account_number)
+
+    return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
+
+
+# TO-DO: Adding of server to DB
+# returns a JsonResponse
+#
+def student_Deploy_Standard_AddIP(requests):
+    student_email = requests.user.email
+    classObj = Class.objects.get(student=student_email)
+    credentialsObj = classObj.awscredential
+
+    if request.method == 'POST':
+        form = ServerForm(request.POST)
+    else:
+        form = ServerForm()
+
+    return utilities.addServerDetailsForm(requests, form, '<input link here>', credentialsObj.account_number)
+
+
+# TO-DO: Updating of server in DB
+# returns a JsonResponse
+#
+def student_Deploy_Standard_UpdateIP(requests,pk):
+    student_email = requests.user.email
+    classObj = Class.objects.get(student=student_email)
+    credentialsObj = classObj.awscredential
+    server = get_object_or_404(Server_Details, pk=pk)
+
+    if request.method == 'POST':
+        form = DeploymentForm(request.POST, instance=server)
+    else:
+        form = DeploymentForm(instance=server)
+
+    return utilities.addServerDetailsForm(requests, form, '<input link here>', credentialsObj.account_number)
+
+
+# TO-DO: Deleting of server from DB
+# returns a JsonResponse
+#
+def student_Deploy_Standard_DeleteIP(requests,pk):
+    student_email = requests.user.email
+    classObj = Class.objects.get(student=student_email)
+    credentialsObj = classObj.awscredential
+    server = get_object_or_404(Server_Details, pk=pk)
+    data = dict()
+
+    if request.method == 'POST':
+        server.delete()
+        data['form_is_valid'] = True
+        servers = Server_Details.objects.filter(account_number=credentialsObj.account_number)
+        data['html_server_list'] = render_to_string('<input link here>', {
+            'servers': server
+        })
+    else:
+        context = {'server': server}
+        data['html_form'] = render_to_string('<input link here>',
+            context,
+            request=request,
+        )
+
+    return JsonResponse(data)

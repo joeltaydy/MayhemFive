@@ -11,7 +11,6 @@ urlpatterns = [
     path('instructor/ITOperationsLab/monitor/',views.faculty_Monitor_Base,name='itopslab_monitor'),
     path('student/ITOperationsLab/deploy/',views.student_Deploy_Base,name='itopslab_studeploy'),
     path('student/ITOperationsLab/deploy/2',views.student_Deploy_Upload,name='itopslab_studeployUpload'),
-     path('student/ITOperationsLab/deploy/standard/',views.student_Deploy_Base_std,name='itopslab_studeploystd'),
     #path('student/ITOperationsLab/deploy/account/',views.student_Deploy_GetAccount,name='itopslab_studeploy_Account'),
     #path('student/ITOperationsLab/deploy/ip/',views.student_Deploy_GetIP,name='itopslab_studeploy_IP'),
     path('student/ITOperationsLab/monitor/',views.student_Monitor_Base,name='itopslab_stumonitor'),
@@ -21,4 +20,10 @@ urlpatterns = [
     path('instructor/ITOperationsLab/setup/ami/get/',views.faculty_Setup_GetAMI,name='itopslab_setup_AMI_get'),
     path('instructor/ITOperationsLab/setup/ami/accounts/get/',views.faculty_Setup_GetAMIAccounts,name='itopslab_setup_AMI_Accounts_get'),
     path('instructor/ITOperationsLab/setup/ami/accounts/share/',views.faculty_Setup_ShareAMI,name='itopslab_setup_AMI_Accounts_share'),
+
+    # For standard student deployment page
+    path('student/ITOperationsLab/deploy/standard/',views.student_Deploy_Standard_Base,name='itopslab_studeploy_standard'),
+    path('student/ITOperationsLab/deploy/standard/server/create/',views.student_Deploy_Standard_AddIP,name='server_create'),
+    path('student/ITOperationsLab/deploy/standard/server/<str:pk>/update/',views.student_Deploy_Standard_UpdateIP,name='server_update'),
+    path('student/ITOperationsLab/deploy/standard/server/<str:pk>/delete/',views.student_Deploy_Standard_DeleteIP,name='server_delete'),
 ]
