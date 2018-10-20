@@ -40,7 +40,7 @@
             <div id="panelBodyOne" class="panel-collapse collapse in">
                 <div class="panel-body">
 
-                    <form id="accNum" action="{% url 'DMmod:itopslab_studeploy_standard' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                    <form id="accNum" action="{% url 'DMmod:itopslab_studeploy_standard_AddAccount' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                         {% csrf_token %}
                         <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                             <label for="name" class="control-label">Account Number</label>
