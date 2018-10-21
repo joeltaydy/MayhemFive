@@ -500,6 +500,7 @@ def student_Deploy_Upload(requests):
     if ipAddress != "":
         try :
             student_Deploy_AddIP(requests)
+            requests.session['newIP'] = ipAddress
             return student_Monitor_Base(requests)
         except:
             traceback.print_exc()
@@ -555,6 +556,9 @@ def student_Monitor_Base(requests):
         return render(requests,'Module_Account/login.html',{})
 
     response['server_ip'] = requests.GET.get('server_ip')
+    if response['server_ip']==None:
+        response['server_ip'] = requests.session['newIP']  # from adding ip function
+        del requests.session['newIP']
 
     try:
         response['server_status'] = []
