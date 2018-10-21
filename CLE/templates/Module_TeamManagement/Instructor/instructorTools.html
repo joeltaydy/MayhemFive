@@ -3,20 +3,22 @@
 {% block bootstrapContent %}
 
 <!-- Button to Open the Modal -->
+</br>
+
 <div class= "redirect">
     <span>
       <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">Course Setup</button>
       <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">Teams Setup</button>
       <button onclick="location.href = '{% url 'TMmod:uploadtools' %}?user=faculty';" type="button" class="btn btn-dark active">Tools Setup</button>
     </span>
-<div>
+</div>
 
 <div class="col-md-8">
 <h1>Tools Setup</h1>
 
 <h3 style="margin-left:10px;">Select Tool:</h3>
 <span style ="margin-left:10px">
-<button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">
+<button type="button" class="btn btn-light" data-toggle="modal" data-target="#trailhead" data-whatever="Trailhead" id="type" value="trailhead">
   <img src="{% static 'images/Trailhead Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Trailhead")'><br>Trailhead
 </button>
 <!-- <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Kahoot" id="type" value ="kahoot">
@@ -27,6 +29,33 @@
     <img src="{% static 'images/Telegram Logo.png' %}" alt="..." class="rounded-circle" align="center" onclick='setTool("Telegram")'><br>Telegram</button>
 </span>
 
+<div class="modal fade" id="trailhead">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Set up Trailhead</h4>
+        <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">
+          <img src="{% static 'images/trailhead_setup.png' %}" alt="..." class="rounded-circle" align="center"><br>Trailhead
+        </button>
+        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#trailmix" data-whatever="Trailmix" id="type" value="trailmix">
+          <img src="{% static 'images/trailmix_setup.png' %}" alt="..." class="rounded-circle" align="center"><br>TrailMix/ Badges
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <!-- The Modal -->
   <div class="modal fade" id="otherToolsModal">
     <div class="modal-dialog modal-lg">
@@ -34,7 +63,7 @@
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">Set up</h4>
+          <h4 class="modal-title">Set up Trailhead</h4>
           <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -81,14 +110,12 @@
         <!-- Modal footer -->
         <div class="modal-footer">
         </br>
-          <button class="btn btn-primary">Configure tools</button>
+          <button class="btn btn-primary">Submit</button>
         </div>
         </form>
       </div>
     </div>
   </div>
-
-
 
   <!--Telegram modal 1-->
   <div class="modal fade" id="TelegramModalstep1">
@@ -120,7 +147,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-        </br>
+          <button class="btn btn-primary TelegramModalstep1" data-dismiss="modal">Previous Step</button>
           <button class="btn btn-primary mr-right">Send verification code</button>
         </div>
         </form>
@@ -170,6 +197,25 @@
         </div>
         </form>
           <!-- end of Form -->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="trailmix">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          {% include "dataforms/trailmixes/trailhead_list.html" %}
       </div>
     </div>
   </div>
@@ -267,7 +313,6 @@ $.ajaxSetup({
 });
 </script>
 
-
 <!-- <label for="name" class="control-label">
   <a href="/images/myw3schoolsimage.jpg" download data-toggle="popover" data-html="true" data-trigger="hover" data-content="Click to download sample excel file.">Help <i class="far fa-question-circle"></i></a>
 </label>
@@ -280,5 +325,5 @@ $(document).ready(function(){
 </script> -->
 
 {% include 'popupmessages/message.html' %}
-
+</div>
 {% endblock %}

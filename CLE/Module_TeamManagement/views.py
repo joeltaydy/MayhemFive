@@ -2,7 +2,7 @@ import os
 import traceback
 import datetime
 from zipfile import ZipFile
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
 from Module_TeamManagement.models import *
 from django.contrib.auth.decorators import login_required
@@ -29,6 +29,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.generic import FormView
 from Module_TeamManagement.mixins import AjaxFormMixin
+
 
 # Student Home Page
 #@login_required(login_url='/')
@@ -262,7 +263,7 @@ def faculty_Overview(requests):
 
     facultyObj = Faculty.objects.get(email=faculty_email)
     classObj_list = Class.objects.all().filter(course_section=course_section)
-    
+
     trailResults = utilities.populateTrailheadInformation(requests, instructorEmail=requests.user.email)
 
     context.update(trailResults)
