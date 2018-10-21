@@ -44,10 +44,11 @@ def stopServer(server_list=None,server=None):
             results = aws_util.stopServer(server['server_id'],access_key,secret_access_key)
 
             if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + counter + '. Successfully stopped server: ' + server['server_ip'])
                 utilities.writeEventLog("stop", server['server_ip'] )
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
+                
             else:
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + counter + '. Unsuccessfully stopped server: ' + server['server_ip'])
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
             counter += 1
             
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Stop Server')

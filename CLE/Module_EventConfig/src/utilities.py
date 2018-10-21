@@ -33,10 +33,11 @@ Method to record recovery time based on IP as well as start recording the initia
 Called by student server
 '''
 def writeRecoveryTime(ipAddress):   
-    eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="stop").order_by("id").reverse()
+    
     tz = pytz.timezone('Asia/Singapore')
     now = str(datetime.now(tz=tz))[:19]
     try :
+        eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="stop").order_by("id").reverse()
         event = eventList[0]
         event.event_endTime = now
         event.event_recovery= recoveryTimeCaclulation(event.event_startTime , now)
