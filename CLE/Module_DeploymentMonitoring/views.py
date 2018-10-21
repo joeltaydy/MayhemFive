@@ -642,7 +642,7 @@ def student_Deploy_Standard_AddAccount(requests):
 
             serverObjs = Server_Details.objects.filter(account_number=old_account_number)
             for serverObj in serverObjs:
-                server.delete()
+                serverObj.delete()
 
             old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
             old_credentialsObj.delete()
