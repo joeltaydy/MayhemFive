@@ -600,8 +600,7 @@ def student_Deploy_Standard_Base(requests,response=None):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    student_email = requests.user.email
-    classObj = Class.objects.get(student=student_email)
+    classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
 
     try:
