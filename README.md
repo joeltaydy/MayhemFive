@@ -3,21 +3,116 @@
 
 --------------------------------------------------------------------------------
 
+**Introduction**
+Cloudtopus makes it easy for you to access, track, and analyse students progress on external learning tools. You can configure tools such as Trailhead, Telegram for facilitating your teaching courses beyond classroom learning materials. The platform serves as a monitoring dashboard for faculty and students to compare student progress within the class. It also comes with an IT operations manager lab which can be used for learning the operation stages in DEVOPS.
 
 **Setup**
-###### Environments to run django:
-* WAMP OR MAMP(for Mac)
-* Python 3.6.x or above
-* Django 2.0.x
-(install via `pip install -r requirements.txt`)    
+###### Base Environment:
+* MySQL
+* Python
+* Git
 
+--------------------------------------------------------------------------------
 
-**Instructions**
-###### Deploy webpage on local server
-1. Start WAMP/MAMP Server
-2. Open command prompt/terminal
-3. Traverse directory to where the `manage.py` file is
-4. Run command `python manage.py runserver` to run local server on your own machine
-5. Go to a web browser and type: `localhost:8000` to see whether you've deployed correctly  
+**Instructions (Setting up Server)**
+###### 1. SSH into server (To-do):
 
-_*To get rid of unapplied migration, type command `python manage.py migrate`_
+    $ ...
+
+###### 2. Install dependencies:
+
+    $ sudo -s
+    $ yum update
+    $ yum install <package name>
+
+List of packages to install on server:
+
+ - python36.x86_64
+ - python36-devel.x86_64
+ - python36-libs.x86_64
+ - python36-pip.noarch
+ - python36-setuptools.noarch
+ - python36-test.x86_64
+ - python36-tools.x86_64
+ - python36-virtualenv.noarch
+ - mysql55.x86_64
+ - mysql55-bench.x86_64
+ - mysql55-devel.x86_64
+ - mysql55-embedded.x86_64
+ - mysql55-embedded-devel.x86_64
+ - mysql55-libs.x86_64
+ - mysql55-server.x86_64
+ - mysql55-test.x86_64
+ - git.x86_64
+ - gcc
+
+###### 3. Linking pyton, pip and virtualenv:
+
+    $ cd/usr/bin
+    $ unlink python
+    $ unlink pip
+    $ unlink virtualenv
+    $ ln -s python36 python
+    $ ln -s pip-3.6 pip
+    $ ln -s virtualenv-3.6 virtualenv
+    $ exit
+
+--------------------------------------------------------------------------------
+
+**Instructions (Setting up Database)**
+###### 1. Initializing database:
+
+    $ sudo -s
+    $ chkconfig mysqld on
+    $ service mysqld start
+    $ mysqladmin -u root password cle12345
+    $ exit
+
+###### 2. Create schemas:
+
+    $ mysql -u root -p
+    mysql> CREATE DATABASE CLE_Data
+    mysql> CREATE DATABASE App_Data
+
+--------------------------------------------------------------------------------
+
+**Instructions (Setting up Application)**
+###### 1. Clone and enter repository:
+
+    $ mkdir Django_App
+    $ cd Djano_App
+    $ git clone https://github.com/joeltaydy/MayhemFive.git
+    $ cd MayhemFive/CLE
+
+###### 2. Set up visual environment (To-do):
+
+    $ ...
+
+###### 2. Install dependencies:
+
+    $ pip install -r requirements.txt
+    $ cd ..
+    $ cd Setup_Dependencies
+    $ bash install_redis.sh
+
+###### 3. Setup up dependencies:
+
+    $ redis-server --daemonize yes
+    $ screen
+    $ bash start_celery_worker.sh
+
+Keyboard command: ctrl + A + D
+
+    $ screen
+    $ bash start_celery_task.sh
+
+Keyboard command: ctrl + A + D
+
+###### 4. Deploy webpage on local server (To-do):
+
+    $ cd CLE
+    $ python manage.py migrate
+    $ python manage.py migrate Module_TeamManagement --database=CLE_Data
+    $ python manage.py migrate Module_DeploymentMonitoring --database=CLE_Data
+    $ python manage.py migrate Module_EventConfig --database=CLE_Data
+    $ python manage.py runserver 0.0.0.0:8000
