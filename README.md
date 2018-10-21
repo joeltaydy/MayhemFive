@@ -4,6 +4,7 @@
 --------------------------------------------------------------------------------
 
 **Introduction**
+
 Cloudtopus makes it easy for you to access, track, and analyse students progress on external learning tools. You can configure tools such as Trailhead, Telegram for facilitating your teaching courses beyond classroom learning materials. The platform serves as a monitoring dashboard for faculty and students to compare student progress within the class. It also comes with an IT operations manager lab which can be used for learning the operation stages in DEVOPS.
 
 **Setup**
@@ -101,12 +102,12 @@ List of packages to install on server:
     $ screen
     $ bash start_celery_worker.sh
 
-Keyboard command: ctrl + A + D
+Keyboard command: ctrl + A + D - To exit screen without terminating it
 
     $ screen
     $ bash start_celery_task.sh
 
-Keyboard command: ctrl + A + D
+Keyboard command: ctrl + A + D - To exit screen without terminating it
 
 ###### 4. Deploy webpage on local server (To-do):
 
