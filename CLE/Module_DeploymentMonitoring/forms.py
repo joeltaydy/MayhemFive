@@ -4,21 +4,18 @@ from Module_DeploymentMonitoring.models import *
 class ServerForm_Add(forms.ModelForm):
     class Meta:
         model = Server_Details
-        fields = ('IP_address', 'instanceid', 'type', )
+        fields = ('IP_address', 'type', )
         labels = {
             'IP_address':'IP Address',
-            'instanceid':'Instance ID',
             'type':'Type',
         }
 
 class ServerForm_Update(forms.ModelForm):
     class Meta:
         model = Server_Details
-        fields = ('IP_address', 'instanceid', 'instanceName', 'type', )
+        fields = ('IP_address', 'type', )
         labels = {
             'IP_address':'IP Address',
-            'instanceid':'Instance ID',
-            'instanceName':'Name',
             'type':'Type',
         }
 

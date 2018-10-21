@@ -614,7 +614,7 @@ def student_Deploy_Standard_Base(requests,response=None):
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
 
-# TO:DO - Validates and add account number into DB
+# Adds account number into DB
 #
 def student_Deploy_Standard_AddAccount(requests):
     response = {'student_Deploy_Standard_AddAccount' : 'active'}
@@ -628,7 +628,36 @@ def student_Deploy_Standard_AddAccount(requests):
     account_number = requests.POST.get('account_number')
 
     try:
-        pass
+        try:
+            # IF account number is in DB
+            credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+
+            # Delete servers under account_number from Server_Detials
+            servers = Server_Details.objects.filter(account_number=credentialsObj)
+            for server in servers:
+                server.delete()
+
+            # Remove account_number from AWS_Credentials
+            credentialsObj.delete()
+        except:
+            traceback.print_exc()
+            pass
+
+        # IF account number is not in DB
+        credentialsObj = AWS_Credentials.objects.create(account_number=account_number)
+        credentialsObj.save()
+
+        studentClassObj = Class.objects.get(student=requests.user.email)
+        team_name = studentClassObj.team_number
+
+        if team_name != None:
+            teamObj = Class.objects.filter(team_number=team_name)
+            for team_member in teamObj:
+                team_member.account_number = credentialsObj
+                team_member.save()
+        else:
+            studentClassObj.account_number = credentialsObj
+            studentClassObj.save()
 
     except Exception as e:
         traceback.print_exc()
@@ -653,7 +682,6 @@ def student_Deploy_Standard_GetIPs(requests):
 # returns a JsonResponse
 #
 def student_Deploy_Standard_AddIPs(requests):
-
     if requests.method == 'POST':
         form = ServerForm_Add(requests.POST)
     else:

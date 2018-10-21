@@ -37,7 +37,7 @@ def getResource(access_key,secret_access_key,region_name=None,service=None):
     return resource
 
 
-# Checks if matching server ip and id
+# Checks if valid server
 def validateServer(server_ip,server_id,access_key=None,secret_access_key=None,client=None):
     if client == None:
         client = getClient(access_key,secret_access_key)

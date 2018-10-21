@@ -241,7 +241,7 @@ def addServerDetailsForm(request, form, template_name):
     account_number = credentialsObj.account_number
 
     if request.method == 'POST':
-        if form.is_valid() and server_is_valid:
+        if form.is_valid():
             form.save()
             data['form_is_valid'] = True
             servers = getAllServer(account_number)
