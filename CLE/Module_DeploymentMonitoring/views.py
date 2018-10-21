@@ -600,8 +600,7 @@ def student_Deploy_Standard_Base(requests,response=None):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    student_email = requests.user.email
-    classObj = Class.objects.get(student=student_email)
+    classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
 
     try:
@@ -642,7 +641,7 @@ def student_Deploy_Standard_AddAccount(requests):
 
             serverObjs = Server_Details.objects.filter(account_number=old_account_number)
             for serverObj in serverObjs:
-                server.delete()
+                serverObj.delete()
 
             old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
             old_credentialsObj.delete()
@@ -662,8 +661,7 @@ def student_Deploy_Standard_AddAccount(requests):
 # Retrieval of github deployment package link from DB
 #
 def student_Deploy_Standard_GetIPs(requests):
-    student_email = requests.user.email
-    classObj = Class.objects.get(student=student_email)
+    classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
     servers = utilities.getAllServer(credentialsObj.account_number)
 
@@ -706,8 +704,7 @@ def student_Deploy_Standard_UpdateIPs(requests,pk):
 # returns a JsonResponse
 #
 def student_Deploy_Standard_DeleteIPs(requests,pk):
-    student_email = requests.user.email
-    classObj = Class.objects.get(student=student_email)
+    classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
     data = dict()
