@@ -8,10 +8,14 @@
 Cloudtopus makes it easy for you to access, track, and analyse students progress on external learning tools. You can configure tools such as Trailhead, Telegram for facilitating your teaching courses beyond classroom learning materials. The platform serves as a monitoring dashboard for faculty and students to compare student progress within the class. It also comes with an IT operations manager lab which can be used for learning the operation stages in DEVOPS.
 
 **Setup**
+
+Below is an indication of the basic dependencies that is needed on the server for it to run Cloudtopus properly.
+
 ###### Base Environment:
 * MySQL
 * Python
 * Git
+* Redis
 
 --------------------------------------------------------------------------------
 
