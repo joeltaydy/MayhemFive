@@ -53,9 +53,11 @@ def validateServer(server_ip,server_id,access_key=None,secret_access_key=None,cl
             return True
         else:
             print("Invalid parameters. Please specify a valid ip address")
+            return False
 
     except ClientError as e:
         print("Invalid parameters. Please specify a valid instance id")
+        return False
 
 
 # Check if valid account number

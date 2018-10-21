@@ -144,7 +144,7 @@ def getStudentClassObject(requests):
     for course_title,course_details in courseList.items():
         if course_title == "EMS201":
             course_section_id = course_details['id']
-    class_studentObj = Class.objects.filter(student= student_email).get(course_section=course_section_id)
+    class_studentObj = Class.objects.filter(student=student_email).get(course_section=course_section_id)
 
     return class_studentObj
 
@@ -235,13 +235,20 @@ def addGitHubLinkForm(request, form, template_name):
 def addServerDetailsForm(request, form, template_name):
     data = dict()
 
-    student_email = request.user.email
-    classObj = Class.objects.get(student=student_email)
-    credentialsObj = classObj.awscredential
-    account_number = credentialsObj.account_number
-
     if request.method == 'POST':
-        if form.is_valid():
+        classObj = getStudentClassObject(request)
+        credentialsObj = classObj.awscredential
+
+        account_number = credentialsObj.account_number
+        access_key = decode(credentialsObj.access_key)
+        secret_access_key = decode(credentialsObj.secret_access_key)
+
+        server_ip = requests.POST.get('IP_address')
+        server_id = requests.POST.get('instanceid')
+
+        server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+
+        if form.is_valid() and server_is_valid:
             form.save()
             data['form_is_valid'] = True
             servers = getAllServer(account_number)

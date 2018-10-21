@@ -687,6 +687,12 @@ def student_Deploy_Standard_GetIPs(requests):
 #
 def student_Deploy_Standard_AddIPs(requests):
     if requests.method == 'POST':
+        studentClassObj = utilities.getStudentClassObject(requests)
+        credentialsObj = studentClassObj.awscredential
+        
+        if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
+            utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
+
         form = ServerForm_Add(requests.POST)
     else:
         form = ServerForm_Add()
