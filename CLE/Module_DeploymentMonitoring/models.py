@@ -74,7 +74,7 @@ class Server_Details(models.Model):
         null=True
     )
     state = models.CharField(
-        db_column="Server_State",
+        db_column='Server_State',
         max_length=255,
         null=True,
         choices=SERVER_STATE,

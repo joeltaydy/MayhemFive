@@ -9,8 +9,8 @@
 
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-            <button onclick="location.href= '{% url 'DMmod:itopslab_studeploystd' %}';" type="button" class="btn btn-dark">Deploy</button>
-            <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
+            <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark">Deploy</button>
+            <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?server_ip={{ first_server_ip.server_ip }}';" type="button" class="btn btn-dark active">Monitor</button>
         </div>
     </div>
 

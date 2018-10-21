@@ -1,4 +1,5 @@
 import boto3
+import traceback
 from botocore.exceptions import ClientError
 from Module_DeploymentMonitoring.src import config, server_util
 
@@ -34,6 +35,27 @@ def getResource(access_key,secret_access_key,region_name=None,service=None):
     )
 
     return resource
+
+
+# Checks if matching server ip and id
+def validateServer(server_ip,server_id,access_key=None,secret_access_key=None,client=None):
+    if client == None:
+        client = getClient(access_key,secret_access_key)
+
+    try:
+        instances = client.describe_instances(
+            InstanceIds=[
+                server_id,
+            ]
+        )
+
+        if server_ip == instances['Reservations'][0]['Instances'][0]['PublicIpAddress']:
+            return True
+        else:
+            print("Invalid parameters. Please specify a valid ip address")
+
+    except ClientError as e:
+        print("Invalid parameters. Please specify a valid instance id")
 
 
 # Check if valid account number
