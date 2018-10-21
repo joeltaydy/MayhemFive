@@ -10,7 +10,7 @@
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
             <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark">Deploy</button>
-            <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?server_ip={{ first_server_ip.server_ip }}';" type="button" class="btn btn-dark active">Monitor</button>
+            <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
                 <div class="col-md-6">
                   <div class="card">
                     {% for details in server_status %}
-                        {% if details.server_ip == sever_ip %}
+                        {% if details.server_ip == server_ip %}
                         <div class="card-header">
                           <h5 align="center" class="card-title">{{details.server_type|add:" Server Status"}}</h5>
                         </div>
@@ -76,7 +76,7 @@
                       <span align="center">
 
                         {% for details in webapp_status %}
-                            {% if details.ip_address == sever_ip %}
+                            {% if details.ip_address == server_ip %}
                             <p class="card-category" align="center"><img src="{% static 'images/icons8-internet-64.png' %}" alt="">
                              {% comment %} {{ details.team_name }} {% endcomment %}
                                 {% if details.webapp_state  == 'Live' %}

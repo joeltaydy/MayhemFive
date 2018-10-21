@@ -243,13 +243,18 @@ def addServerDetailsForm(request, form, template_name):
         access_key = decode(credentialsObj.access_key)
         secret_access_key = decode(credentialsObj.secret_access_key)
 
-        server_ip = requests.POST.get('IP_address')
-        server_id = requests.POST.get('instanceid')
+        server_ip = request.POST.get('IP_address')
+        server_id = request.POST.get('instanceid')
 
         server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
 
         if form.is_valid() and server_is_valid:
             form.save()
+
+            serverObj = Server_Details.objects.get(IP_address=server_ip)
+            serverObj.account_number = credentialsObj
+            serverObj.save()
+
             data['form_is_valid'] = True
             servers = getAllServer(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers})
@@ -277,6 +282,7 @@ def getMonitoringStatus(account_number, team_number, response):
         if server_state == 'Killed':
             server.delete()
             continue
+
         server_statistics = getServerStatistics(server_ip)
         response['server_status'].append(
             {
@@ -284,6 +290,7 @@ def getMonitoringStatus(account_number, team_number, response):
                 'server_ip':server_ip,
                 'server_state':server_state,
                 'server_name':server_name if server_name != None else '',
+                'server_type':server.type,
                 'breakdowns': server_statistics['Breakdowns'],
                 'mtbf': server_statistics['MTBF'],
                 'mttr': server_statistics['MTTR']
@@ -365,8 +372,9 @@ def getServerStatistics(server_ip):
         mtbf = str(totalUpTime/len(serverEventList))
         serverStatistics = {"Breakdowns": len(serverEventList), "MTTR": timeToString(mttr) , "MTBF" :timeToString(mtbf) }
     except:
-        traceback.print_exc()
+        # traceback.print_exc()
         serverStatistics = {"Breakdowns": 0, "MTTR": 0, "MTBF" : 0}
+
     return serverStatistics
 
 

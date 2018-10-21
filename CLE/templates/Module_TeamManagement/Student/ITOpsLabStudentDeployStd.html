@@ -14,7 +14,7 @@
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
                 <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark active">Deploy</button>
-                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?server_ip={{ first_server_ip.server_ip }}';" type="button" class="btn btn-dark">Monitor</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor</button>
             </div>
         </div>
 
@@ -44,23 +44,24 @@
                         {% csrf_token %}
                         <div class="container col-md-6" style="display: block;margin-left: auto;margin-right: auto;">
                             <label for="name" class="control-label">Account Number</label>
-                            <input class="form-control" type="text" name="account_number" id="account_number" aria-describedby="fileHelp" placeholder="Account Number">
+                            <input class="form-control" type="text" name="new_account_number" id="new_account_number" aria-describedby="fileHelp" placeholder="Account Number">
                             <br>
                         </div>
                         <div class="col-md-9 form-group" style = "margin-bottom:40px;">
                             <br>
                             <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
                         </div>
-                    </form>
-                    <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
-                        <h3><b>Submitted Account Number </b></h3>
-                        {% if submittedAccountNumber != "" %}
-                            <b>Current Account Number:</b> {{account_number}}
-                        {% else %}
-                            <b><i color = "red">No Account Number submitted</i></b>
-                        {%endif %}
+                        <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+                            <h3><b>Submitted Account Number </b></h3>
+                            {% if submittedAccountNumber != "" %}
+                                <b>Current Account Number:</b> {{account_number}}
+                                <input class="form-control" type="hidden" name="old_account_number" id="old_account_number" value={{account_number}}>
+                            {% else %}
+                                <b><i color = "red">No Account Number submitted</i></b>
+                            {%endif %}
 
-                    </div>
+                        </div>
+                    </form>
 
                 </div>
             </div>

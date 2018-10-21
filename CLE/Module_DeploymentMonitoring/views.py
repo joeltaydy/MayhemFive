@@ -416,7 +416,7 @@ def faculty_Monitor_Base(requests):
 
         for details in section_details:
             response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
-            print(response)
+
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
@@ -457,8 +457,6 @@ def student_Deploy_Base(requests):
         awsAccountNumber =  class_studentObj.awscredential
         awsImageList = awsAccountNumber.imageDetails.all() # Could be None or aws image object Currently take first
         accountNumber = awsAccountNumber.account_number
-
-        response['first_server_ip'] = utilities.getAllServer(accountNumber)[0]
 
         consistent = False
         for image in awsImageList:
@@ -556,9 +554,6 @@ def student_Monitor_Base(requests):
         return render(requests,'Module_Account/login.html',{})
 
     response['server_ip'] = requests.GET.get('server_ip')
-    if response['server_ip']==None:
-        response['server_ip'] = requests.session['newIP']  # from adding ip function
-        del requests.session['newIP']
 
     try:
         response['server_status'] = []
@@ -570,12 +565,16 @@ def student_Monitor_Base(requests):
         team_number= studentClassObj.team_number
         account_number = AWS_Credentials.account_number
 
-        response = utilities.getMonitoringStatus(account_number,team_number,response)
-        response = utilities.getMetric(response['server_ip'],response)
+        if response['server_ip'] == None:
+            if len(utilities.getAllServer(account_number)[0]) > 0:
+                response['server_ip'] = utilities.getAllServer(account_number)[0]['server_ip']
+
+        if response['server_ip'] != None:
+            response = utilities.getMonitoringStatus(account_number,team_number,response)
+            response = utilities.getMetric(response['server_ip'],response)
 
         tz = pytz.timezone('Asia/Singapore')
         response['last_updated']= str(datetime.datetime.now(tz=tz))[:19]
-        response['first_server_ip'] = utilities.getAllServer(AWS_Credentials.account_number)[0]
 
     except Exception as e:
         traceback.print_exc()
@@ -608,7 +607,6 @@ def student_Deploy_Standard_Base(requests,response=None):
     try:
         response['account_number'] = credentialsObj.account_number
         response['servers'] = utilities.getAllServer(credentialsObj.account_number)
-        response['first_server_ip'] = utilities.getAllServer(credentialsObj.account_number)[0]
 
     except Exception as e:
         traceback.print_exc()
@@ -629,44 +627,34 @@ def student_Deploy_Standard_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    account_number = requests.POST.get('account_number')
+    new_account_number = requests.POST.get('new_account_number')
+    old_account_number = requests.POST.get('old_account_number')
 
     try:
-        try:
-            # IF account number is in DB
-            credentialsObj = AWS_Credentials.objects.get(account_number=account_number)
+        new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
+        new_credentialsObj.save()
 
-            # Delete servers under account_number from Server_Detials
-            servers = Server_Details.objects.filter(account_number=credentialsObj)
-            for server in servers:
+        if old_account_number != None:
+            querySet = Class.objects.filter(awscredential=old_account_number)
+            for studentClassObj in querySet:
+                studentClassObj.awscredential = new_credentialsObj
+                studentClassObj.save()
+
+            serverObjs = Server_Details.objects.filter(account_number=old_account_number)
+            for serverObj in serverObjs:
                 server.delete()
 
-            # Remove account_number from AWS_Credentials
-            credentialsObj.delete()
-        except:
-            traceback.print_exc()
-            pass
-
-        # IF account number is not in DB
-        credentialsObj = AWS_Credentials.objects.create(account_number=account_number)
-        credentialsObj.save()
-
-        studentClassObj = Class.objects.get(student=requests.user.email)
-        team_name = studentClassObj.team_number
-
-        if team_name != None:
-            teamObj = Class.objects.filter(team_number=team_name)
-            for team_member in teamObj:
-                team_member.account_number = credentialsObj
-                team_member.save()
+            old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
+            old_credentialsObj.delete()
         else:
-            studentClassObj.account_number = credentialsObj
+            studentClassObj = utilities.getStudentClassObject(requests)
+            studentClassObj.awscredential = new_credentialsObj
             studentClassObj.save()
 
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during validating of new account number (Student Deploy Standard): ' + str(e.args[0])
-        return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
+        return student_Deploy_Standard_Base(requests,response)
 
     return student_Deploy_Standard_Base(requests,response)
 
@@ -689,7 +677,7 @@ def student_Deploy_Standard_AddIPs(requests):
     if requests.method == 'POST':
         studentClassObj = utilities.getStudentClassObject(requests)
         credentialsObj = studentClassObj.awscredential
-        
+
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
             utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
 
