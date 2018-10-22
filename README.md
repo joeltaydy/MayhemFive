@@ -20,7 +20,16 @@ Below is an indication of the basic dependencies that is needed on the server fo
 --------------------------------------------------------------------------------
 
 **Instructions (Setting up Server)**
-###### 1. SSH into server (To-do):
+###### 1. SSH into server (TO-DO):
+
+MAC:
+
+Navigate to the folder where you store your key pair that you've downloaded from AWS (i.e. 'CLE.pem') and run these set of commands to ssh into your server.
+
+    $ chmod 400 <key_pair_name>.pem
+    $ ssh -i "<key_pair_name>.pem" ec2-user@<public_dns>
+
+WINDOWS:
 
     $ ...
 
@@ -82,25 +91,30 @@ List of packages to install on server:
 --------------------------------------------------------------------------------
 
 **Instructions (Setting up Application)**
-###### 1. Clone and enter repository:
+###### 1. Set up folders for repository:
 
     $ mkdir Django_App
     $ cd Djano_App
+
+###### 2. Set up virtual environment:
+
+    $ virtualenv CLE_Env
+    $ cd CLE_Env
+    $ . bin/activate
+
+###### 3. Clone repository:
+
     $ git clone https://github.com/joeltaydy/MayhemFive.git
     $ cd MayhemFive/CLE
 
-###### 2. Set up visual environment (To-do):
-
-    $ ...
-
-###### 2. Install dependencies:
+###### 4. Install dependencies:
 
     $ pip install -r requirements.txt
     $ cd ..
     $ cd Setup_Dependencies
     $ bash install_redis.sh
 
-###### 3. Setup up dependencies:
+###### 5. Setup up dependencies:
 
     $ redis-server --daemonize yes
     $ screen
@@ -113,7 +127,7 @@ Keyboard command: ctrl + A + D - To exit screen without terminating it
 
 Keyboard command: ctrl + A + D - To exit screen without terminating it
 
-###### 4. Deploy webpage on local server (To-do):
+###### 6. Deploy webpage on local server (To-do):
 
     $ cd CLE
     $ python manage.py migrate
