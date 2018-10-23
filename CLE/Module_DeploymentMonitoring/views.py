@@ -663,7 +663,10 @@ def student_Deploy_Standard_AddAccount(requests):
 def student_Deploy_Standard_GetIPs(requests):
     classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
-    servers = utilities.getAllServer(credentialsObj.account_number)
+    servers = []
+
+    if credentialsObj != None:
+        servers = utilities.getAllServer(credentialsObj.account_number)
 
     return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers})
 
