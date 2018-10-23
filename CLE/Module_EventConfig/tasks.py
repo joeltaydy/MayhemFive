@@ -54,7 +54,7 @@ def stopServer(server_list=None,server=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Stop Server')
 
 
-# @background(schedule=0)
+@background(schedule=0)
 def stopWebApplication(server_list=None,server=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: Stop Web App')
 
@@ -71,10 +71,10 @@ def stopWebApplication(server_list=None,server=None):
         server_jsonObj = json.loads(server_response.content.decode())
 
         if server_jsonObj['HTTPStatusCode'] == 200:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped web app: ' + server['server_ip'])
 
         else:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped web app: ' + server['server_ip'])
 
         counter += 1
 
