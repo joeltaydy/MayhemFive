@@ -105,7 +105,8 @@ def faculty_Event_Base(requests):
     return views_DM.faculty_Monitor_Base(requests)
 
 
-
+# Method to write the recovery time of the server that calls this
+#
 def serverRecoveryCall(request):
     secret_key = request.GET.get('secret_key')
     if utilities.validate(secret_key) == True:
@@ -119,7 +120,9 @@ def serverRecoveryCall(request):
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)
 
+
 # Method to call to log an event entry
+#
 def serverCall(request):
     secret_key = request.GET.get('secret_key')
     if utilities.validate(secret_key) == True:
