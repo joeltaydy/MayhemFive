@@ -43,6 +43,7 @@ def faculty_Event_Base(requests):
     events = {
         'stop':tasks.stopServer,
         'dos':tasks.dosAttack,
+        'stopapp':tasks.stopWebApplicaiton,
     }
 
     response = {"faculty_Event_Base" : "active"}
@@ -110,7 +111,7 @@ def serverRecoveryCall(request):
     if utilities.validate(secret_key) == True:
         response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
         ipAddress= request.GET.get('ip')
-        try: 
+        try:
             utilities.writeRecoveryTime(ipAddress)
         except:
             response = {'HTTPStatus':'No', 'HTTPStatusCode':404}

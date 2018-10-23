@@ -58,6 +58,7 @@
                         <select class="form-control" id="event_type" name="event_type">
                             <option value="" disabled selected>Select event type</option>
                             <option value="stop">Stop Server</option>
+                            <option value="stopapp">Stop Web App</option>
                             <option value="ddos">Send DoS Attack</option>
                         </select>
                     </div>
@@ -138,6 +139,9 @@
         }
         else if(event_type == "ddos"){
             document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" + "<h5>Send DoS Attack on Servers</h5>";
+        }
+        else if(event_type == "stopapp"){
+            document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" + "<h5>Stop Web Applications</h5>";
         }
         if (server_type != ""){
             document.querySelector(".summary-servertype").innerHTML = "<b>Server Type: </b>" + "<h5>" + server_type + "</h5>";

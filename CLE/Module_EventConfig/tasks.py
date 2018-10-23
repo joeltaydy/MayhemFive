@@ -22,7 +22,7 @@ def stopServer(server_list=None,server=None):
         server_ip = server['server_ip']
         server_id = server['server_id']
 
-        server_url = 'http://' + server_ip + ":8999/ec2/instance/event/stop/"
+        server_url = 'http://' + server_ip + ':8999/ec2/instance/event/stop/'
         payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
         server_response = req.get(server_url, params=payload)
         server_jsonObj = json.loads(server_response.content.decode())
@@ -46,12 +46,39 @@ def stopServer(server_list=None,server=None):
             if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
                 utilities.writeEventLog("stop", server['server_ip'] )
                 print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
-                
+
             else:
                 print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
             counter += 1
-            
+
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Stop Server')
+
+
+@background(schedule=0)
+def stopWebApplicaiton(server_list=None,server=None):
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: Stop Web App')
+
+    if server !=  None:
+        server_list = [server]
+
+    counter = 1
+    for server in server_list:
+        server_ip = server['server_ip']
+
+        server_url = 'http://' + server_ip + ':8999/event/stop/web_application/'
+        payload = {'port_number':8000}
+        server_response = req.get(server_url, params=payload)
+        server_jsonObj = json.loads(server_response.content.decode())
+
+        if server_jsonObj['HTTPStatusCode'] == 200:
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
+
+        else:
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
+
+        counter += 1
+
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Ending background event: Stop Web App')
 
 
 @background(schedule=0)
