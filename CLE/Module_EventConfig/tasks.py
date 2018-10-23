@@ -54,8 +54,8 @@ def stopServer(server_list=None,server=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Stop Server')
 
 
-@background(schedule=0)
-def stopWebApplicaiton(server_list=None,server=None):
+# @background(schedule=0)
+def stopWebApplication(server_list=None,server=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: Stop Web App')
 
     if server !=  None:
