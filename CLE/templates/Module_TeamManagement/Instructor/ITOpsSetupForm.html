@@ -35,7 +35,7 @@
                                         var account_numbers_table = document.getElementById("account_numbers");
 
                                         // remove existing options here
-                                        console.log(account_numbers_table);
+                                        $("#account_numbers option").remove();
 
                                         for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
                                             var option = document.createElement("OPTION");
