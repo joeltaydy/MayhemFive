@@ -131,6 +131,13 @@ def faculty_HomePage(requests):
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
 
+    try:
+        #Populates the info for the side nav bar for instructor
+        utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+    except Exception as e:
+        traceback.print_exc()
+        context['error_message'] = e.args[0]
+
     return render(requests, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
 
 
@@ -227,7 +234,6 @@ def faculty_Dashboard(requests):
         context['student_count'] = len(students)
 
     except:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         context = {'messages' : ['Invalid user account']}
         return render(requests,'Module_Account/login.html',context)
