@@ -111,7 +111,7 @@ List of packages to install on server:
 
     $ pip install -r requirements.txt
     $ cd ..
-    $ cd Setup_Dependencies
+    $ cd bin
     $ bash install_redis.sh
 
 ###### 5. Setup up dependencies:
