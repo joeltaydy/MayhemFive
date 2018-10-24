@@ -43,6 +43,7 @@ def faculty_Event_Base(requests):
     events = {
         'stop':tasks.stopServer,
         'dos':tasks.dosAttack,
+        'stopapp':tasks.stopWebApplication,
     }
 
     response = {"faculty_Event_Base" : "active"}
@@ -100,17 +101,18 @@ def faculty_Event_Base(requests):
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     requests.section_number = response['first_section']
-    time.sleep(15)
+    time.sleep(5)
     return views_DM.faculty_Monitor_Base(requests)
 
 
-
+# Method to write the recovery time of the server that calls this
+#
 def serverRecoveryCall(request):
     secret_key = request.GET.get('secret_key')
     if utilities.validate(secret_key) == True:
         response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
         ipAddress= request.GET.get('ip')
-        try: 
+        try:
             utilities.writeRecoveryTime(ipAddress)
         except:
             response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
@@ -118,7 +120,9 @@ def serverRecoveryCall(request):
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)
 
+
 # Method to call to log an event entry
+#
 def serverCall(request):
     secret_key = request.GET.get('secret_key')
     if utilities.validate(secret_key) == True:

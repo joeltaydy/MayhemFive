@@ -1031,3 +1031,7 @@ def trailhead_delete(request, pk):
 def teleMgmt(request):
     response = {}
     return render(request, "Module_TeamManagement/Instructor/TelegramManagement.html", response)
+    
+def home2(request):
+    context = {'home2': "active"}
+    return render(request, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)

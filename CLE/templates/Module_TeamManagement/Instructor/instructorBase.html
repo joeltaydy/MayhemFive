@@ -21,6 +21,13 @@ Instructor page
 {% endblock %}
 
 {% block sidenavBar %}
+<li class="nav-item {{ home2 }}">
+    <a class="nav-link" href="{% url 'TMmod:instHome2' %}">
+        <i class="fas fa-chart-pie"></i>
+        <p>Home</p>
+    </a>
+</li>
+
 <li class="nav-item {{ faculty_Home }}">
     <a class="nav-link" href="{% url 'TMmod:instHome' %}">
         <i class="fas fa-chart-pie"></i>
