@@ -46,7 +46,7 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
         # Pretty much hard code the login redirect url as the overwriting method above does not seem to be work
         if isInstructor != [] or sociallogin.account.extra_data["email"] == "keagenkoi@gmail.com":
             #print("Pushing to instructor's home")
-            settings.LOGIN_REDIRECT_URL = "TMmod:instHome"
+            settings.LOGIN_REDIRECT_URL = "TMmod:instHome2"
 
         elif not email_address == "smu.edu.sg":
             messages.error(request, "Please use an SMU account")
@@ -54,7 +54,7 @@ class SocialAccountWhitelist(DefaultSocialAccountAdapter):
 
         else:
             #print("Pushing to student's home")
-            try: 
+            try:
                 stu = Student.objects.get(email=sociallogin.account.extra_data["email"])
                 stu.loginCounts += 1
                 stu.save()
