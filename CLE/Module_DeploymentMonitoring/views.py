@@ -646,9 +646,10 @@ def student_Deploy_Standard_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    new_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
+    new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number')
     old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
-
+    print(new_account_number)
+    print(old_account_number)
     try:
         if new_account_number == None:
             raise Exception('Please enter a valid account number')
