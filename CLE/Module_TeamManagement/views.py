@@ -1027,3 +1027,7 @@ def trailhead_delete(request, pk):
         context = {'trailhead': trailhead}
         data['html_form'] = render_to_string('dataforms/trailmixes/partial_trailhead_delete.html', context, request=request)
     return JsonResponse(data)
+
+def teleMgmt(request):
+    response = {}
+    return render(request, "Module_TeamManagement/Instructor/TelegramManagement.html", response)

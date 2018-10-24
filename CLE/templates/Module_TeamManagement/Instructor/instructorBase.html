@@ -62,4 +62,11 @@ Instructor page
     {% endif %}
 {% endfor %}
 
+<li class="nav-item {{ teleMgmt }}">
+    <a class="nav-link" href="{% url 'TMmod:teleMgmt' %}">
+      <i class="fab fa-telegram"></i>
+      <p>Telegram Mgmt</p>
+    </a>
+</li>
+
 {% endblock %}
