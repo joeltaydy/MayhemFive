@@ -617,13 +617,13 @@ def student_Deploy_Standard_Base(requests,response=None):
 
     classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
-    account_number = credentialsObj.account_number
-
+    
     try:
         response['account_number'] = ''
         response['servers'] = []
 
-        if account_number != None:
+        if credentialsObj != None:
+            account_number = credentialsObj.account_number
             response['account_number'] = account_number
             response['servers'] = utilities.getAllServer(account_number)
 
