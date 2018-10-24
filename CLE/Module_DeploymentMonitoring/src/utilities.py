@@ -230,6 +230,7 @@ def initiateStartServerTime(ipAddress):
 
     try:
         eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="start").order_by("id").reverse()
+        print(eventList)
     except:
         event_Entry = Event_Details.objects.create(
             event_type="start",
@@ -239,6 +240,7 @@ def initiateStartServerTime(ipAddress):
             event_recovery=0
         )
         event_Entry.save()
+        print(event_Entry)
 
 
 # Validate if the IP address sent by the student user belongs under their account
@@ -297,8 +299,6 @@ def addServerDetailsForm(request, form, template_name):
             serverObj = Server_Details.objects.get(IP_address=server_ip)
             serverObj.account_number = credentialsObj
             serverObj.save()
-
-            initiateStartServerTime(server_ip)
 
             data['form_is_valid'] = True
             servers = getAllServer(account_number)

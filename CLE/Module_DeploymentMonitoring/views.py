@@ -707,6 +707,8 @@ def student_Deploy_Standard_AddIPs(requests):
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
             utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
 
+        utilities.initiateStartServerTime(requests.POST.get('IP_address'))
+
         form = ServerForm_Add(requests.POST)
     else:
         form = ServerForm_Add()
