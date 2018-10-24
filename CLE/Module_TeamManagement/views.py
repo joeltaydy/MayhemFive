@@ -112,7 +112,7 @@ def CLEAdmin(requests):
 
 
 # Faculty Home Page
-def faculty_DashboardPage(requests):
+def faculty_HomePage(requests):
     context = {'faculty_DashboardPage': "active"}
 
     # Redirect user to login page if not authorized and faculty
