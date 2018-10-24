@@ -33,6 +33,10 @@
                                         console.log(image_result);
 
                                         var account_numbers_table = document.getElementById("account_numbers");
+
+                                        // remove existing options here
+                                        account_numbers_table.remove();
+
                                         for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
                                             var option = document.createElement("OPTION");
                                             option.value = image_result.nonshared_accounts_list[i].account_number;
@@ -47,7 +51,7 @@
                                             var option = document.createElement("OPTION");
                                             option.value = image_result.shared_accounts_list[i].account_number;
                                             option.selected = true;
-                                            
+
                                             var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
                                             option.appendChild(text);
 
