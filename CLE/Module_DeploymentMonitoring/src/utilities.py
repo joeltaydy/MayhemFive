@@ -296,7 +296,7 @@ def addServerDetailsForm(request, form, template_name):
             serverObj.account_number = credentialsObj
             serverObj.save()
 
-            initiateStartServerTime(ipAddress)
+            initiateStartServerTime(server_ip)
 
             data['form_is_valid'] = True
             servers = getAllServer(account_number)
