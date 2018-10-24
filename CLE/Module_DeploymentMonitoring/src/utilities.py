@@ -450,6 +450,7 @@ def timeToString(minutes):
     timeString=timeString + str(seconds).split(".")[0] + " Seconds "
     return timeString
 
+
 # Rule of thumb method - To check server status
 #
 def getServerStatus(server):
@@ -550,3 +551,9 @@ def getAllServer(account_number):
         )
 
     return server_ips
+
+
+def getEventLogs(account_number,team_name):
+    event_logs = []
+
+    return event_logs

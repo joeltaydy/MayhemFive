@@ -419,6 +419,7 @@ def faculty_Monitor_Base(requests):
 
     response['server_status'] = []
     response['webapp_status'] = []
+    response['event_log'] = []
 
     course_sectionList = requests.session['courseList_updated']
     response['first_section'] = course_sectionList['EMS201'][0]['section_number']
@@ -431,6 +432,7 @@ def faculty_Monitor_Base(requests):
 
         for details in section_details:
             response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
+            # response['event_log'] = utilities.getEventLogs(details["account_number"],details["team_name"])
 
     except Exception as e:
         traceback.print_exc()
@@ -715,7 +717,7 @@ def student_Deploy_Standard_AddIPs(requests):
 
     if requests.method == 'POST':
         utilities.initiateStartServerTime(requests.POST.get('IP_address'))
-        
+
     return response
 
 

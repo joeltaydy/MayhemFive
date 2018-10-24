@@ -28,18 +28,17 @@
             </tr>
         </thead>
         <tbody>
-            {% for details in server_status %}
+            {% for details in event_log %}
             <tr>
-                <td>{{ details.team_name }}</td>
-                <td>
-                {% if details.server_state == 'Live' %}
-                    <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
-                {% elif details.server_state == 'Pending' %}
-                    <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
-                {% else %}
-                    <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
-                {% endif %}
-                </td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td>-Work in progress-</td>
             </tr>
             {% endfor %}
         </tbody>
