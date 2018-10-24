@@ -111,10 +111,10 @@ def CLEAdmin(requests):
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# Faculty Home Page
-#@login_required(login_url='/')
-def faculty_Home(requests):
-    context = {}
+# Faculty Home Page 2 - EXPERIMENTAL
+def faculty_HomePage(request):
+    context = {'faculty_HomePage': "active"}
+
     # Redirect user to login page if not authorized and faculty
     try:
         processLogin.InstructorVerification(requests)
@@ -122,10 +122,32 @@ def faculty_Home(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',context)
 
+    faculty_username = requests.user.email.split('@')[0]
+    all_SocialAccount = SocialAccount.objects.all()
+
+    for each_SocialAccount in all_SocialAccount:
+        data = each_SocialAccount.extra_data
+        if data['email'] == requests.user.email:
+            requests.session['user_picture'] = data['picture']
+            requests.session['user_name'] = data['name'].replace('_','').strip()
+
+    return render(request, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
+
+
+# Faculty Home Page
+#@login_required(login_url='/')
+def faculty_Home(requests):
     context = {"faculty_Home" : "active"}
 
-    faculty_username = requests.user.email.split('@')[0]
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',context)
 
+
+    faculty_username = requests.user.email.split('@')[0]
     all_SocialAccount = SocialAccount.objects.all()
 
     for each_SocialAccount in all_SocialAccount:
@@ -1063,7 +1085,3 @@ def faculty_telegram_Base(requests):
     context['course_title'] = course_title
     context['section_number'] = section_number
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",context)
-    
-def home2(request):
-    context = {'home2': "active"}
-    return render(request, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
