@@ -205,8 +205,6 @@ def faculty_Setup_GetAWSKeys(requests):
             credentialsObj.account_number = account_number
             credentialsObj.access_key = encode(access_key)
             credentialsObj.secret_access_key = encode(secret_access_key)
-            # credentialsObj.access_key = access_key
-            # credentialsObj.secret_access_key = secret_access_key
             credentialsObj.save()
 
             facultyObj.awscredential = credentialsObj
@@ -225,6 +223,8 @@ def faculty_Setup_GetAWSKeys(requests):
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
+            
+        response['message'] = 'Successfully updated AWS Credentials'
 
     except Exception as e:
         traceback.print_exc()
@@ -376,6 +376,8 @@ def faculty_Setup_ShareAMI(requests):
             # Step 5 REMOVE the image from AWS_Credentials (Student)
             for account_number in remove_list:
                 utilities.removeImageFromAUser(imageObj,account_number)
+
+        response['message'] = 'Successfully shared Deployment Environment'
 
     except Exception as e:
         traceback.print_exc()
