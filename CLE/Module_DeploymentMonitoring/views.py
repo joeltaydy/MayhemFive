@@ -366,15 +366,17 @@ def faculty_Setup_ShareAMI(requests):
 
         if choosen_account_list != None and len(choosen_account_list) > 0:
             imageObj = Image_Details.objects.get(imageId=image_id)
-            current_account_list = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum 
+            current_account_list = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum
 
             # Step 1: ADD the account number to the image permission on AWS
             add_list = list(set(choosen_account_list)-set(current_account_list))
+            print(add_list)
             if len(add_list) > 0:
                 aws_util.addUserToImage(image_id,add_list,client=client)
 
-            # Step 2: REMOVE ADD the account number from the image permission on AWS
+            # Step 2: REMOVE the account number from the image permission on AWS
             remove_list = list(set(current_account_list)-set(choosen_account_list))
+            print(remove_list)
             if len(remove_list) > 0:
                 aws_util.removeUserFromImage(image_id,remove_list,client=client)
 
