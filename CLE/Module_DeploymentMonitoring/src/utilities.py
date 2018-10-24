@@ -149,6 +149,24 @@ def getStudentClassObject(requests):
     return class_studentObj
 
 
+# Retrieve the Class object that belongs under the current student user
+def getTeamMembersClassQuerySet(requests):
+    team_name = getStudentClassObject(requests).team_number
+
+    if team_name == None:
+        return [getStudentClassObject(requests)]
+
+    courseList = requests.session['courseList_updated']
+
+    for course_title,course_details in courseList.items():
+        if course_title == "EMS201":
+            course_section_id = course_details['id']
+
+    querySet = Class.objects.filter(course_section=course_section_id).get(team_number=team_name)
+
+    return querySet
+
+
 # Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(ipAddress,requests):
     class_studentObj= getStudentClassObject(requests)
@@ -196,10 +214,10 @@ def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
         sd = Server_Details.objects.get(IP_address = ipAddress)
         sd.account_number =awsC
         sd.save()
-            
+
     tz = pytz.timezone('Asia/Singapore')
     now = str(datetime.now(tz=tz))[:19]
-    try: 
+    try:
         eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="start").order_by("id").reverse()
     except:
         event_Entry = Event_Details.objects.create(
@@ -379,7 +397,7 @@ def getServerStatistics(server_ip):
         serverEventList = Event_Details.objects.filter(server_details=server_ip).exclude(event_type="start")
         totalDownTime = 0
         for event in serverEventList:
-            if event.event_recovery != None: 
+            if event.event_recovery != None:
                 totalDownTime = totalDownTime+float(event.event_recovery) #required for mttr
         totalUpTime = max(recoveryTimeCaclulation(serverInitiateTime, now) - totalDownTime,0) #required for mtbf
         mttr= str(totalDownTime/len(serverEventList))
@@ -409,7 +427,7 @@ def timeToString(minutes):
             minute = minute % 60
     timeString = ""
     if day >0 :
-        timeString = timeString +  str(day)+" Days " 
+        timeString = timeString +  str(day)+" Days "
     if hours> 0:
         timeString= timeString + str(hours) + " Hours "
     if minute>0:

@@ -669,9 +669,11 @@ def student_Deploy_Standard_AddAccount(requests):
             old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
             old_credentialsObj.delete()
         else:
-            studentClassObj = utilities.getStudentClassObject(requests)
-            studentClassObj.awscredential = new_credentialsObj
-            studentClassObj.save()
+            team_members = utilities.getTeamMembersClassQuerySet(requests)
+
+            for team_member in team_members:
+                team_member.awscredential = new_credentialsObj
+                team_member.save()
 
     except Exception as e:
         traceback.print_exc()
