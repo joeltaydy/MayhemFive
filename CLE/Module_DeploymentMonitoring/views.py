@@ -617,10 +617,15 @@ def student_Deploy_Standard_Base(requests,response=None):
 
     classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
+    account_number = credentialsObj.account_number
 
     try:
-        response['account_number'] = credentialsObj.account_number
-        response['servers'] = utilities.getAllServer(credentialsObj.account_number)
+        response['account_number'] = ''
+        response['servers'] = []
+
+        if account_number != None:
+            response['account_number'] = account_number
+            response['servers'] = utilities.getAllServer(account_number)
 
     except Exception as e:
         traceback.print_exc()
@@ -643,7 +648,8 @@ def student_Deploy_Standard_AddAccount(requests):
 
     new_account_number = requests.POST.get('new_account_number')
     old_account_number = requests.POST.get('old_account_number')
-
+    print(new_account_number)
+    print(old_account_number)
     try:
         new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
         new_credentialsObj.save()
