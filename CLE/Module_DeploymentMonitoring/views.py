@@ -201,7 +201,11 @@ def faculty_Setup_GetAWSKeys(requests):
 
         # try:UPDATE, except:SAVE Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
         try:
+
             credentialsObj = facultyObj.awscredential
+            old_account_number = credentialsObj.account_number
+
+            # Create NEW AWS_Credentials
             credentialsObj.account_number = account_number
             credentialsObj.access_key = encode(access_key)
             credentialsObj.secret_access_key = encode(secret_access_key)
@@ -209,6 +213,15 @@ def faculty_Setup_GetAWSKeys(requests):
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
+
+            # Delete OLD AWS_Credentials and Images tied to it
+            old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
+
+            imageObjs = old_credentialsObj.imageDetails.all()
+            for imageObj in imageObjs:
+                imageObj.delete()
+
+            old_credentialsObj.delete()
 
         except:
             access_key = encode(access_key)
@@ -223,7 +236,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
-            
+
         response['message'] = 'Successfully updated AWS Credentials'
 
     except Exception as e:
@@ -606,8 +619,13 @@ def student_Deploy_Standard_Base(requests,response=None):
     credentialsObj = classObj.awscredential
 
     try:
-        response['account_number'] = credentialsObj.account_number
-        response['servers'] = utilities.getAllServer(credentialsObj.account_number)
+        response['account_number'] = ''
+        response['servers'] = []
+
+        if credentialsObj != None:
+            account_number = credentialsObj.account_number
+            response['account_number'] = account_number
+            response['servers'] = utilities.getAllServer(account_number)
 
     except Exception as e:
         traceback.print_exc()
@@ -628,10 +646,13 @@ def student_Deploy_Standard_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    new_account_number = requests.POST.get('new_account_number')
-    old_account_number = requests.POST.get('old_account_number')
+    new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number')
+    old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
 
     try:
+        if new_account_number == None:
+            raise Exception('Please enter a valid account number')
+
         new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
         new_credentialsObj.save()
 
@@ -648,9 +669,11 @@ def student_Deploy_Standard_AddAccount(requests):
             old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
             old_credentialsObj.delete()
         else:
-            studentClassObj = utilities.getStudentClassObject(requests)
-            studentClassObj.awscredential = new_credentialsObj
-            studentClassObj.save()
+            team_members = utilities.getTeamMembersClassQuerySet(requests)
+            print(team_members)
+            for team_member in team_members:
+                team_member.awscredential = new_credentialsObj
+                team_member.save()
 
     except Exception as e:
         traceback.print_exc()

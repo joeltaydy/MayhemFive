@@ -150,6 +150,24 @@ def getStudentClassObject(requests):
     return class_studentObj
 
 
+# Retrieve the Class object that belongs under the current student user
+def getTeamMembersClassQuerySet(requests):
+    team_name = getStudentClassObject(requests).team_number
+    print(team_name)
+    if team_name == None:
+        return [getStudentClassObject(requests)]
+
+    courseList = requests.session['courseList_updated']
+
+    for course_title,course_details in courseList.items():
+        if course_title == "EMS201":
+            course_section_id = course_details['id']
+
+    querySet = Class.objects.filter(course_section=course_section_id).filter(team_number=team_name)
+
+    return querySet
+
+
 # Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(ipAddress,requests):
     class_studentObj= getStudentClassObject(requests)
@@ -205,7 +223,8 @@ def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
 def initiateStartServerTime(ipAddress):
     tz = pytz.timezone('Asia/Singapore')
     now = str(datetime.now(tz=tz))[:19]
-    try: 
+
+    try:
         eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="start").order_by("id").reverse()
     except:
         event_Entry = Event_Details.objects.create(
@@ -216,8 +235,7 @@ def initiateStartServerTime(ipAddress):
             event_recovery=0
         )
         event_Entry.save()
-           
-    
+
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
     url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
@@ -377,6 +395,7 @@ def getServerStatistics(server_ip):
     from Module_EventConfig.src.utilities import recoveryTimeCaclulation
 
 
+
     try:
         serverInitiateTime = Event_Details.objects.filter(server_details=server_ip).get(event_type="start").event_startTime
         tz = pytz.timezone('Asia/Singapore')
@@ -385,7 +404,7 @@ def getServerStatistics(server_ip):
         serverEventList = Event_Details.objects.filter(server_details=server_ip).exclude(event_type="start")
         totalDownTime = 0
         for event in serverEventList:
-            if event.event_recovery != None: 
+            if event.event_recovery != None:
                 totalDownTime = totalDownTime+float(event.event_recovery) #required for mttr
         totalUpTime = max(recoveryTimeCaclulation(serverInitiateTime, now) - totalDownTime,0) #required for mtbf
         mttr= str(totalDownTime/len(serverEventList))
