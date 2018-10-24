@@ -16,7 +16,7 @@
             <h4 class="card-title">Dashboard</h4>
             <p class="card-text">Overview of students and teams. Provides statistics of students' progression.</p>
             <div class="text-center">
-              <button onclick="location.href = '/instructor/overview/*';" type="button" class="btn btn-primary">Dashboard</button>
+              <button onclick="location.href = '/instructor/home/';" type="button" class="btn btn-primary">Dashboard</button>
             </div>
           </div>
         </div>
@@ -29,7 +29,7 @@
           <h4 class="card-title">Student Management</h4>
           <p class="card-text">View different sections from different courses. Contains students' invidual data.</p>
           <div class="text-center">
-            <button onclick="location.href = '/instructor/overview/';" type="button" class="btn btn-primary">Student Mgmt</button>
+            <button onclick="location.href = '';" type="button" class="btn btn-primary">-Work in Progress-</button>
           </div>
         </div>
       </div>
@@ -48,18 +48,23 @@
       </div>
     </div>
 
-      <div class="col-md-4">
-      <div class="card col-md-12">
-        <img class="card-img-top" src="{% static 'images/ITops_home.png' %}" alt="Card image">
-        <div class="card-body">
-          <h4 class="card-title">IT Operations Lab</h4>
-          <p class="card-text">Monitoring of students' IT infrastructure and applications, sending of events.</p>
-          <div class="text-center">
-            <button onclick="location.href = '#';" type="button" class="btn btn-primary">IT Ops Lab</button>
+    {% for course_title,course_sectionList in request.session.courseList_updated.items %}
+        {% if course_title == 'EMS201' %}
+          <div class="col-md-4">
+          <div class="card col-md-12">
+            <img class="card-img-top" src="{% static 'images/ITops_home.png' %}" alt="Card image">
+            <div class="card-body">
+              <h4 class="card-title">IT Operations Lab</h4>
+              <p class="card-text">Monitoring of students' IT infrastructure and applications, sending of events.</p>
+              <div class="text-center">
+                <button onclick="location.href = '#';" type="button" class="btn btn-primary">IT Ops Lab</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+        {% endif %}
+    {% endfor %}
+
         </div>
     </div>
 </div>
