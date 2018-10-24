@@ -201,7 +201,11 @@ def faculty_Setup_GetAWSKeys(requests):
 
         # try:UPDATE, except:SAVE Account_Number, Access_Key and Secret_Access_Key to AWS_Credentials
         try:
+
             credentialsObj = facultyObj.awscredential
+            old_account_number = credentialsObj.account_number
+
+            # Create NEW AWS_Credentials
             credentialsObj.account_number = account_number
             credentialsObj.access_key = encode(access_key)
             credentialsObj.secret_access_key = encode(secret_access_key)
@@ -209,6 +213,15 @@ def faculty_Setup_GetAWSKeys(requests):
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
+
+            # Delete OLD AWS_Credentials and Images tied to it
+            old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
+
+            imageObjs = old_credentialsObj.imageDetails.all()
+            for imageObj in imageObjs:
+                imageObj.delete()
+
+            old_credentialsObj.delete()
 
         except:
             access_key = encode(access_key)
@@ -223,7 +236,7 @@ def faculty_Setup_GetAWSKeys(requests):
 
             facultyObj.awscredential = credentialsObj
             facultyObj.save()
-            
+
         response['message'] = 'Successfully updated AWS Credentials'
 
     except Exception as e:
