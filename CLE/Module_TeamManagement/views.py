@@ -131,7 +131,7 @@ def faculty_HomePage(requests):
             requests.session['user_picture'] = data['picture']
             requests.session['user_name'] = data['name'].replace('_','').strip()
 
-    return render(request, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
+    return render(requests, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
 
 
 # Faculty Daboard
