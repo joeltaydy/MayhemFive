@@ -10,7 +10,8 @@ from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-
+import pytz
+from datetime import datetime
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
@@ -196,7 +197,12 @@ def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
         sd = Server_Details.objects.get(IP_address = ipAddress)
         sd.account_number =awsC
         sd.save()
-            
+    initiateStartServerTime(ipAddress)
+
+# Saves the start time state of a server that is just set up
+# Input: elastic IP Address of instance
+# Output: Nil
+def initiateStartServerTime(ipAddress):
     tz = pytz.timezone('Asia/Singapore')
     now = str(datetime.now(tz=tz))[:19]
     try: 
@@ -210,7 +216,8 @@ def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
             event_recovery=0
         )
         event_Entry.save()
-
+           
+    
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
     url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
@@ -368,8 +375,7 @@ def getMonitoringStatus(account_number, team_number, response):
 def getServerStatistics(server_ip):
     from Module_EventConfig.models import Event_Details
     from Module_EventConfig.src.utilities import recoveryTimeCaclulation
-    import pytz
-    from datetime import datetime
+
 
     try:
         serverInitiateTime = Event_Details.objects.filter(server_details=server_ip).get(event_type="start").event_startTime
