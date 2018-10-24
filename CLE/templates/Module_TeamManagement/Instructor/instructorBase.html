@@ -69,11 +69,21 @@ Instructor page
     {% endif %}
 {% endfor %}
 
-<li class="nav-item {{ teleMgmt }}">
-    <a class="nav-link" href="{% url 'TMmod:teleMgmt' %}">
-      <i class="fab fa-telegram"></i>
-      <p>Telegram Mgmt</p>
-    </a>
-</li>
+
+<div id="accordion">
+    <li class="nav-item {{ faculty_telegram_Base }}">
+        <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            <i class="fab fa-telegram"></i>
+            <span class="no-icon">Telegram Mgmt</span>
+        </a>
+    </li>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" aria-expanded="true" data-parent="#accordion">
+            {% for course_title,course_sectionList in request.session.courseList_updated.items %}
+                <a class="nav-link" href="{% url 'TMmod:faculty_telegram_Base' %}?module={{ course_sectionList.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionList.0.section_number }}">
+                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
+                </a>
+            {% endfor %}
+        </div>
+</div>
 
 {% endblock %}

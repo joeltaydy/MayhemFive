@@ -1028,9 +1028,41 @@ def trailhead_delete(request, pk):
         data['html_form'] = render_to_string('dataforms/trailmixes/partial_trailhead_delete.html', context, request=request)
     return JsonResponse(data)
 
-def teleMgmt(request):
-    response = {}
-    return render(request, "Module_TeamManagement/Instructor/TelegramManagement.html", response)
+def faculty_telegram_Base(requests):
+    context = {}
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',context)
+
+    context = {"faculty_telegram_Base" : "active", 'course' : {}}
+
+    if requests.method == "GET":
+        course_section = requests.GET.get('module')
+        course_title = requests.GET.get('course_title')
+        section_number = requests.GET.get('section_number')
+    else:
+        course_section = requests.POST.get('course_section')
+        course_title = course_section[:-2]
+        section_number = course_section[-2:]
+
+    # Return sections that's related to the course
+    courseList_updated = requests.session['courseList_updated']
+    context['course_sectionList'] = courseList_updated[course_title]
+
+    classObj_list = Class.objects.all().filter(course_section=course_section)
+
+    course_section = Course_Section.objects.get(course_section_id=course_section)
+    if course_section.section_number == 'G0':
+        context['module'] = course_section.course.course_title
+    else:
+        context['module'] = course_section.course.course_title + " " + course_section.section_number
+
+    context['course_title'] = course_title
+    context['section_number'] = section_number
+    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",context)
     
 def home2(request):
     context = {'home2': "active"}

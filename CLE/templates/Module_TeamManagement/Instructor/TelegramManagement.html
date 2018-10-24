@@ -1,3 +1,51 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 {% load staticfiles %}
 
+<div class="content">
+    <div class="container-fluid">
+      <p> <br> </p>
+      <h1> Telegram Management for {{ course_title }}</h1> 
+        {% if section_number == 'G0' %}
+            <h1 align="center">No Section Chosen</h1>
+        {% else %}
+            <h1 align="center">Section: {{ section_number }}</h1>
+        {% endif %}
+  
+        <div class="navDiv">
+          {% for course_section in course_sectionList %}
+              {% if course_section.section_number != 'G0' %}
+          <a href="/instructor/TelegramManagement/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-dark">{{ course_section.section_number }}</a>
+              {% endif %}
+          {% endfor %}
+        </div>
+    </div>
+
+
+    <div class="col-md-12">
+        <div class="card ">
+            <div class="card-header ">
+                <img src="{% static 'images/Telegram Logo.png' %}" alt="..." class="rounded-circle" align="center">
+                <h4 align="center" class="card-title">Oops! You have not configured any groups/channels!</h4>
+                    
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add active class to the current button (highlight it)
+    $(function(){
+        pageUrl = location.href;
+        // console.log(pageUrl)
+        $('.navDiv a').each(function () {
+            link = $(this);
+            var href = link.attr("href");
+            console.log(link);
+            // console.log(link.attr("href") === pageUrl);
+            if (href === pageUrl.substring(pageUrl.length-href.length)) {
+                console.log("success");
+                link.addClass("active");
+            }
+        });
+    });
+</script>

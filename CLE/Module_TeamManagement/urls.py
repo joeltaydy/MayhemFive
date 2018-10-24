@@ -30,5 +30,5 @@ urlpatterns = [
     path('instructor/trailmix/<str:pk>/update/', views.trailhead_update, name='trailhead_update'),
     path('instructor/trailmix/<str:pk>/delete/', views.trailhead_delete, name='trailhead_delete'),
     #telegram
-    path('instructor/TelegramManagement',views.teleMgmt,name='teleMgmt'),
+    path('instructor/TelegramManagement',views.faculty_telegram_Base,name='faculty_telegram_Base'),
 ]
