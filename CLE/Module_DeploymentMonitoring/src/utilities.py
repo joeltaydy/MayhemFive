@@ -196,7 +196,20 @@ def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
         sd = Server_Details.objects.get(IP_address = ipAddress)
         sd.account_number =awsC
         sd.save()
-
+            
+    tz = pytz.timezone('Asia/Singapore')
+    now = str(datetime.now(tz=tz))[:19]
+    try: 
+        eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="start").order_by("id").reverse()
+    except:
+        event_Entry = Event_Details.objects.create(
+            event_type="start",
+            server_details=serverDetails,
+            event_startTime=now,
+            event_endTime=now,
+            event_recovery=0
+        )
+        event_Entry.save()
 
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
@@ -366,7 +379,8 @@ def getServerStatistics(server_ip):
         serverEventList = Event_Details.objects.filter(server_details=server_ip).exclude(event_type="start")
         totalDownTime = 0
         for event in serverEventList:
-            totalDownTime = totalDownTime+float(event.event_recovery) #required for mttr
+            if event.event_recovery != None: 
+                totalDownTime = totalDownTime+float(event.event_recovery) #required for mttr
         totalUpTime = max(recoveryTimeCaclulation(serverInitiateTime, now) - totalDownTime,0) #required for mtbf
         mttr= str(totalDownTime/len(serverEventList))
         mtbf = str(totalUpTime/len(serverEventList))
@@ -393,7 +407,15 @@ def timeToString(minutes):
         elif minute > 60:
             hours = minute//60
             minute = minute % 60
-    return str(day)+" Days " + str(hours) + " Hours " + str(minute) + " Minutes " + str(seconds).split(".")[0] + " Seconds "
+    timeString = ""
+    if day >0 :
+        timeString = timeString +  str(day)+" Days " 
+    if hours> 0:
+        timeString= timeString + str(hours) + " Hours "
+    if minute>0:
+        timeString=timeString+ str(minute) + " Minutes "
+    timeString=timeString + str(seconds).split(".")[0] + " Seconds "
+    return timeString
 
 # Rule of thumb method - To check server status
 #

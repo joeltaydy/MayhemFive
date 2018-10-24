@@ -43,15 +43,7 @@ def writeRecoveryTime(ipAddress):
         event.event_recovery= recoveryTimeCaclulation(event.event_startTime , now)
         event.save()
     except:
-        serverDetails = Server_Details.objects.get(IP_address=ipAddress)
-        event_Entry = Event_Details.objects.create(
-            event_type="start",
-            server_details=serverDetails,
-            event_startTime=now,
-            event_endTime=now,
-            event_recovery=0
-        )
-        event_Entry.save()
+        pass
         
     
 # return in minutes
