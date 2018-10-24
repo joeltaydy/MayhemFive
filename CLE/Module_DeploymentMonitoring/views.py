@@ -707,13 +707,16 @@ def student_Deploy_Standard_AddIPs(requests):
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
             utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
 
-        utilities.initiateStartServerTime(requests.POST.get('IP_address'))
-
         form = ServerForm_Add(requests.POST)
     else:
         form = ServerForm_Add()
 
-    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html')
+    response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html')
+
+    if requests.method == 'POST':
+        utilities.initiateStartServerTime(requests.POST.get('IP_address'))
+        
+    return response
 
 
 # Updating of server in DB
