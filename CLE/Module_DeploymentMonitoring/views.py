@@ -617,7 +617,7 @@ def student_Deploy_Standard_Base(requests,response=None):
 
     classObj = utilities.getStudentClassObject(requests)
     credentialsObj = classObj.awscredential
-    
+
     try:
         response['account_number'] = ''
         response['servers'] = []
@@ -646,11 +646,13 @@ def student_Deploy_Standard_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    new_account_number = requests.POST.get('new_account_number')
-    old_account_number = requests.POST.get('old_account_number')
-    print(new_account_number)
-    print(old_account_number)
+    new_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
+    old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
+
     try:
+        if new_account_number == None:
+            raise Exception('Please enter a valid account number')
+
         new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
         new_credentialsObj.save()
 
