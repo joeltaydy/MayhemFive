@@ -65,7 +65,7 @@ def stopWebApplication(server_list=None,server=None):
     for server in server_list:
         server_ip = server['server_ip']
 
-        server_url = 'http://' + server_ip + ':8999/event/stop/web_application/'
+        server_url = 'http://' + server_ip + ':8999/event/stop/deployment/'
         payload = {'port_number':8000}
         server_response = req.get(server_url, params=payload)
         server_jsonObj = json.loads(server_response.content.decode())
