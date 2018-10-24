@@ -112,8 +112,8 @@ def CLEAdmin(requests):
 
 
 # Faculty Home Page
-def faculty_HomePage(requests):
-    context = {'faculty_HomePage': "active"}
+def faculty_DashboardPage(requests):
+    context = {'faculty_DashboardPage': "active"}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -137,7 +137,7 @@ def faculty_HomePage(requests):
 # Faculty Daboard
 #@login_required(login_url='/')
 def faculty_Dashboard(requests):
-    context = {"faculty_Home" : "active"}
+    context = {"faculty_Dashboard" : "active"}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -533,7 +533,7 @@ def configureDB_course(requests):
     utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
 
     response['message'] = 'Course created'
-    return faculty_Home(requests)
+    return faculty_Dashboard(requests)
 
 
 # This is for subsequent configuration by faculty
@@ -609,7 +609,7 @@ def configureDB_students(requests):
     response['message'] = 'Successful Upload'
     # return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
     #utilities.webScrapper()
-    return faculty_Home(requests)
+    return faculty_Dashboard(requests)
 
 
 # This is for subsequent configuration by faculty
