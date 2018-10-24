@@ -215,7 +215,9 @@ def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
         sd = Server_Details.objects.get(IP_address = ipAddress)
         sd.account_number =awsC
         sd.save()
+
     initiateStartServerTime(ipAddress)
+
 
 # Saves the start time state of a server that is just set up
 # Input: elastic IP Address of instance
@@ -235,6 +237,7 @@ def initiateStartServerTime(ipAddress):
             event_recovery=0
         )
         event_Entry.save()
+
 
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
@@ -292,6 +295,8 @@ def addServerDetailsForm(request, form, template_name):
             serverObj = Server_Details.objects.get(IP_address=server_ip)
             serverObj.account_number = credentialsObj
             serverObj.save()
+
+            initiateStartServerTime(ipAddress)
 
             data['form_is_valid'] = True
             servers = getAllServer(account_number)
@@ -434,7 +439,7 @@ def timeToString(minutes):
             minute = minute % 60
     timeString = ""
     if day >0 :
-        timeString = timeString +  str(day)+" Days " 
+        timeString = timeString +  str(day)+" Days "
     if hours> 0:
         timeString= timeString + str(hours) + " Hours "
     if minute>0:
