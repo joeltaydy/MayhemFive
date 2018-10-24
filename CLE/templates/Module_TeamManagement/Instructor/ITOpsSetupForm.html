@@ -9,6 +9,7 @@
                      var optionSelected = $(this).find("option:selected");
                      var valueSelected  = optionSelected.val();
                      var section_number = optionSelected.text();
+                     var section_data = {};
 
                      section_data = { 'section_number' : section_number };
                      ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",section_data,function(section_result){
@@ -25,6 +26,7 @@
                                  var optionSelected = $(this).find("option:selected");
                                  var image_id  = optionSelected.val();
                                  var image_name = optionSelected.text();
+                                 var image_data = {}
 
                                  image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number };
                                  ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
@@ -44,7 +46,8 @@
                                         for (var i = image_result.shared_accounts_list.length - 1; i >= 0; i--) {
                                             var option = document.createElement("OPTION");
                                             option.value = image_result.shared_accounts_list[i].account_number;
-
+                                            option.selected = true;
+                                            
                                             var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
                                             option.appendChild(text);
 
