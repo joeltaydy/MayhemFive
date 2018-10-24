@@ -230,17 +230,18 @@ def initiateStartServerTime(ipAddress):
 
     try:
         eventList = Event_Details.objects.filter(server_details=ipAddress,event_type="start").order_by("id").reverse()
-        print(eventList)
+        if len(eventList) == 0:
+            event_Entry = Event_Details.objects.create(
+                event_type="start",
+                server_details=serverDetails,
+                event_startTime=now,
+                event_endTime=now,
+                event_recovery=0
+            )
+            event_Entry.save()
+            print(event_Entry)
     except:
-        event_Entry = Event_Details.objects.create(
-            event_type="start",
-            server_details=serverDetails,
-            event_startTime=now,
-            event_endTime=now,
-            event_recovery=0
-        )
-        event_Entry.save()
-        print(event_Entry)
+        traceback.print_exc()
 
 
 # Validate if the IP address sent by the student user belongs under their account
