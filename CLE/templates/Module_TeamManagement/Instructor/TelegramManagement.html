@@ -1,32 +1,44 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 {% load staticfiles %}
+{% block classList %}
 
 <div class="content">
     <div class="container-fluid">
-      <p> <br> </p>
-      <h1> Telegram Management for {{ course_title }}</h1> 
-        {% if section_number == 'G0' %}
-            <h1 align="center">No Section Chosen</h1>
-        {% else %}
-            <h1 align="center">Section: {{ section_number }}</h1>
-        {% endif %}
-  
-        <div class="navDiv">
-          {% for course_section in course_sectionList %}
-              {% if course_section.section_number != 'G0' %}
-          <a href="/instructor/TelegramManagement/?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-dark">{{ course_section.section_number }}</a>
-              {% endif %}
-          {% endfor %}
+        <h1 style="text-align: center"> Telegram Management </h1>
+        <div class="navDiv text-center" style="display: block;margin-left: auto;margin-right: auto;">
+            {% for course_section in course_sectionList %}
+                {% if course_section.section_number != 'G0' %}
+                <a href="/instructor/TelegramManagement?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-dark">{{ course_section.section_number }}</a>
+                {% endif %}
+            {% endfor %}
         </div>
+        <br>
+        {% if section_number == 'G0' %}
+        <h2 style = "background-color:#23272b; color:white; text-align: center">{{ course_title }}</h2>
+        {% else %}
+        <h2 style = "background-color:#23272b; color:white; text-align: center"> {{ course_title }} {{ section_number }}</h2> 
+        {% endif %}
+      
+  
+        
     </div>
 
-
-    <div class="col-md-12">
+    <br>
+    <div class="col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
         <div class="card ">
-            <div class="card-header ">
-                <img src="{% static 'images/Telegram Logo.png' %}" alt="..." class="rounded-circle" align="center">
-                <h4 align="center" class="card-title">Oops! You have not configured any groups/channels!</h4>
-                    
+            <div class="card-header" style="display: block;margin-left: auto;margin-right: auto;">
+                <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=150px height = 150px style="display: block;margin-left: auto;margin-right: auto;" >
+                <br>
+                <div style = "display: block;margin-left: auto;margin-right: auto;"> <h3 align = "center">Oops! <br> You have not configured any groups/channels </h3></div>
+                <br>
+            </div>
+            <div class="card-body" style = "display: block;margin-left: auto;margin-right: auto;">
+                    <button type="button" class="btn btn" style="background-color: #0088CC" data-toggle="modal" data-target="#createGroup" id="createGroup" value="createGroup">
+                        Create Section Group
+                    </button>
+                    <button type="button" class="btn btn" style="background-color: #0088CC" data-toggle="modal" data-target="#createChannel" id="createChannel" value="createChannel">
+                        Create Section Channel
+                    </button>
             </div>
         </div>
     </div>
@@ -49,3 +61,4 @@
         });
     });
 </script>
+{% endblock %}
