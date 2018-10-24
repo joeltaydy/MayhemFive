@@ -162,7 +162,7 @@ def getTeamMembersClassQuerySet(requests):
         if course_title == "EMS201":
             course_section_id = course_details['id']
 
-    querySet = Class.objects.filter(course_section=course_section_id).get(team_number=team_name)
+    querySet = Class.objects.filter(course_section=course_section_id).filter(team_number=team_name)
 
     return querySet
 
