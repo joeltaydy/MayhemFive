@@ -111,8 +111,8 @@ def CLEAdmin(requests):
     # return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
-# Faculty Home Page 2 - EXPERIMENTAL
-def faculty_HomePage(request):
+# Faculty Home Page
+def faculty_HomePage(requests):
     context = {'faculty_HomePage': "active"}
 
     # Redirect user to login page if not authorized and faculty
@@ -134,9 +134,9 @@ def faculty_HomePage(request):
     return render(request, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
 
 
-# Faculty Home Page
+# Faculty Daboard
 #@login_required(login_url='/')
-def faculty_Home(requests):
+def faculty_Dashboard(requests):
     context = {"faculty_Home" : "active"}
 
     # Redirect user to login page if not authorized and faculty
