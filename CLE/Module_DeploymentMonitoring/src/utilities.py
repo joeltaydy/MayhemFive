@@ -233,7 +233,7 @@ def initiateStartServerTime(ipAddress):
         if len(eventList) == 0:
             event_Entry = Event_Details.objects.create(
                 event_type="start",
-                server_details=serverDetails,
+                server_details=Server_Details.objects.get(IP_address=ipAddress),
                 event_startTime=now,
                 event_endTime=now,
                 event_recovery=0
