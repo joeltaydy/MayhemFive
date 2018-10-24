@@ -363,10 +363,8 @@ def faculty_Setup_ShareAMI(requests):
         secret_access_key = decode(aws_credentials.secret_access_key)
 
         client = aws_util.getClient(access_key,secret_access_key)
-        print(choosen_account_list)
-        print(current_account_list)
 
-        if choosen_account_list != None and len(choosen_account_list) > 0:
+        if choosen_account_list != None:
             imageObj = Image_Details.objects.get(imageId=image_id)
             current_account_list = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum.split('_')
 
