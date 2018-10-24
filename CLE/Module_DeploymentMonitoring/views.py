@@ -670,7 +670,7 @@ def student_Deploy_Standard_AddAccount(requests):
             old_credentialsObj.delete()
         else:
             team_members = utilities.getTeamMembersClassQuerySet(requests)
-
+            print(team_members)
             for team_member in team_members:
                 team_member.awscredential = new_credentialsObj
                 team_member.save()

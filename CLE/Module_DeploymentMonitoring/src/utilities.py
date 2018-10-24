@@ -152,7 +152,7 @@ def getStudentClassObject(requests):
 # Retrieve the Class object that belongs under the current student user
 def getTeamMembersClassQuerySet(requests):
     team_name = getStudentClassObject(requests).team_number
-
+    print(team_name)
     if team_name == None:
         return [getStudentClassObject(requests)]
 
