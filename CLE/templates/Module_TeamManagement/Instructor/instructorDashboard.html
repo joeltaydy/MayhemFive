@@ -29,11 +29,42 @@
           <h4 class="card-title">Student Management</h4>
           <p class="card-text">View different sections from different courses. Contains students' invidual data.</p>
           <div class="text-center">
-            <button onclick="location.href = '';" type="button" class="btn btn-primary">-Work in Progress-</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#courselist">
+              Student Mgmt
+            </button>
+            <!-- <button onclick="location.href = '';" type="button" class="btn btn-primary">Student Mgmt</button> -->
           </div>
         </div>
       </div>
     </div>
+
+
+    <!--student management modal-->
+    <div class="modal fade" id="courselist">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header d-block">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title text-center">Select your course</h4>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body text-center">
+            {% for course_title,course_sectionList in request.session.courseList_updated.items %}
+                <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionList.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionList.0.section_number }}">
+                    <button type="button" class="btn btn-primary">{{ course_title }}</button>
+                </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--student management modal-->
+
 
       <div class="col-md-4">
       <div class="card col-md-12">
