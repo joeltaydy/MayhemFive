@@ -205,11 +205,11 @@ def sendGroupMessage(client,group_name,message):
 
 
 def sendChannelMessage(client,channel_name,message):
-    dialog = getDialog(client,channel_name,Channel)
-    # client(messages.SendMessageRequest(
-    #     channel=dialog,
-    #     message=[message],
-    # ))
+    channel_entity = getEntity(client,channel_name,Channel)
+    client(messages.SendMessageRequest(
+        peer=channel_entity.id,
+        message=message,
+    ))
 
 
 def disconnectClient(client=None):

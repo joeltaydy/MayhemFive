@@ -1235,7 +1235,7 @@ def faculty_telegram_CreateChannel(requests):
     return faculty_telegram_Base(requests,response)
 
 
-# TO-DO: Send message to designated section group/channel
+# Send message to designated section group/channel
 #
 def faculty_telegram_SendMessage(requests):
     response = {"faculty_telegram_SendMessage" : "active"}
