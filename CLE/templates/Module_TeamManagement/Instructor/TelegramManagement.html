@@ -50,12 +50,13 @@
         <div class="card ">
             <div class="card-header">
                 
-                    <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createGroup" value="createGroup">   
-                        <b>Group</b>
-                    </button>
-                    <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createChannel" value="createChannel">
-                        <b>Create Section Channel</b>
-                    </button>
+                    <div class="navDiv" style="display: block;margin-left: auto;margin-right: auto;">
+                        {% for course_section in course_sectionList %}
+                            {% if course_section.section_number != 'G0' %}
+                            <a href="/instructor/TelegramManagement?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ course_section.course_title }} {{ course_section.section_number }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 
                     <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                 <br>
@@ -65,8 +66,8 @@
                 <div class = "col-md-6">
                 <div class ="card">
                     <div class="card-header">
-                            <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px;">Send a Message:</h3>
-                        <p class="card-category text-center">This message will be send to your telegram group/channel</p>
+                            <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px;"><b>Send a Message:</b></h3>
+                        <p class="card-category text-center">This message will be sent to your telegram group/channel</p>
                     </div>            
                     <div class="card-body">
                         <form action="{% url 'TMmod:faculty_telegram_Base' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
@@ -75,7 +76,7 @@
                                 <textarea class="form-control col-md9" style="height:200px; margin-bottom:15px" name="send_msg" id="send_msg"></textarea>
                             <!-- Submission -->
                                 <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
-                                    <button class="btn btn-dark" >Send Message</button>
+                                    <button class="btn" style = "background-color:#f9b902"><b>Send Message</b></button>
                                 </div>
                             </div>  
                         </form>
