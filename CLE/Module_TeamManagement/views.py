@@ -1080,24 +1080,39 @@ def faculty_telegram_Base(requests,response=None):
         for telegram_tool in telegram_querySet:
             response['telegram_chats'].append({'name': telegram_tool.name,})
 
-        if telegram_chat_name == None:
-            first_chat = telegram_querySet[0]
-            response['current_telegram_chat'] = {
-                'name': first_chat.name,
-                'link': first_chat.link,
-                'type': first_chat.type,
-                'members': first_chat.members.split('_') if first_chat.members != None else [],
-                'members_count': len(first_chat.members.split('_')) if first_chat.members != None else 0,
-            }
-        else:
-            telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
-            response['current_telegram_chat'] = {
-                'name': telegram_chat.name,
-                'link': telegram_chat.link,
-                'type': telegram_chat.type,
-                'members': telegram_chat.members.split('_') if telegram_chat.members != None else [],
-                'members_count': len(telegram_chat.members.split('_')) if telegram_chat.members != None else 0,
-            }
+        if len(telegram_querySet) > 0:
+            if telegram_chat_name == None:
+                first_chat = telegram_querySet[0]
+                response['current_telegram_chat'] = {
+                    'name': first_chat.name,
+                    'link': first_chat.link,
+                    'type': first_chat.type,
+                    'members': first_chat.members.split('_') if first_chat.members != None else [],
+                    'members_count': len(first_chat.members.split('_')) if first_chat.members != None else 0,
+                }
+            else:
+                telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+                response['current_telegram_chat'] = {
+                    'name': telegram_chat.name,
+                    'link': telegram_chat.link,
+                    'type': telegram_chat.type,
+                    'members': telegram_chat.members.split('_') if telegram_chat.members != None else [],
+                    'members_count': len(telegram_chat.members.split('_')) if telegram_chat.members != None else 0,
+                }
+
+        # Note to self:
+        # The problem here is that if the student doesn't join the group/channel
+        # using the link we supplied via the cloudtopus, it won't be added into
+        # the DB. (i.e. if their firends invite them into the group/channel)
+
+        # Mitigation:
+        # Restructure the method to do the same thing you did with the AMIs
+
+        # However:
+        # We won't be able to link the username is to the respective student
+
+        # Mititgation for that: ?
+        # <yet to figure out>
 
     except Exception as e:
         traceback.print_exc()
@@ -1107,7 +1122,7 @@ def faculty_telegram_Base(requests,response=None):
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
-# TO-DO: Group creation form
+# Group creation form
 #
 def faculty_telegram_CreateGroup(requests):
     response = {"faculty_telegram_CreateGroup" : "active"}
@@ -1120,25 +1135,39 @@ def faculty_telegram_CreateGroup(requests):
         return render(requests,'Module_Account/login.html',response)
 
     group_name = requests.POST.get('group_name')
+    additional_username = requests.POST.get('username')
     course_section = requests.POST.get('course_section')
-    print('Gorup Name: ' + group_name)
+    print('Group Name: ' + group_name)
     print('Course Section: ' + course_section)
+    print('Additional Username: ' + additional_username)
 
     try:
-        pass
-        # username = requests.user.email.split('@')[0]
-        # client = tele_util.getClient(username)
-        #
-        # class_QuerySet = Class.objects.filter(course_section=course_section)
-        # results = tele_util.initialize_Channel(
-        #     client=client,
-        #     course_title=group_name,
-        #     section_number=course_section[-2:],
-        # )
+        username = requests.user.email.split('@')[0]
+        client = tele_util.getClient(username)
 
-        # for student in class_QuerySet:
-        #     student.telegram_channellink = results['channel_link']
-        #     student.save()
+        results = tele_util.initialize_Group(
+            username=additional_username,
+            client=client,
+            group_name=group_name,
+        )
+
+        # Create Telegram_Chats object
+        try:
+            telegram_chat = Telegram_Chats.objects.create(
+                name=group_name,
+                type='Group',
+                link=results['group_link'],
+                members=None,
+            )
+            telegram_chat.save()
+        except:
+            telegram_chat = Telegram_Chats.objects.get(name=group_name)
+
+        # Assign to the students of the course_section
+        class_QuerySet = Class.objects.filter(course_section=course_section)
+        for student in class_QuerySet:
+            student.telegram_chats.add(telegram_chat)
+            student.save()
 
     except Exception as e:
         traceback.print_exc()
@@ -1149,7 +1178,7 @@ def faculty_telegram_CreateGroup(requests):
     return faculty_telegram_Base(requests,response)
 
 
-# TO-DO: Channel crreation form
+# Channel creation form
 #
 def faculty_telegram_CreateChannel(requests):
     response = {"faculty_telegram_CreateChannel" : "active"}
@@ -1167,20 +1196,31 @@ def faculty_telegram_CreateChannel(requests):
     print('Course Section: ' + course_section)
 
     try:
-        pass
-        # username = requests.user.email.split('@')[0]
-        # client = tele_util.getClient(username)
-        #
-        # class_QuerySet = Class.objects.filter(course_section=course_section)
-        # results = tele_util.initialize_Channel(
-        #     client=client,
-        #     course_title=channel_name,
-        #     section_number=course_section[-2:],
-        # )
+        username = requests.user.email.split('@')[0]
+        client = tele_util.getClient(username)
 
-        # for student in class_QuerySet:
-        #     student.telegram_channellink = results['channel_link']
-        #     student.save()
+        results = tele_util.initialize_Channel(
+            client=client,
+            channel_name=channel_name,
+        )
+
+        # Create Telegram_Chats object
+        try:
+            telegram_chat = Telegram_Chats.objects.create(
+                name=channel_name,
+                type='Channel',
+                link=results['channel_link'],
+                members=None,
+            )
+            telegram_chat.save()
+        except:
+            telegram_chat = Telegram_Chats.objects.get(name=channel_name)
+
+        # Assign to the students of the course_section
+        class_QuerySet = Class.objects.filter(course_section=course_section)
+        for student in class_QuerySet:
+            student.telegram_chats.add(telegram_chat)
+            student.save()
 
     except Exception as e:
         traceback.print_exc()

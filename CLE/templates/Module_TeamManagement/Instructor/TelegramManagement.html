@@ -131,7 +131,10 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="name" class="control-label">Please Specify Group Name</label>
+                    <br>
                     <input type="text" class="form-control text-center col-md9" name="group_name" id="group_name" placeholder="Group Name">
+                    <br>
+                    <input type="text" class="form-control text-center col-md9" name="username" id="username" placeholder="Additional Telegram Username">
                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                 </div>
                 <!-- Submission -->
