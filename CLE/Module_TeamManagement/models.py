@@ -181,7 +181,7 @@ class School_Term(models.Model):
         db_table = 'School_Term'
         unique_together = (('financial_year','term'),)
 
-class Telegram_Tools(models.Model):
+class Telegram_Chats(models.Model):
     CHAT_TYPE = (
         ('Channel','Channel'),
         ('Group','Group'),
@@ -205,11 +205,12 @@ class Telegram_Tools(models.Model):
     )
     members = models.TextField(
         db_column='Members',
+        null=True,
     )
 
     class Meta:
         managed = True
-        db_table = 'Telegram_Tools'
+        db_table = 'Telegram_Chats'
 
 class Class(models.Model):
     school_term = models.ForeignKey(
@@ -243,9 +244,9 @@ class Class(models.Model):
         db_column='CLT_ID',
         null=True,
     )
-    telegram_tools = models.ManyToManyField(
-        Telegram_Tools,
-        db_column='Telegram_Tools',
+    telegram_chats = models.ManyToManyField(
+        Telegram_Chats,
+        db_column='Telegram_Chats',
         null=True,
     )
 

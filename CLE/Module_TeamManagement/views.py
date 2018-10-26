@@ -1035,10 +1035,11 @@ def trailhead_delete(request, pk):
 #----------------------------------------------#
 
 
-# TO-DO: Main page for telegram management page
+# Main page for telegram management page
 #
-def faculty_telegram_Base(requests):
-    response = {"faculty_telegram_Base" : "active", 'current_course_section_details' : {}}
+def faculty_telegram_Base(requests,response=None):
+    if response == None:
+        response = {"faculty_telegram_Base" : "active"}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -1049,13 +1050,12 @@ def faculty_telegram_Base(requests):
 
     if requests.method == "GET":
         course_section = requests.GET.get('course_section')
+        telegram_chat_name = requests.GET.get('chat_name')
     else:
         course_section = requests.POST.get('course_section')
+        telegram_chat_name = requests.POST.get('chat_name')
 
     try:
-        if course_section == None:
-            raise Exception('Please specify course_section')
-
         # Retrieve Administritive Stuff
         courseList_updated = requests.session['courseList_updated']
         course_section = Course_Section.objects.get(course_section_id=course_section)
@@ -1066,36 +1066,51 @@ def faculty_telegram_Base(requests):
         else:
             to_string= course_section.course.course_title + " " + course_section.section_number
 
-        response['current_course_section_details'].update(
-            {
-                'id':course_section.course_section_id,
-                'course_title':course_section.course.course_title,
-                'section_number':course_section.section_number,
-                'to_string':course_section.to_string,
-            }
-        )
+        response['current_course_section_details'] = {
+            'id':course_section.course_section_id,
+            'course_title':course_section.course.course_title,
+            'section_number':course_section.section_number,
+            'to_string':course_section.to_string,
+        }
 
         # Retrieve Telegram Stuff
-        faculty_username = requests.user.email.split('@')[0]
-        client = tele_util.getClient(faculty_username)
+        telegram_querySet = Class.objects.filter(course_section=course_section)[0].telegram_chats.all()
 
-        classObj = Class.objects.filter(course_section=course_section)
-        
+        response['telegram_chats'] = []
+        for telegram_tool in telegram_querySet:
+            response['telegram_chats'].append({'name': telegram_tool.name,})
+
+        if telegram_chat_name == None:
+            first_chat = telegram_querySet[0]
+            response['current_telegram_chat'] = {
+                'name': first_chat.name,
+                'link': first_chat.link,
+                'type': first_chat.type,
+                'members': first_chat.members.split('_') if first_chat.members != None else [],
+                'members_count': len(first_chat.members.split('_')) if first_chat.members != None else 0,
+            }
+        else:
+            telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+            response['current_telegram_chat'] = {
+                'name': telegram_chat.name,
+                'link': telegram_chat.link,
+                'type': telegram_chat.type,
+                'members': telegram_chat.members.split('_') if telegram_chat.members != None else [],
+                'members_count': len(telegram_chat.members.split('_')) if telegram_chat.members != None else 0,
+            }
 
     except Exception as e:
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of Telegram details: ' + str(e.args[0])
-        return JsonResponse(response)
-        # return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
-    return JsonResponse(response)
-    # return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
 # TO-DO: Group creation form
 #
 def faculty_telegram_CreateGroup(requests):
-    response = {}
+    response = {"faculty_telegram_CreateGroup" : "active"}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -1106,24 +1121,24 @@ def faculty_telegram_CreateGroup(requests):
 
     group_name = requests.POST.get('group_name')
     course_section = requests.POST.get('course_section')
-    print(group_name)
-    print(course_section)
+    print('Gorup Name: ' + group_name)
+    print('Course Section: ' + course_section)
 
     try:
         pass
-        username = requests.user.email.split('@')[0]
-        client = tele_util.getClient(username)
+        # username = requests.user.email.split('@')[0]
+        # client = tele_util.getClient(username)
+        #
+        # class_QuerySet = Class.objects.filter(course_section=course_section)
+        # results = tele_util.initialize_Channel(
+        #     client=client,
+        #     course_title=group_name,
+        #     section_number=course_section[-2:],
+        # )
 
-        class_QuerySet = Class.objects.filter(course_section=course_section)
-        results = tele_util.initialize_Channel(
-            client=client,
-            course_title=group_name,
-            section_number=course_section[-2:],
-        )
-
-        for student in class_QuerySet:
-            student.telegram_channellink = results['channel_link']
-            student.save()
+        # for student in class_QuerySet:
+        #     student.telegram_channellink = results['channel_link']
+        #     student.save()
 
     except Exception as e:
         traceback.print_exc()
@@ -1131,13 +1146,13 @@ def faculty_telegram_CreateGroup(requests):
         response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
-    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+    return faculty_telegram_Base(requests,response)
 
 
 # TO-DO: Channel crreation form
 #
 def faculty_telegram_CreateChannel(requests):
-    response = {}
+    response = {"faculty_telegram_CreateChannel" : "active"}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -1148,24 +1163,24 @@ def faculty_telegram_CreateChannel(requests):
 
     channel_name = requests.POST.get('channel_name')
     course_section = requests.POST.get('course_section')
-    print(channel_name)
-    print(course_section)
+    print('Channel Name: ' + channel_name)
+    print('Course Section: ' + course_section)
 
     try:
         pass
-        username = requests.user.email.split('@')[0]
-        client = tele_util.getClient(username)
+        # username = requests.user.email.split('@')[0]
+        # client = tele_util.getClient(username)
+        #
+        # class_QuerySet = Class.objects.filter(course_section=course_section)
+        # results = tele_util.initialize_Channel(
+        #     client=client,
+        #     course_title=channel_name,
+        #     section_number=course_section[-2:],
+        # )
 
-        class_QuerySet = Class.objects.filter(course_section=course_section)
-        results = tele_util.initialize_Channel(
-            client=client,
-            course_title=group_name,
-            section_number=course_section[-2:],
-        )
-
-        for student in class_QuerySet:
-            student.telegram_channellink = results['channel_link']
-            student.save()
+        # for student in class_QuerySet:
+        #     student.telegram_channellink = results['channel_link']
+        #     student.save()
 
     except Exception as e:
         traceback.print_exc()
@@ -1173,13 +1188,13 @@ def faculty_telegram_CreateChannel(requests):
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
-    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+    return faculty_telegram_Base(requests,response)
 
 
 # TO-DO: Send message to designated section group/channel
 #
 def faculty_telegram_SendMessage(requests):
-    response = {}
+    response = {"faculty_telegram_SendMessage" : "active"}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -1188,6 +1203,9 @@ def faculty_telegram_SendMessage(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
+    message = requests.POST.get('message')
+    print('Message: ' + message)
+
     try:
         pass
 
@@ -1197,4 +1215,4 @@ def faculty_telegram_SendMessage(requests):
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
-    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+    return faculty_telegram_Base(requests,response)

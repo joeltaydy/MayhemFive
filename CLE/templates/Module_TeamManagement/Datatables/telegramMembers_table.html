@@ -25,10 +25,10 @@
             </tr>
         </thead>
         <tbody>
-            {% for student in course.telegramList %}
+            {% for member in current_telegram_chat.members %}
                 <tr>
-                    <td>{{ student.info.firstname }}</td>
-                    <td>{{ student.info.teleuser }}</td>
+                    <td>{{ member }}</td>
+                    <td>NIL</td>
                 </tr>
             {% endfor %}
         </tbody>
