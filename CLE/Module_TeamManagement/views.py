@@ -1035,7 +1035,7 @@ def trailhead_delete(request, pk):
 #----------------------------------------------#
 
 
-# Main page for telegram management page
+# TO-DO: Main page for telegram management page
 #
 def faculty_telegram_Base(requests):
     response = {"faculty_telegram_Base" : "active", 'course' : {}}
@@ -1071,7 +1071,7 @@ def faculty_telegram_Base(requests):
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
-# Group creation form
+# TO-DO: Group creation form
 #
 def faculty_telegram_CreateGroup(requests):
     response = {}
@@ -1113,7 +1113,7 @@ def faculty_telegram_CreateGroup(requests):
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
-# Channel crreation form
+# TO-DO: Channel crreation form
 #
 def faculty_telegram_CreateChannel(requests):
     response = {}
@@ -1155,7 +1155,7 @@ def faculty_telegram_CreateChannel(requests):
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
-# Send message to designated section group/channel
+# TO-DO: Send message to designated section group/channel
 #
 def faculty_telegram_SendMessage(requests):
     response = {}
