@@ -98,13 +98,18 @@ class Server_Details(models.Model):
 
 
 class Deployment_Package(models.Model):
-    deploymentid = models.CharField(
+    deployment_id = models.AutoField(
         db_column='Deployment_ID',
-        max_length=255,
         primary_key=True,
     )
-    gitlink = models.TextField(
-        db_column='GitHub_Link',
+    deployment_name = models.CharField(
+        db_column='Deployment_Name',
+        max_length=255,
+        null=True,
+    )
+    deployment_link = models.TextField(
+        db_column='Deployment_Link',
+        null=True,
     )
 
     class Meta:
