@@ -435,15 +435,16 @@ def faculty_Monitor_Base(requests):
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
 
-        # TO-DO
         if section_num == None:
-            pass
             # run all servers
+            all_section_details = []
             course_details = utilities.getAllTeamDetails(course_sectionList)
+            for section_number,section_details in course_details.items():
+                all_section_details += section_details
 
-            for section_details in course_details:
-                for details in section_details:
+            for details in all_section_details:
                     response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
+                    
         else:
             section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
