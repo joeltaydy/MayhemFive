@@ -1,16 +1,16 @@
 {% for package_details in dps %}
   <tr>
-      <td>{{ package_details.deploymentid }}</td>
-      <td>{{ package_details.gitlink }}</td>
+      <td>{{ package_details.deployment_name }}</td>
+      <td>{{ package_details.deployment_link }}</td>
     <td style="width: 250px">
       <button type="button"
               class="btn btn-warning btn-sm js-update-dp"
-              data-url="{% url 'DMmod:dp_update' pk=package_details.deploymentid %}">
+              data-url="{% url 'DMmod:dp_update' pk=package_details.deployment_id %}">
         <span class="glyphicon glyphicon-pencil"></span> Edit
       </button>
       <button type="button"
              class="btn btn-danger btn-sm js-delete-dp"
-             data-url="{% url 'DMmod:dp_delete' pk=package_details.deploymentid %}">
+             data-url="{% url 'DMmod:dp_delete' pk=package_details.deployment_id %}">
        <span class="glyphicon glyphicon-trash"></span> Delete
      </button>
     </td>
