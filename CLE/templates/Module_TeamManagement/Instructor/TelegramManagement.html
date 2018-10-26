@@ -24,6 +24,7 @@
     </div>
 
     <br>
+    <!-- if no channel/group registered-->
     <div class="col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
         <div class="card ">
             <div class="card-header" style="display: block;margin-left: auto;margin-right: auto;">
@@ -35,16 +36,79 @@
             <div class="card-body">
                 <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
                     <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createGroup" value="createGroup">   
-                        <b>Create Section Group</b>
+                        <b>Create Section<br> Group</b>
                     </button>
                     <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createChannel" value="createChannel">
-                        <b>Create Section Channel</b>
+                        <b>Create Section<br> Channel</b>
                     </button>
                 </div>
             </div>
         </div>
     </div>
+    <!--if channel/group registered-->
+    <div class="col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
+        <div class="card ">
+            <div class="card-header">
+                
+                    <div class="navDiv" style="display: block;margin-left: auto;margin-right: auto;">
+                        {% for course_section in course_sectionList %}
+                            {% if course_section.section_number != 'G0' %}
+                            <!--Can be group name or something @backend -->
+                            <a href="/instructor/TelegramManagement?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ course_section.course_title }} {{ course_section.section_number }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                
+                    <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
+                    <br>
+                    <h4 class="text-center">
+                        <a href="{{ channel_link }} " role="button" class="btn"  style="background-color: #0088CC;"> <b><!--Insert whether group or channel here--> Link</b></a>
+                    </h4>
+                <br>
+                
+                <div class="col-md-12">
+                <div class ="row">
+                <div class = "col-md-6">
+                <div class ="card">
+                    <div class="card-header">
+                            <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px;"><b>Send a Message:</b></h3>
+                        <p class="card-category text-center">This message will be sent to your telegram group/channel</p>
+                    </div>            
+                    <div class="card-body">
+                        <form action="{% url 'TMmod:faculty_telegram_Base' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <textarea class="form-control col-md9" style="height:200px; margin-bottom:15px" name="send_msg" id="send_msg"></textarea>
+                            <!-- Submission -->
+                                <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
+                                    <button class="btn" style = "background-color:#f9b902"><b>Send Message</b></button>
+                                </div>
+                            </div>  
+                        </form>
+                    </div>
+                </div>
+                </div>
+                <div class = "col-md-6">
+                <div class ="card">
+                    <div class="card-header">
+                            <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px"><b>Registered Members:</b></h3>
+                    </div>            
+                    <div class="card-body">
+                        <h3 class="text-center"><b>{{registeredMembers.count}} 0</b></h3>
+                    </div>
+                    <div class="text-center" style ="margin-left:15px; margin-right:15px;">
+                        {% include "Module_TeamManagement/Datatables/telegramMembers_table.html" %}
+                    </div>
+                </div>
+                </div>
+        
+                </div>
+                </div>
+        </div>
+    </div>
 </div>
+
+<!--Modals for creating group & channel-->
 
 <!--Create Telegram Group-->
 <div class="modal fade" id="createGroup">

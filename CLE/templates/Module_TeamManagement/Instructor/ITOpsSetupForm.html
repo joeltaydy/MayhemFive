@@ -93,15 +93,28 @@
                                   </div>
                               {% endif %}
                           {% endfor %} -->
+                          {% for section_number in section_numbers %}
+                              {% if section_number != 'G0' %}
+                              <!-- <option value="{{ section_number }}"> {{ section_number }} </option> -->
+                              <div class="custom-control custom-checkbox custom-control-inline mb-5">
+                                        <input class="custom-control-input" type="checkbox" name="courseSection" id={{section_number}} value={{section_number}}>
+                                      <label class="custom-control-label" for={{section_number}}>{{section_number}}</label>
+                              </div>
+                              {% endif %}
+                          {% endfor %}
+                          <div class="custom-control custom-checkbox custom-control-inline mb-5">
+                                  <input class="custom-control-input" type="checkbox" id="checkAll">
+                                  <label class="custom-control-label" for="checkAll">Check all</label>
+                          </div>
 
-                          <select class="form-control" name="courseSection" id="courseSection">
+                          <!-- <select class="form-control" name="courseSection" id="courseSection">
                               <option value="" selected disabled hidden>Select section here</option>
                             {% for section_number in section_numbers %}
                                 {% if section_number != 'G0' %}
                           			<option value="{{ section_number }}"> {{ section_number }} </option>
                                 {% endif %}
                             {% endfor %}
-                      	  </select>
+                      	  </select> -->
 
                         </div>
                     </div>

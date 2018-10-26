@@ -48,6 +48,19 @@
                     <div class="col-md-9 form-group" style = "margin-bottom:40px;">
                         <br>
                         <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
+
+                        <!-- to remove after UT!-->
+                        <!-- <button type="button" class="btn btn-danger" data-container="body" data-toggle="popover" data-placement="right" data-content="
+                        Account Number:	233703087823 &nbsp;
+
+                        Access Key: AKIAJEDZQ6ZBZHKGWCEA &nbsp;
+
+                        Secret Access Key: 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
+                        ">
+                          Copy Account Details
+                        </button> -->
+                        <!--to remove after UT! -->
+
                     </div>
                 </form>
                 <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
@@ -176,8 +189,17 @@
         // $("#name").val('John Doe');
 
         // });
-
-
-
+        $("#checkAll").click(function () {
+          $('input:checkbox').not(this).prop('checked', this.checked);
+        });
     </script>
+
+    <!--to remove after UT!-->
+    <!-- <script>
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();
+    });
+    </script> -->
+<!--to remove after UT!-->
+
 {% endblock %}
