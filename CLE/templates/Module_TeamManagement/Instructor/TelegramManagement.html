@@ -53,12 +53,17 @@
                     <div class="navDiv" style="display: block;margin-left: auto;margin-right: auto;">
                         {% for course_section in course_sectionList %}
                             {% if course_section.section_number != 'G0' %}
+                            <!--Can be group name or something @backend -->
                             <a href="/instructor/TelegramManagement?module={{ course_section.id }}&course_title={{ course_section.course_title }}&section_number={{ course_section.section_number}}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ course_section.course_title }} {{ course_section.section_number }}</a>
                             {% endif %}
                         {% endfor %}
                     </div>
                 
                     <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
+                    <br>
+                    <h4 class="text-center">
+                        <a href="{{ channel_link }} " role="button" class="btn"  style="background-color: #0088CC;"> <b><!--Insert whether group or channel here--> Link</b></a>
+                    </h4>
                 <br>
                 
                 <div class="col-md-12">
@@ -102,6 +107,8 @@
         </div>
     </div>
 </div>
+
+<!--Modals for creating group & channel-->
 
 <!--Create Telegram Group-->
 <div class="modal fade" id="createGroup">
