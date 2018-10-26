@@ -1038,7 +1038,7 @@ def trailhead_delete(request, pk):
 # TO-DO: Main page for telegram management page
 #
 def faculty_telegram_Base(requests):
-    response = {"faculty_telegram_Base" : "active", 'course' : {}}
+    response = {"faculty_telegram_Base" : "active", 'current_course_section_details' : {}}
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -1048,27 +1048,48 @@ def faculty_telegram_Base(requests):
         return render(requests,'Module_Account/login.html',response)
 
     if requests.method == "GET":
-        course_section = requests.GET.get('module')
-        course_title = requests.GET.get('course_title')
-        section_number = requests.GET.get('section_number')
+        course_section = requests.GET.get('course_section')
     else:
         course_section = requests.POST.get('course_section')
-        course_title = course_section[:-2]
-        section_number = course_section[-2:]
 
-    # Return sections that's related to the course (i.e. G3,G4 from EMS201)
-    courseList_updated = requests.session['courseList_updated']
-    response['course_sectionList'] = courseList_updated[course_title]
+    try:
+        if course_section == None:
+            raise Exception('Please specify course_section')
 
-    course_section = Course_Section.objects.get(course_section_id=course_section)
-    if course_section.section_number == 'G0':
-        response['module'] = course_section.course.course_title
-    else:
-        response['module'] = course_section.course.course_title + " " + course_section.section_number
+        # Retrieve Administritive Stuff
+        courseList_updated = requests.session['courseList_updated']
+        course_section = Course_Section.objects.get(course_section_id=course_section)
+        response['course_sectionList'] = courseList_updated[course_section.course.course_title]
 
-    response['course_title'] = course_title
-    response['section_number'] = section_number
-    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        if course_section.section_number == 'G0':
+            to_string = course_section.course.course_title
+        else:
+            to_string= course_section.course.course_title + " " + course_section.section_number
+
+        response['current_course_section_details'].update(
+            {
+                'id':course_section.course_section_id,
+                'course_title':course_section.course.course_title,
+                'section_number':course_section.section_number,
+                'to_string':course_section.to_string,
+            }
+        )
+
+        # Retrieve Telegram Stuff
+        faculty_username = requests.user.email.split('@')[0]
+        client = tele_util.getClient(faculty_username)
+
+        classObj = Class.objects.filter(course_section=course_section)
+        
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during retrieval of Telegram details: ' + str(e.args[0])
+        return JsonResponse(response)
+        # return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return JsonResponse(response)
+    # return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
 # TO-DO: Group creation form

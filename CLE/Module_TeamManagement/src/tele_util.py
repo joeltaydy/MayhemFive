@@ -32,7 +32,7 @@ def dialogExists(client=None,dialog_name=None,type=None):
         raise Exception('Please specify a group/channel name.')
 
     if type == None:
-        raise Exception('Please specify a type; group/channel.')
+        raise Exception('Please specify a type; Chat/Channel.')
 
     dialogs = client.get_dialogs()
     for dialog in dialogs:
