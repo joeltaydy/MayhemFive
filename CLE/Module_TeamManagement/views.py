@@ -1035,7 +1035,7 @@ def trailhead_delete(request, pk):
 #----------------------------------------------#
 
 
-# Main page for telegram management page
+# TO-DO: Main page for telegram management page
 #
 def faculty_telegram_Base(requests,response=None):
     if response == None:
@@ -1169,6 +1169,8 @@ def faculty_telegram_CreateGroup(requests):
             student.telegram_chats.add(telegram_chat)
             student.save()
 
+        tele_util.disconnectClient(client)
+
     except Exception as e:
         traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
@@ -1222,6 +1224,8 @@ def faculty_telegram_CreateChannel(requests):
             student.telegram_chats.add(telegram_chat)
             student.save()
 
+        tele_util.disconnectClient(client)
+
     except Exception as e:
         traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
@@ -1244,10 +1248,23 @@ def faculty_telegram_SendMessage(requests):
         return render(requests,'Module_Account/login.html',response)
 
     message = requests.POST.get('message')
+    telegram_chat_link = requests.POST.get('telegram_chat_link')
+    telegram_chat_type = requests.POST.get('telegram_chat_type')
+    print('Telegram Chat Link: ' + telegram_chat_link)
+    print('Telegram Chat Type: ' + telegram_chat_type)
     print('Message: ' + message)
 
     try:
-        pass
+        telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
+        username = requests.user.email.split('@')[0]
+        client = tele_util.getClient(username)
+
+        if telegram_chat_type == 'Group':
+            tele_util.sendGroupMessage(client,telegram_chatObj.name,message)
+        elif telegram_chat_type == 'Channel':
+            tele_util.sendChannelMessage(client,telegram_chatObj.name,message)
+
+        tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()

@@ -196,6 +196,22 @@ def initialize_Group(username,client=None,course_title=None,section_number=None,
     return results
 
 
+def sendGroupMessage(client,group_name,message):
+    dialog = getDialog(client,group_name,Chat)
+    client(messages.SendMessageRequest(
+        peer=dialog,
+        message=message,
+    ))
+
+
+def sendChannelMessage(client,channel_name,message):
+    dialog = getDialog(client,channel_name,Channel)
+    # client(messages.SendMessageRequest(
+    #     channel=dialog,
+    #     message=[message],
+    # ))
+
+
 def disconnectClient(client=None):
     if client == None:
         raise Exception('Please specify a client.')
