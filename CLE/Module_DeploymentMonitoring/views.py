@@ -141,10 +141,12 @@ def faculty_Setup_AddGitHubLinks(request):
 #
 def faculty_Setup_UpdateGitHubLinks(request,pk):
     dp = get_object_or_404(Deployment_Package, pk=pk)
+
     if request.method == 'POST':
         form = DeploymentForm(request.POST, instance=dp)
     else:
         form = DeploymentForm(instance=dp)
+
     return utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_update.html')
 
 
@@ -269,14 +271,15 @@ def faculty_Setup_GetAMI(requests):
         facultyObj = Faculty.objects.get(email=faculty_email)
         aws_credentialsObj = facultyObj.awscredential
 
-        images_detailObjs = aws_credentialsObj.imageDetails.all()
-        for image in images_detailObjs:
-            response['images'].append(
-                {
-                    'image_name':image.imageName,
-                    'image_id':image.imageId
-                }
-            )
+        if aws_credentialsObj != None:
+            images_detailObjs = aws_credentialsObj.imageDetails.all()
+            for image in images_detailObjs:
+                response['images'].append(
+                    {
+                        'image_name':image.imageName,
+                        'image_id':image.imageId
+                    }
+                )
 
     except Exception as e:
         traceback.print_exc()
@@ -366,7 +369,10 @@ def faculty_Setup_ShareAMI(requests):
 
         if choosen_account_list != None:
             imageObj = Image_Details.objects.get(imageId=image_id)
-            current_account_list = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum.split('_')
+            current_account_list = []
+
+            if imageObj.sharedAccNum != None and imageObj.sharedAccNum != ' ' and imageObj.sharedAccNum != '':
+                current_account_list = imageObj.sharedAccNum.split('_')
 
             # Step 1: ADD the account number to the image permission on AWS
             add_list = list(set(choosen_account_list)-set(current_account_list))
@@ -428,11 +434,21 @@ def faculty_Monitor_Base(requests):
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-        section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
-        for details in section_details:
-            response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
-            # response['event_log'] = utilities.getEventLogs(details["account_number"],details["team_name"])
+        if section_num == None:
+            pass
+            # run all servers
+            course_details = utilities.getAllTeamDetails(course_sectionList)
+
+            for section_details in course_details:
+                for details in section_details:
+                    response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
+        else:
+            section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
+
+            for details in section_details:
+                response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
+                # response['event_log'] = utilities.getEventLogs(details["account_number"],details["team_name"])
 
     except Exception as e:
         traceback.print_exc()
