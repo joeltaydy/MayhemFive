@@ -181,23 +181,37 @@ class School_Term(models.Model):
         db_table = 'School_Term'
         unique_together = (('financial_year','term'),)
 
-class Class(models.Model):
-    GRADES_CHOICES = (
-        ('A+','A+'),
-        ('A','A'),
-        ('A-','A-'),
-        ('B+','B+'),
-        ('B','B'),
-        ('B-','B-'),
-        ('C+','C+'),
-        ('C','C'),
-        ('C-','C-'),
-        ('D+','D+'),
-        ('D','D'),
-        ('D-','D-'),
-        ('F','F'),
+class Telegram_Tools(models.Model):
+    CHAT_TYPE = (
+        ('Channel','Channel'),
+        ('Group','Group'),
     )
 
+    id = models.AutoField(
+        db_column='ID',
+        primary_key=True,
+    )
+    name = models.CharField(
+        db_column='Name',
+        max_length=255,
+    )
+    type = models.CharField(
+        db_column='Type',
+        max_length=10,
+        choices=CHAT_TYPE,
+    )
+    link = models.TextField(
+        db_column='Link',
+    )
+    members = models.TextField(
+        db_column='Members',
+    )
+
+    class Meta:
+        managed = True
+        db_table = 'Telegram_Tools'
+
+class Class(models.Model):
     grades = models.CharField(
         db_column='Student_Grades',
         max_length=2,
@@ -208,14 +222,6 @@ class Class(models.Model):
         db_column='Student_Score',
         null=True,
     )
-    telegram_grouplink = models.TextField(
-        db_column='Telegram_Grouplink',
-        null=True,
-    )
-    telegram_channellink = models.TextField(
-        db_column='Telegram_Channellink',
-        null=True,
-    )
     team_number = models.CharField(
         db_column='Team_Number',
         max_length=255,
@@ -224,6 +230,11 @@ class Class(models.Model):
     clt_id = models.ManyToManyField(
         Cloud_Learning_Tools,
         db_column='CLT_ID',
+        null=True,
+    )
+    telegram_tools = models.ManyToManyField(
+        Telegram_Tools,
+        db_column='Telegram_Tools',
         null=True,
     )
     student = models.ForeignKey(
