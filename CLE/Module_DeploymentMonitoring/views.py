@@ -435,6 +435,7 @@ def faculty_Monitor_Base(requests):
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
 
+        # TO-DO
         if section_num == None:
             pass
             # run all servers
