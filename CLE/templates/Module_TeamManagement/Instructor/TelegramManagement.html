@@ -1,6 +1,6 @@
 {% extends 'Module_TeamManagement/Instructor/instructorBase.html' %}
 {% load staticfiles %}
-{% block classList %}
+{% block bootstrapContent %}
 
 <div class="content">
     <div class="container-fluid">
@@ -32,18 +32,84 @@
                 <div style = "display: block;margin-left: auto;margin-right: auto;"> <h3 align = "center">Oops! <br> You have not configured any groups/channels </h3></div>
                 <br>
             </div>
-            <div class="card-body" style = "display: block;margin-left: auto;margin-right: auto;">
-                    -Work in progress-
-                    <!-- <button type="button" class="btn btn" style="background-color: #0088CC" data-toggle="modal" data-target="#createGroup" id="createGroup" value="createGroup">
-                        Create Section Group
+            <div class="card-body">
+                <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
+                    <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createGroup" value="createGroup">   
+                        <b>Create Section Group</b>
                     </button>
-                    <button type="button" class="btn btn" style="background-color: #0088CC" data-toggle="modal" data-target="#createChannel" id="createChannel" value="createChannel">
-                        Create Section Channel
-                    </button> -->
+                    <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createChannel" value="createChannel">
+                        <b>Create Section Channel</b>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!--Create Telegram Group-->
+<div class="modal fade" id="createGroup">
+    <div class="modal-dialog modal-md">
+    <div class="modal-content">
+
+        <div class="modal-header text-center">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <div class="modal-body text-center">
+            <!--Form Create Group-->
+            
+            <img src="{% static 'images/Telegram Logo.png' %}" width=100px height = 100px class="text-center">
+            <h4 class="modal-title" >Create Section Group</h4>
+            
+            <form action="{% url 'TMmod:faculty_telegram_Base' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="control-label">Please Specify Group Name</label>
+                    <input type="text" class="form-control text-center col-md9" name="group_name" id="group_name" placeholder="Group Name">
+                        
+                </div>
+                <!-- Submission -->
+                <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
+                    <button class="btn btn-dark">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!--Create Telegram Channel-->
+<div class="modal fade" id="createChannel">
+    <div class="modal-dialog modal-md">
+    <div class="modal-content">
+
+        <div class="modal-header text-center">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <div class="modal-body text-center">
+            <!--Form Create Channel-->
+            
+            <img src="{% static 'images/Telegram Logo.png' %}" width=100px height = 100px class="text-center">
+            <h4 class="modal-title" >Create Section Channel</h4>
+            
+            <form action="{% url 'TMmod:faculty_telegram_Base' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="control-label">Please Specify Group Name</label>
+                    <input type="text" class="form-control text-center col-md9" name="channel_name" id="channel_name" placeholder="Channel Name">
+                        
+                </div>
+                <!-- Submission -->
+                <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
+                    <button class="btn btn-dark">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+
 
 <script>
     // Add active class to the current button (highlight it)
