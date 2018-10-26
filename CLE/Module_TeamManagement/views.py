@@ -1,6 +1,8 @@
 import os
-import traceback
+import csv
+import logging
 import datetime
+import traceback
 from zipfile import ZipFile
 from django.shortcuts import render, get_object_or_404
 from Module_TeamManagement.src import bootstrap, utilities, tele_util
@@ -10,29 +12,23 @@ from allauth.socialaccount.models import SocialAccount
 from telethon.errors import PhoneNumberUnoccupiedError
 from telethon.tl.types import Channel, Chat
 from django.utils.encoding import smart_str
-import csv
 from random import randint
 from django.views.generic import TemplateView
 from formtools.wizard.views import SessionWizardView
 from django.http import HttpResponse
-
-# Required for verification
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
-
 from Module_TeamManagement import forms
-import logging
-logr = logging.getLogger(__name__)
-#Async form submission
 from Module_TeamManagement.forms import *
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.generic import FormView
 from Module_TeamManagement.mixins import AjaxFormMixin
 
+logr = logging.getLogger(__name__)
 
 # Student Home Page
-#@login_required(login_url='/')
+#
 def home(requests):
     context = {}
     # Redirect user to login page if not authorized and student
@@ -97,11 +93,8 @@ def home(requests):
 
 
 # Admin homepage
-#@login_required(login_url='/')
+#
 def CLEAdmin(requests):
-    '''
-        Check if user is authenticated aka session
-    '''
     context = {}
     if not requests.user.is_authenticated:
         return render(requests,'Module_Account/login.html',context)
@@ -112,6 +105,7 @@ def CLEAdmin(requests):
 
 
 # Faculty Home Page
+#
 def faculty_HomePage(requests):
     context = {'faculty_DashboardPage': "active"}
 
@@ -142,7 +136,7 @@ def faculty_HomePage(requests):
 
 
 # Faculty Daboard
-#@login_required(login_url='/')
+#
 def faculty_Dashboard(requests):
     context = {"faculty_Dashboard" : "active"}
 
@@ -261,7 +255,7 @@ def faculty_Dashboard(requests):
 
 
 # Faculty Student Management Page
-#@login_required(login_url='/')
+#
 def faculty_Overview(requests):
 
     context = {}
@@ -328,8 +322,8 @@ def faculty_Overview(requests):
 
 
 # TO-DO: update function
-# @login_required(login_url='/')
-def studStats(requests):
+#
+def student_Stats(requests):
     '''
         Check if user is authenticated aka session
     '''
@@ -345,7 +339,7 @@ def studStats(requests):
 
 
 # Student Team Page
-# @login_required(login_url='/')
+#
 def student_Team(requests):
     context = {}
     # Redirect user to login page if not authorized and student
@@ -822,11 +816,6 @@ def configureDB_clt(requests):
 # - results
 # - message
 #
-class PhoneNumberFormView(AjaxFormMixin, FormView):
-    form_class = PhoneNumberForm
-    template_name  = 'Module_TeamManagement/Instructor/instructorTools.html'
-    success_url = '/form-success/'
-
 def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
     if requests.method == "GET":
@@ -866,80 +855,42 @@ def configureDB_telegram(requests):
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(phone=phone_number, code=login_code)
 
-        # Debug this tomorrow
-        print(registered_course)
         for course_section in registered_course:
-            print(course_section.course_section_id)
             bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
         # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
         action = requests.POST.get('action')
         course_section = requests.POST.get('course_section')
 
-        if action == 'create_sectionChannel':
-            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
-            class_QuerySet = Class.objects.filter(course_section=course_section)
-
-            results = tele_util.initialize_Channel(
-                client=client,
-                course_title=course_sectionObj.course.course_title,
-                section_number=course_sectionObj.section_number,
-            )
-
-            for student in class_QuerySet:
-                student.telegram_channellink = results['channel_link']
-                student.save()
-
-            response['message'] = results['message']
-            return faculty_Overview(requests)
-
-        elif action == 'create_sectionGroup':
-            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
-            class_QuerySet = Class.objects.filter(course_section=course_section)
-
-            results = tele_util.initialize_Group(
-                client=client,
-                course_title=course_sectionObj.course.course_title,
-                section_number=course_sectionObj.section_number,
-            )
-
-            for student in class_QuerySet:
-                student.telegram_grouplink = results['group_link']
-                student.save()
-
-            response['message'] = results['message']
-            return faculty_Overview(requests)
-
-        elif action == 'create_teamGroup':
-            course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
-            class_QuerySet = Class.objects.filter(course_section=course_section)
-
-            teams = {}
-            for student in class_QuerySet:
-                try:
-                    teams[student.team_number].append(student)
-                except:
-                    teams[student.team_number] = [student]
-
-            for team_number,students in teams.items():
-                results = tele_util.initialize_Group(
-                    client=client,
-                    course_title=course_sectionObj.course.course_title,
-                    section_number=course_sectionObj.section_number,
-                    team_number=team_number,
-                )
-                for student in students:
-                    student.telegram_grouplink = results['group_link']
-                    student.save()
-
-            response['message'] = 'Teams Telegram Group Configured'
-            return faculty_Overview(requests)
+        # if action == 'create_teamGroup':
+        #     course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
+        #     class_QuerySet = Class.objects.filter(course_section=course_section)
+        #
+        #     teams = {}
+        #     for student in class_QuerySet:
+        #         try:
+        #             teams[student.team_number].append(student)
+        #         except:
+        #             teams[student.team_number] = [student]
+        #
+        #     for team_number,students in teams.items():
+        #         results = tele_util.initialize_Group(
+        #             client=client,
+        #             course_title=course_sectionObj.course.course_title,
+        #             section_number=course_sectionObj.section_number,
+        #             team_number=team_number,
+        #         )
+        #         for student in students:
+        #             student.telegram_grouplink = results['group_link']
+        #             student.save()
+        #
+        #     response['message'] = 'Teams Telegram Group Configured'
+        #     return faculty_Overview(requests)
 
         tele_util.disconnectClient(client)
 
 
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
         response['courses'] = requests.session['courseList_updated']
@@ -954,7 +905,16 @@ def configureDB_telegram(requests):
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
 
 
-#multistep form for telegram Setup
+# <description>
+#
+class PhoneNumberFormView(AjaxFormMixin, FormView):
+    form_class = PhoneNumberForm
+    template_name  = 'Module_TeamManagement/Instructor/instructorTools.html'
+    success_url = '/form-success/'
+
+
+# Multistep form for telegram Setup
+#
 class TelegramWizard(SessionWizardView):
     template_name = "Module_TeamManagement/Instructor/telegram.html"
 
@@ -964,6 +924,8 @@ class TelegramWizard(SessionWizardView):
         return render(self.request, 'Module_TeamManagement/Instructor/done.html', {'form_data': form_data})
 
 
+# <description>
+#
 def process_form_data(form_list):
     form_data = [form.cleaned_data for form in form_list]
 
@@ -973,7 +935,9 @@ def process_form_data(form_list):
     #add in method to return the validation Code
     return form_data
 
+
 # For exporting the file
+#
 def clt_file_download(requests):
 
     output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
@@ -983,6 +947,8 @@ def clt_file_download(requests):
     return response
 
 
+# <description>
+#
 def clt_file_ouput(requests):
     context ={}
     output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
@@ -999,14 +965,15 @@ def clt_file_ouput(requests):
     return render(requests, "Administrator/dummycsvpage.html", context)
 
 
-
-
-
+# <description>
+#
 def trailhead_list(request):
     thm = Trailmix_Information.objects.all()
     return render(request, 'dataforms/trailmixes/trailhead_list.html', {'thm': thm})
 
 
+# <description>
+#
 def save_trailhead_form(request, form, template_name):
     data = dict()
     if request.method == 'POST':
@@ -1024,6 +991,8 @@ def save_trailhead_form(request, form, template_name):
     return JsonResponse(data)
 
 
+# <description>
+#
 def trailhead_create(request):
     if request.method == 'POST':
         form = TrailheadForm(request.POST)
@@ -1032,6 +1001,8 @@ def trailhead_create(request):
     return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_create.html')
 
 
+# <description>
+#
 def trailhead_update(request, pk):
     trailhead = get_object_or_404(Trailmix_Information, pk=pk)
     if request.method == 'POST':
@@ -1041,6 +1012,8 @@ def trailhead_update(request, pk):
     return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_update.html')
 
 
+# <description>
+#
 def trailhead_delete(request, pk):
     trailhead = get_object_or_404(Trailmix_Information, pk=pk)
     data = dict()
@@ -1056,16 +1029,23 @@ def trailhead_delete(request, pk):
         data['html_form'] = render_to_string('dataforms/trailmixes/partial_trailhead_delete.html', context, request=request)
     return JsonResponse(data)
 
+
+#----------------------------------------------#
+#----------------Telegram Stuff----------------#
+#----------------------------------------------#
+
+
+# Main page for telegram management page
+#
 def faculty_telegram_Base(requests):
-    context = {}
+    response = {"faculty_telegram_Base" : "active", 'course' : {}}
+
     # Redirect user to login page if not authorized and faculty
     try:
         processLogin.InstructorVerification(requests)
     except:
         logout(requests)
-        return render(requests,'Module_Account/login.html',context)
-
-    context = {"faculty_telegram_Base" : "active", 'course' : {}}
+        return render(requests,'Module_Account/login.html',response)
 
     if requests.method == "GET":
         course_section = requests.GET.get('module')
@@ -1076,18 +1056,124 @@ def faculty_telegram_Base(requests):
         course_title = course_section[:-2]
         section_number = course_section[-2:]
 
-    # Return sections that's related to the course
+    # Return sections that's related to the course (i.e. G3,G4 from EMS201)
     courseList_updated = requests.session['courseList_updated']
-    context['course_sectionList'] = courseList_updated[course_title]
-
-    classObj_list = Class.objects.all().filter(course_section=course_section)
+    response['course_sectionList'] = courseList_updated[course_title]
 
     course_section = Course_Section.objects.get(course_section_id=course_section)
     if course_section.section_number == 'G0':
-        context['module'] = course_section.course.course_title
+        response['module'] = course_section.course.course_title
     else:
-        context['module'] = course_section.course.course_title + " " + course_section.section_number
+        response['module'] = course_section.course.course_title + " " + course_section.section_number
 
-    context['course_title'] = course_title
-    context['section_number'] = section_number
-    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",context)
+    response['course_title'] = course_title
+    response['section_number'] = section_number
+    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+
+# Group creation form
+#
+def faculty_telegram_CreateGroup(requests):
+    response = {}
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    group_name = requests.POST.get('group_name')
+    course_section = requests.POST.get('course_section')
+    print(group_name)
+    print(course_section)
+
+    try:
+        pass
+        username = requests.user.email.split('@')[0]
+        client = tele_util.getClient(username)
+
+        class_QuerySet = Class.objects.filter(course_section=course_section)
+        results = tele_util.initialize_Channel(
+            client=client,
+            course_title=group_name,
+            section_number=course_section[-2:],
+        )
+
+        for student in class_QuerySet:
+            student.telegram_channellink = results['channel_link']
+            student.save()
+
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+
+# Channel crreation form
+#
+def faculty_telegram_CreateChannel(requests):
+    response = {}
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    channel_name = requests.POST.get('channel_name')
+    course_section = requests.POST.get('course_section')
+    print(channel_name)
+    print(course_section)
+
+    try:
+        pass
+        username = requests.user.email.split('@')[0]
+        client = tele_util.getClient(username)
+
+        class_QuerySet = Class.objects.filter(course_section=course_section)
+        results = tele_util.initialize_Channel(
+            client=client,
+            course_title=group_name,
+            section_number=course_section[-2:],
+        )
+
+        for student in class_QuerySet:
+            student.telegram_channellink = results['channel_link']
+            student.save()
+
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+
+# Send message to designated section group/channel
+#
+def faculty_telegram_SendMessage(requests):
+    response = {}
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    try:
+        pass
+
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
