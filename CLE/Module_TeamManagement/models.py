@@ -212,19 +212,30 @@ class Telegram_Tools(models.Model):
         db_table = 'Telegram_Tools'
 
 class Class(models.Model):
-    grades = models.CharField(
-        db_column='Student_Grades',
-        max_length=2,
-        null=True,
-        choices=GRADES_CHOICES,
+    school_term = models.ForeignKey(
+        School_Term,
+        on_delete=models.CASCADE,
+        db_column='School_Term',
     )
-    score = models.IntegerField(
-        db_column='Student_Score',
-        null=True,
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        db_column='Student',
     )
     team_number = models.CharField(
         db_column='Team_Number',
         max_length=255,
+        null=True,
+    )
+    course_section = models.ForeignKey(
+        Course_Section,
+        on_delete=models.CASCADE,
+        db_column='Course_Section',
+    )
+    awscredential = models.ForeignKey(
+        AWS_Credentials,
+        on_delete=models.CASCADE,
+        db_column='AWS_Credentials',
         null=True,
     )
     clt_id = models.ManyToManyField(
@@ -235,27 +246,6 @@ class Class(models.Model):
     telegram_tools = models.ManyToManyField(
         Telegram_Tools,
         db_column='Telegram_Tools',
-        null=True,
-    )
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE,
-        db_column='Student',
-    )
-    course_section = models.ForeignKey(
-        Course_Section,
-        on_delete=models.CASCADE,
-        db_column='Course_Section',
-    )
-    school_term = models.ForeignKey(
-        School_Term,
-        on_delete=models.CASCADE,
-        db_column='School_Term',
-    )
-    awscredential = models.ForeignKey(
-        AWS_Credentials,
-        on_delete=models.CASCADE,
-        db_column='AWS_Credentials',
         null=True,
     )
 
