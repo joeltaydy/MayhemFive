@@ -25,8 +25,8 @@ class ServerForm_Update(forms.ModelForm):
 class DeploymentForm(forms.ModelForm):
     class Meta:
         model = Deployment_Package
-        fields = ('deploymentid', 'gitlink', )
+        fields = ('deployment_name', 'deployment_link', )
         labels = {
-            'deploymentid':'Deployment Package Name (Unique)',
-            'gitlink':'Storage Link',
+            'deployment_name':'Deployment Package Name',
+            'deployment_link':'Storage Link',
         }
