@@ -40,7 +40,7 @@
                     <h3 class="fs-subtitle">Please select class(es) to configure an event for</h3>
                     {% for course_section in course_sectionList %}
                         {% if course_section.section_number != 'G0' %}
-                            <div class="custom-control custom-checkbox custom-control-inline mb-5">
+                            <div class="custom-control custom-checkbox custom-control-inline mb-5 section-class">
                                     <input class="custom-control-input" type="checkbox" name="section_number" id={{course_section.id}} value={{course_section.section_number}}>
                                     <label class="custom-control-label" for={{course_section.id}}>{{course_section.section_number}}</label>
                             </div>
@@ -48,7 +48,7 @@
                     {% endfor %}
                     <div class="custom-control custom-checkbox custom-control-inline mb-5">
                             <input class="custom-control-input" type="checkbox" id="checkAll">
-                            <label class="custom-control-label" for="checkAll">Check all</label>
+                            <label class="custom-control-label" for="checkAll">All classes</label>
                     </div>
 
 
@@ -179,7 +179,7 @@
     }
 
     $("#checkAll").click(function () {
-      $('input:checkbox').not(this).prop('checked', this.checked);
+      $('.section-class input:checkbox').not(this).prop('checked', this.checked);
     });
     </script>
 </body>

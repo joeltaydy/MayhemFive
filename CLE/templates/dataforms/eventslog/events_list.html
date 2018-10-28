@@ -1,0 +1,52 @@
+{% extends 'dataforms/dataformbase.html' %}
+
+{% load static %}
+
+{% block javascript %}
+  <script src="{% static 'js/dataforms/events.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  <!-- BUTTON TO TRIGGER THE ACTION -->
+  <p>
+    <!-- <button type="button"
+            class="btn btn-primary js-create-events"
+            data-url="{% url 'ECmod:events_create' %}">
+      <span class="glyphicon glyphicon-plus"></span>
+      New Event
+    </button> -->
+    <h3>Events Log</h3>
+  </p>
+
+  <table class="table" id="events-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Team</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% include 'dataforms/eventslog/partial_events_list.html' %}
+    </tbody>
+  </table>
+
+  <!-- THE MODAL WE WILL BE USING -->
+ <div class="modal fade" id="modal-events">
+   <div class="modal-dialog">
+     <div class="modal-content">
+     </div>
+   </div>
+
+<!-- <script>
+$(document).ready(function() {
+  console.log("{% url 'ECmod:events_list' %}deployment_package/ #t-table")
+   $("#dp-table").load("{% url 'ECmod:events_list' %}deployment_package/ #dp-table");
+});
+</script> -->
+
+
+{% endblock %}
