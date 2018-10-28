@@ -181,44 +181,62 @@ class School_Term(models.Model):
         db_table = 'School_Term'
         unique_together = (('financial_year','term'),)
 
-class Class(models.Model):
-    GRADES_CHOICES = (
-        ('A+','A+'),
-        ('A','A'),
-        ('A-','A-'),
-        ('B+','B+'),
-        ('B','B'),
-        ('B-','B-'),
-        ('C+','C+'),
-        ('C','C'),
-        ('C-','C-'),
-        ('D+','D+'),
-        ('D','D'),
-        ('D-','D-'),
-        ('F','F'),
+class Telegram_Chats(models.Model):
+    CHAT_TYPE = (
+        ('Channel','Channel'),
+        ('Group','Group'),
     )
 
-    grades = models.CharField(
-        db_column='Student_Grades',
-        max_length=2,
-        null=True,
-        choices=GRADES_CHOICES,
+    id = models.AutoField(
+        db_column='ID',
+        primary_key=True,
     )
-    score = models.IntegerField(
-        db_column='Student_Score',
+    name = models.CharField(
+        db_column='Name',
+        max_length=255,
+    )
+    type = models.CharField(
+        db_column='Type',
+        max_length=10,
+        choices=CHAT_TYPE,
+    )
+    link = models.TextField(
+        db_column='Link',
+    )
+    members = models.TextField(
+        db_column='Members',
         null=True,
     )
-    telegram_grouplink = models.TextField(
-        db_column='Telegram_Grouplink',
-        null=True,
+
+    class Meta:
+        managed = True
+        db_table = 'Telegram_Chats'
+
+class Class(models.Model):
+    school_term = models.ForeignKey(
+        School_Term,
+        on_delete=models.CASCADE,
+        db_column='School_Term',
     )
-    telegram_channellink = models.TextField(
-        db_column='Telegram_Channellink',
-        null=True,
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        db_column='Student',
     )
     team_number = models.CharField(
         db_column='Team_Number',
         max_length=255,
+        null=True,
+    )
+    course_section = models.ForeignKey(
+        Course_Section,
+        on_delete=models.CASCADE,
+        db_column='Course_Section',
+    )
+    awscredential = models.ForeignKey(
+        AWS_Credentials,
+        on_delete=models.CASCADE,
+        db_column='AWS_Credentials',
         null=True,
     )
     clt_id = models.ManyToManyField(
@@ -226,25 +244,9 @@ class Class(models.Model):
         db_column='CLT_ID',
         null=True,
     )
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE,
-        db_column='Student',
-    )
-    course_section = models.ForeignKey(
-        Course_Section,
-        on_delete=models.CASCADE,
-        db_column='Course_Section',
-    )
-    school_term = models.ForeignKey(
-        School_Term,
-        on_delete=models.CASCADE,
-        db_column='School_Term',
-    )
-    awscredential = models.ForeignKey(
-        AWS_Credentials,
-        on_delete=models.CASCADE,
-        db_column='AWS_Credentials',
+    telegram_chats = models.ManyToManyField(
+        Telegram_Chats,
+        db_column='Telegram_Chats',
         null=True,
     )
 

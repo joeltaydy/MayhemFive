@@ -32,7 +32,7 @@ def dialogExists(client=None,dialog_name=None,type=None):
         raise Exception('Please specify a group/channel name.')
 
     if type == None:
-        raise Exception('Please specify a type; group/channel.')
+        raise Exception('Please specify a type; Chat/Channel.')
 
     dialogs = client.get_dialogs()
     for dialog in dialogs:
@@ -103,17 +103,22 @@ def getMembers(client,dialog_name,type):
 # - message
 # - channel_name
 # - channel_link
-def initialize_Channel(client=None,course_title='',section_number=''):
+def initialize_Channel(client=None,course_title=None,section_number=None,channel_name=None):
     results = {'status' : False}
+    title = ''
 
     if client == None:
         raise Exception('Client is invalid. Please connect to telegram client first.')
 
-    if course_title == '':
-        raise Exception('Please specify a course title at least; section number is optional.')
+    if course_title != None and section_number != None:
+        fin_year = getFinancialYear()
+        title = (fin_year + ' ' + course_title + ' ' + section_number).strip()
 
-    fin_year = getFinancialYear()
-    title = (fin_year + ' ' + course_title + ' ' + section_number).strip()
+    if channel_name != None:
+        title = channel_name
+
+    if title == '':
+        raise Exception('Please specify a course tittle and section number OR a channel name.')
 
     # Create channel for specified user
     if dialogExists(client,title,Channel):
@@ -156,24 +161,29 @@ def initialize_Channel(client=None,course_title='',section_number=''):
 # - message
 # - group_name
 # - group_link
-def initialize_Group(client=None,course_title='',section_number='',team_number=''):
+def initialize_Group(username,client=None,course_title=None,section_number=None,team_number='',group_name=None):
     results = {'status' : False}
+    title = ''
 
     if client == None:
         raise Exception('Client is invalid. Please connect to telegram client first.')
 
-    if course_title == '' or section_number == '':
-        raise Exception('Please specify a course title and a section number at least; team number is optional.')
+    if course_title != None and section_number != None:
+        fin_year = getFinancialYear()
+        title = (fin_year + ' ' + course_title + ' ' + section_number + team_number).strip()
 
-    fin_year = getFinancialYear()
-    title = (fin_year + ' ' + course_title + ' ' + section_number + team_number).strip()
+    if group_name != None:
+        title = group_name
+
+    if title == '':
+        raise Exception('Please specify a course tittle and section number OR a group name.')
 
     # Create groups for specified user
     if dialogExists(client,title,Chat):
         results['status'] = True
         results['message'] = title + ' group already exists within Telegram.'
     else:
-        users = ['@rizzzy','@SMUCLEBot']
+        users = [username,'@SMUCLEBot']
         client(messages.CreateChatRequest(users=users,title=title))
 
         results['status'] = True
@@ -184,6 +194,22 @@ def initialize_Group(client=None,course_title='',section_number='',team_number='
     results['group_link'] = invite_link.link
 
     return results
+
+
+def sendGroupMessage(client,group_name,message):
+    dialog = getDialog(client,group_name,Chat)
+    client(messages.SendMessageRequest(
+        peer=dialog,
+        message=message,
+    ))
+
+
+def sendChannelMessage(client,channel_name,message):
+    channel_entity = getEntity(client,channel_name,Channel)
+    client(messages.SendMessageRequest(
+        peer=channel_entity.id,
+        message=message,
+    ))
 
 
 def disconnectClient(client=None):

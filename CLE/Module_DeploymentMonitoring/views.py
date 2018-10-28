@@ -261,7 +261,7 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_number'] = requests.GET.get('section_number').strip()
+    response['section_number'] = requests.GET.get('section_number')
     print("Ajax test section_number (faculty_Setup_GetAMI): " + response['section_number'])
 
     try:
@@ -444,7 +444,7 @@ def faculty_Monitor_Base(requests):
 
             for details in all_section_details:
                     response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
-                    
+
         else:
             section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
 
