@@ -31,7 +31,7 @@ My Stats
           </div>
           <br>
 
-        {# if 'Telegram' in courseDetails.toolImage_list #}
+        {% if 'Telegram' in courseDetails.toolImage_list %}
           <div class="col-md-12">
             <div class="row">
               <!-- FOR TOOLS USED -->
@@ -89,8 +89,8 @@ My Stats
               
               
             
-          {# else #}
-          <!-- <div class="col-md-12">
+          {% else %}
+          <div class="col-md-12">
             <div class="card">
               <div class="card-header">
                 <h5 align="center" class="card-title">Tools used</h5>
@@ -121,8 +121,8 @@ My Stats
 
               </div>
             </div>
-          </div> -->
-          {# endif #}
+          </div>
+          {% endif %}
 
           <!--Tool 1 Card-->
 
