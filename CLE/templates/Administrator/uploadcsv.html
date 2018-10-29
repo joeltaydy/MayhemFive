@@ -3,16 +3,16 @@
 {% block bootstrapContent %}
 <body>
     <form action="{% url 'TMmod:modSu' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
-        </br>
+        <br>
         {% csrf_token %}
         <div class="form-group">
             <div class="col-md-8">
             <label class="control-label" for="date"> Term Start Date:</label>
                 <input class="form-control" id="start_date" name="start_date" placeholder="YYYY-MM-DD" type="date"/>
-            </br>
+            <br>
             <label class="control-label" for="date"> Term End Date:</label>
                 <input class="form-control" id="end_date" name="end_date" placeholder="YYYY-MM-DD" type="date"/>
-            </br>
+            <br>
             <label for="name" class="control-label">File: </label>
                 <input type="file" name="file" id="file" required="True" class="form-control">
                 <input type="checkbox" name="action" id="action" value="True"> Clear Database<br>

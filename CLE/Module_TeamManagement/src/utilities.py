@@ -314,12 +314,14 @@ def classInformationRetrieval(results, courseSection):
 
 
 # The webscrapper to scrap static info from website
+# Uses the data from database - Cloud_Learning_Tools and scraps the internet for the results of each student
+# Does it for all data in database
+# Stores in clt_files/
 def webScrapper():
-    from bs4 import BeautifulSoup
+    import threading
     from Module_TeamManagement.models import Cloud_Learning_Tools, Class
     import datetime
     import pytz
-
     output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
 
@@ -334,8 +336,69 @@ def webScrapper():
 
     print("read link from file : %.9f " % (time.time()-st) )
 
+    
+    processes = []
+    numProcesses= 5
+    lenOfLinks = len(studentEmails)
+    chunkStart = 0
+    avgLinkPerProcess = lenOfLinks//numProcesses
     info = {}
-    counter=0 #iterate in studentList
+    #for counter in range(lenOfLinks):
+    #    info[studentEmails[counter]] = ""
+
+    threads = []
+    for i in range(numProcesses):
+        chunkEnd= chunkStart + avgLinkPerProcess
+        
+        # Each process runs an equal chunk of the main list ie studentLinks[a,b] based on number of processes
+        if i == numProcesses-1: #End of fence
+            t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks] ,info))
+            #p = Process(target=webScrapper_MultipleLinks, args=(info,studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks]))  # Passing the list of remaining
+        else:
+            t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:chunkEnd],studentEmails[chunkStart:chunkEnd], info))  # Passing the list of n equal length variables
+        threads.append(t)
+        chunkStart= chunkEnd
+        t.start()
+    for t in threads:
+        t.join()
+
+    '''
+    
+    #info =webScrapper_MultipleLinks(studentLinks,studentEmails)
+    for p in processes:
+        p.join()
+    '''
+    #print(info)
+    print("scrapping info from  file : %.9f " % (time.time()-st) )
+
+    with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
+        writer = csv.writer(file)
+        tz = pytz.timezone('Asia/Singapore')
+        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
+        writer.writerow(['link','student_email','class_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+
+        for email,content in info.items():
+            to_write = [
+                content['link'],
+                email,
+                content['name'].replace("," , "").replace("_" , ""),
+                content['badge-count'].replace("," , ""),
+                content['points-count'].replace("," , ""),
+                content['trail-count'].replace("," , ""),
+                content['titles']
+            ]
+            writer.writerow(to_write)
+
+    print("done scrapping info from  file : %.9f " % (time.time()-st) )
+
+#
+# usage of bs4 to scrap multiple links
+#
+#
+def webScrapper_MultipleLinks(studentLinks,studentEmails,info):
+    from bs4 import BeautifulSoup
+    counter = 0
+    
     for link in studentLinks:
         content = {}
 
@@ -358,32 +421,8 @@ def webScrapper():
         content['points-count'] = stats[1].text.strip()
         content['trail-count'] = stats[2].text.strip()
         content['link'] = link
-
         info[studentEmails[counter]] = content #key is student email, value is information
-        counter+=1 
-
-    print("scrapping info from  file : %.9f " % (time.time()-st) )
-
-    counter = 0
-    with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
-        writer = csv.writer(file)
-        tz = pytz.timezone('Asia/Singapore')
-        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
-        writer.writerow(['link','student_email','class_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
-
-        for email,content in info.items():
-            to_write = [
-                content['link'],
-                email,
-                content['name'].replace("," , "").replace("_" , ""),
-                content['badge-count'].replace("," , ""),
-                content['points-count'].replace("," , ""),
-                content['trail-count'].replace("," , ""),
-                content['titles']
-            ]
-            writer.writerow(to_write)
-
-    print("done scrapping info from  file : %.9f " % (time.time()-st) )
+        counter+=1
 
 
 # The webscrapper to scrap static info from website - single link

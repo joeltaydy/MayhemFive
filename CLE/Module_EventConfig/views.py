@@ -11,6 +11,10 @@ from Module_DeploymentMonitoring import views as views_DM
 from Module_DeploymentMonitoring.src import utilities as utilities_DM
 from django.http import JsonResponse
 from django.contrib.auth import logout
+from Module_EventConfig.forms import *
+from Module_EventConfig.models import *
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 
 # Test to see if django-background-tasks is wokring or not
 #
@@ -134,3 +138,68 @@ def serverCall(request):
     else:
         response = {'HTTPStatus':'No', 'HTTPStatusCode':404}
     return JsonResponse(response)
+
+
+# <description>
+#
+def events_list(request):
+    events = Events_Log.objects.all()
+    return render(request, 'dataforms/eventslog/events_list.html', {'events': events})
+
+
+# <description>
+#
+def save_events_form(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            events = Events_Log.objects.all()
+            data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
+                'events': events
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+# <description>
+#
+def events_create(request):
+    if request.method == 'POST':
+        form = EventsForm(request.POST)
+    else:
+        form = EventsForm()
+    return save_events_form(request, form, 'dataforms/eventslog/partial_events_create.html')
+
+
+# <description>
+#
+def events_update(request, pk):
+    eventsLog = get_object_or_404(Events_Log, pk=pk)
+    if request.method == 'POST':
+        form = EventsForm(request.POST, instance=eventsLog)
+    else:
+        form = EventsForm(instance=eventsLog)
+    return save_events_form(request, form, 'dataforms/eventslog/partial_events_update.html')
+
+
+# <description>
+#
+def events_delete(request, pk):
+    eventsLog = get_object_or_404(Events_Log, pk=pk)
+    data = dict()
+    if request.method == 'POST':
+        eventsLog.delete()
+        data['form_is_valid'] = True
+        eventsLog = Events_Log.objects.all()
+        data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
+            'events': events
+        })
+    else:
+        context = {'eventsLog': eventsLog}
+        data['html_form'] = render_to_string('dataforms/eventslog/partial_events_delete.html', context, request=request)
+    return JsonResponse(data)

@@ -24,7 +24,7 @@ urlpatterns = [
     path('join/', PhoneNumberFormView.as_view(), name='phone_number_form'),
     path('csv/clt_file.csv', views.clt_file_download),
     path('admin/csv/clt_file.csv', views.clt_file_ouput, name = "clt_file"),
-
+    path('celery/trailhead/refresh', views.trailhead_refresh, name = 'trailhead_refresh'),
     #trailmixes
     path('instructor/trailmix/',views.trailhead_list,name='trailhead_list'),
     path('instructor/trailmix/create/', views.trailhead_create, name='trailhead_create'),

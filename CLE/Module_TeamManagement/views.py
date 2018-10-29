@@ -14,7 +14,7 @@ from django.utils.encoding import smart_str
 from random import randint
 from django.views.generic import TemplateView
 from formtools.wizard.views import SessionWizardView
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
 from Module_TeamManagement import forms
@@ -71,6 +71,7 @@ def home(requests):
     # Get telegram group/channel link
     enrolled_classes = Class.objects.filter(student=student_email)
     context['telegram'] = {'status' : 'False'}
+    '''
     for enrolled_class in enrolled_classes:
         group_link = enrolled_class.telegram_grouplink
         channel_link = enrolled_class.telegram_channellink
@@ -89,7 +90,7 @@ def home(requests):
             except:
                 context['telegram']['channel'] = {enrolled_class.course_section : channel_link}
     #print(context)
-
+    '''
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -254,6 +255,12 @@ def faculty_Dashboard(requests):
     #print(context)
     return render(requests, "Module_TeamManagement/Instructor/instructorHome.html",context)
 
+# Faculty force refresh trailhead page
+#
+#
+def trailhead_refresh(requests):
+    utilities.webScrapper()
+    return HttpResponseRedirect(requests.META.get('HTTP_REFERER'))
 
 # Faculty Student Management Page
 #
@@ -609,7 +616,6 @@ def configureDB_students(requests):
 
     response['message'] = 'Successful Upload'
     # return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
-    #utilities.webScrapper()
     return faculty_Dashboard(requests)
 
 

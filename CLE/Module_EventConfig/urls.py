@@ -7,4 +7,10 @@ urlpatterns = [
     path('instructor/ITOperationsLab/event/',views.faculty_Event_Base,name='itopslab_event'),
     path('event/start/', views.serverCall), #Temp endpoint
     path('event/recovery/', views.serverRecoveryCall),
+
+    # For events logs
+    path('instructor/ITOperationsLab/eventslog/',views.events_list,name='events_list'),
+    path('instructor/ITOperationsLab/eventslog/create/', views.events_create, name='events_create'),
+    path('instructor/ITOperationsLab/eventslog/<str:pk>/update/', views.events_update, name='events_update'),
+    path('instructor/ITOperationsLab/eventslog/<str:pk>/delete/', views.events_delete, name='events_delete'),
 ]
