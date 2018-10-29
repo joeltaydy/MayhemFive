@@ -31,26 +31,87 @@ My Stats
           </div>
           <br>
 
+        {# if 'Telegram' in courseDetails.toolImage_list #}
           <div class="col-md-12">
+            <div class="row">
+              <!-- FOR TOOLS USED -->
+              <div class = "col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 align="center" class="card-title">Tools used</h3>
+                      <br>
+                      <div class="row text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                        
+                        {% if not course_section.toolImage_list %}
+                        <div class="text-center">
+                          <h6 style = "color:red"> No tools have been initialised</h6>
+                        </div>
+                        {% else %}
+                          {% for toolImage in course_section.toolImage_list %}
+                          {% if toolImage != '' %}
+                          {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
+                          <div class="col-md-4" style="display: block;margin-left: auto;margin-right: auto;">
+                            <img src="{% static toolLink %}" class="rounded-circle">
+                          </div>
+                          {% endwith %}
+                          {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                      <br>
+    
+                      <p align="right">
+                        <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">Initialise tools</a>
+                      </p>
+    
+                    </div>
+                  </div>
+                </div>
+                <!-- FOR TELEGRAM -->
+                <div class = "col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title text-center">Telegram</h3>
+                    </div>
+                    <div class = "card-body text-center">
+                        <a href="{{ current_telegram_chat.link }} ">
+                          <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=80px height = 80px style="display: block;margin-left: auto;margin-right: auto;" >
+                        </a>
+                    </div>
+                    <div class = "card-footer text-center">
+                        <h6><b>Join {{current_telegram_chat.type}} now!</b></h6>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+              
+              
+            
+          {# else #}
+          <!-- <div class="col-md-12">
             <div class="card">
               <div class="card-header">
                 <h5 align="center" class="card-title">Tools used</h5>
                 <br>
-                <div class="row">
-                  {% for toolImage in course_section.toolImage_list %}
-                  {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                  <div class="col-md-4" align="center">
-                    <img src="{% static toolLink %}" class="rounded-circle">
+                <div class="row" style="display: block;margin-left: auto;margin-right: auto;">
+                  
+                  {% if not course_section.toolImage_list %}
+                  <div class="text-center">
+                    <h6 style = "color:red"> No tools have been initialised</h6>
                   </div>
-                  {% endwith %}
-                  {% endfor %}
-
-                  <!-- <div class="col-md-4"align="center">
-                                    <img src="http://www.stickpng.com/assets/images/5842a8fba6515b1e0ad75b03.png" alt="..." class="rounded-circle">
-                                </div>
-                                <div class="col-md-4"align="center">
-                                    <img src="http://www.actusconsulting.com/wp-content/uploads/2017/08/trailhead-logo.png" alt="..." class="rounded-circle">
-                                </div> -->
+                  {% else %}
+                    {% for toolImage in course_section.toolImage_list %}
+                    {% if toolImage != '' %}
+                    {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
+                    <div class="col-md-4" style="display: block;margin-left: auto;margin-right: auto;">
+                      <img src="{% static toolLink %}" class="rounded-circle">
+                    </div>
+                    {% endwith %}
+                    {% endif %}
+                    {% endfor %}
+                  {% endif %}
                 </div>
                 <br>
 
@@ -60,19 +121,20 @@ My Stats
 
               </div>
             </div>
-          </div>
+          </div> -->
+          {# endif #}
 
           <!--Tool 1 Card-->
 
-          <div class="col-md-6">
+          <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title" align="right">Trailhead</h3>
+                <h3 class="card-title text-center">Trailhead</h3>
                 <br>
               </div>
 
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <center><img src="https://png.icons8.com/dusk/50/000000/report-card.png">
                     <h1>{{personal.points_count}}</h1>
                     <h6>POINTS</h6>
@@ -80,7 +142,7 @@ My Stats
                   <br>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <center><img src="https://png.icons8.com/dusk/40/000000/waypoint-map.png">
                     <h1>{{personal.trail_count}}</h1>
                     <h6>TRAILS COMPLETED</h6>
@@ -88,23 +150,64 @@ My Stats
                   <br>
                 </div>
 
-              </div>
-
-              <div class="col-md-12">
-                <div class="card">
-                  <p class="card-category"><Br>
+                <div class="col-md-4">
                     <center><img src="https://png.icons8.com/dusk/50/000000/prize.png">
                       <h1>{{personal.badge_count}}</h1>
                       <h6>BADGES</h6>
                     </center>
-                  </p>
-                  <div class="card-body">
-                    <span align="center"> {% include "Module_TeamManagement/Student/trailhead.html" %} </span>
+                  <br>
+                </div>
+
+              </div>
+
+              <div class="card-body">
+                <span align="center"> {% include "Module_TeamManagement/Student/trailhead.html" %} </span>
+              </div>
+
+            
+
+            <!-- class ranking-->
+            <div class ="col-md-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                      <div class="card-header">
+                        <h5 align="center" class="card-title">Team Ranking</h5>
+                        <p class="card-category" align="center">24 Hours performance</p>
+                      </div>
+                      <div class="card-body">
+                        <span align="center">
+                          {% include "Module_TeamManagement/Dashboard/class_scoreboard.html" %}
+                        </span>
+                      </div>
+                      <div class="card-footer ">
+                        <div class="stats">
+                          <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card"  style="height: 13cm;">
+                    <div class="card-header">
+                      <h4 align="center" class="card-title">Trailhead performance</h4>
+                      <p align="center" class="card-category">Points against Badges</p>
+                    </div>
+    
+                    <div class="card-body">
+                      {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
+                    </div>
+                    <div class="card-footer ">
+                      <div class="stats">
+                        <i class="fa fa-history"></i> Updated "{{last_updated}}"
+                      </div>
+                    </div>
+      
                   </div>
                 </div>
               </div>
-
-
+            </div>
+              
             </div>
           </div>
 
@@ -120,44 +223,7 @@ My Stats
                 </div> -->
           <!--end of calendar-->
 
-          <!-- class ranking-->
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-header">
-                <h5 align="center" class="card-title">Team Ranking</h5>
-                <p class="card-category" align="center">24 Hours performance</p>
-              </div>
-              <div class="card-body">
-                <span align="center">
-                  {% include "Module_TeamManagement/Dashboard/class_scoreboard.html" %}
-                </span>
-              </div>
-              <div class="card-footer ">
-                <div class="stats">
-                  <i class="fa fa-history"></i> Last Updated at "{{last_updated}}"
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-header">
-                  <h4 align="center" class="card-title">Trailhead performance</h4>
-                  <p align="center" class="card-category">Points against Badges</p>
-                </div>
-
-                <div class="card-body">
-                  {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
-                </div>
-                <div class="card-footer ">
-                  <div class="stats">
-                    <i class="fa fa-history"></i> Updated "{{last_updated}}"
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
+          
         </div>
 
       </div>
