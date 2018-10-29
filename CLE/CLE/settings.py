@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'Module_TeamManagement',
     'Module_Account',
     'Module_DeploymentMonitoring',
+    'Module_CommunicationManagement',
     'Module_EventConfig',
     'django.contrib.sites', # new
     'allauth', # new
