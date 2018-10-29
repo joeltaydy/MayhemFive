@@ -249,6 +249,6 @@ if __name__ == "__main__":
     except Exception as e:
         traceback.print_exc()
 else:
-    from Module_TeamManagement.src.tele_config import *
-    from Module_TeamManagement.src import tele_config
+    from Module_CommunicationManagement.src.tele_config import *
+    from Module_CommunicationManagement.src import tele_config
     from Module_TeamManagement.src.utilities import getFinancialYear

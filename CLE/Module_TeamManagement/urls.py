@@ -24,16 +24,10 @@ urlpatterns = [
     path('join/', PhoneNumberFormView.as_view(), name='phone_number_form'),
     path('csv/clt_file.csv', views.clt_file_download),
     path('admin/csv/clt_file.csv', views.clt_file_ouput, name = "clt_file"),
-
+    path('celery/trailhead/refresh', views.trailhead_refresh, name = 'trailhead_refresh'),
     #trailmixes
     path('instructor/trailmix/',views.trailhead_list,name='trailhead_list'),
     path('instructor/trailmix/create/', views.trailhead_create, name='trailhead_create'),
     path('instructor/trailmix/<str:pk>/update/', views.trailhead_update, name='trailhead_update'),
     path('instructor/trailmix/<str:pk>/delete/', views.trailhead_delete, name='trailhead_delete'),
-
-    #telegram
-    path('instructor/TelegramManagement/',views.faculty_telegram_Base,name='faculty_telegram_Base'),
-    path('instructor/TelegramManagement/create/group/',views.faculty_telegram_CreateGroup,name='faculty_telegram_CreateGroup'),
-    path('instructor/TelegramManagement/create/channel/',views.faculty_telegram_CreateChannel,name='faculty_telegram_CreateChannel'),
-    path('instructor/TelegramManagement/sendMessage/',views.faculty_telegram_SendMessage,name='faculty_telegram_SendMessage'),
 ]

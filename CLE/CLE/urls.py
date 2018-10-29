@@ -9,4 +9,5 @@ urlpatterns = [
     path('', include(('Module_Account.urls','Module_Account'), namespace="Amod")),
     path('', include(('Module_DeploymentMonitoring.urls','Module_DeploymentMonitoring'), namespace="DMmod")),
     path('', include(('Module_EventConfig.urls','Module_EventConfig'), namespace="ECmod")),
+    path('', include(('Module_CommunicationManagement.urls','Module_CommunicationManagement'), namespace="CMmod")),
 ]
