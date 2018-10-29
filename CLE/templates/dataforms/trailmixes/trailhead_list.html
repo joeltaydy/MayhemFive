@@ -39,12 +39,12 @@
      </div>
    </div>
 
-<!-- <script>
-$(document).ready(function() {
-  console.log("{% url 'TMmod:trailhead_list' %}deployment_package/ #t-table")
-   $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/ #dp-table");
-});
-</script> -->
+ <script>
+ $(document).ready(function() {
+   console.log("{% url 'TMmod:trailhead_list' %} #trailhead-table")
+    $("#trailhead-table").load("{% url 'TMmod:trailhead_list' %} #trailhead-table");
+ });
+ </script>
 
 
 {% endblock %}

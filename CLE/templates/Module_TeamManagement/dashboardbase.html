@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% load staticfiles %} <!-- to load the css -->
-<html lang="en">
 
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" >
@@ -39,7 +39,7 @@
             <div class="sidebar-wrapper">
                 <div class="logo">
                   <span>
-                    <img class="d-block w-10 center" src="{% static 'images/THMlogo.png' %}">
+                    <img src="{% static 'images/Cloudtopus-V1.png' %}" height="100" width="200">
                   </span>
                 </div>
                 {% block sideuserprofile %}
@@ -148,6 +148,7 @@
     </div>
 </body>
 <!--   Core JS Files   -->
+{% include 'loading.html' %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 <!--Data table JS Files-->

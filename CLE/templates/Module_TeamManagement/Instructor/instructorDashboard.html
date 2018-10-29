@@ -8,6 +8,12 @@
 {% block facultyHome %}
 <div class="content">
     <div class="container-fluid">
+      <div class="card-header bg-dark text-white">
+        <h1>Welcome to Cloudtopus</h1>
+        <h4>begin by selecting a module</h4>
+      </div>
+
+      <br>
       <div class="row">
         <div class="col-md-4">
         <div class="card col-md-12">
@@ -89,6 +95,23 @@
               <p class="card-text">Monitoring of students' IT infrastructure and applications, sending of events.</p>
               <div class="text-center">
                 <button onclick="location.href = '/instructor/ITOperationsLab/setup/';" type="button" class="btn btn-primary">IT Ops Lab</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+
+    {% for course_title,course_sectionList in request.session.courseList_updated.items %}
+        {% if course_title == 'EMS201' %}
+          <div class="col-md-4">
+          <div class="card col-md-12">
+            <img class="card-img-top" src="{% static 'images/Telegram_home.png' %}" alt="Card image">
+            <div class="card-body">
+              <h4 class="card-title">Telegram Management</h4>
+              <p class="card-text">Create Telegram groups, broadcast channels and interact with students.</p>
+              <div class="text-center">
+                <button onclick="location.href = '/instructor/TelegramManagement/';" type="button" class="btn btn-primary">Telegram Mgmt</button>
               </div>
             </div>
           </div>
