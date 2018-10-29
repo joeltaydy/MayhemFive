@@ -166,7 +166,7 @@
             <form action="{% url 'CMmod:faculty_telegram_CreateChannel' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="name" class="control-label">Please Specify Group Name</label>
+                    <label for="name" class="control-label">Please Specify Channel Name</label>
                     <input type="text" class="form-control text-center col-md9" name="channel_name" id="channel_name" placeholder="Channel Name">
                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                 </div>
