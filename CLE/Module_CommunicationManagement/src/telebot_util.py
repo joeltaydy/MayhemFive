@@ -1,5 +1,5 @@
 import telegram
-from Module_TeamManagement.src.tele_config import *
+from Module_CommunicationManagement.src.tele_config import *
 
 #-----------------------------------------------------------------------------#
 #------------------------ Telegram Bot Functions -----------------------------#

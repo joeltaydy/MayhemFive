@@ -74,7 +74,7 @@
                             <p class="card-category text-center">This message will be sent to your telegram group/channel</p>
                         </div>
                         <div class="card-body">
-                            <form action="{% url 'TMmod:faculty_telegram_SendMessage' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                            <form action="{% url 'CMmod:faculty_telegram_SendMessage' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <textarea class="form-control col-md9" style="height:200px; margin-bottom:15px" name="message" id="message"></textarea>
@@ -128,7 +128,7 @@
             <img src="{% static 'images/Telegram Logo.png' %}" width=100px height = 100px class="text-center">
             <h4 class="modal-title" >Create Section Group</h4>
 
-            <form action="{% url 'TMmod:faculty_telegram_CreateGroup' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <form action="{% url 'CMmod:faculty_telegram_CreateGroup' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="name" class="control-label">Please Specify Group Name</label>
@@ -163,7 +163,7 @@
             <img src="{% static 'images/Telegram Logo.png' %}" width=100px height = 100px class="text-center">
             <h4 class="modal-title" >Create Section Channel</h4>
 
-            <form action="{% url 'TMmod:faculty_telegram_CreateChannel' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <form action="{% url 'CMmod:faculty_telegram_CreateChannel' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="name" class="control-label">Please Specify Channel Name</label>
