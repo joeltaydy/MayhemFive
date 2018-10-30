@@ -5,7 +5,7 @@
 <!-- Button to Open the Modal -->
 </br>
 
-<div class= "redirect">
+<div class="redirect">
     <span>
       <button onclick="location.href= '{% url 'TMmod:uploadcsv' %}';" type="button" class="btn btn-dark">Course Setup</button>
       <button onclick="location.href = '{% url 'TMmod:uploadteam' %}';" type="button" class="btn btn-dark">Teams Setup</button>
@@ -44,10 +44,10 @@
 
       <!-- Modal body -->
       <div class="modal-body">
-        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="type" value="trailhead">
+        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="trailheadsub" value="trailhead">
           <img src="{% static 'images/trailhead_setup.png' %}" alt="..." class="rounded-circle" align="center"><br>Trailhead
         </button>
-        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#trailmix" data-whatever="Trailmix" id="type" value="trailmix">
+        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#trailmix" data-whatever="Trailmix" id="trailheadsub2" value="trailmix">
           <img src="{% static 'images/trailmix_setup.png' %}" alt="..." class="rounded-circle" align="center"><br>TrailMix/ Badges
         </button>
       </div>
@@ -88,7 +88,7 @@
                     {% endfor %}
                   </select>
 
-                  </br>
+                  <br>
                   <!-- <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Learning Tools</label>
                     <select class="form-control" id="type" name="type">
                       <option value="" disabled selected>Select your tools</option>
@@ -109,7 +109,8 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-        </br>
+        <!-- <button class="btn btn-primary" data-dismiss="modal">Back</button> -->
+        <br>
           <button class="btn btn-primary">Submit</button>
         </div>
         </form>
@@ -147,7 +148,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button class="btn btn-primary TelegramModalstep1" data-dismiss="modal">Previous Step</button>
+          <br>
           <button class="btn btn-primary mr-right">Send verification code</button>
         </div>
         </form>
@@ -201,13 +202,13 @@
     </div>
   </div>
 
-  <div class="modal fade" id="trailmix">
+  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="trailmix">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+          <h4 class="modal-title">Set up Trailmix</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -217,9 +218,14 @@
         <div class="modal-body">
           {% include "dataforms/trailmixes/trailhead_list.html" %}
       </div>
+
+      <!-- <div class="modal-footer">
+        <button class="btn btn-primary" data-dismiss="modal">Back</button>
+      </div> -->
     </div>
   </div>
 </div>
+
 
 <script>
   $(function(){
@@ -228,6 +234,12 @@
     });
     $(".TelegramModalstep1").click(function() {
        $("#TelegramModalstep1").modal();
+    });
+    $("#trailheadsub").click(function() {
+       $("#trailhead").modal('hide');
+    });
+    $("#trailheadsub2").click(function() {
+       $("#trailhead").modal('hide');
     });
   });
 
