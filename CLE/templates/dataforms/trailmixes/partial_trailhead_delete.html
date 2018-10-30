@@ -1,16 +1,22 @@
 <form method="post" action="{% url 'TMmod:trailhead_delete' pk=trailhead.name %}" class="js-trailhead-delete-form">
   {% csrf_token %}
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <h4 class="modal-title">Confirm Trailmix deletion</h4>
+    <button type="button" class="close" id="close" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
-    <h4 class="modal-title">Confirm Trailmix deletion</h4>
   </div>
   <div class="modal-body">
     <p class="lead">Are you sure you want to delete the Trailmix? <strong>{{ trailhead.name }}</strong>?</p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <br>
     <button type="submit" class="btn btn-danger">Delete Trailmix</button>
   </div>
 </form>
+
+<script>
+  $('#close').on('click',function() {
+    $('#modal-trailhead').modal('hide');
+  });
+</script>

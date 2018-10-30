@@ -54,8 +54,8 @@ def faculty_Setup_Base(requests,response=None):
             for deployment_packageObj in deployment_packageObjs:
                 response['deployment_packages'].append(
                     {
-                        'package_name':deployment_packageObj.deploymentid,
-                        'package_link':deployment_packageObj.gitlink
+                        'package_name':deployment_packageObj.deployment_name,
+                        'package_link':deployment_packageObj.deployment_link
                     }
                 )
 
@@ -602,8 +602,9 @@ def student_Monitor_Base(requests):
         account_number = AWS_Credentials.account_number
 
         if response['server_ip'] == None:
-            if len(utilities.getAllServer(account_number)[0]) > 0:
-                response['server_ip'] = utilities.getAllServer(account_number)[0]['server_ip']
+            servers = utilities.getAllServer(account_number)
+            if len(servers) > 0:
+                response['server_ip'] = servers[0]['server_ip']
 
         if response['server_ip'] != None:
             response = utilities.getMonitoringStatus(account_number,team_number,response)

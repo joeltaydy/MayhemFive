@@ -23,7 +23,7 @@ Instructor page
 {% block sidenavBar %}
 <li class="nav-item {{ home2 }}">
     <a class="nav-link" href="{% url 'TMmod:instHome2' %}">
-        <i class="fas fa-chart-pie"></i>
+        <i class="fas fa-home"></i>
         <p>Home</p>
     </a>
 </li>
@@ -79,7 +79,7 @@ Instructor page
     </li>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" aria-expanded="true" data-parent="#accordion">
             {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-                <a class="nav-link" href="{% url 'TMmod:faculty_telegram_Base' %}?course_section={{ course_sectionList.0.id }}">
+                <a class="nav-link" href="{% url 'CMmod:faculty_telegram_Base' %}?course_section={{ course_sectionList.0.id }}">
                     <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
                 </a>
             {% endfor %}

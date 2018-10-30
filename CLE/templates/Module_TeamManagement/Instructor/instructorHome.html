@@ -64,7 +64,8 @@
                     <br>
 
                     <!--inner card row one-->
-                    <div class="col-md-12 row">
+                    <div class="col-md-12">
+                        <div class="row">
                         <div class="col-md-3">
                             <div class="card h-75">
                                 <div class="card-header">
@@ -86,25 +87,37 @@
                                   <div class="card-header">
                                       <h3 align="center" class="card-title">Tools used</h3>
                                   </div>
-                                      <br>
-                                      <div class="col-md-12 row">
-                                          {% for toolImage in courseDetails.toolImage_list %}
-                                              {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                                              <div class="col-md-4" align="center">
-                                                  <img src="{% static toolLink %}" class="rounded-circle">
-                                              </div>
-                                              {% endwith %}
-                                          {% endfor %}
-
-                                          <div class="col-md-4">
-                                              <center>
-                                              <a href="{% url 'TMmod:uploadtools' %}?user=faculty"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle add"></a>
-                                              </center>
-                                              <h6 align = "center">Add Tools</h6>
-                                          </div>
-                                      </div>
+                                    <div class = "card-body">
+                                        <div class="row text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                                            {% if not course_section.toolImage_list %}
+                                                <div style="text-center">
+                                                    <h6 style = "color:red"> No tools have been initialised</h6>
+                                                    <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtools' %}?user=faculty">Initialise tools</a>
+                                                </div>
+                                            {% else %}
+                                                
+                                                {% for toolImage in courseDetails.toolImage_list %}
+                                                    {% if toolImage != '' %}
+                                                    {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
+                                                    <div class="col-md-4" align="center">
+                                                        <img src="{% static toolLink %}" class="rounded-circle">
+                                                    </div>
+                                                    {% endwith %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <div class="col-md-4">
+                                                    <a href="{% url 'TMmod:uploadtools' %}?user=faculty"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle add"></a>
+                                                    <h6 style ="text-center;">Add Tools</h6>
+                                                </div>
+                                                
+                                            {% endif %}
+                                        </div>
+                                        
+                                    </div>
+                                      
                                   <br>
                               </div>
+                        </div>
                         </div>
                     </div>
 
@@ -136,8 +149,9 @@
                     {% endif %}
                     <!--end of inner card row three-->
 
-                    <div class="col-md-12 row">
-                      <div class="col-md-6">
+                    <div class="col-md-12">
+                        <div class = "row">
+                        <div class="col-md-6">
                           <div class="card">
                               <div class="card-header">
                                       <h5 align="center" class="card-title">Section Information</h5>
@@ -157,7 +171,7 @@
                           </div>
                       </div>
 
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                           <div class="card">
                               <div class="card-header">
                                   <h4 class="card-title">Section Ranking</h4>
@@ -173,6 +187,7 @@
                               </div>
                           </div>
                       </div>
+                    </div>
                     </div>
                 </div>
               </div>
