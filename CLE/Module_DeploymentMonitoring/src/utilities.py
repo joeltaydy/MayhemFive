@@ -19,10 +19,10 @@ from Module_DeploymentMonitoring.src import aws_util
 def getAllTeamDetails(course_sectionList):
     section_list = {}
 
-    if len(course_sectionList) < 0 and 'EMS201' not in course_sectionList.keys():
+    if len(course_sectionList) < 0 and 'ESM201' not in course_sectionList.keys():
         return {}
 
-    for course_section in course_sectionList['EMS201']:
+    for course_section in course_sectionList['ESM201']:
         section_number = course_section['section_number']
         section_list[section_number] = []
 
@@ -133,7 +133,7 @@ def getTeamClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
     for course_title,course_details in courseList.items():
-        if course_title == "EMS201":
+        if course_title == "ESM201":
             course_section_id = course_details['id']
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=course_section_id)
     class_teamObj = Class.objects.filter(course_section=course_section_id).filter(team_number = class_studentObj.team_number).exclude(student =class_studentObj.student)
@@ -145,7 +145,7 @@ def getStudentClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
     for course_title,course_details in courseList.items():
-        if course_title == "EMS201":
+        if course_title == "ESM201":
             course_section_id = course_details['id']
     class_studentObj = Class.objects.filter(student=student_email).get(course_section=course_section_id)
 
@@ -162,7 +162,7 @@ def getTeamMembersClassQuerySet(requests):
     courseList = requests.session['courseList_updated']
 
     for course_title,course_details in courseList.items():
-        if course_title == "EMS201":
+        if course_title == "ESM201":
             course_section_id = course_details['id']
 
     querySet = Class.objects.filter(course_section=course_section_id).filter(team_number=team_name)
