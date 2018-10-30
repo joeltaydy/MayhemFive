@@ -14,7 +14,7 @@ def test_tasks(message):
 
 
 @background(schedule=0)
-def stopServer(server_list=None,server=None):
+def stopServer(server_list=None,server=None,section_numbers=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Stop Server')
 
     # If stopping only a server
@@ -55,7 +55,7 @@ def stopServer(server_list=None,server=None):
 
 
 @background(schedule=0)
-def stopWebApplication(server_list=None,server=None):
+def stopWebApplication(server_list=None,server=None,section_numbers=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: Stop Web App')
 
     if server !=  None:
@@ -82,7 +82,7 @@ def stopWebApplication(server_list=None,server=None):
 
 
 @background(schedule=0)
-def dosAttack(server_list=None,server=None):
+def dosAttack(server_list=None,server=None,section_numbers=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: DDOS Attack')
 
     # If sending to one server

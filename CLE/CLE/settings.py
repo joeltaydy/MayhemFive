@@ -227,7 +227,7 @@ CELERY_TIMEZONE = 'Asia/Makassar'
 CELERY_BEAT_SCHEDULE = {
     'task-number-one': { #name of scheduler
     'task': 'trailheadscrapper', #name of task
-    'schedule':  43000.0 #period of running in seconds (Roughly one day)
+    'schedule':  crontab(hour=0, minute=45) #period of running in seconds (Roughly one day)
     #'arg's :  #if have args
     #},
     #'task-number-two': { #name of scheduler

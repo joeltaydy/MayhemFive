@@ -434,7 +434,7 @@ def faculty_Monitor_Base(requests):
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-
+        
         if section_num == None:
             # run all servers
             all_section_details = []
@@ -447,16 +447,17 @@ def faculty_Monitor_Base(requests):
 
         else:
             section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
-
+            response = utilities.getAllLog(section_num,response)
             for details in section_details:
                 response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
                 # response['event_log'] = utilities.getEventLogs(details["account_number"],details["team_name"])
 
     except Exception as e:
         traceback.print_exc()
+        print(response)
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-
+    print(response)
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 

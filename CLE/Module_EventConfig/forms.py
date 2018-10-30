@@ -1,15 +1,11 @@
 from django import forms
-from Module_EventConfig.models import *
+from background_task.models_completed import CompletedTask
+from background_task.models import Task
 
-
-class EventsForm(forms.ModelForm):
+class PendingEventsForm(forms.ModelForm):
     class Meta:
-        model = Events_Log
-        fields = ('events_date', 'events_name','events_type','events_team','events_status', )
+        model = Task
+        fields = ('run_at',  )
         labels = {
-            'events_date':'Date',
-            'events_name':'Name',
-            'events_type':'Type',
-            'events_team':'Team',
-            'events_status':'Status',
+            'run_at':'Date',
         }
