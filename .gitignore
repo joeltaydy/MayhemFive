@@ -106,4 +106,4 @@ pyvenv.cfg
 pip-selfcheck.json
 
 # CLT_files
-CLE/clt_files/
+CLE/clt_files/trailhead-points.csv
