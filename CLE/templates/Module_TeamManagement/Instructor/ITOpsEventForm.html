@@ -172,11 +172,12 @@
         var event_type = document.getElementById("event_type").value;
         var server_type = document.getElementById("server_type").value;
         var datetime = document.getElementById("setDate").value;
+        var errorFound = 0; 
         if (classes!=""){
             document.querySelector(".summary-class").innerHTML = "<b>Class(es): </b>" + "<h5>" + classes + "</h5>";
         } else {
             document.querySelector(".summary-class").innerHTML = "<b>Class(es): </b>" + "<h5 class = 'error'>No classes have been specified</h5>";
-            document.getElementById('submit').disabled = true;
+            errorFound+=1;
         }
         
         if (event_type == "stop"){
@@ -189,18 +190,23 @@
             document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" + "<h5>Stop Web Applications</h5>";
         } else {
             document.querySelector(".summary-eventtype").innerHTML = "<b>Event Type: </b>" +"<h5 class = 'error'>No Event Type has been specified</h5>";
-            document.getElementById('submit').disabled = true;
+            errorFound+=1;
         }
         if (server_type != ""){
             document.querySelector(".summary-servertype").innerHTML = "<b>Server Type: </b>" + "<h5>" + server_type + "</h5>";
         } else {
             document.querySelector(".summary-servertype").innerHTML = "<b>Server Type: </b>" +"<h5 class = 'error'>No Server Type has been specified</h5>";
-            document.getElementById('submit').disabled = true;
+            errorFound+=1;
         }
         if (isNow==true){
             document.querySelector(".summary-datetime").innerHTML = "<b>Date Time: </b><h5>NOW</h5>";
         } else {
             document.querySelector(".summary-datetime").innerHTML = "<b>Date Time: </b>" + "<h5>" + datetime.replace('T',' ') + "</h5>";
+        }
+        if (errorFound==0){
+            document.getElementById('submit').disabled = false;
+        } else {
+            document.getElementById('submit').disabled = true;
         }
         
     }
