@@ -4,7 +4,7 @@ import pytz
 import json
 import traceback
 import requests as req
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models import Count
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -14,6 +14,7 @@ from Module_TeamManagement.models import *
 from Module_EventConfig.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
+import ast
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList):
@@ -394,7 +395,47 @@ def getMonitoringStatus(account_number, team_number, response):
 
     return response
 
+#   Gets all event logs from completed_tasks and background_tasks table based on section num
+#   
+#
+def getAllLog(section_num,response):
+    response["pending_events"] = getPendingTasksLogs(section_num)
+    response["completed_events"] = getCompletedTasksLog(section_num)
+    return response
 
+# Gets all pending task log based on the section num
+#
+#
+def getPendingTasksLogs(section_num):
+    from background_task.models import Task
+    allTasks = Task.objects.all()
+    relatedTasks = []
+    for task in allTasks:
+        if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
+            taskInfo = { 'class':section_num }
+            taskInfo['events_id']= task.id
+            taskInfo['events_name'] = task.task_name.split('tasks.')[1] #related to tasks.py of event Config
+            taskInfo['event_run_at'] = (task.run_at + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+            relatedTasks.append(taskInfo)
+        
+    return relatedTasks
+
+# Gets Completed tasks log based on the section num
+#
+#
+def getCompletedTasksLog(section_num):
+    from background_task.models_completed import CompletedTask
+    allTasks = CompletedTask.objects.all()
+    relatedTasks = []
+    for task in allTasks:
+        if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
+            taskInfo = { 'class':section_num }
+            taskInfo['events_id']= task.id
+            taskInfo['events_name'] = task.task_name.split('tasks.')[1] #related to tasks.py of event Config
+            taskInfo['event_run_at'] = (task.run_at + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+            relatedTasks.append(taskInfo)
+        
+    return relatedTasks
 # Gets the statistics of a server based on ip_address against event_details table
 # Statistics obtained includes MTTR, MTBF, Breakdowns
 #

@@ -15,7 +15,8 @@ from Module_EventConfig.forms import *
 from Module_EventConfig.models import *
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
-
+from background_task.models_completed import CompletedTask
+from background_task.models import Task
 # Test to see if django-background-tasks is wokring or not
 #
 def test(requests):
@@ -97,10 +98,12 @@ def faculty_Event_Base(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            events[event_type](server_list=serverList, schedule=period)
+            print(scheduled_datetime)
+            print(datetime.now())
+            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList)
 
     except Exception as e:
-        traceback.print_exc()
+        traceback.print_exc() 
         response['error_message'] = 'Error during event execution: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
@@ -143,7 +146,7 @@ def serverCall(request):
 # <description>
 #
 def events_list(request):
-    events = Events_Log.objects.all()
+    events = Task.objects.all()
     return render(request, 'dataforms/eventslog/events_list.html', {'events': events})
 
 
@@ -155,7 +158,7 @@ def save_events_form(request, form, template_name):
         if form.is_valid():
             form.save()
             data['form_is_valid'] = True
-            events = Events_Log.objects.all()
+            events = Task.objects.all()
             data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
                 'events': events
             })
@@ -170,34 +173,34 @@ def save_events_form(request, form, template_name):
 #
 def events_create(request):
     if request.method == 'POST':
-        form = EventsForm(request.POST)
+        form = PendingEventsForm(request.POST)
     else:
-        form = EventsForm()
+        form = PendingEventsForm()
     return save_events_form(request, form, 'dataforms/eventslog/partial_events_create.html')
 
 
 # <description>
 #
 def events_update(request, pk):
-    eventsLog = get_object_or_404(Events_Log, pk=pk)
+    eventsLog = get_object_or_404(Task, pk=pk)
     if request.method == 'POST':
-        form = EventsForm(request.POST, instance=eventsLog)
+        form = PendingEventsForm(request.POST, instance=eventsLog)
     else:
-        form = EventsForm(instance=eventsLog)
+        form = PendingEventsForm(instance=eventsLog)
     return save_events_form(request, form, 'dataforms/eventslog/partial_events_update.html')
 
 
 # <description>
 #
 def events_delete(request, pk):
-    eventsLog = get_object_or_404(Events_Log, pk=pk)
+    eventsLog = get_object_or_404(Task, pk=pk)
     data = dict()
     if request.method == 'POST':
         eventsLog.delete()
         data['form_is_valid'] = True
         eventsLog = Events_Log.objects.all()
         data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
-            'events': events
+            'events': eventsLog
         })
     else:
         context = {'eventsLog': eventsLog}
