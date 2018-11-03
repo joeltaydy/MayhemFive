@@ -426,7 +426,7 @@ def faculty_Monitor_Base(requests):
     response['server_status'] = []
     response['webapp_status'] = []
     response['event_log'] = []
-
+    requests.session['ESMCourseSection'] = section_num
     course_sectionList = requests.session['courseList_updated']
     response['first_section'] = course_sectionList['EMS201'][0]['section_number']
     response['course_sectionList'] = course_sectionList['EMS201']
