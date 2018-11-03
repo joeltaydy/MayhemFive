@@ -23,7 +23,20 @@
     </tbody>
   </table>
   <br>
- 
+  <h4> Completed Log </h4>
+    <table class="table" id="completed-events-table">
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Task Name</th>
+          <th>Run At</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% include 'dataforms/eventslog/partial_completed_events_list.html' %}
+      </tbody>
+  </table>
   <!-- THE MODAL WE WILL BE USING -->
  <div class="modal fade" id="modal-events">
    <div class="modal-dialog">
