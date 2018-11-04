@@ -1,13 +1,11 @@
-<form method="post" action="{% url 'ECmod:events_delete' pk=event.events_id %}" class="js-events-delete-form">
+<form method="post" action="{% url 'ECmod:events_delete' pk=event.id %}" class="js-events-delete-form">
   {% csrf_token %}
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    
     <h4 class="modal-title">Confirm Event deletion</h4>
   </div>
   <div class="modal-body">
-    <p class="lead">Are you sure you want to delete the Event? <strong>{{ event.events_id }}</strong>?</p>
+    <p class="lead">Are you sure you want to delete the Event? </p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
