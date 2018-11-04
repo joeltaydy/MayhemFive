@@ -64,22 +64,25 @@
                     </div>
                 </form>
                 <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
-                    {% if submittedAccountNumber != "" %}
-                        <h5><b>Submitted Account Number:</b> {{account_number}} </h5>
+                    <h5><b>Submitted Account Number</b>
+                    {% if account_number != "" %}
+                        <b>Current Account Number:</b> {{account_number}}
                     {% else %}
-                        <h5><b>Submitted Account Number:</b> <i color = "red">No Account Number submitted</i></h5>
+                        <div class ="error">No Account Number submitted</div>
                     {%endif %}
-
-                    {% if submittedAccessKey != "" %}
-                        <h5><b>Submitted AWS Access Key:</b> {{access_key}} </h5>
+                    
+                    <h5><b>Submitted AWS Access Key</b>
+                    {% if access_key != "" %}
+                        <b>Current AWS Access Key:</b> {{access_key}}
                     {% else %}
-                        <h5><b>Submitted AWS Access Key:</b> <i color = "red">No Access Key submitted</i></h5>
+                        <div class ="error">No AWS Access Key submitted</div>
                     {%endif %}
-
-                    {% if submittedSecAccessKey != "" %}
-                        <h5><b>Submitted AWS Secret Access Key:</b> {{secret_access_key}}</h5>
+                    
+                    <h5><b>Submitted Secret Access Key</b>
+                    {% if secret_access_key != "" %}
+                        <b>Current Secret Access Key:</b> {{secret_access_key}}
                     {% else %}
-                        <h5><b>Submitted AWS Secret Access Key:</b> <i color = "red">No Access Key submitted</i></h5>
+                        <div class ="error">No Secret Access Key submitted</div>
                     {%endif %}
                 </div>
 

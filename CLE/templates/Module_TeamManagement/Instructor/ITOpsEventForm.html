@@ -144,13 +144,6 @@
             }
         }
 
-
-    // numEvents = 0;
-
-    // function storeNumEvents(){
-    //     numEvents= document.getElementById("numEvents");
-    // // }
-    // var class_names =[];
     var isNow = false; 
 
     function getSummary() {
@@ -160,14 +153,19 @@
         }
 
         var classes = "";
-        for (i=0; i<class_names.length;i++){
-            if(document.getElementById(class_names[i]).checked == true && i==class_names.length-1){
-                classes+= class_names[i] + " ";
-            } else if(document.getElementById(class_names[i]).checked == true) {
-                classes+= class_names[i] + ", ";
-            }
+        if (class_names.length!=1){
+            classes+= class_names[0];
+        } else {
+            for (i=0; i<class_names.length;i++){
+                if(document.getElementById(class_names[i]).checked == true && i==class_names.length-1){
+                    classes+= class_names[i] + " ";
+                } else if(document.getElementById(class_names[i]).checked == true) {
+                    classes+= class_names[i] + ", ";
+                }
 
+            }
         }
+        
 
         var event_type = document.getElementById("event_type").value;
         var server_type = document.getElementById("server_type").value;
