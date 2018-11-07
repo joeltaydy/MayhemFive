@@ -1,3 +1,4 @@
+import time
 import traceback
 from django.shortcuts import render
 from Module_TeamManagement.models import *
@@ -14,6 +15,11 @@ from Module_CommunicationManagement.src import tele_util, utilities
 # TO-DO: Main page for telegram management page
 #
 def faculty_telegram_Base(requests,response=None):
+    tele_chat_type = {
+        'Channel':Channel,
+        'Group':Chat,
+    }
+
     if response == None:
         response = {"faculty_telegram_Base" : "active"}
 
@@ -57,7 +63,7 @@ def faculty_telegram_Base(requests,response=None):
         for telegram_chat in telegram_chats:
             response['telegram_chats'].append({'name': telegram_chat.name})
 
-            members = tele_util.getMembers(client,telegram_chat.name,telegram_chat.type)
+            members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
             telegram_chat.members = '_'.join(members)
             telegram_chat.save()
 
@@ -69,19 +75,7 @@ def faculty_telegram_Base(requests,response=None):
                 telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
                 response['current_telegram_chat'] = utilities.getTelegramChatJSON(telegram_chat)
 
-        # Note to self:
-        # The problem here is that if the student doesn't join the group/channel
-        # using the link we supplied via the cloudtopus, it won't be added into
-        # the DB. (i.e. if their firends invite them into the group/channel)
-
-        # Mitigation:
-        # Restructure the method to do the same thing you did with the AMIs
-
-        # However:
-        # We won't be able to link the username is to the respective student
-
-        # Mititgation for that: ?
-        # <yet to figure out>
+        tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -234,6 +228,39 @@ def faculty_telegram_SendMessage(requests):
             tele_util.sendChannelMessage(client,telegram_chatObj.name,message)
 
         tele_util.disconnectClient(client)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return faculty_telegram_Base(requests,response)
+
+
+# To-do: Send message to designated section group/channel @ a specific time
+#
+def faculty_telegram_SendScheduledMessage(requests):
+    response = {"faculty_telegram_SendScheduledMessage" : "active"}
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    message = requests.POST.get('message')
+    scheduled_time = requests.POST.get('scheduled_time')
+    telegram_chat_link = requests.POST.get('telegram_chat_link')
+    telegram_chat_type = requests.POST.get('telegram_chat_type')
+    print('Telegram Chat Link: ' + telegram_chat_link)
+    print('Telegram Chat Type: ' + telegram_chat_type)
+    print('Message: ' + message)
+    print('Scheduled Time: ' + scheduled_time)
+
+    try:
+        pass
 
     except Exception as e:
         traceback.print_exc()
