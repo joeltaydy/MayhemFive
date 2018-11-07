@@ -4,7 +4,7 @@ from Module_TeamManagement.models import *
 from telethon.tl.types import Channel, Chat
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
-from Module_CommunicationManagement.src import tele_util
+from Module_CommunicationManagement.src import tele_util, utilities
 
 #----------------------------------------------#
 #----------------Telegram Stuff----------------#
@@ -50,31 +50,24 @@ def faculty_telegram_Base(requests,response=None):
         }
 
         # Retrieve Telegram Stuff
-        telegram_querySet = Class.objects.filter(course_section=course_section)[0].telegram_chats.all()
+        telegram_chats = Class.objects.filter(course_section=course_section)[0].telegram_chats.all()
+        client = tele_util.getClient(requests.user.email.split('@')[0])
 
         response['telegram_chats'] = []
-        for telegram_tool in telegram_querySet:
-            response['telegram_chats'].append({'name': telegram_tool.name,})
+        for telegram_chat in telegram_chats:
+            response['telegram_chats'].append({'name': telegram_chat.name})
 
-        if len(telegram_querySet) > 0:
+            members = tele_util.getMembers(client,telegram_chat.name,telegram_chat.type)
+            telegram_chat.members = '_'.join(members)
+            telegram_chat.save()
+
+        if len(telegram_chats) > 0:
             if telegram_chat_name == None:
-                first_chat = telegram_querySet[0]
-                response['current_telegram_chat'] = {
-                    'name': first_chat.name,
-                    'link': first_chat.link,
-                    'type': first_chat.type,
-                    'members': first_chat.members.split('_') if first_chat.members != None else [],
-                    'members_count': len(first_chat.members.split('_')) if first_chat.members != None else 0,
-                }
+                first_chat = telegram_chats[0]
+                response['current_telegram_chat'] = utilities.getTelegramChatJSON(first_chat)
             else:
                 telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
-                response['current_telegram_chat'] = {
-                    'name': telegram_chat.name,
-                    'link': telegram_chat.link,
-                    'type': telegram_chat.type,
-                    'members': telegram_chat.members.split('_') if telegram_chat.members != None else [],
-                    'members_count': len(telegram_chat.members.split('_')) if telegram_chat.members != None else 0,
-                }
+                response['current_telegram_chat'] = utilities.getTelegramChatJSON(telegram_chat)
 
         # Note to self:
         # The problem here is that if the student doesn't join the group/channel
