@@ -187,7 +187,7 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
+def getStudentClassObject(ipAddress,server_type,requests=None,account_number=None):
     if requests != None:
         class_studentObj= getStudentClassObject(requests)
         awsC = class_studentObj.awscredential
