@@ -25,9 +25,12 @@
                     <div class="col-md-4"  style="display: block;margin-left: auto;margin-right: auto; ">
                         <label for="name" class="control-label">Account Number</label>
                         <input class="form-control" type="text" name="accountNum" id="accountNum" aria-describedby="fileHelp">
-
-                        <b><i>Account Number submitted:</i></b><br>  {% if submittedAccNum == None %} No account number found {% else %} {{submittedAccNum.account_number}} {% endif %}
                     </div>
+                    <div class="col-md-6" style="display: block;margin-left: auto;margin-right: auto; ">
+                        <b>Account Number submitted:</b><br>  {% if submittedAccNum == None %} <div class = "error"> No account number found. Please submit your account number.</i> {% else %} {{submittedAccNum.account_number}} {% endif %}</div>
+                    </div>
+                        
+                    
                     <hr>
                     <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" style = "background-color:#f9b902" value="Submit"/>
                     <input type="button" name="next" class="next action-button" id="accNext" value="Next"/>

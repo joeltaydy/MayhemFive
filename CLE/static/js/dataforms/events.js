@@ -53,6 +53,6 @@ $(function () {
 
   // Delete book
   $("#events-table").on("click", ".js-delete-events", loadForm);
-  $("#modal-events").on("submit", ".js-events-delete-form", saveForm);
+  $("#modal-events").on("submit", ".js-events-delete-form", saveForm); 
 
 });

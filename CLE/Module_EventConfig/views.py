@@ -15,7 +15,8 @@ from Module_EventConfig.forms import *
 from Module_EventConfig.models import *
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
-
+from background_task.models_completed import CompletedTask
+from background_task.models import Task
 # Test to see if django-background-tasks is wokring or not
 #
 def test(requests):
@@ -70,11 +71,11 @@ def faculty_Event_Base(requests):
     section_numberList = requests.POST.getlist('section_number')
     server_type = requests.POST.get('server_type')
     event_type = requests.POST.get('event_type')
-
-    if requests.POST.get('datetime') == 'now' or requests.POST.get('datetime') == None:
+    
+    if requests.POST.get('datetime') == 'now' or requests.POST.get('setDate') == None:
         scheduled_datetime = datetime.now()
     else:
-        scheduled_datetime = (datetime.strptime(requests.POST.get('datetime'),'%Y-%m-%dT%H:%M'))-timedelta(hours=8)
+        scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
 
     if section_numberList == None or event_type == None or server_type == None:
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
@@ -97,10 +98,10 @@ def faculty_Event_Base(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            events[event_type](server_list=serverList, schedule=period)
+            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList)
 
     except Exception as e:
-        traceback.print_exc()
+        traceback.print_exc() 
         response['error_message'] = 'Error during event execution: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
@@ -143,7 +144,7 @@ def serverCall(request):
 # <description>
 #
 def events_list(request):
-    events = Events_Log.objects.all()
+    events = Task.objects.all()
     return render(request, 'dataforms/eventslog/events_list.html', {'events': events})
 
 
@@ -153,11 +154,13 @@ def save_events_form(request, form, template_name):
     data = dict()
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            new_event = form.save()
+            new_event.run_at = new_event.run_at - timedelta(hours=8)
+            new_event.save()
             data['form_is_valid'] = True
-            events = Events_Log.objects.all()
+            events = utilities_DM.getPendingTasksLogs(request.session['ESMCourseSection'])
             data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
-                'events': events
+                'pending_events': events
             })
         else:
             data['form_is_valid'] = False
@@ -170,36 +173,37 @@ def save_events_form(request, form, template_name):
 #
 def events_create(request):
     if request.method == 'POST':
-        form = EventsForm(request.POST)
+        form = PendingEventsForm(request.POST)
     else:
-        form = EventsForm()
+        form = PendingEventsForm()
     return save_events_form(request, form, 'dataforms/eventslog/partial_events_create.html')
 
 
 # <description>
 #
 def events_update(request, pk):
-    eventsLog = get_object_or_404(Events_Log, pk=pk)
+    eventsLog = get_object_or_404(Task, pk=pk)
     if request.method == 'POST':
-        form = EventsForm(request.POST, instance=eventsLog)
+        form = PendingEventsForm(request.POST, instance=eventsLog)
     else:
-        form = EventsForm(instance=eventsLog)
+        eventsLog.run_at = (eventsLog.run_at + timedelta(hours=8)) #.strftime("%Y-%m-%d %H:%M:%S")
+        form = PendingEventsForm(instance=eventsLog)
     return save_events_form(request, form, 'dataforms/eventslog/partial_events_update.html')
 
 
-# <description>
+# Delete function 
 #
 def events_delete(request, pk):
-    eventsLog = get_object_or_404(Events_Log, pk=pk)
+    eventsLog = get_object_or_404(Task, pk=pk)
     data = dict()
     if request.method == 'POST':
         eventsLog.delete()
         data['form_is_valid'] = True
-        eventsLog = Events_Log.objects.all()
+        events = utilities_DM.getPendingTasksLogs(request.session['ESMCourseSection'])
         data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
-            'events': events
+            'pending_events': events
         })
     else:
-        context = {'eventsLog': eventsLog}
+        context = {'event': eventsLog}
         data['html_form'] = render_to_string('dataforms/eventslog/partial_events_delete.html', context, request=request)
     return JsonResponse(data)

@@ -52,12 +52,12 @@
                             <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
                         </div>
                         <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
-                            <h3><b>Submitted Account Number </b></h3>
-                            {% if submittedAccountNumber != "" %}
+                            <h5><b>Submitted Account Number </b></h5>
+                            {% if account_number != "" %}
                                 <b>Current Account Number:</b> {{account_number}}
                                 <input class="form-control" type="hidden" name="old_account_number" id="old_account_number" value={{account_number}}>
                             {% else %}
-                                <b><i color = "red">No Account Number submitted</i></b>
+                                <div class ="error">No Account Number submitted</div>
                             {%endif %}
 
                         </div>
@@ -137,18 +137,19 @@ $(document).ready(function(){
         return this.optional( element ) || /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress);
         }, 'Please enter a valid IP Address.');
 
-        $(function(){
-            var accNum = "{{submittedAccNum.account_number}}";
-            if (accNum==""){
-                document.getElementById("accNext").disabled = true;
-            } else {
-                window.onload = function(){
-                    document.getElementById("accNext").click();
-                }
-            }
-        });
+        // $(function(){
+        //     var accNum = "{{submittedAccNum.account_number}}";
+        //     if (accNum==""){
+        //         document.getElementById("accNext").disabled = true;
+        //     } else {
+        //         window.onload = function(){
+        //             document.getElementById("accNext").click();
+        //         }
+        //     }
+        // });
 
 </script>
 </div>
 
+{% include 'popupmessages/message.html' %}
 {% endblock %}
