@@ -434,7 +434,7 @@ def faculty_Monitor_Base(requests):
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-        
+
         if section_num == None:
             # run all servers
             all_section_details = []
@@ -620,9 +620,6 @@ def student_Monitor_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
-#--------------------------------------#
-#--------------------------------------#
-#--------------------------------------#
 
 # Main function for deployment page on student.
 # Will retrieve work products and render to http page
@@ -675,8 +672,11 @@ def student_Deploy_Standard_AddAccount(requests):
         if new_account_number == None:
             raise Exception('Please enter a valid account number')
 
-        new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
-        new_credentialsObj.save()
+        try:
+            new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
+            new_credentialsObj.save()
+        except:
+            new_credentialsObj = AWS_Credentials.objects.get(account_number=new_account_number)
 
         if old_account_number != None:
             querySet = Class.objects.filter(awscredential=old_account_number)
@@ -692,7 +692,7 @@ def student_Deploy_Standard_AddAccount(requests):
             old_credentialsObj.delete()
         else:
             team_members = utilities.getTeamMembersClassQuerySet(requests)
-            print(team_members)
+
             for team_member in team_members:
                 team_member.awscredential = new_credentialsObj
                 team_member.save()
