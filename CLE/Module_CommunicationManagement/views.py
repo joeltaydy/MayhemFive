@@ -1,19 +1,27 @@
+import time
 import traceback
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from Module_TeamManagement.models import *
 from telethon.tl.types import Channel, Chat
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
-from Module_CommunicationManagement.src import tele_util
+from Module_CommunicationManagement import tasks
+from Module_CommunicationManagement.src import tele_util, utilities
 
 #----------------------------------------------#
 #----------------Telegram Stuff----------------#
 #----------------------------------------------#
 
 
-# TO-DO: Main page for telegram management page
+# Main page for telegram management page
 #
 def faculty_telegram_Base(requests,response=None):
+    tele_chat_type = {
+        'Channel':Channel,
+        'Group':Chat,
+    }
+
     if response == None:
         response = {"faculty_telegram_Base" : "active"}
 
@@ -50,45 +58,25 @@ def faculty_telegram_Base(requests,response=None):
         }
 
         # Retrieve Telegram Stuff
-        telegram_querySet = Class.objects.filter(course_section=course_section)[0].telegram_chats.all()
+        telegram_chats = Class.objects.filter(course_section=course_section)[0].telegram_chats.all()
+        client = tele_util.getClient(requests.user.email.split('@')[0])
 
         response['telegram_chats'] = []
-        for telegram_tool in telegram_querySet:
-            response['telegram_chats'].append({'name': telegram_tool.name,})
+        for telegram_chat in telegram_chats:
+            if tele_util.dialogExists(client,telegram_chat.name,tele_chat_type[telegram_chat.type]):
+                response['telegram_chats'].append({'name': telegram_chat.name})
+            else:
+                telegram_chat.delete()
 
-        if len(telegram_querySet) > 0:
+        if len(response['telegram_chats']) > 0:
             if telegram_chat_name == None:
-                first_chat = telegram_querySet[0]
-                response['current_telegram_chat'] = {
-                    'name': first_chat.name,
-                    'link': first_chat.link,
-                    'type': first_chat.type,
-                    'members': first_chat.members.split('_') if first_chat.members != None else [],
-                    'members_count': len(first_chat.members.split('_')) if first_chat.members != None else 0,
-                }
+                first_chat_name = telegram_chats[0].name
+                response['current_telegram_chat'] = utilities.getTelegramChatJSON(chat_name=first_chat_name)
             else:
                 telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
-                response['current_telegram_chat'] = {
-                    'name': telegram_chat.name,
-                    'link': telegram_chat.link,
-                    'type': telegram_chat.type,
-                    'members': telegram_chat.members.split('_') if telegram_chat.members != None else [],
-                    'members_count': len(telegram_chat.members.split('_')) if telegram_chat.members != None else 0,
-                }
+                response['current_telegram_chat'] = utilities.getTelegramChatJSON(chat_obj=telegram_chat)
 
-        # Note to self:
-        # The problem here is that if the student doesn't join the group/channel
-        # using the link we supplied via the cloudtopus, it won't be added into
-        # the DB. (i.e. if their firends invite them into the group/channel)
-
-        # Mitigation:
-        # Restructure the method to do the same thing you did with the AMIs
-
-        # However:
-        # We won't be able to link the username is to the respective student
-
-        # Mititgation for that: ?
-        # <yet to figure out>
+        tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -97,6 +85,45 @@ def faculty_telegram_Base(requests,response=None):
 
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+
+# Get all members in chat
+#
+def faculty_telegram_UpdateChatMembers(requests):
+    response = {"faculty_telegram_UpdateChatMembers" : "active"}
+    tele_chat_type = {
+        'Channel':Channel,
+        'Group':Chat,
+    }
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    course_section = requests.POST.get('course_section')
+    telegram_chat_name = requests.POST.get('chat_name')
+    print('Chat Name: ' + telegram_chat_name)
+    print('Course Section: ' + course_section)
+
+    try:
+        telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+        client = tele_util.getClient(requests.user.email.split('@')[0])
+
+        members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
+        telegram_chat.members = '_'.join(members)
+        telegram_chat.save()
+
+        tele_util.disconnectClient(client)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return faculty_telegram_Base(requests,response)
 
 # Group creation form
 #
@@ -231,16 +258,24 @@ def faculty_telegram_SendMessage(requests):
     print('Message: ' + message)
 
     try:
+        if message == None:
+            raise Exception('Please specify a message for broadcasting.')
+
+        if requests.POST.get('datetime') == 'now' or requests.POST.get('setDate') == None:
+            scheduled_datetime = datetime.now()
+        else:
+            scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
+
         telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
-        username = requests.user.email.split('@')[0]
-        client = tele_util.getClient(username)
+        period = scheduled_datetime - datetime.now()
 
-        if telegram_chat_type == 'Group':
-            tele_util.sendGroupMessage(client,telegram_chatObj.name,message)
-        elif telegram_chat_type == 'Channel':
-            tele_util.sendChannelMessage(client,telegram_chatObj.name,message)
-
-        tele_util.disconnectClient(client)
+        tasks.sendMessage(
+            username=requests.user.email.split('@')[0],
+            chat_type=telegram_chat_type,
+            chat_name=telegram_chatObj.name,
+            message=message,
+            schedule=period,
+        )
 
     except Exception as e:
         traceback.print_exc()

@@ -20,22 +20,19 @@
     <table id="telegramtable" class="display compact nowrap" style="width:100%">
         <thead>
             <tr>
-              <th>Name</th>
               <th>Telegram Username</th>
             </tr>
         </thead>
         <tbody>
             {% for member in current_telegram_chat.members %}
                 <tr>
-                    <td>{{ member }}</td>
-                    <td>NIL</td>
+                    <td>{{ "@"|add:member }}</td>
                 </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
               <th>Name</th>
-              <th>Telegram Username</th>
             </tr>
         </tfoot>
     </table>
