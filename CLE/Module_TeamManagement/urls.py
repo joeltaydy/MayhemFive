@@ -28,6 +28,5 @@ urlpatterns = [
     #trailmixes
     path('instructor/trailmix/',views.trailhead_list,name='trailhead_list'),
     path('instructor/trailmix/create/', views.trailhead_create, name='trailhead_create'),
-    path('instructor/trailmix/<str:pk>/update/', views.trailhead_update, name='trailhead_update'),
     path('instructor/trailmix/<str:pk>/delete/', views.trailhead_delete, name='trailhead_delete'),
 ]
