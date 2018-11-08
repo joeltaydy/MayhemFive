@@ -1,6 +1,6 @@
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from Module_TeamManagement.models import *
 from telethon.tl.types import Channel, Chat
@@ -203,7 +203,7 @@ def faculty_telegram_CreateChannel(requests):
     return faculty_telegram_Base(requests,response)
 
 
-# TO-DO (left with testing): Send message to designated section group/channel
+# Send message to designated section group/channel
 #
 def faculty_telegram_SendMessage(requests):
     response = {"faculty_telegram_SendMessage" : "active"}
@@ -236,6 +236,7 @@ def faculty_telegram_SendMessage(requests):
 
         tasks.sendMessage(
             username=requests.user.email.split('@')[0],
+            chat_type=telegram_chat_type,
             chat_name=telegram_chatObj.name,
             message=message,
             schedule=period,

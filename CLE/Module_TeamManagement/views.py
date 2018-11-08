@@ -829,37 +829,7 @@ def configureDB_telegram(requests):
         for course_section in registered_course:
             bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
-        # Creation to channel/groups. IF action == NONE, this whole portion will be skipped
-        action = requests.POST.get('action')
-        course_section = requests.POST.get('course_section')
-
-        # if action == 'create_teamGroup':
-        #     course_sectionObj = Course_Section.objects.get(course_section_id=course_section)
-        #     class_QuerySet = Class.objects.filter(course_section=course_section)
-        #
-        #     teams = {}
-        #     for student in class_QuerySet:
-        #         try:
-        #             teams[student.team_number].append(student)
-        #         except:
-        #             teams[student.team_number] = [student]
-        #
-        #     for team_number,students in teams.items():
-        #         results = tele_util.initialize_Group(
-        #             client=client,
-        #             course_title=course_sectionObj.course.course_title,
-        #             section_number=course_sectionObj.section_number,
-        #             team_number=team_number,
-        #         )
-        #         for student in students:
-        #             student.telegram_grouplink = results['group_link']
-        #             student.save()
-        #
-        #     response['message'] = 'Teams Telegram Group Configured'
-        #     return faculty_Overview(requests)
-
         tele_util.disconnectClient(client)
-
 
     except Exception as e:
         traceback.print_exc()
