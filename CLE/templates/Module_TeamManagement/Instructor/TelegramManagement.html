@@ -113,6 +113,16 @@
                         <div class="text-center" style ="margin-left:15px; margin-right:15px;">
                             {% include "Module_TeamManagement/Datatables/telegramMembers_table.html" %}
                         </div>
+                        <form action="{% url 'CMmod:faculty_telegram_UpdateChatMembers' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
+                                <input type="hidden" name="chat_name" id="chat_name" value={{current_telegram_chat.name}}>
+                                <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
+                                    <button class="btn" style = "background-color:#f9b902"><b>Update Members</b></button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     </div>
 

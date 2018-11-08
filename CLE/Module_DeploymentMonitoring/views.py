@@ -33,7 +33,7 @@ def faculty_Setup_Base(requests,response=None):
 
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-    response['first_section'] = requests.session['courseList_updated']['EMS201'][0]['section_number']
+    response['first_section'] = requests.session['courseList_updated']['ESM201'][0]['section_number']
 
     try:
         response['deployment_packages'] = []
@@ -42,8 +42,8 @@ def faculty_Setup_Base(requests,response=None):
         response['secret_access_key'] = ''
         response['section_numbers'] = []
 
-        # Retrieve Setions that are under EMS201 for faculty
-        ems_course_sectionList = requests.session['courseList_updated']['EMS201']
+        # Retrieve Setions that are under ESM201 for faculty
+        ems_course_sectionList = requests.session['courseList_updated']['ESM201']
         for course_section in ems_course_sectionList:
             response['section_numbers'].append(course_section['section_number'])
 
@@ -428,13 +428,13 @@ def faculty_Monitor_Base(requests):
     response['event_log'] = []
     requests.session['ESMCourseSection'] = section_num
     course_sectionList = requests.session['courseList_updated']
-    response['first_section'] = course_sectionList['EMS201'][0]['section_number']
-    response['course_sectionList'] = course_sectionList['EMS201']
+    response['first_section'] = course_sectionList['ESM201'][0]['section_number']
+    response['course_sectionList'] = course_sectionList['ESM201']
 
     try:
         # Retrieve the team_number and account_number for each section
         course_sectionList = requests.session['courseList_updated']
-        
+
         if section_num == None:
             # run all servers
             all_section_details = []
@@ -478,7 +478,7 @@ def student_Deploy_Base(requests):
     courseList = requests.session['courseList_updated']
 
     for course_title, crse in courseList.items():
-        if course_title == "EMS201":
+        if course_title == "ESM201":
             coursesec = crse['id']
 
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
@@ -620,9 +620,6 @@ def student_Monitor_Base(requests):
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentMonitor.html", response)
 
-#--------------------------------------#
-#--------------------------------------#
-#--------------------------------------#
 
 # Main function for deployment page on student.
 # Will retrieve work products and render to http page
@@ -675,8 +672,11 @@ def student_Deploy_Standard_AddAccount(requests):
         if new_account_number == None:
             raise Exception('Please enter a valid account number')
 
-        new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
-        new_credentialsObj.save()
+        try:
+            new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
+            new_credentialsObj.save()
+        except:
+            new_credentialsObj = AWS_Credentials.objects.get(account_number=new_account_number)
 
         if old_account_number != None:
             querySet = Class.objects.filter(awscredential=old_account_number)
@@ -692,7 +692,7 @@ def student_Deploy_Standard_AddAccount(requests):
             old_credentialsObj.delete()
         else:
             team_members = utilities.getTeamMembersClassQuerySet(requests)
-            print(team_members)
+
             for team_member in team_members:
                 team_member.awscredential = new_credentialsObj
                 team_member.save()

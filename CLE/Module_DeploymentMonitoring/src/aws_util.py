@@ -159,13 +159,13 @@ def startServer(server_id,access_key=None,secret_access_key=None,client=None):
 
     # Do a dryrun first to verify permissions
     try:
-        client.terminate_instances(InstanceIds=[server_id], DryRun=True)
+        client.start_instances(InstanceIds=[server_id], DryRun=True)
     except ClientError as e:
         if e.response['Error']['Code'] == 'UnauthorizedOperation':
             raise Exception('HTTPStatusCode: 401, HTTPStatus: Unauthorized, Message: Dry run failed, Error: ' + e.args[0])
 
     # Dry run succeeded, call stop_instances without dryrun
     try:
-        return client.terminate_instances(InstanceIds=[server_id], DryRun=False)
+        return client.start_instances(InstanceIds=[server_id], DryRun=False)
     except Exception as e:
         raise e

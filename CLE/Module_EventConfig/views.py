@@ -64,8 +64,8 @@ def faculty_Event_Base(requests):
     facultyObj = Faculty.objects.get(email=faculty_email)
     course_sectionList = requests.session['courseList_updated']
 
-    response['course_sectionList'] = course_sectionList['EMS201']
-    response['first_section'] = course_sectionList['EMS201'][0]['section_number']
+    response['course_sectionList'] = course_sectionList['ESM201']
+    response['first_section'] = course_sectionList['ESM201'][0]['section_number']
 
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
