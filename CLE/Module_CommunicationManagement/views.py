@@ -1,10 +1,12 @@
 import time
 import traceback
+from datetime import datetime
 from django.shortcuts import render
 from Module_TeamManagement.models import *
 from telethon.tl.types import Channel, Chat
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
+from Module_CommunicationManagement import tasks
 from Module_CommunicationManagement.src import tele_util, utilities
 
 #----------------------------------------------#
@@ -12,7 +14,7 @@ from Module_CommunicationManagement.src import tele_util, utilities
 #----------------------------------------------#
 
 
-# TO-DO: Main page for telegram management page
+# Main page for telegram management page
 #
 def faculty_telegram_Base(requests,response=None):
     tele_chat_type = {
@@ -61,19 +63,22 @@ def faculty_telegram_Base(requests,response=None):
 
         response['telegram_chats'] = []
         for telegram_chat in telegram_chats:
-            response['telegram_chats'].append({'name': telegram_chat.name})
+            if tele_util.dialogExists(client,telegram_chat.name,tele_chat_type[telegram_chat.type]):
+                response['telegram_chats'].append({'name': telegram_chat.name})
 
-            members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
-            telegram_chat.members = '_'.join(members)
-            telegram_chat.save()
+                members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
+                telegram_chat.members = '_'.join(members)
+                telegram_chat.save()
+            else:
+                telegram_chat.delete()
 
-        if len(telegram_chats) > 0:
+        if len(response['telegram_chats']) > 0:
             if telegram_chat_name == None:
-                first_chat = telegram_chats[0]
-                response['current_telegram_chat'] = utilities.getTelegramChatJSON(first_chat)
+                first_chat_name = telegram_chats[0].name
+                response['current_telegram_chat'] = utilities.getTelegramChatJSON(chat_name=first_chat_name)
             else:
                 telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
-                response['current_telegram_chat'] = utilities.getTelegramChatJSON(telegram_chat)
+                response['current_telegram_chat'] = utilities.getTelegramChatJSON(chat_obj=telegram_chat)
 
         tele_util.disconnectClient(client)
 
@@ -198,7 +203,7 @@ def faculty_telegram_CreateChannel(requests):
     return faculty_telegram_Base(requests,response)
 
 
-# Send message to designated section group/channel
+# TO-DO (left with testing): Send message to designated section group/channel
 #
 def faculty_telegram_SendMessage(requests):
     response = {"faculty_telegram_SendMessage" : "active"}
@@ -218,49 +223,23 @@ def faculty_telegram_SendMessage(requests):
     print('Message: ' + message)
 
     try:
+        if message == None:
+            raise Exception('Please specify a message for broadcasting.')
+
+        if requests.POST.get('datetime') == 'now' or requests.POST.get('setDate') == None:
+            scheduled_datetime = datetime.now()
+        else:
+            scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
+
         telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
-        username = requests.user.email.split('@')[0]
-        client = tele_util.getClient(username)
+        period = scheduled_datetime - datetime.now()
 
-        if telegram_chat_type == 'Group':
-            tele_util.sendGroupMessage(client,telegram_chatObj.name,message)
-        elif telegram_chat_type == 'Channel':
-            tele_util.sendChannelMessage(client,telegram_chatObj.name,message)
-
-        tele_util.disconnectClient(client)
-
-    except Exception as e:
-        traceback.print_exc()
-        response['courses'] = requests.session['courseList_updated']
-        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
-        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
-
-    return faculty_telegram_Base(requests,response)
-
-
-# To-do: Send message to designated section group/channel @ a specific time
-#
-def faculty_telegram_SendScheduledMessage(requests):
-    response = {"faculty_telegram_SendScheduledMessage" : "active"}
-
-    # Redirect user to login page if not authorized and faculty
-    try:
-        processLogin.InstructorVerification(requests)
-    except:
-        logout(requests)
-        return render(requests,'Module_Account/login.html',response)
-
-    message = requests.POST.get('message')
-    scheduled_time = requests.POST.get('scheduled_time')
-    telegram_chat_link = requests.POST.get('telegram_chat_link')
-    telegram_chat_type = requests.POST.get('telegram_chat_type')
-    print('Telegram Chat Link: ' + telegram_chat_link)
-    print('Telegram Chat Type: ' + telegram_chat_type)
-    print('Message: ' + message)
-    print('Scheduled Time: ' + scheduled_time)
-
-    try:
-        pass
+        tasks.sendMessage(
+            username=requests.user.email.split('@')[0],
+            chat_name=telegram_chatObj.name,
+            message=message,
+            schedule=period,
+        )
 
     except Exception as e:
         traceback.print_exc()
