@@ -259,10 +259,11 @@ class Trailmix_Information(models.Model):
     name = models.CharField(
         db_column='Name',
         max_length=255,
-        primary_key=True,
+        null= True,
     )
     link = models.TextField(
         db_column='Link',
+        null=True,
     )
     description = models.TextField(
         db_column='Description',
@@ -276,6 +277,7 @@ class Trailmix_Information(models.Model):
         Course,
         on_delete=models.CASCADE,
         db_column='Course',
+        null=True,
     )
 
     class Meta:

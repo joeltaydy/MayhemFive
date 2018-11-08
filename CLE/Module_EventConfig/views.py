@@ -71,7 +71,7 @@ def faculty_Event_Base(requests):
     section_numberList = requests.POST.getlist('section_number')
     server_type = requests.POST.get('server_type')
     event_type = requests.POST.get('event_type')
-    
+
     if requests.POST.get('datetime') == 'now' or requests.POST.get('setDate') == None:
         scheduled_datetime = datetime.now()
     else:
@@ -98,7 +98,7 @@ def faculty_Event_Base(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList)
+            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type= server_type)
 
     except Exception as e:
         traceback.print_exc() 
