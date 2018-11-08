@@ -65,10 +65,6 @@ def faculty_telegram_Base(requests,response=None):
         for telegram_chat in telegram_chats:
             if tele_util.dialogExists(client,telegram_chat.name,tele_chat_type[telegram_chat.type]):
                 response['telegram_chats'].append({'name': telegram_chat.name})
-
-                members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
-                telegram_chat.members = '_'.join(members)
-                telegram_chat.save()
             else:
                 telegram_chat.delete()
 
@@ -89,6 +85,45 @@ def faculty_telegram_Base(requests,response=None):
 
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+
+# Get all members in chat
+#
+def faculty_telegram_UpdateChatMembers(requests):
+    response = {"faculty_telegram_UpdateChatMembers" : "active"}
+    tele_chat_type = {
+        'Channel':Channel,
+        'Group':Chat,
+    }
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    course_section = requests.POST.get('course_section')
+    telegram_chat_name = requests.POST.get('chat_name')
+    print('Chat Name: ' + telegram_chat_name)
+    print('Course Section: ' + course_section)
+
+    try:
+        telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+        client = tele_util.getClient(requests.user.email.split('@')[0])
+
+        members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
+        telegram_chat.members = '_'.join(members)
+        telegram_chat.save()
+
+        tele_util.disconnectClient(client)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    return faculty_telegram_Base(requests,response)
 
 # Group creation form
 #
