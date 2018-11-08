@@ -36,10 +36,10 @@
                 </div>
                 <div class="card-body">
                     <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
-                        <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createGroup" value="createGroup">
+                        <button type="button" class="btn" style="background-color: #0088CC; color:white;" data-toggle="modal" data-target="#createGroup" value="createGroup">
                             <b>Create Section<br> Group</b>
                         </button>
-                        <button type="button" class="btn" style="background-color: #0088CC;" data-toggle="modal" data-target="#createChannel" value="createChannel">
+                        <button type="button" class="btn" style="background-color: #0088CC; color:white;" data-toggle="modal" data-target="#createChannel" value="createChannel">
                             <b>Create Section<br> Channel</b>
                         </button>
                     </div>
@@ -56,12 +56,24 @@
                             {% for telegram_chat in telegram_chats %}
                                 <a href="/instructor/TelegramManagement?course_section={{ current_course_section_details.id }}&chat_name={{ telegram_chat.name }}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ telegram_chat.name }}</a>
                             {% endfor %}
+                            <button type="button" class="btn btn-dark" 
+                            style="
+                            width: 35spx;
+                            height: 35px;
+                            text-align: center;
+                            padding: 10px 10px;
+                            color:white;
+                            line-height: 0.5;
+                            border-radius: 25px;" 
+                            data-toggle="modal" data-target="#chooseGC" value="chooseGC">
+                            <i class="fas fa-plus"></i>
+                            </button>
                         </div>
 
                         <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                         <br>
                         <h4 class="text-center">
-                            <a href="{{ current_telegram_chat.link }} " role="button" class="btn"  style="background-color: #0088CC;"> <b>{{current_telegram_chat.type}} Link</b></a>
+                            <a href="{{ current_telegram_chat.link }} " role="button" class="btn"  style="background-color: #0088CC; color:white;"> <b>{{current_telegram_chat.type}} Link</b></a>
                         </h4>
                     <br>
 
@@ -70,7 +82,7 @@
                     <div class = "col-md-6">
                     <div class ="card">
                         <div class="card-header">
-                                <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px;"><b>Send a Message:</b></h3>
+                                <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px;">SEND A <br>MESSAGE</h3>
                             <p class="card-category text-center">This message will be sent to your telegram group/channel</p>
                         </div>
                         <div class="card-body">
@@ -83,7 +95,7 @@
                                     <input type="hidden" name="telegram_chat_type" id="telegram_chat_type" value={{current_telegram_chat.type}}>
                                 <!-- Submission -->
                                     <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
-                                        <button class="btn" style = "background-color:#f9b902"><b>Send Message</b></button>
+                                        <button class="btn btn-warning"><b>Send Message</b></button>
                                     </div>
                                 </div>
                             </form>
@@ -93,7 +105,7 @@
                     <div class = "col-md-6">
                     <div class ="card">
                         <div class="card-header">
-                                <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px"><b>Registered Members:</b></h3>
+                                <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px">REGISTERED MEMBERS<br></h3>
                         </div>
                         <div class="card-body">
                             <h3 class="text-center"><b>{{current_telegram_chat.members_count}}</b></h3>
@@ -180,6 +192,35 @@
     </div>
 </div>
 
+<!--Choose Group/Channel-->
+<div class="modal fade" id="chooseGC">
+    <div class="modal-dialog modal-md">
+    <div class="modal-content">
+
+        <div class="modal-header text-center">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="modal-body text-center">
+            <!--Form Create Group-->
+
+            <img src="{% static 'images/Telegram Logo.png' %}" width=100px height = 100px class="text-center">
+            <h4 class="modal-title " style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 20px;margin-top:10px;">Add Group/Channel</h4>
+
+            <!-- Buttons -->
+            <div class="btn-group text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: auto">
+                <button type="button" class="btn" style="background-color: #0088CC; color:white;" data-toggle="modal" data-target="#createGroup" value="createGroup" onclick=" $(function(){ $('#chooseGC').modal('hide')});">
+                    <b>Create Section<br> Group</b>
+                </button>
+                <button type="button" class="btn" style="background-color: #0088CC; color:white;" data-toggle="modal" data-target="#createChannel" value="createChannel" onclick=" $(function(){ $('#chooseGC').modal('hide')});">
+                    <b>Create Section<br> Channel</b>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+    </div>
+</div>
 
 <script>
     // Add active class to the current button (highlight it)
