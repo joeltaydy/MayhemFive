@@ -441,6 +441,7 @@ def configureCourseToolsList(course_section, toolName):
     else:
         if toolName not in course_sectionObj.learning_tools:
             course_sectionObj.learning_tools = course_sectionObj.learning_tools + "_" + toolName
+            
     course_sectionObj.save()
     return
 
