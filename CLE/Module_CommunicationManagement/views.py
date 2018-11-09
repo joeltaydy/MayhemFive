@@ -283,4 +283,5 @@ def faculty_telegram_SendMessage(requests):
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    response['message'] = 'Message successfully sent'
     return faculty_telegram_Base(requests,response)
