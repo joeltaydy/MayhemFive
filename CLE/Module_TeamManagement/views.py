@@ -799,8 +799,10 @@ def configureDB_telegram(requests):
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
         toolType = requests.POST.get('type')
+        print(toolType)
 
-        registered_course = []
+        facultyObj = Faculty.objects.get(username=username)
+        registered_course = facultyObj.course_section.all()
 
         if len(phone_number) == 8:
             phone_number = str('+65') + phone_number
@@ -811,12 +813,9 @@ def configureDB_telegram(requests):
             if phone_number != None and login_code == None:
                 client.send_code_request(phone_number)
 
-                facultyObj = Faculty.objects.get(username=username)
                 encrypt_phone_number = utilities.encode(phone_number)
                 facultyObj.phone_number = encrypt_phone_number
                 facultyObj.save()
-
-                registered_course = facultyObj.course_section.all()
 
                 return HttpResponse('')
 
@@ -933,7 +932,7 @@ def save_trailhead_form(request, form, template_name):
             badgeLinks = ""
             for broths in broth:
                 badgeLinks = badgeLinks + (broths.text.strip()) + " | "
-                #print(broths.a.get('href'))   
+                #print(broths.a.get('href'))
             newTrailMix.badges = badgeLinks
             newTrailMix.save()
             data['form_is_valid'] = True
