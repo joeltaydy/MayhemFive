@@ -1,3 +1,4 @@
+import os
 import xlrd
 import time
 import traceback
@@ -6,13 +7,13 @@ from django.core.files import File
 from Module_TeamManagement.src import utilities
 from Module_TeamManagement.models import *
 from Module_DeploymentMonitoring.models import *
+from Module_CommunicationManagement.src import tele_config
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Bootstrap Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
 def clear_Database():
-    
     Deployment_Package.objects.all().delete()
     Server_Details.objects.all().delete()
     AWS_Credentials.objects.all().delete()
@@ -24,6 +25,16 @@ def clear_Database():
     Course_Section.objects.all().delete()
     Student.objects.all().delete()
     Course.objects.all().delete()
+    Telegram_Chats.objects.all().delete()
+
+    session_folder = tele_config.SESSION_FOLDER
+    for session_file in os.listdir(session_folder):
+        file_path = os.path.join(session_folder,session_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            raise e
 
 
 def parse_File_Student(filePath,bootstrapInfo={}):
@@ -473,7 +484,7 @@ def update_CLT(fileDict, course):
     faculty_email = fileDict['faculty_email']
     course = fileDict['course']
     action = fileDict['action']
-    
+
     try:
         if len(bootstrapInfo) == 0:
             raise Exception
