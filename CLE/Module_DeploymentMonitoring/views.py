@@ -33,7 +33,9 @@ def faculty_Setup_Base(requests,response=None):
 
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-    response['first_section'] = requests.session['courseList_updated']['ESM201'][0]['section_number']
+
+    if 'ESM201' in requests.session['courseList_updated'].keys():
+        response['first_section'] = requests.session['courseList_updated']['ESM201'][0]['section_number']
 
     try:
         response['deployment_packages'] = []
