@@ -10,7 +10,7 @@
     <div class="container-fluid">
       <div class="card-header bg-dark text-white">
         <h1>Welcome to Cloudtopus</h1>
-        <h4>begin by selecting a module</h4>
+        <h4>Begin by selecting a module</h4>
       </div>
 
       <br>
@@ -86,7 +86,7 @@
     </div>
 
     {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-        {% if course_title == 'EMS201' %}
+        {% if course_title == 'ESM201' %}
           <div class="col-md-4">
           <div class="card col-md-12">
             <img class="card-img-top" src="{% static 'images/ITops_home.png' %}" alt="Card image">
@@ -102,8 +102,7 @@
         {% endif %}
     {% endfor %}
 
-    {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-        {% if course_title == 'EMS201' %}
+   <!-- Add tool list validation if  -->
           <div class="col-md-4">
           <div class="card col-md-12">
             <img class="card-img-top" src="{% static 'images/Telegram_home.png' %}" alt="Card image">
@@ -116,8 +115,6 @@
             </div>
           </div>
         </div>
-        {% endif %}
-    {% endfor %}
 
         </div>
     </div>

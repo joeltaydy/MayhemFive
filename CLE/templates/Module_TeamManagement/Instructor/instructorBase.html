@@ -59,7 +59,7 @@ Instructor page
 </li>
 
 {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-    {% if course_title == 'EMS201' %}
+    {% if course_title == 'ESM201' %}
         <li class="nav-item {{ ITOpsLabSetup }}">
             <a class="nav-link" href="{% url 'DMmod:itopslab_setup' %}">
               <i class="fas fa-infinity"></i>

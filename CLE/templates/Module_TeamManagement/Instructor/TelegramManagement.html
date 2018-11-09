@@ -117,9 +117,9 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
-                                <input type="hidden" name="chat_name" id="chat_name" value={{current_telegram_chat.name}}>
+                                <input type="hidden" name="chat_link" id="chat_link" value={{current_telegram_chat.link}}>
                                 <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
-                                    <button class="btn" style = "background-color:#f9b902"><b>Update Members</b></button>
+                                    <button class="btn btn-warning"><b>Update Members</b></button>
                                 </div>
                             </div>
                         </form>

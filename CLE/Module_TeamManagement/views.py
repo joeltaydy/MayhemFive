@@ -916,10 +916,26 @@ def trailhead_list(request):
 # <description>
 #
 def save_trailhead_form(request, form, template_name):
+    from bs4 import BeautifulSoup
+    import requests
+
     data = dict()
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            newTrailMix = form.save()
+            req = requests.get(newTrailMix.link)
+            soup = BeautifulSoup(req.text, 'html.parser')
+            title_broth = soup.find('div',attrs={'class': 'content-title'})
+            description_broth = soup.find('div', attrs={'class': 'content-description'})
+            newTrailMix.name = title_broth.text.strip()
+            newTrailMix.description= (description_broth.text.strip())
+            broth = soup.find_all('h3', attrs={'class': 'item-title'})
+            badgeLinks = ""
+            for broths in broth:
+                badgeLinks = badgeLinks + (broths.text.strip()) + " | "
+                #print(broths.a.get('href'))   
+            newTrailMix.badges = badgeLinks
+            newTrailMix.save()
             data['form_is_valid'] = True
             thm = Trailmix_Information.objects.all()
             data['html_trailhead_list'] = render_to_string('dataforms/trailmixes/partial_trailhead_list.html', {
