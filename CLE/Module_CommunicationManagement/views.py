@@ -123,6 +123,7 @@ def faculty_telegram_UpdateChatMembers(requests):
         response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    response['message'] = 'Members successfully updated'
     return faculty_telegram_Base(requests,response)
 
 # Group creation form
@@ -180,6 +181,7 @@ def faculty_telegram_CreateGroup(requests):
         response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    response['message'] = 'Telegram Group successfully created'
     return faculty_telegram_Base(requests,response)
 
 
@@ -235,6 +237,7 @@ def faculty_telegram_CreateChannel(requests):
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    response['message'] = 'Telegram Channel successfully created'
     return faculty_telegram_Base(requests,response)
 
 
