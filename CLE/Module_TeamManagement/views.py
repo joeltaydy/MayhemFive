@@ -799,7 +799,6 @@ def configureDB_telegram(requests):
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
         toolType = requests.POST.get('type')
-        print(toolType)
 
         facultyObj = Faculty.objects.get(username=username)
         registered_course = facultyObj.course_section.all()
