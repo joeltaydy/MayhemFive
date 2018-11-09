@@ -103,12 +103,12 @@ def faculty_telegram_UpdateChatMembers(requests):
         return render(requests,'Module_Account/login.html',response)
 
     course_section = requests.POST.get('course_section')
-    telegram_chat_name = requests.POST.get('chat_name')
-    print('Chat Name: ' + telegram_chat_name)
+    telegram_chat_link = requests.POST.get('chat_link')
+    print(telegram_chat_link)
     print('Course Section: ' + course_section)
 
     try:
-        telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+        telegram_chat = Telegram_Chats.objects.get(link=telegram_chat_link)
         client = tele_util.getClient(requests.user.email.split('@')[0])
 
         members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
