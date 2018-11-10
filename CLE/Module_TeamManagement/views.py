@@ -350,6 +350,7 @@ def student_Team(requests):
     context['module'] = classObj[0].course_section.course_section_id
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s team'
+    print(context)
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
 
