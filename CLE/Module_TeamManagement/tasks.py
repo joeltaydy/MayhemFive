@@ -13,6 +13,7 @@ def webscrapper():
     """
     Saves latest image from Flickr
     """
+    utilities.cloud_learning_tool_logging()
     utilities.webScrapper()
 
 

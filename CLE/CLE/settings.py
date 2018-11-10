@@ -228,14 +228,15 @@ CELERY_TIMEZONE = 'Asia/Makassar'
 CELERY_BEAT_SCHEDULE = {
     'task-number-one': { #name of scheduler
     'task': 'trailheadscrapper', #name of task
-    'schedule':  crontab(hour=0, minute=45) #period of running in seconds (Roughly one day)
+    'schedule':  100 #crontab(hour=0, minute=45) #period of running in seconds (Roughly one day)
     #'arg's :  #if have args
     #},
     #'task-number-two': { #name of scheduler
     #'task': 'tableaurefresh', #name of task
     #'schedule':  100.0 #period of running in seconds
     #'arg's :  #if have args
-    }
+    },
+        
 }
 
 

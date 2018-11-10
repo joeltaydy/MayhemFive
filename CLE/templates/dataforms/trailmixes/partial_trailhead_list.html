@@ -1,7 +1,7 @@
 {% for trailhead in thm %}
   <tr>
       <td>{{ trailhead.name }}</td>
-      <td>{{ trailhead.link }}</td>
+      <td> <a href={{ trailhead.link }}> {{ trailhead.link }} </a></td>
       <td>{{ trailhead.description }}</td>
       <td>{{ trailhead.badges }}</td>
       <td>{{ trailhead.course.course_title }}</td>

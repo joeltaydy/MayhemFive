@@ -86,6 +86,16 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
     requests.session['courseList_updated'] = courseList_updated
     return
 
+# Retreives school term from database
+# uses school term object for webscrapper
+# assumes school_term list is correct
+def retrieve_school_term():
+    latest_school_term = School_Term.objects.all().order_by('end_date').reverse()[0] #latest school term date is available
+    today =  datetime.date.today()
+    if (latest_school_term.start_date < today and latest_school_term.end_date > today):
+        return latest_school_term
+    return None    
+
 # Returns all trailhead webscrapper info from tcsv():
 #
 # final format should be
@@ -320,77 +330,79 @@ def classInformationRetrieval(results, courseSection):
 def webScrapper():
     import threading
     from Module_TeamManagement.models import Cloud_Learning_Tools, Class
-    import datetime
     import pytz
-    output_file = 'clt_files/trailhead-points.csv'
     st = time.time()
-
-    clt_tools = Cloud_Learning_Tools.objects.filter(type='TrailHead')
-
-    studentEmails = []
-    studentLinks = []
-
-    for clt in clt_tools:
-        studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
-        studentLinks.append(clt.website_link)
-
-    print("read link from file : %.9f " % (time.time()-st) )
-
-    
-    processes = []
-    numProcesses= 5
-    lenOfLinks = len(studentEmails)
-    chunkStart = 0
-    avgLinkPerProcess = lenOfLinks//numProcesses
-    info = {}
-    #for counter in range(lenOfLinks):
-    #    info[studentEmails[counter]] = ""
-
-    threads = []
-    for i in range(numProcesses):
-        chunkEnd= chunkStart + avgLinkPerProcess
+    schoolterm = retrieve_school_term()
+    if schoolterm != None:
         
-        # Each process runs an equal chunk of the main list ie studentLinks[a,b] based on number of processes
-        if i == numProcesses-1: #End of fence
-            t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks] ,info))
-            #p = Process(target=webScrapper_MultipleLinks, args=(info,studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks]))  # Passing the list of remaining
-        else:
-            t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:chunkEnd],studentEmails[chunkStart:chunkEnd], info))  # Passing the list of n equal length variables
-        threads.append(t)
-        chunkStart= chunkEnd
-        t.start()
-    for t in threads:
-        t.join()
+        classes =Class.objects.filter(school_term = schoolterm).values('course_section').distinct()
+        for cs in classes:
+            course_section = cs['course_section']
+            trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
+            
+            studentEmails = []
+            studentLinks = []
+            
+            for trailRecord in trailHeadClass:
+                clt = Cloud_Learning_Tools.objects.get(id=trailRecord['clt_id'],course_section=course_section)
+                studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
+                studentLinks.append(clt.website_link)
+            
+            print("read link from file : %.9f " % (time.time()-st) )
 
-    '''
-    
-    #info =webScrapper_MultipleLinks(studentLinks,studentEmails)
-    for p in processes:
-        p.join()
-    '''
-    #print(info)
-    print("scrapping info from  file : %.9f " % (time.time()-st) )
+            if len(studentEmails) != 0:
+                out_dir='clt_files/' + schoolterm.school_term_id.replace('/',"") + '/' + course_section
+                if not(os.path.exists(out_dir)):
+                    os.makedirs(out_dir)
+                output_file = out_dir + '/trailhead-points.csv'
+                
+                processes = []
+                numProcesses= 5
+                lenOfLinks = len(studentEmails)
+                chunkStart = 0
+                avgLinkPerProcess = lenOfLinks//numProcesses
+                info = {}
+                #for counter in range(lenOfLinks):
+                #    info[studentEmails[counter]] = ""
 
-    with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
-        writer = csv.writer(file)
-        tz = pytz.timezone('Asia/Singapore')
-        writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
-        writer.writerow(['link','student_email','class_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+                threads = []
+                for i in range(numProcesses):
+                    chunkEnd= chunkStart + avgLinkPerProcess
+                    
+                    # Each process runs an equal chunk of the main list ie studentLinks[a,b] based on number of processes
+                    if i == numProcesses-1: #End of fence
+                        t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks] ,info))
+                        #p = Process(target=webScrapper_MultipleLinks, args=(info,studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks]))  # Passing the list of remaining
+                    else:
+                        t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:chunkEnd],studentEmails[chunkStart:chunkEnd], info))  # Passing the list of n equal length variables
+                    threads.append(t)
+                    chunkStart= chunkEnd
+                    t.start()
+                for t in threads:
+                    t.join()
 
-        for email,content in info.items():
-            to_write = [
-                content['link'],
-                email,
-                content['name'].replace("," , "").replace("_" , ""),
-                content['badge-count'].replace("," , ""),
-                content['points-count'].replace("," , ""),
-                content['trail-count'].replace("," , ""),
-                content['titles']
-            ]
-            writer.writerow(to_write)
+                print("scrapping info from  file : %.9f " % (time.time()-st) )
+
+                with (open(output_file, 'w', newline='', encoding='utf-8-sig')) as file:
+                    writer = csv.writer(file)
+                    tz = pytz.timezone('Asia/Singapore')
+                    writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
+                    writer.writerow(['link','student_email', 'trail_account_name' ,'course_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+
+                    for email,content in info.items():
+                        to_write = [
+                            content['link'],
+                            email,
+                            content['name'].replace("," , "").replace("_" , ""),
+                            course_section,
+                            content['badge-count'].replace("," , ""),
+                            content['points-count'].replace("," , ""),
+                            content['trail-count'].replace("," , ""),
+                            content['titles']
+                        ]
+                        writer.writerow(to_write)
 
     print("done scrapping info from  file : %.9f " % (time.time()-st) )
-
 #
 # usage of bs4 to scrap multiple links
 #
@@ -475,6 +487,40 @@ def webScrapper_SingleLink(student_email,link):
             for word in row:
                 new_row.append(str(word.encode('utf-8').decode('ascii', 'ignore')))
             writer.writerow(new_row)
+
+# Logs all previous data on an excel
+# By date and class
+#
+def cloud_learning_tool_logging():
+    schoolterm = retrieve_school_term()
+    if schoolterm != None:
+        classes =Class.objects.filter(school_term = schoolterm).values('course_section').distinct()
+        for cs in classes:
+            course_section = cs['course_section']
+            trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
+            if len(trailHeadClass) !=0:
+                out_dir='clt_files/' + schoolterm.school_term_id.replace('/',"") + '/' + course_section
+                if not(os.path.exists(out_dir)):
+                    os.makedirs(out_dir)
+                input_file = out_dir + '/trailhead-points.csv'
+                output_file = out_dir + '/trailhead-points-log.csv'
+                file_exists = os.path.isfile(output_file)
+                with open(input_file, 'r', newline='',encoding='utf-8-sig') as f, open(output_file, 'a', newline='',encoding='utf-8-sig') as data:
+                    
+                    writer = csv.writer(data)
+                    if not file_exists:
+                        writer.writerow(['date','link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails', 'badges_obtained'])
+                    rowEntries = []
+                    for index,line in enumerate(f):
+                        if index ==1 :
+                            continue
+                        elif index==0:
+                            last_log_time = line.split(",")[1] # Skip over header in input file.
+                            continue
+                        rowEntry = [last_log_time]
+                        rowEntry.extend(line.split(","))
+                        writer.writerow(rowEntry)
+                    
 
 
 # Encrypt a 32-bit string
