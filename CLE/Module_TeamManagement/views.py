@@ -908,7 +908,7 @@ def clt_file_ouput(requests):
 #
 def trailhead_list(request):
     thm = Trailmix_Information.objects.all()
-    return render(request, 'dataforms/trailmixes/trailhead_list.html', {'thm': thm})
+    return render(request, 'Module_TeamManagement/Instructor/instructorTrailmixes.html', {'thm': thm})
 
 
 # <description>

@@ -47,7 +47,7 @@
         <button type="button" class="btn btn-light" data-toggle="modal" data-target="#otherToolsModal" data-whatever="Trailhead" id="trailheadsub" value="trailhead">
           <img src="{% static 'images/trailhead_setup.png' %}" alt="..." class="rounded-circle" align="center"><br>Trailhead
         </button>
-        <button type="button" class="btn btn-light" data-toggle="modal" data-target="#trailmix" data-whatever="Trailmix" id="trailheadsub2" value="trailmix">
+        <button type="button" class="btn btn-light" onclick="location.href= '{% url 'TMmod:trailhead_list' %}';">
           <img src="{% static 'images/trailmix_setup.png' %}" alt="..." class="rounded-circle" align="center"><br>TrailMix/ Badges
         </button>
       </div>
@@ -202,26 +202,6 @@
     </div>
   </div>
 
-  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="trailmix">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title">Set up Trailmix</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <!-- Modal body -->
-        <div class="modal-body">
-          {% include "dataforms/trailmixes/trailhead_list.html" %}
-      </div>
-
-      <!-- <div class="modal-footer">
-        <button class="btn btn-primary" data-dismiss="modal">Back</button>
-      </div> -->
     </div>
   </div>
 </div>
