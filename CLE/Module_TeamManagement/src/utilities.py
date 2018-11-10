@@ -270,7 +270,7 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail):
 #     "studentLoopTimes" : range(0, number of students)
 # }
 
-def populateTeamTrailHeadInformation(results, studentemail=None, courseSection=None):
+def  populateTeamTrailHeadInformation(results, studentemail=None, courseSection=None):
     if courseSection == None:
         classStudentObj = Class.objects.filter(student=studentemail)
         courseSection = classStudentObj[0].course_section.course_section_id

@@ -67,7 +67,7 @@ def home(requests):
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
         context['progress'] = 0
-
+    print(context)
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -287,10 +287,10 @@ def faculty_Overview(requests):
     else:
         context['module'] = course_section.course.course_title + " " + course_section.section_number
 
-    context['course_title'] = course_title
-    context['section_number'] = section_number
+    context['course_section'] = Course_Section.objects.get(course=course_title, section_number = section_number)
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
+    print(context)
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
