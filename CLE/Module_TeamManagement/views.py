@@ -716,7 +716,7 @@ def configureDB_clt(requests):
             for student in class_studentObj:
                 student.clt_id.add(cltObj)
 
-            utilities.webScrapper_SingleLink(student_email,link)
+            utilities.webScrapper_SingleLink(student_email,link,course_section=course.replace(' ',''))
             return home(requests)
 
         file = requests.FILES.get("file", False)

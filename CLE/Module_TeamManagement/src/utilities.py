@@ -105,37 +105,41 @@ def retrieve_school_term():
 # }
 #
 def getTrailheadInformation():
-    file_path = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
+    schoolterm = retrieve_school_term()
     results ={}
+    if schoolterm != None:
+        classes =Class.objects.filter(school_term = schoolterm).values('course_section').distinct() #normal web scrapper
+        for cs in classes:
+            course_section = cs['course_section']
+            trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
+            if len(trailHeadClass) != 0:
+                file_path = os.path.join(os.getcwd(),'clt_files',schoolterm.school_term_id.replace('/',""), course_section ,'trailhead-points.csv')
 
-    with open(file_path,mode='r',encoding='cp1252') as csvInput:
-        csv_reader = csv.reader(csvInput, delimiter=',')
-        counter = 0
+                with open(file_path,mode='r', encoding='utf-8-sig') as csvInput:
+                    csv_reader = csv.reader(csvInput, delimiter=',')
+                    counter = 0
+                    for row in csv_reader:
+                        content = {}
+                        if counter == 0:
+                            results['last_updated'] = row[1] # take last updated information
+                            counter+=1
+                        elif counter ==1:
+                            counter+=1
+                            pass #skip headers
+                        else:
+                            # Track all student information
+                            studId = row[1]
+                            content['badge_count'] = row[4]
+                            content['points_count'] = row[5]
+                            content['trail_count'] = row[6]
 
-        for row in csv_reader:
-            content = {}
+                            badges_obtained = row[7].split('|')
+                            new_badges_obtained = []
+                            for badge_obtained in badges_obtained:
+                                new_badges_obtained.append(badge_obtained.replace(" ","_").lower())
 
-            if counter == 0:
-                results['last_updated'] = row[1] # take last updated information
-                counter+=1
-            elif counter ==1:
-                counter+=1
-                pass #skip headers
-            else:
-
-                # Track all student information
-                studId = row[1]
-                content['badge_count'] = row[3]
-                content['points_count'] = row[4]
-                content['trail_count'] = row[5]
-
-                badges_obtained = row[6].split('|')
-                new_badges_obtained = []
-                for badge_obtained in badges_obtained:
-                    new_badges_obtained.append(badge_obtained.replace(" ","_").lower())
-
-                content['badges_obtained'] = new_badges_obtained
-                results[studId] = content #Key is student_email
+                            content['badges_obtained'] = new_badges_obtained
+                            results[studId] = content #Key is student_email
     return results
 
 
@@ -353,10 +357,10 @@ def webScrapper(course_selected=None):
             print("read link from file : %.9f " % (time.time()-st) )
 
             if len(studentEmails) != 0:
-                out_dir='clt_files/' + schoolterm.school_term_id.replace('/',"") + '/' + course_section
+                out_dir = os.path.join('clt_files',schoolterm.school_term_id.replace('/',""), course_section )
                 if not(os.path.exists(out_dir)):
                     os.makedirs(out_dir)
-                output_file = out_dir + '/trailhead-points.csv'
+                output_file=os.path.join('clt_files',schoolterm.school_term_id.replace('/',""), 'trailhead-points.csv' )
                 
                 processes = []
                 numProcesses= 5
@@ -389,7 +393,7 @@ def webScrapper(course_selected=None):
                     writer = csv.writer(file)
                     tz = pytz.timezone('Asia/Singapore')
                     writer.writerow(["last updated:" , str(datetime.datetime.now(tz=tz))[:19]])
-                    writer.writerow(['link','student_email', 'trail_account_name' ,'course_section','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained'])
+                    writer.writerow(['link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails','badges_obtained'])
 
                     for email,content in info.items():
                         to_write = [
@@ -440,55 +444,56 @@ def webScrapper_MultipleLinks(studentLinks,studentEmails,info):
 
 
 # The webscrapper to scrap static info from website - single link
-def webScrapper_SingleLink(student_email,link):
+def webScrapper_SingleLink(student_email,link,course_section):
     from bs4 import BeautifulSoup
     import datetime
     import pytz
+    schoolterm = retrieve_school_term()
+    if schoolterm != None:
+        output_file = os.path.join(os.getcwd(),'clt_files', schoolterm.school_term_id.replace('/',""), course_section,'trailhead-points.csv')
+        content = []
 
-    output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
-    content = []
+        req = requests.get(link)
+        soup = BeautifulSoup(req.text, 'html.parser')
+        broth = soup.find(attrs={'data-react-class': 'BadgesPanel'})
 
-    req = requests.get(link)
-    soup = BeautifulSoup(req.text, 'html.parser')
-    broth = soup.find(attrs={'data-react-class': 'BadgesPanel'})
+        json_obj = json.loads(str(broth['data-react-props']))
 
-    json_obj = json.loads(str(broth['data-react-props']))
+        titles = []
+        for i in json_obj['badges']:
+            titles.append(i['title'])
 
-    titles = []
-    for i in json_obj['badges']:
-        titles.append(i['title'])
+        name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
+        stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
 
-    name = soup.find(attrs={'class', 'slds-p-left_x-large slds-size_1-of-1 slds-medium-size_3-of-4'}).find('div')
-    stats = soup.find_all('div', attrs={'class', 'user-information__achievements-data'})
+        if os.path.isfile(output_file):
+            with open(output_file, mode='r', encoding='utf-8') as inputFile:
+                reader = csv.reader(inputFile, delimiter=',')
+                for row in reader:
+                    if row[1] != student_email:
+                        content.append(row)
+        else:
+            content = [['link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails', 'badges_obtained']] 
 
-    if os.path.isfile(output_file):
-        with open(output_file, mode='r', encoding='utf-8') as inputFile:
-            reader = csv.reader(inputFile, delimiter=',')
-            for row in reader:
-                if row[1] != student_email:
-                    content.append(row)
-    else:
-        content = [['link','student_email','trailhead_name', 'badges', 'points', 'trails', 'badges_obtained']] + content
+        content.append(
+            [
+                link,
+                student_email,
+                json.loads(str(name['data-react-props']))['full_name'].replace("," , "").replace("_" , ""),
+                stats[0].text.strip().replace("," , ""),
+                stats[1].text.strip().replace("," , ""),
+                stats[2].text.strip().replace("," , ""),
+                '|'.join(titles)
+            ]
+        )
 
-    content.append(
-        [
-            link,
-            student_email,
-            json.loads(str(name['data-react-props']))['full_name'].replace("," , "").replace("_" , ""),
-            stats[0].text.strip().replace("," , ""),
-            stats[1].text.strip().replace("," , ""),
-            stats[2].text.strip().replace("," , ""),
-            '|'.join(titles)
-        ]
-    )
-
-    with (open(output_file, mode='w', newline='')) as outputFile:
-        writer = csv.writer(outputFile)
-        for row in content:
-            new_row = []
-            for word in row:
-                new_row.append(str(word.encode('utf-8').decode('ascii', 'ignore')))
-            writer.writerow(new_row)
+        with (open(output_file, mode='w',encoding='utf-8' ,newline='')) as outputFile:
+            writer = csv.writer(outputFile)
+            for row in content:
+                new_row = []
+                for word in row:
+                    new_row.append(str(word.encode('utf-8').decode('ascii', 'ignore')))
+                writer.writerow(new_row)
 
 # Logs all previous data on an excel
 # By date and class
@@ -501,11 +506,11 @@ def cloud_learning_tool_logging():
             course_section = cs['course_section']
             trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
             if len(trailHeadClass) !=0:
-                out_dir='clt_files/' + schoolterm.school_term_id.replace('/',"") + '/' + course_section
+                out_dir=os.path.join('clt_files',schoolterm.school_term_id.replace('/',""), course_section )
                 if not(os.path.exists(out_dir)):
                     os.makedirs(out_dir)
-                input_file = out_dir + '/trailhead-points.csv'
-                output_file = out_dir + '/trailhead-points-log.csv'
+                input_file = os.path.join(out_dir, 'trailhead-points.csv')
+                output_file = os.path.join(out_dir, 'trailhead-points-log.csv')
                 file_exists = os.path.isfile(output_file)
                 with open(input_file, 'r', newline='',encoding='utf-8-sig') as f, open(output_file, 'a', newline='',encoding='utf-8-sig') as data:
                     
