@@ -223,7 +223,8 @@ def faculty_Dashboard(requests):
 #
 #
 def trailhead_refresh(requests):
-    utilities.webScrapper()
+    course_section = requests.GET.get("course_section")
+    utilities.webScrapper(course_selected=course_section )
     return HttpResponseRedirect(requests.META.get('HTTP_REFERER'))
 
 # Faculty Student Management Page

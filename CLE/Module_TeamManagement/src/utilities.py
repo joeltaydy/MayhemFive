@@ -327,15 +327,17 @@ def classInformationRetrieval(results, courseSection):
 # Uses the data from database - Cloud_Learning_Tools and scraps the internet for the results of each student
 # Does it for all data in database
 # Stores in clt_files/
-def webScrapper():
+def webScrapper(course_selected=None):
     import threading
     from Module_TeamManagement.models import Cloud_Learning_Tools, Class
     import pytz
     st = time.time()
     schoolterm = retrieve_school_term()
     if schoolterm != None:
-        
-        classes =Class.objects.filter(school_term = schoolterm).values('course_section').distinct()
+        if course_selected == None:
+            classes =Class.objects.filter(school_term = schoolterm).values('course_section').distinct() #normal web scrapper
+        else: 
+            classes =[{'course_section':course_selected}] #Only refresh one course - from refresh now button
         for cs in classes:
             course_section = cs['course_section']
             trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
