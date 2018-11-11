@@ -175,8 +175,10 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
             context["CourseTrailResults"] = populateTeamTrailHeadInformation(trailHeadInfo,courseSection=moduleCode) #for selective course modules titles
         else:
             context["CourseTrailResults"] = populateTeamTrailHeadInformation_instructor(trailHeadInfo,instructorEmail ) # instructor dashboard
-
-    context["last_updated"] = trailHeadInfo["last_updated"]
+    if result != {}:
+        context["last_updated"] = trailHeadInfo["last_updated"]
+    else:
+        context["last_updated"] =  str(datetime.datetime.now(tz=tz))[:19]
     #print(context)
     return context
 
