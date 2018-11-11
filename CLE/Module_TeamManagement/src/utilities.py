@@ -12,7 +12,7 @@ from Crypto.Cipher import AES
 from CLE.settings import AES_SECRET_KEY
 from Module_TeamManagement.models import *
 from selenium import webdriver
-
+import pytz
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Utilities Function -------------------------------#
@@ -338,7 +338,7 @@ def classInformationRetrieval(results, courseSection):
 def webScrapper(course_selected=None):
     import threading
     from Module_TeamManagement.models import Cloud_Learning_Tools, Class
-    import pytz
+
     st = time.time()
     schoolterm = retrieve_school_term()
     if schoolterm != None:
