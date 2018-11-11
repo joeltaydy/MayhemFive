@@ -178,6 +178,7 @@ def populateTrailheadInformation(requests, student_email=None, instructorEmail=N
     if trailHeadInfo != {}:
         context["last_updated"] = trailHeadInfo["last_updated"]
     else:
+        tz = pytz.timezone('Asia/Singapore')
         context["last_updated"] =  str(datetime.datetime.now(tz=tz))[:19]
     #print(context)
     return context
