@@ -355,17 +355,18 @@ def webScrapper(course_selected=None):
             studentLinks = []
             
             for trailRecord in trailHeadClass:
-                clt = Cloud_Learning_Tools.objects.get(id=trailRecord['clt_id'],course_section=course_section)
-                studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
-                studentLinks.append(clt.website_link)
-            
+                clt = Cloud_Learning_Tools.objects.get(id=trailRecord['clt_id'])
+                if Course_Section.objects.get(course_section_id=course_section) in clt.course_section.all():
+                    studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
+                    studentLinks.append(clt.website_link)
+                
             print("read link from file : %.9f " % (time.time()-st) )
 
             if len(studentEmails) != 0:
                 out_dir = os.path.join('clt_files',schoolterm.school_term_id.replace('/',""), course_section )
                 if not(os.path.exists(out_dir)):
                     os.makedirs(out_dir)
-                output_file=os.path.join('clt_files',schoolterm.school_term_id.replace('/',""), 'trailhead-points.csv' )
+                output_file=os.path.join(out_dir, 'trailhead-points.csv' )
                 
                 processes = []
                 numProcesses= 5

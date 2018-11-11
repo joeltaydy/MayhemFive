@@ -497,7 +497,7 @@ def update_CLT(fileDict, course):
             for clt in clt_list:
                 try:
                     # Update link
-                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0],course_section=course_section)
+                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0])
                     cltObj.website_link = clt[2]
                     cltObj.save()
                 except:
@@ -505,10 +505,11 @@ def update_CLT(fileDict, course):
                     cltObj = Cloud_Learning_Tools.objects.create(
                         id=clt[0],
                         type=clt[1],
-                        website_link=clt[2],
-                        course_section=course_section
+                        website_link=clt[2]
                     )
                     cltObj.save()
+                if course_section not in cltObj.course_section.all():
+                    cltObj.course_section.add(course_section)
 
                 if action == 'batch':
                     course_sections = facultyObj.course_section.all()
