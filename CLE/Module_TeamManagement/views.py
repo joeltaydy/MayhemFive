@@ -107,6 +107,7 @@ def faculty_HomePage(requests):
     try:
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+        utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
     except Exception as e:
         traceback.print_exc()
         context['error_message'] = e.args[0]

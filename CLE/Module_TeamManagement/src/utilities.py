@@ -18,6 +18,26 @@ import pytz
 #-------------------------- Utilities Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
+# Populate configured tools related to instructors/students from database
+def populateConfiguredTools(requests,faculty_email=None):
+    configured_Tools = []
+
+    if faculty_email == None:
+        faculty_email = requests.user.email
+
+    try:
+        course_sectionObjs = Faculty.objects.get(email=faculty_email).course_section.all()
+        for course_sectionObj in course_sectionObjs:
+            if course_sectionObj.learning_tools != None:
+                for tool in course_sectionObj.learning_tools.split('_'):
+                    if tool not in configured_Tools:
+                        configured_Tools.append(tool)
+
+    except:
+        traceback.print_exc()
+
+    requests.session['configured_Tools'] = configured_Tools
+    return
 
 # Populate relevant courses related to instructors/students from database
 def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
@@ -60,6 +80,7 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                             toolsList.append(tools)
                 except:
                     pass
+
                 courseList[course_section.course_section_id]["toolImage_list"] = toolsList
                 try:
                     courseList_updated[course_section.course.course_title].update(
@@ -78,7 +99,6 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                         'to_string':course_section.course.course_title + " " + course_section.section_number,
                     }
 
-
     except :
         traceback.print_exc()
 
@@ -94,7 +114,7 @@ def retrieve_school_term():
     today =  datetime.date.today()
     if (latest_school_term.start_date < today and latest_school_term.end_date > today):
         return latest_school_term
-    return None    
+    return None
 
 # Returns all trailhead webscrapper info from tcsv():
 #
@@ -228,7 +248,7 @@ def populateTeamTrailHeadInformation_instructor(results, instructorEmail):
                     classResult[course_section_id] = {}
                     classResult[course_section_id]["Teams_Information"] = {}
                     classResult[course_section_id]["Students_Information"] = {"students" :[] , "points" : [] , "badges": []}
-                if classObj.course_section.learning_tools != None and "Trailhead" in classObj.course_section.learning_tools.split("_"): 
+                if classObj.course_section.learning_tools != None and "Trailhead" in classObj.course_section.learning_tools.split("_"):
                     try:
                         #populate student results
                         classResult[course_section_id]["Students_Information"]["students"].append(classObj.student.email.split("@")[0])
@@ -326,7 +346,7 @@ def classInformationRetrieval(results, courseSection):
                 classResult["class"]["Teams_Information"][classObj.team_number]["badges"] += int(results[classObj.student.email]['badge_count'])
                 classResult["class"]["Teams_Information"][classObj.team_number]["points"] += int(results[classObj.student.email]['points_count'].replace(",",""))
                 classResult["class"]["Teams_Information"][classObj.team_number]["trails"] += int(results[classObj.student.email]['trail_count'])
-            except: 
+            except:
                 pass
 
     return classResult
@@ -345,21 +365,21 @@ def webScrapper(course_selected=None):
     if schoolterm != None:
         if course_selected == None:
             classes =Class.objects.filter(school_term = schoolterm).values('course_section').distinct() #normal web scrapper
-        else: 
+        else:
             classes =[{'course_section':course_selected}] #Only refresh one course - from refresh now button
         for cs in classes:
             course_section = cs['course_section']
             trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
-            
+
             studentEmails = []
             studentLinks = []
-            
+
             for trailRecord in trailHeadClass:
                 clt = Cloud_Learning_Tools.objects.get(id=trailRecord['clt_id'])
                 if Course_Section.objects.get(course_section_id=course_section) in clt.course_section.all():
                     studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
                     studentLinks.append(clt.website_link)
-                
+
             print("read link from file : %.9f " % (time.time()-st) )
 
             if len(studentEmails) != 0:
@@ -367,7 +387,7 @@ def webScrapper(course_selected=None):
                 if not(os.path.exists(out_dir)):
                     os.makedirs(out_dir)
                 output_file=os.path.join(out_dir, 'trailhead-points.csv' )
-                
+
                 processes = []
                 numProcesses= 5
                 lenOfLinks = len(studentEmails)
@@ -380,7 +400,7 @@ def webScrapper(course_selected=None):
                 threads = []
                 for i in range(numProcesses):
                     chunkEnd= chunkStart + avgLinkPerProcess
-                    
+
                     # Each process runs an equal chunk of the main list ie studentLinks[a,b] based on number of processes
                     if i == numProcesses-1: #End of fence
                         t = threading.Thread(target=webScrapper_MultipleLinks, args=(studentLinks[chunkStart:lenOfLinks],studentEmails[chunkStart:lenOfLinks] ,info))
@@ -422,7 +442,7 @@ def webScrapper(course_selected=None):
 def webScrapper_MultipleLinks(studentLinks,studentEmails,info):
     from bs4 import BeautifulSoup
     counter = 0
-    
+
     for link in studentLinks:
         content = {}
 
@@ -479,7 +499,7 @@ def webScrapper_SingleLink(student_email,link,course_section):
                     if row[1] != student_email:
                         content.append(row)
         else:
-            content = [['link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails', 'badges_obtained']] 
+            content = [['link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails', 'badges_obtained']]
 
         content.append(
             [
@@ -519,7 +539,7 @@ def cloud_learning_tool_logging():
                 output_file = os.path.join(out_dir, 'trailhead-points-log.csv')
                 file_exists = os.path.isfile(output_file)
                 with open(input_file, 'r', newline='',encoding='utf-8-sig') as f, open(output_file, 'a', newline='',encoding='utf-8-sig') as data:
-                    
+
                     writer = csv.writer(data)
                     if not file_exists:
                         writer.writerow(['date','link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails', 'badges_obtained'])
@@ -533,7 +553,7 @@ def cloud_learning_tool_logging():
                         rowEntry = [last_log_time]
                         rowEntry.extend(line.split(","))
                         writer.writerow(rowEntry)
-                    
+
 
 
 # Encrypt a 32-bit string

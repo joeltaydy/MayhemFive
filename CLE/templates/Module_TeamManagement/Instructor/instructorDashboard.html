@@ -102,7 +102,8 @@
         {% endif %}
     {% endfor %}
 
-   <!-- Add tool list validation if  -->
+    {% for tool in request.session.configured_Tools %}
+        {% if tool == 'Telegram' %}
           <div class="col-md-4">
           <div class="card col-md-12">
             <img class="card-img-top" src="{% static 'images/Telegram_home.png' %}" alt="Card image">
@@ -115,6 +116,8 @@
             </div>
           </div>
         </div>
+        {% endif %}
+    {% endfor %}
 
         </div>
     </div>
