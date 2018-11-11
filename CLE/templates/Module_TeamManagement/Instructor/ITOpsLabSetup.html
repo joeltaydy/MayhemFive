@@ -13,9 +13,9 @@
 
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-          <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark active" >Setup</button>
-          <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}?section_number={{first_section}}';" type="button" class="btn btn-dark">Monitor</button>
-          <button onclick="location.href = '{% url 'ECmod:itopslab_event' %}';" type="button" class="btn btn-dark">Event Management</button>
+          <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}?course_title={{course_title}}';" type="button" class="btn btn-dark active" >Setup</button>
+          <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}?course_title={{course_title}}&section_number={{first_section}}';" type="button" class="btn btn-dark">Monitor</button>
+          <button onclick="location.href = '{% url 'ECmod:itopslab_event' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Event Management</button>
         </div>
     </div>
 
@@ -48,19 +48,7 @@
                     <div class="col-md-9 form-group" style = "margin-bottom:40px;">
                         <br>
                         <button class="btn btn-dark pull-right" type="submit" value="Submit">Submit</button>
-
-                        <!-- to remove after UT!-->
-                        <!-- <button type="button" class="btn btn-danger" data-container="body" data-toggle="popover" data-placement="right" data-content="
-                        Account Number:	233703087823 &nbsp;
-
-                        Access Key: AKIAJEDZQ6ZBZHKGWCEA &nbsp;
-
-                        Secret Access Key: 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
-                        ">
-                          Copy Account Details
-                        </button> -->
-                        <!--to remove after UT! -->
-
+                        <input type="hidden" name="course_title" id="course_title" value={{course_title}}>
                     </div>
                 </form>
                 <div class="container col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
@@ -70,14 +58,14 @@
                     {% else %}
                         <div class ="error">No Account Number submitted</div>
                     {%endif %}
-                    
+
                     <h5><b>Submitted AWS Access Key</b>
                     {% if access_key != "" %}
                         <b>Current AWS Access Key:</b> {{access_key}}
                     {% else %}
                         <div class ="error">No AWS Access Key submitted</div>
                     {%endif %}
-                    
+
                     <h5><b>Submitted Secret Access Key</b>
                     {% if secret_access_key != "" %}
                         <b>Current Secret Access Key:</b> {{secret_access_key}}

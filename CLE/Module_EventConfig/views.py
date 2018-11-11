@@ -63,9 +63,11 @@ def faculty_Event_Base(requests):
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
     course_sectionList = requests.session['courseList_updated']
+    course_title = requests.GET.get('course_title')
 
     response['course_sectionList'] = course_sectionList['ESM201']
     response['first_section'] = course_sectionList['ESM201'][0]['section_number']
+    response['course_title'] = course_title
 
     # Second round retrieval
     section_numberList = requests.POST.getlist('section_number')
@@ -101,7 +103,7 @@ def faculty_Event_Base(requests):
             events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type= server_type)
 
     except Exception as e:
-        traceback.print_exc() 
+        traceback.print_exc()
         response['error_message'] = 'Error during event execution: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
@@ -191,7 +193,7 @@ def events_update(request, pk):
     return save_events_form(request, form, 'dataforms/eventslog/partial_events_update.html')
 
 
-# Delete function 
+# Delete function
 #
 def events_delete(request, pk):
     eventsLog = get_object_or_404(Task, pk=pk)

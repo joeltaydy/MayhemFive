@@ -85,8 +85,8 @@
       </div>
     </div>
 
-    {% for course_title,course_sectionList in request.session.courseList_updated.items %}
-        {% if course_title == 'ESM201' %}
+    {% for tool in request.session.configured_Tools %}
+        {% if tool == 'ITOpsLab' %}
           <div class="col-md-4">
           <div class="card col-md-12">
             <img class="card-img-top" src="{% static 'images/ITops_home.png' %}" alt="Card image">

@@ -58,14 +58,23 @@ Instructor page
     </a>
 </li>
 
-{% for course_title,course_sectionList in request.session.courseList_updated.items %}
-    {% if course_title == 'ESM201' %}
+{% for tool in request.session.configured_Tools %}
+    {% if tool == 'ITOpsLab' %}
+    <div id="accordion">
         <li class="nav-item {{ ITOpsLabSetup }}">
-            <a class="nav-link" href="{% url 'DMmod:itopslab_setup' %}">
+            <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
               <i class="fas fa-infinity"></i>
-              <p>IT Ops Lab</p>
+              <span class="no-icon">IT Ops Lab</span>
             </a>
         </li>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" aria-expanded="true" data-parent="#accordion">
+            {% for course_title,course_sectionList in request.session.courseList_updated.items %}
+                <a class="nav-link" href="{% url 'DMmod:itopslab_setup' %}?course_title={{ course_sectionList.0.course_title }}">
+                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
     {% endif %}
 {% endfor %}
 

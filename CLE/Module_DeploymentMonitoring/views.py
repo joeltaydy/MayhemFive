@@ -34,8 +34,13 @@ def faculty_Setup_Base(requests,response=None):
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
 
-    if 'ESM201' in requests.session['courseList_updated'].keys():
-        response['first_section'] = requests.session['courseList_updated']['ESM201'][0]['section_number']
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
+
+    response['course_title'] = course_title
+    response['first_section'] = requests.session['courseList_updated'][course_title][0]['section_number']
 
     try:
         response['deployment_packages'] = []
@@ -45,7 +50,7 @@ def faculty_Setup_Base(requests,response=None):
         response['section_numbers'] = []
 
         # Retrieve Setions that are under ESM201 for faculty
-        ems_course_sectionList = requests.session['courseList_updated']['ESM201']
+        ems_course_sectionList = requests.session['courseList_updated'][course_title]
         for course_section in ems_course_sectionList:
             response['section_numbers'].append(course_section['section_number'])
 
@@ -422,16 +427,19 @@ def faculty_Monitor_Base(requests):
 
     if requests.method == "GET":
         section_num = requests.GET.get('section_number')
+        course_title = requests.GET.get('course_title')
     else:
         section_num = requests.POST.get('section_number')
+        course_title = requests.POST.get('course_title')
 
     response['server_status'] = []
     response['webapp_status'] = []
     response['event_log'] = []
     requests.session['ESMCourseSection'] = section_num
     course_sectionList = requests.session['courseList_updated']
-    response['first_section'] = course_sectionList['ESM201'][0]['section_number']
-    response['course_sectionList'] = course_sectionList['ESM201']
+    response['first_section'] = course_sectionList[course_title][0]['section_number']
+    response['course_title'] = course_title
+    response['course_sectionList'] = course_sectionList[course_title]
 
     try:
         # Retrieve the team_number and account_number for each section
