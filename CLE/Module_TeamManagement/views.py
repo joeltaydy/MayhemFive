@@ -142,6 +142,7 @@ def faculty_Dashboard(requests):
 
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+        utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
         facultyObj = Faculty.objects.get(email=requests.user.email)
         registered_course_section = facultyObj.course_section.all()
         courses = {}
@@ -437,7 +438,7 @@ def configureDB_faculty(requests):
 
 
 # This is for initial configuration by faculty
-# This function associates the course witht he faculty member
+# This function associates the course with the faculty member
 #
 # Requests param: POST
 # - course_title
@@ -499,7 +500,6 @@ def configureDB_course(requests):
         facultyObj.course_section.add(course_sectioObj)
 
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
@@ -570,7 +570,7 @@ def configureDB_students(requests):
             raise Exception("Invalid file type. Please upload .xlsx only")
 
         # If file is .xlsx then proceed with processing
-        response['results'] =  bootstrap.bootstrap_Students(bootstrapFile)
+        response['results'] =  bootstrap.bootstrap_Students(requests,bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
@@ -750,8 +750,8 @@ def configureDB_clt(requests):
         # If file is .xlsx then proceed with processing
         response['results'] = bootstrap.update_CLT(bootstrapFile,course)
         utilities.webScrapper(course_selected=course )
+
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['error_message'] = e.args[0]
         if requests.POST.get("user") == "student":
@@ -768,6 +768,8 @@ def configureDB_clt(requests):
             return faculty_Overview(requests)
 
     response['message'] = 'Learning Tools Configured'
+    utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
+
     if action == 'batch':
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
         response['courses'] = requests.session['courseList_updated']
@@ -841,6 +843,7 @@ def configureDB_telegram(requests):
 
     # Need to double confirm where to direct the user to once done.
     response['message'] = 'Telegram Account Configured'
+    utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 

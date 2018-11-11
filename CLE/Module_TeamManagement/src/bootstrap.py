@@ -327,7 +327,7 @@ def bootstrap_Faculty(fileDict):
     return results
 
 
-def bootstrap_Students(fileDict):
+def bootstrap_Students(requests,fileDict):
     bootstrapInfo = {}
     results = {}
 
@@ -389,6 +389,13 @@ def bootstrap_Students(fileDict):
                 )
                 course_sectionObj.save()
 
+            if 'Telegram' in requests.session['configured_Tools']:
+                if course_sectionObj.learning_tools == None:
+                    course_sectionObj.learning_tools = 'Telegram'
+                else:
+                    course_sectionObj.learning_tools = course_sectionObj.learning_tools + '_Telegram'
+                course_sectionObj.save()
+
             facultyObj.course_section.add(course_sectionObj)
 
             for user,data in section_Data.items():
@@ -441,7 +448,7 @@ def configureCourseToolsList(course_section, toolName):
     else:
         if toolName not in course_sectionObj.learning_tools:
             course_sectionObj.learning_tools = course_sectionObj.learning_tools + "_" + toolName
-            
+
     course_sectionObj.save()
     return
 
