@@ -748,7 +748,7 @@ def configureDB_clt(requests):
 
         # If file is .xlsx then proceed with processing
         response['results'] = bootstrap.update_CLT(bootstrapFile,course)
-
+        utilities.webScrapper(course_selected=course )
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
