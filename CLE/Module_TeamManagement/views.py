@@ -478,12 +478,20 @@ def configureDB_course(requests):
 
         course_title = requests.POST.get("course_title")
         facultyObj = Faculty.objects.get(email=requests.user.email)
+        itOps_tool = requests.POST.get("add_tool")
 
         if course_title == None:
             raise Exception('Please enter a valid course title')
 
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
+
+        if requests.session['configured_Tools'] == None:
+            tools = [itOps_tool]
+        else:
+            tools = ['Telegram'] if 'Telegram' in requests.session['configured_Tools'] else []
+            if itOps_tool != None:
+                tools.append(itOps_tool)
 
         # Create/Retrieve (if exists) course_section object
         try:
@@ -493,6 +501,8 @@ def configureDB_course(requests):
                 course_section_id=course_section_id,
                 course=courseObj,
                 section_number='G0',
+                learning_tools='_'.join(tools) if len(tools) > 0 else None,
+                to_string=course_title+' G0',
             )
             course_sectioObj.save()
 
@@ -506,6 +516,7 @@ def configureDB_course(requests):
 
     # Reflush the nav bar
     utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
+    utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
 
     response['message'] = 'Course created'
     return faculty_Dashboard(requests)

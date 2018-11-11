@@ -389,12 +389,16 @@ def bootstrap_Students(requests,fileDict):
                 )
                 course_sectionObj.save()
 
-            if 'Telegram' in requests.session['configured_Tools']:
-                if course_sectionObj.learning_tools == None:
-                    course_sectionObj.learning_tools = 'Telegram'
-                else:
-                    course_sectionObj.learning_tools = course_sectionObj.learning_tools + '_Telegram'
-                course_sectionObj.save()
+            itOps_tool = requests.POST.get("add_tool")
+            if requests.session['configured_Tools'] == None:
+                tools = [itOps_tool]
+            else:
+                tools = ['Telegram'] if 'Telegram' in requests.session['configured_Tools'] else []
+                if itOps_tool != None:
+                    tools.append(itOps_tool)
+
+            course_sectionObj.learning_tools = '_'.join(tools) if len(tools) > 0 else None
+            course_sectionObj.save()
 
             facultyObj.course_section.add(course_sectionObj)
 
