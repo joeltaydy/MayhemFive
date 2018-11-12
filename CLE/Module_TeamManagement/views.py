@@ -67,7 +67,7 @@ def home(requests):
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
         context['progress'] = 0
-    print(context)
+    
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -107,7 +107,6 @@ def faculty_HomePage(requests):
     try:
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-        utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
     except Exception as e:
         traceback.print_exc()
         context['error_message'] = e.args[0]
@@ -142,7 +141,6 @@ def faculty_Dashboard(requests):
 
         #Populates the info for the side nav bar for instructor
         utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-        utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
         facultyObj = Faculty.objects.get(email=requests.user.email)
         registered_course_section = facultyObj.course_section.all()
         courses = {}
@@ -292,7 +290,7 @@ def faculty_Overview(requests):
     context['course_section'] = Course_Section.objects.get(course=course_title, section_number = section_number)
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
-    print(context)
+
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
@@ -516,7 +514,6 @@ def configureDB_course(requests):
 
     # Reflush the nav bar
     utilities.populateRelevantCourses(requests, instructorEmail=requests.user.email)
-    utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
 
     response['message'] = 'Course created'
     return faculty_Dashboard(requests)
@@ -779,7 +776,6 @@ def configureDB_clt(requests):
             return faculty_Overview(requests)
 
     response['message'] = 'Learning Tools Configured'
-    utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
 
     if action == 'batch':
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
@@ -854,7 +850,6 @@ def configureDB_telegram(requests):
 
     # Need to double confirm where to direct the user to once done.
     response['message'] = 'Telegram Account Configured'
-    utilities.populateConfiguredTools(requests, faculty_email=requests.user.email)
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
 

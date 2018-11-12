@@ -17,13 +17,13 @@ from Module_DeploymentMonitoring.src import aws_util
 import ast
 
 # Get all team number and account number for those enrolled in course ESM201
-def getAllTeamDetails(course_sectionList):
+def getAllTeamDetails(course_sectionList,course_title):
     section_list = {}
 
-    if len(course_sectionList) < 0 and 'ESM201' not in course_sectionList.keys():
+    if len(course_sectionList) < 0 and course_title not in course_sectionList.keys():
         return {}
 
-    for course_section in course_sectionList['ESM201']:
+    for course_section in course_sectionList[course_title]:
         section_number = course_section['section_number']
         section_list[section_number] = []
 
@@ -145,6 +145,7 @@ def getTeamClassObject(requests):
 def getStudentClassObject(requests):
     student_email = requests.user.email
     courseList = requests.session['courseList_updated']
+    
     for course_title,course_details in courseList.items():
         if course_title == "ESM201":
             course_section_id = course_details['id']
@@ -188,7 +189,7 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def getStudentClassObject(ipAddress,server_type,requests=None,account_number=None):
+def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
     if requests != None:
         class_studentObj= getStudentClassObject(requests)
         awsC = class_studentObj.awscredential
@@ -428,6 +429,7 @@ def getCompletedTasksLog(section_num):
     allTasks = CompletedTask.objects.all()
     relatedTasks = []
     for task in allTasks:
+        print(ast.literal_eval(task.task_params)[1])
         if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
             taskInfo = { 'class':section_num }
             taskInfo['events_id']= task.id
@@ -436,6 +438,7 @@ def getCompletedTasksLog(section_num):
             relatedTasks.append(taskInfo)
 
     return relatedTasks
+
 # Gets the statistics of a server based on ip_address against event_details table
 # Statistics obtained includes MTTR, MTBF, Breakdowns
 #

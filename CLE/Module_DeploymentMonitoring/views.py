@@ -49,9 +49,9 @@ def faculty_Setup_Base(requests,response=None):
         response['secret_access_key'] = ''
         response['section_numbers'] = []
 
-        # Retrieve Setions that are under ESM201 for faculty
-        ems_course_sectionList = requests.session['courseList_updated'][course_title]
-        for course_section in ems_course_sectionList:
+        # Retrieve Setions that are under Course section registered for ITopslab for faculty
+        course_sectionList = requests.session['courseList_updated'][course_title]
+        for course_section in course_sectionList:
             response['section_numbers'].append(course_section['section_number'])
 
         # Retrieve GitHub link from Deployment_Package
@@ -268,8 +268,8 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_number'] = requests.GET.get('section_number')
-    print("Ajax test section_number (faculty_Setup_GetAMI): " + response['section_number'])
+    response['section_number'] = requests.GET.getlist('section_number')
+    print("Ajax test section_number (faculty_Setup_GetAMI): " + '_'.join(response['section_number']))
 
     try:
         response['images'] = []
@@ -308,11 +308,17 @@ def faculty_Setup_GetAMIAccounts(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_number = requests.GET.get('section_number').strip()
-    print("Ajax test section_number (faculty_Setup_GetAMIAccounts): " + section_number)
+    section_numbers = requests.GET.get('section_number')
+    if isinstance(section_numbers, str):
+        section_numbers = [section_numbers]
+    print("Ajax test section_number (faculty_Setup_GetAMIAccounts): " + '_'.join(section_numbers))
 
     image_id = requests.GET.get('image_id').strip()
     print("Ajax test image_id (faculty_Setup_GetAMIAccounts): " + image_id)
+
+    # Have yet to configure front end to send back course_title
+    course_title = requests.GET.get('course_title').strip()
+    print("Ajax test course_title (faculty_Setup_GetAMIAccounts): " + course_title)
 
     try:
         response['shared_accounts_list'] = []
@@ -321,24 +327,25 @@ def faculty_Setup_GetAMIAccounts(requests):
         imageObj = Image_Details.objects.get(imageId=image_id)
         shared_accounts = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum
 
-        course_sectionList = requests.session['courseList_updated']
-        section_teamList = utilities.getAllTeamDetails(course_sectionList)
+        course_sectionList = requests.session['courseList_ITOpsLab']
+        section_teamList = utilities.getAllTeamDetails(course_sectionList,course_title)
 
-        for details in section_teamList[section_number]:
-            if details["account_number"] in shared_accounts:
-                response['shared_accounts_list'].append(
-                    {
-                        'team_name':details["team_name"],
-                        'account_number':details["account_number"]
-                    }
-                )
-            else:
-                response['nonshared_accounts_list'].append(
-                    {
-                        'team_name':details["team_name"],
-                        'account_number':details["account_number"]
-                    }
-                )
+        for section_number in section_numbers:
+            for details in section_teamList[section_number]:
+                if details["account_number"] in shared_accounts:
+                    response['shared_accounts_list'].append(
+                        {
+                            'team_name':details["team_name"],
+                            'account_number':details["account_number"]
+                        }
+                    )
+                else:
+                    response['nonshared_accounts_list'].append(
+                        {
+                            'team_name':details["team_name"],
+                            'account_number':details["account_number"]
+                        }
+                    )
 
     except Exception as e:
         traceback.print_exc()
@@ -436,19 +443,19 @@ def faculty_Monitor_Base(requests):
     response['webapp_status'] = []
     response['event_log'] = []
     requests.session['ESMCourseSection'] = section_num
-    course_sectionList = requests.session['courseList_updated']
+
+    # Retrieve the team_number and account_number for each section
+    course_sectionList = requests.session['courseList_ITOpsLab']
+
     response['first_section'] = course_sectionList[course_title][0]['section_number']
     response['course_title'] = course_title
     response['course_sectionList'] = course_sectionList[course_title]
 
     try:
-        # Retrieve the team_number and account_number for each section
-        course_sectionList = requests.session['courseList_updated']
-
         if section_num == None:
             # run all servers
             all_section_details = []
-            course_details = utilities.getAllTeamDetails(course_sectionList)
+            course_details = utilities.getAllTeamDetails(course_sectionList,course_title)
             for section_number,section_details in course_details.items():
                 all_section_details += section_details
 
@@ -456,7 +463,7 @@ def faculty_Monitor_Base(requests):
                     response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
 
         else:
-            section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
+            section_details = utilities.getAllTeamDetails(course_sectionList,course_title)[section_num]
             response = utilities.getAllLog(section_num,response)
             for details in section_details:
                 response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
@@ -464,10 +471,9 @@ def faculty_Monitor_Base(requests):
 
     except Exception as e:
         traceback.print_exc()
-        print(response)
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-    print(response)
+
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 
@@ -644,10 +650,10 @@ def student_Deploy_Standard_Base(requests,response=None):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    classObj = utilities.getStudentClassObject(requests)
-    credentialsObj = classObj.awscredential
-
     try:
+        classObj = utilities.getStudentClassObject(requests)
+        credentialsObj = classObj.awscredential
+        
         response['account_number'] = ''
         response['servers'] = []
 

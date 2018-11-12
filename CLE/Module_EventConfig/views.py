@@ -1,3 +1,4 @@
+import time
 import traceback
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -17,6 +18,8 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from background_task.models_completed import CompletedTask
 from background_task.models import Task
+
+
 # Test to see if django-background-tasks is wokring or not
 #
 def test(requests):
@@ -41,17 +44,51 @@ def test(requests):
     return HttpResponse('Background tasks successfully initiated')
 
 
-# Main function for event configuration page on faculty.
+# Main base function for event configuration page on faculty.
 #
 def faculty_Event_Base(requests):
-    import time
+    response = {"faculty_Event_Base" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    try:
+        course_title = requests.GET.get('course_title')
+        course_sectionList = requests.session['courseList_ITOpsLab']
+
+        response['course_sectionList'] = course_sectionList[course_title]
+        response['course_title'] = course_title
+
+        section_team_list = utilities_DM.getAllTeamDetails(course_sectionList,course_title)
+
+        for team_details in section_team_list:
+            pass
+
+        # faculty_email = requests.user.email
+        # facultyObj = Faculty.objects.get(email=faculty_email)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['error_message'] = 'Error during event execution: ' + str(e.args[0])
+        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+
+    return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+
+
+# Execute event function after base is called
+#
+def faculty_Event_Execute(requests):
+    response = {"faculty_Event_Execute" : "active"}
+
     events = {
         'stop':tasks.stopServer,
         'dos':tasks.dosAttack,
         'stopapp':tasks.stopWebApplication,
     }
-
-    response = {"faculty_Event_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
@@ -62,14 +99,9 @@ def faculty_Event_Base(requests):
 
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
-    course_sectionList = requests.session['courseList_updated']
-    course_title = requests.GET.get('course_title')
+    course_sectionList = requests.session['courseList_ITOpsLab']
 
-    response['course_sectionList'] = course_sectionList['ESM201']
-    response['first_section'] = course_sectionList['ESM201'][0]['section_number']
-    response['course_title'] = course_title
-
-    # Second round retrieval
+    course_title = requests.POST.get('course_title')
     section_numberList = requests.POST.getlist('section_number')
     server_type = requests.POST.get('server_type')
     event_type = requests.POST.get('event_type')
@@ -79,8 +111,11 @@ def faculty_Event_Base(requests):
     else:
         scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
 
-    if section_numberList == None or event_type == None or server_type == None:
-        return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+    print('Course Title: ' + course_title)
+    print('Section Numbers: ' + '_'.join(section_numberList))
+    print('Server Type: ' + server_type)
+    print('Event Type: ' + event_type)
+    print('Schedule Datatime: ' + scheduled_datetime)
 
     try:
         serverList = []
@@ -107,7 +142,7 @@ def faculty_Event_Base(requests):
         response['error_message'] = 'Error during event execution: ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
-    requests.section_number = response['first_section']
+    requests.section_number = course_sectionList[course_title][0]['section_number']
     time.sleep(5)
     return views_DM.faculty_Monitor_Base(requests)
 
