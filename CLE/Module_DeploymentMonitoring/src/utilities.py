@@ -105,7 +105,8 @@ def getRegisteredUsers(permissions):
 
 # Add AWS credentials for the relevant students
 def addAWSCredentials(accountNum, requests):
-    class_studentObj= getStudentClassObject(requests)
+    course_title = requests.POST.get('course_title')
+    class_studentObj= getStudentClassObject(requests,course_title)
     teamAddition = requests.POST.get("isTeam") #if "" or None then is single add if not is a group add
     try:
         awsC=class_studentObj.awscredential
@@ -184,7 +185,8 @@ def addAWSKeys(ipAddress,requests):
 # Add the server details into the server details table
 def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
     if requests != None:
-        class_studentObj= getStudentClassObject(requests)
+        course_title = request.POST.get('course_title')
+        class_studentObj= getStudentClassObject(requests,course_title)
         awsC = class_studentObj.awscredential
         validity = validateAccountNumber(ipAddress, awsCredentials=awsC)
 
