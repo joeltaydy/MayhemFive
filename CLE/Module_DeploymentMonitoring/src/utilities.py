@@ -142,39 +142,32 @@ def getTeamClassObject(requests):
 
 
 # Retrieve the Class object that belongs under the current student user
-def getStudentClassObject(requests):
+def getStudentClassObject(requests,course_title):
     student_email = requests.user.email
-    courseList = requests.session['courseList_updated']
-    
-    for course_title,course_details in courseList.items():
-        if course_title == "ESM201":
-            course_section_id = course_details['id']
-    class_studentObj = Class.objects.filter(student=student_email).get(course_section=course_section_id)
+    course_details = requests.session['courseList_updated'][course_title]
+    class_studentObj = Class.objects.filter(student=student_email).get(course_section=course_details['id'])
 
     return class_studentObj
 
 
 # Retrieve the Class object that belongs under the current student user
 def getTeamMembersClassQuerySet(requests):
-    team_name = getStudentClassObject(requests).team_number
+    course_title = requests.POST.get('course_title')
+    team_name = getStudentClassObject(requests,course_title).team_number
 
     if team_name == None:
-        return [getStudentClassObject(requests)]
+        return [getStudentClassObject(requests,course_title)]
 
-    courseList = requests.session['courseList_updated']
-
-    for course_title,course_details in courseList.items():
-        if course_title == "ESM201":
-            course_section_id = course_details['id']
-
-    querySet = Class.objects.filter(course_section=course_section_id).filter(team_number=team_name)
+    course_details = requests.session['courseList_updated'][course_title]
+    querySet = Class.objects.filter(course_section=course_details['id']).filter(team_number=team_name)
 
     return querySet
 
 
 # Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(ipAddress,requests):
-    class_studentObj= getStudentClassObject(requests)
+    course_title = requests.POST.get('course_title')
+    class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
     try:
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
@@ -282,9 +275,13 @@ def addGitHubLinkForm(request, form, template_name):
 # Adds and Updated Server Details via form
 def addServerDetailsForm(request, form, template_name):
     data = dict()
+    context = dict()
 
     if request.method == 'POST':
-        classObj = getStudentClassObject(request)
+        course_title = request.POST.get('course_title')
+        context['course_title'] = course_title
+
+        classObj = getStudentClassObject(request,course_title)
         credentialsObj = classObj.awscredential
 
         account_number = credentialsObj.account_number
@@ -305,11 +302,13 @@ def addServerDetailsForm(request, form, template_name):
 
             data['form_is_valid'] = True
             servers = getAllServer(account_number)
-            data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers})
+            data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
             data['form_is_valid'] = False
+    else:
+        context['course_title'] = request.GET.get('course_title')
 
-    context = {'form': form}
+    context['form'] = form
     data['html_form'] = render_to_string(template_name, context, request=request)
     return JsonResponse(data)
 

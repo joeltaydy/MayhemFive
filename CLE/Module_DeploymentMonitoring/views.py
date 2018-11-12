@@ -607,11 +607,17 @@ def student_Monitor_Base(requests):
 
     response['server_ip'] = requests.GET.get('server_ip')
 
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
+
     try:
         response['server_status'] = []
         response['webapp_status'] = []
         response['webapp_metric'] = {}
-        studentClassObj = utilities.getStudentClassObject(requests)
+        response['course_title'] = course_title
+        studentClassObj = utilities.getStudentClassObject(requests,course_title)
 
         AWS_Credentials = studentClassObj.awscredential
         team_number= studentClassObj.team_number
@@ -650,12 +656,18 @@ def student_Deploy_Standard_Base(requests,response=None):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
+
     try:
-        classObj = utilities.getStudentClassObject(requests)
+        classObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = classObj.awscredential
-        
+
         response['account_number'] = ''
         response['servers'] = []
+        response['course_title'] = course_title
 
         if credentialsObj != None:
             account_number = credentialsObj.account_number
@@ -688,30 +700,30 @@ def student_Deploy_Standard_AddAccount(requests):
         if new_account_number == None:
             raise Exception('Please enter a valid account number')
 
-        try:
+        if new_account_number != old_account_number:
             new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
             new_credentialsObj.save()
-        except:
-            new_credentialsObj = AWS_Credentials.objects.get(account_number=new_account_number)
 
-        if old_account_number != None:
-            querySet = Class.objects.filter(awscredential=old_account_number)
-            for studentClassObj in querySet:
-                studentClassObj.awscredential = new_credentialsObj
-                studentClassObj.save()
+            if old_account_number != None:
+                querySet = Class.objects.filter(awscredential=old_account_number)
+                for studentClassObj in querySet:
+                    studentClassObj.awscredential = new_credentialsObj
+                    studentClassObj.save()
 
-            serverObjs = Server_Details.objects.filter(account_number=old_account_number)
-            for serverObj in serverObjs:
-                serverObj.delete()
+                serverObjs = Server_Details.objects.filter(account_number=old_account_number)
+                for serverObj in serverObjs:
+                    serverObj.delete()
 
-            old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
-            old_credentialsObj.delete()
+                old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
+                old_credentialsObj.delete()
+            else:
+                team_members = utilities.getTeamMembersClassQuerySet(requests)
+
+                for team_member in team_members:
+                    team_member.awscredential = new_credentialsObj
+                    team_member.save()
         else:
-            team_members = utilities.getTeamMembersClassQuerySet(requests)
-
-            for team_member in team_members:
-                team_member.awscredential = new_credentialsObj
-                team_member.save()
+            response['error_message'] = 'New account number is the same as the old account number. Please state a different account number.'
 
     except Exception as e:
         traceback.print_exc()
@@ -724,14 +736,15 @@ def student_Deploy_Standard_AddAccount(requests):
 # Retrieval of github deployment package link from DB
 #
 def student_Deploy_Standard_GetIPs(requests):
-    classObj = utilities.getStudentClassObject(requests)
+    course_title = requests.GET.get('course_title')
+    classObj = utilities.getStudentClassObject(requests,course_title)
     credentialsObj = classObj.awscredential
     servers = []
 
     if credentialsObj != None:
         servers = utilities.getAllServer(credentialsObj.account_number)
 
-    return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers})
+    return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers, 'course_title': course_title})
 
 
 # Adding of server to DB
@@ -739,7 +752,8 @@ def student_Deploy_Standard_GetIPs(requests):
 #
 def student_Deploy_Standard_AddIPs(requests):
     if requests.method == 'POST':
-        studentClassObj = utilities.getStudentClassObject(requests)
+        course_title = requests.POST.get('course_title')
+        studentClassObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = studentClassObj.awscredential
 
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
@@ -760,7 +774,7 @@ def student_Deploy_Standard_AddIPs(requests):
 # Updating of server in DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_UpdateIPs(requests,pk):
+def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
     server = get_object_or_404(Server_Details, pk=pk)
 
     if requests.method == 'POST':
@@ -774,8 +788,8 @@ def student_Deploy_Standard_UpdateIPs(requests,pk):
 # Deleting of server from DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_DeleteIPs(requests,pk):
-    classObj = utilities.getStudentClassObject(requests)
+def student_Deploy_Standard_DeleteIPs(requests,pk,course_title):
+    classObj = utilities.getStudentClassObject(requests,course_title)
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
     data = dict()
@@ -785,10 +799,12 @@ def student_Deploy_Standard_DeleteIPs(requests,pk):
         data['form_is_valid'] = True
         servers = utilities.getAllServer(credentialsObj.account_number)
         data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
-            'servers': servers
+            'servers': servers,
+            'course_title': course_title
         })
     else:
-        context = {'server': server}
+        course_title = requests.GET.get('course_title')
+        context = {'server': server, 'course_title': course_title}
         data['html_form'] = render_to_string('dataforms/serverdetails/partial_server_delete.html',
             context,
             request=requests,

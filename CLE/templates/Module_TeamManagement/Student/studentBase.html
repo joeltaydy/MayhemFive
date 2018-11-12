@@ -53,12 +53,25 @@
   </a>
 </li>
 
-<li class="nav-item {{ ITOpsLabStudentDeploy }}">
-    <a class="nav-link" href="{% url 'DMmod:itopslab_studeploy_standard' %}">
-        <i class="fas fa-infinity"></i>
-        <p>IT Ops Lab</p>
-    </a>
-</li>
+{% for tool in request.session.configured_Tools %}
+    {% if tool == 'ITOpsLab' %}
+    <div id="accordion">
+        <li class="nav-item {{ ITOpsLabStudentDeploy }}">
+            <a class="nav-link" href ="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                <i class="fas fa-infinity"></i>
+                <p>IT Ops Lab</p>
+            </a>
+        </li>
+        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" aria-expanded="true" data-parent="#accordion">
+            {% for course_title,course_sectionList in request.session.courseList_ITOpsLab.items %}
+                <a class="nav-link" href="{% url 'DMmod:itopslab_studeploy_standard' %}?course_title={{ course_sectionList.0.course_title }}">
+                    <p class="col-md-3 col-sm-3 col-xs-12 control-label">{{ course_title }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
 
 
 {% endblock %}

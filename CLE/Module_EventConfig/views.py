@@ -46,7 +46,7 @@ def test(requests):
 
 # Main base function for event configuration page on faculty.
 #
-def faculty_Event_Base(requests):
+def faculty_Event_Base(requests,response=None):
     response = {"faculty_Event_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
@@ -144,7 +144,7 @@ def faculty_Event_Execute(requests):
 
     requests.section_number = course_sectionList[course_title][0]['section_number']
     time.sleep(5)
-    return views_DM.faculty_Monitor_Base(requests)
+    return views_DM.faculty_Monitor_Base(requests,response)
 
 
 # Method to write the recovery time of the server that calls this

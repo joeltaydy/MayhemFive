@@ -23,8 +23,15 @@ def populateITOpsLabCourses(requests,faculty_email=None,student_email=None):
     courseList_ITOpsLab = {}
 
     try:
-        courseObject = Faculty.objects.get(email=faculty_email).course_section.all()
-        for course_section in courseObject:
+        if faculty_email != None and student_email == None:
+            course_sectionObjs = Faculty.objects.get(email=faculty_email).course_section.all()
+        elif faculty_email == None and student_email != None:
+            class_Objs = Class.objects.filter(student=student_email)
+            course_sectionObjs = []
+            for class_Obj in class_Objs:
+                course_sectionObjs.append(class_Obj.course_section)
+
+        for course_section in course_sectionObjs:
             if course_section.learning_tools != None:
                 if 'ITOpsLab' in course_section.learning_tools.split('_'):
                     try:
@@ -45,7 +52,6 @@ def populateITOpsLabCourses(requests,faculty_email=None,student_email=None):
                                 'to_string':course_section.course.course_title + " " + course_section.section_number,
                             }
                         ]
-
     except:
         traceback.print_exc()
 
@@ -103,7 +109,6 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
                             'to_string':course_section.course.course_title + " " + course_section.section_number,
                         }
                     ]
-
         elif studentEmail != None:
             classObject = Class.objects.all().filter(student=studentEmail).distinct()
             for individuaClass in classObject:
