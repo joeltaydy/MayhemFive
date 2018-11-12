@@ -417,20 +417,12 @@ def webScrapper(course_selected=None):
 
             studentEmails = []
             studentLinks = []
-<<<<<<< HEAD
-
-=======
->>>>>>> 187148ca42ed9859cfa7df939a044ec61332aedd
             for trailRecord in trailHeadClass:
                 clt = Cloud_Learning_Tools.objects.get(id=trailRecord['clt_id'])
 
                 if Course_Section.objects.get(course_section_id=course_section) in clt.course_section.all():
                     studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
                     studentLinks.append(clt.website_link)
-<<<<<<< HEAD
-
-=======
->>>>>>> 187148ca42ed9859cfa7df939a044ec61332aedd
             print("read link from file : %.9f " % (time.time()-st) )
 
             if len(studentEmails) != 0:
