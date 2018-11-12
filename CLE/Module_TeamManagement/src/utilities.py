@@ -18,21 +18,58 @@ import pytz
 #-------------------------- Utilities Function -------------------------------#
 #-----------------------------------------------------------------------------#
 
-# Populate configured tools related to instructors/students from database
-def populateConfiguredTools(requests,faculty_email=None):
-    configured_Tools = []
-
-    if faculty_email == None:
-        faculty_email = requests.user.email
+# Populate courses related tagged under ITOpsLab for instructors
+def populateITOpsLabCourses(requests,faculty_email=None,student_email=None):
+    courseList_ITOpsLab = {}
 
     try:
-        course_sectionObjs = Faculty.objects.get(email=faculty_email).course_section.all()
+        courseObject = Faculty.objects.get(email=faculty_email).course_section.all()
+        for course_section in courseObject:
+            if course_section.learning_tools != None:
+                if 'ITOpsLab' in course_section.learning_tools.split('_'):
+                    try:
+                        courseList_ITOpsLab[course_section.course.course_title].append(
+                            {
+                                'id':course_section.course_section_id,
+                                'course_title':course_section.course.course_title,
+                                'section_number':course_section.section_number,
+                                'to_string':course_section.course.course_title + " " + course_section.section_number,
+                            }
+                        )
+                    except:
+                        courseList_ITOpsLab[course_section.course.course_title] = [
+                            {
+                                'id':course_section.course_section_id,
+                                'course_title':course_section.course.course_title,
+                                'section_number':course_section.section_number,
+                                'to_string':course_section.course.course_title + " " + course_section.section_number,
+                            }
+                        ]
+
+    except:
+        traceback.print_exc()
+
+    requests.session['courseList_ITOpsLab'] = courseList_ITOpsLab
+    return
+
+# Populate configured tools related to instructors/students from database
+def populateConfiguredTools(requests,faculty_email=None,student_email=None):
+    configured_Tools = []
+
+    try:
+        if faculty_email != None and student_email == None:
+            course_sectionObjs = Faculty.objects.get(email=faculty_email).course_section.all()
+        elif faculty_email == None and student_email != None:
+            class_Objs = Class.objects.filter(student=student_email)
+            course_sectionObjs = []
+            for class_Obj in class_Objs:
+                course_sectionObjs.append(class_Obj.course_section)
+
         for course_sectionObj in course_sectionObjs:
             if course_sectionObj.learning_tools != None:
                 for tool in course_sectionObj.learning_tools.split('_'):
                     if tool not in configured_Tools:
                         configured_Tools.append(tool)
-
     except:
         traceback.print_exc()
 
@@ -101,6 +138,9 @@ def populateRelevantCourses(requests,instructorEmail=None,studentEmail=None):
 
     except :
         traceback.print_exc()
+
+    populateConfiguredTools(requests,instructorEmail,studentEmail)
+    populateITOpsLabCourses(requests,instructorEmail,studentEmail)
 
     requests.session['courseList'] = courseList
     requests.session['courseList_updated'] = courseList_updated
