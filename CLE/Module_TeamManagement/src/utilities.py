@@ -339,7 +339,6 @@ def classInformationRetrieval(results, courseSection):
 def webScrapper(course_selected=None):
     import threading
     from Module_TeamManagement.models import Cloud_Learning_Tools, Class
-
     st = time.time()
     schoolterm = retrieve_school_term()
     if schoolterm != None:
@@ -353,13 +352,12 @@ def webScrapper(course_selected=None):
             
             studentEmails = []
             studentLinks = []
-            
             for trailRecord in trailHeadClass:
                 clt = Cloud_Learning_Tools.objects.get(id=trailRecord['clt_id'])
+
                 if Course_Section.objects.get(course_section_id=course_section) in clt.course_section.all():
                     studentEmails.append(clt.id.split("_")[0] + "@smu.edu.sg") #converts trailids to student emails
                     studentLinks.append(clt.website_link)
-                
             print("read link from file : %.9f " % (time.time()-st) )
 
             if len(studentEmails) != 0:

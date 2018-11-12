@@ -480,7 +480,7 @@ def update_Teams(fileDict):
 def update_CLT(fileDict, course):
     bootstrapInfo = {}
     results = {}
-    course_section =  Course_Section.objects.get(course_section_id=course)
+    course_section_selected =  Course_Section.objects.get(course_section_id=course)
     bootstrapInfo = parse_File_CLT(fileDict['file_path'],bootstrapInfo)
     faculty_email = fileDict['faculty_email']
     course = fileDict['course']
@@ -508,8 +508,11 @@ def update_CLT(fileDict, course):
                         website_link=clt[2]
                     )
                     cltObj.save()
-                if course_section not in cltObj.course_section.all():
-                    cltObj.course_section.add(course_section)
+                print(course_section_selected)
+                print(course_section_selected not in cltObj.course_section.all())
+                if course_section_selected not in cltObj.course_section.all():
+                    cltObj.course_section.add(course_section_selected)
+                    print(course_section_selected not in cltObj.course_section.all())
 
                 if action == 'batch':
                     course_sections = facultyObj.course_section.all()
