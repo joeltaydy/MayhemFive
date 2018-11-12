@@ -128,17 +128,24 @@
                             <div class="col-md-12">
                                 <div class="card ">
                                     <div class="card-header">
-                                        <h5 align="center" class="card-title">Telegram Status</h5>
+                                        <h3 class="card-title text-center">Telegram</h3>
                                         <span align = "center">
                                             <br>
-                                            <center>
-                                                <!-- <img src = "{% static 'images/Telegram Logo.png' %}" class="rounded-circle"> -->
-                                                {% for course_section,telegram_details in telegram_data.items %}
-                                                    <h4><b>{{telegram_details.registered_count}}/{{telegram_details.total_count}}</b></h4>
-                                                    <h5>Registered for <b>{{course_section}}</b></h5>
-                                                {% endfor %}
-                                                <button type="button" class="btn btn-sm btn-primary">Send reminder</button>
-                                            </center>
+                                            <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=80px height = 80px style="display: block;margin-left: auto;margin-right: auto;" >
+                                            <br>
+                                            {% for course_section,telegram_details in telegram_data.items %}
+                                            <div style = "col-md-4"> 
+                                                
+                                                <h4><b>{{telegram_details.registered_count}}/{{telegram_details.total_count}}</b></h4>
+                                                <h5>Registered for <b>{{course_section}}</b></h5>
+                                                
+                                            </div>
+                                            {% endfor %}
+                                            
+                                            <button type="button" class="btn btn-sm" style="background-color: #0088CC; color:white; display: block;margin-left: auto;margin-right: auto;" >
+                                                Telegram Management
+                                            </button>
+                                            
                                             <br>
                                         </span>
                                     </div>
