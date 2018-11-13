@@ -104,10 +104,12 @@ def getRegisteredUsers(permissions):
 
 
 # Add AWS credentials for the relevant students
-def addAWSCredentials(accountNum, requests):
-    course_title = requests.POST.get('course_title')
-    class_studentObj= getStudentClassObject(requests,course_title)
+def addAWSCredentials(requests):
     teamAddition = requests.POST.get("isTeam") #if "" or None then is single add if not is a group add
+    accountNum = requests.POST.get('accountNum')
+    course_title = requests.POST.get('course_title')
+
+    class_studentObj= getStudentClassObject(requests,course_title)
     try:
         awsC=class_studentObj.awscredential
         awsC.account_number = accountNum
@@ -178,7 +180,7 @@ def addAWSKeys(ipAddress,requests):
         awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
         awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
         awsC.save()
-    
+
     except:
         traceback.print_exc()
         print("something wrong with request = AMS")
@@ -305,7 +307,7 @@ def addServerDetailsForm(request, form, template_name):
             serverObj.save()
 
             data['form_is_valid'] = True
-            servers = getAllServer(account_number)
+            servers = getAllServers(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
             data['form_is_valid'] = False
@@ -583,7 +585,7 @@ def getCloudMetric(webapp_url):
 
 # Get all server ip registered under that account number
 #
-def getAllServer(account_number):
+def getAllServers(account_number):
     server_ips = []
 
     querySet = Server_Details.objects.filter(account_number=account_number)

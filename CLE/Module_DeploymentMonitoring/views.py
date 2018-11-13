@@ -498,7 +498,7 @@ def student_Deploy_Base(requests):
     student_email = requests.user.email
     coursesec = requests.session['courseList_updated'][course_title]['id']
 
-    class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
+    class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec)
 
     try:
         awsAccountNumber =  class_studentObj.awscredential
@@ -528,13 +528,12 @@ def student_Deploy_Base(requests):
 
     response["studentDeployBase"] = "active"
     response["course_title"] = course_title
-
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
 
 # Processes Form
 #
-def student_Deploy_Upload(requests):
+def student_Deploy_Upload(requests,course_title):
     response = {}
     try:
         processLogin.studentVerification(requests)
@@ -546,6 +545,9 @@ def student_Deploy_Upload(requests):
 
     accountNum = requests.POST.get("accountNum")            #string of account number
     ipAddress = requests.POST.get("ipaddress")              #string of IP address
+
+    requests.POST = requests.POST.copy()
+    requests.POST['course_title'] = course_title
 
     if accountNum != "" :
         student_Deploy_AddAccount(requests)
@@ -573,8 +575,7 @@ def student_Deploy_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    accountNum = requests.POST.get("accountNum")            #string of account number
-    utilities.addAWSCredentials(accountNum, requests)       #creates an incomplete account object
+    utilities.addAWSCredentials(requests)       #creates an incomplete account object
 
 
 # Storing and validating of student user IP address
@@ -616,7 +617,6 @@ def student_Monitor_Base(requests):
         course_title = requests.POST.get('course_title')
 
     try:
-        response['server_ip'] = ''
         response['server_status'] = []
         response['webapp_status'] = []
         response['webapp_metric'] = {}
@@ -628,8 +628,9 @@ def student_Monitor_Base(requests):
 
         if AWS_Credentials != None:
             account_number = AWS_Credentials.account_number
+
             if response['server_ip'] == None:
-                servers = utilities.getAllServer(account_number)
+                servers = utilities.getAllServers(account_number)
                 if len(servers) > 0:
                     response['server_ip'] = servers[0]['server_ip']
 
@@ -677,7 +678,7 @@ def student_Deploy_Standard_Base(requests,response=None):
         if credentialsObj != None:
             account_number = credentialsObj.account_number
             response['account_number'] = account_number
-            response['servers'] = utilities.getAllServer(account_number)
+            response['servers'] = utilities.getAllServers(account_number)
 
     except Exception as e:
         traceback.print_exc()
@@ -701,13 +702,19 @@ def student_Deploy_Standard_AddAccount(requests):
     new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number')
     old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
 
+    print('New ' + str(new_account_number))
+    print('Old ' + str(old_account_number))
+
     try:
         if new_account_number == None:
             raise Exception('Please enter a valid account number')
 
         if new_account_number != old_account_number:
-            new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
-            new_credentialsObj.save()
+            try:
+                new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
+                new_credentialsObj.save()
+            except:
+                raise Exception('That account number is already in use, please use a different one')
 
             if old_account_number != None:
                 querySet = Class.objects.filter(awscredential=old_account_number)
@@ -747,7 +754,7 @@ def student_Deploy_Standard_GetIPs(requests):
     servers = []
 
     if credentialsObj != None:
-        servers = utilities.getAllServer(credentialsObj.account_number)
+        servers = utilities.getAllServers(credentialsObj.account_number)
 
     return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers, 'course_title': course_title})
 
@@ -760,7 +767,7 @@ def student_Deploy_Standard_AddIPs(requests):
         course_title = requests.POST.get('course_title')
         studentClassObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = studentClassObj.awscredential
-        
+
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
             utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
 
@@ -803,7 +810,7 @@ def student_Deploy_Standard_DeleteIPs(requests,pk,course_title):
     if requests.method == 'POST':
         server.delete()
         data['form_is_valid'] = True
-        servers = utilities.getAllServer(credentialsObj.account_number)
+        servers = utilities.getAllServers(credentialsObj.account_number)
         data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
             'servers': servers,
             'course_title': course_title
