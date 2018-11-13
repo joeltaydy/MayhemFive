@@ -121,7 +121,7 @@ def addAWSCredentials(requests):
         awsC.save()
     class_studentObj.awscredential = awsC
     class_studentObj.save()
-    print(teamAddition)
+
     #Add to rest of team
     if teamAddition != None and teamAddition != "":
         classTeam = getTeamClassObject(requests) #returns a list of class student objects based on current user (exclude current user)
@@ -168,7 +168,9 @@ def getTeamMembersClassQuerySet(requests):
 
 
 # Add Access Keys and Secret Access Keys into the AWS credentials table
-def addAWSKeys(ipAddress,requests):
+def addAWSKeys(requests):
+    ipAddress = requests.POST.get("ipaddress")                #string of IP address
+
     course_title = requests.POST.get('course_title')
     class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
@@ -187,7 +189,10 @@ def addAWSKeys(ipAddress,requests):
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
+def addServerDetails(requests=None,account_number=None):
+    server_type = requests.POST.get("server_type")            #string of server_type; parent/slave
+    ipAddress = requests.POST.get("ipaddress")                #string of IP address
+
     if requests != None:
         course_title = request.POST.get('course_title')
         class_studentObj= getStudentClassObject(requests,course_title)
@@ -240,7 +245,6 @@ def initiateStartServerTime(ipAddress):
                 event_recovery=0
             )
             event_Entry.save()
-            print(event_Entry)
     except:
         traceback.print_exc()
 
@@ -434,7 +438,6 @@ def getCompletedTasksLog(section_num):
     allTasks = CompletedTask.objects.all()
     relatedTasks = []
     for task in allTasks:
-        print(ast.literal_eval(task.task_params)[1])
         if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
             taskInfo = { 'class':section_num }
             taskInfo['events_id']= task.id
