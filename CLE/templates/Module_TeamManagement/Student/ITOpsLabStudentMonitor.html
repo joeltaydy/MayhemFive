@@ -9,8 +9,8 @@
 
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-            <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark">Deploy</button>
-            <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark active">Monitor</button>
+            <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Deploy</button>
+            <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?course_title={{course_title}}';" type="button" class="btn btn-dark active">Monitor</button>
         </div>
     </div>
 
@@ -32,7 +32,7 @@
 
                     <!-- to remove once for loop is settled by backend -->
                     {% for details in server_status %}
-                        <a href="/student/ITOperationsLab/monitor/?server_ip={{ details.server_ip }}" role="button" class="btn btn-primary">{{ details.server_type|add:" - "|add:details.server_ip }}</a>
+                        <a href="/student/ITOperationsLab/monitor/?course_title={{course_title}}&server_ip={{ details.server_ip }}" role="button" class="btn btn-primary">{{ details.server_type|add:" - "|add:details.server_ip }}</a>
                     {% endfor %}
 
                 </div>

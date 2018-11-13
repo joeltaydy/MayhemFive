@@ -1,4 +1,4 @@
-<form method="post" action="{% url 'DMmod:server_delete' pk=server.IP_address %}" class="js-server-delete-form">
+<form method="post" action="{% url 'DMmod:server_delete' course_title=course_title pk=server.IP_address %}" class="js-server-delete-form">
   {% csrf_token %}
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -12,5 +12,6 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     <button type="submit" class="btn btn-danger">Delete Server</button>
+    <input type="hidden" name="course_title" id="course_title" value={{course_title}}>
   </div>
 </form>

@@ -67,7 +67,7 @@ def home(requests):
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
         context['progress'] = 0
-
+    
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -223,7 +223,8 @@ def faculty_Dashboard(requests):
 #
 #
 def trailhead_refresh(requests):
-    utilities.webScrapper()
+    course_section = requests.GET.get("course_section")
+    utilities.webScrapper(course_selected=course_section )
     return HttpResponseRedirect(requests.META.get('HTTP_REFERER'))
 
 # Faculty Student Management Page
@@ -286,10 +287,10 @@ def faculty_Overview(requests):
     else:
         context['module'] = course_section.course.course_title + " " + course_section.section_number
 
-    context['course_title'] = course_title
-    context['section_number'] = section_number
+    context['course_section'] = Course_Section.objects.get(course=course_title, section_number = section_number)
     context['user'] = facultyObj
     context['message'] = 'Successful retrieval of faculty\'s profile'
+
     return render(requests,"Module_TeamManagement/Instructor/instructorOverview.html",context)
 
 
@@ -349,6 +350,7 @@ def student_Team(requests):
     context['module'] = classObj[0].course_section.course_section_id
     context['user'] = studentObj
     context['message'] = 'Successful retrieval of student\'s team'
+    print(context)
     return render(requests,"Module_TeamManagement/Student/studentTeam.html",context)
 
 
@@ -434,7 +436,7 @@ def configureDB_faculty(requests):
 
 
 # This is for initial configuration by faculty
-# This function associates the course witht he faculty member
+# This function associates the course with the faculty member
 #
 # Requests param: POST
 # - course_title
@@ -474,12 +476,20 @@ def configureDB_course(requests):
 
         course_title = requests.POST.get("course_title")
         facultyObj = Faculty.objects.get(email=requests.user.email)
+        itOps_tool = requests.POST.get("add_tool")
 
         if course_title == None:
             raise Exception('Please enter a valid course title')
 
         courseObj = Course.objects.get(course_title=course_title)
         course_section_id = course_title + 'G0'
+
+        if requests.session['configured_Tools'] == None:
+            tools = [itOps_tool]
+        else:
+            tools = ['Telegram'] if 'Telegram' in requests.session['configured_Tools'] else []
+            if itOps_tool != None:
+                tools.append(itOps_tool)
 
         # Create/Retrieve (if exists) course_section object
         try:
@@ -489,6 +499,8 @@ def configureDB_course(requests):
                 course_section_id=course_section_id,
                 course=courseObj,
                 section_number='G0',
+                learning_tools='_'.join(tools) if len(tools) > 0 else None,
+                to_string=course_title+' G0',
             )
             course_sectioObj.save()
 
@@ -496,7 +508,6 @@ def configureDB_course(requests):
         facultyObj.course_section.add(course_sectioObj)
 
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/uploadcsv.html", response)
@@ -567,7 +578,7 @@ def configureDB_students(requests):
             raise Exception("Invalid file type. Please upload .xlsx only")
 
         # If file is .xlsx then proceed with processing
-        response['results'] =  bootstrap.bootstrap_Students(bootstrapFile)
+        response['results'] =  bootstrap.bootstrap_Students(requests,bootstrapFile)
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
@@ -715,7 +726,7 @@ def configureDB_clt(requests):
             for student in class_studentObj:
                 student.clt_id.add(cltObj)
 
-            utilities.webScrapper_SingleLink(student_email,link)
+            utilities.webScrapper_SingleLink(student_email,link,course_section=course.replace(' ',''))
             return home(requests)
 
         file = requests.FILES.get("file", False)
@@ -746,9 +757,9 @@ def configureDB_clt(requests):
 
         # If file is .xlsx then proceed with processing
         response['results'] = bootstrap.update_CLT(bootstrapFile,course)
+        utilities.webScrapper(course_selected=course )
 
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['error_message'] = e.args[0]
         if requests.POST.get("user") == "student":
@@ -765,6 +776,7 @@ def configureDB_clt(requests):
             return faculty_Overview(requests)
 
     response['message'] = 'Learning Tools Configured'
+
     if action == 'batch':
         utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
         response['courses'] = requests.session['courseList_updated']

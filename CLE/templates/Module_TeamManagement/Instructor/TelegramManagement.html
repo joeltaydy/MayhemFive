@@ -2,6 +2,11 @@
 {% load staticfiles %}
 {% block bootstrapContent %}
 
+<head>
+    <link rel="stylesheet" href="{% static 'css/telegrammgmt.css' %}">
+</head>
+
+
 <div class="content">
     <div class="container-fluid">
         <h1 style="text-align: center"> Telegram Management </h1>
@@ -86,16 +91,28 @@
                             <p class="card-category text-center">This message will be sent to your telegram group/channel</p>
                         </div>
                         <div class="card-body">
-                            <form action="{% url 'CMmod:faculty_telegram_SendMessage' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                            <form action="{% url 'CMmod:faculty_telegram_SendMessage' %}" method="POST" enctype="multipart/form-data" class="form-horizontal" id="messageForm">
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <textarea class="form-control col-md9" style="height:200px; margin-bottom:15px" name="message" id="message"></textarea>
                                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                                     <input type="hidden" name="telegram_chat_link" id="telegram_chat_link" value={{current_telegram_chat.link}}>
                                     <input type="hidden" name="telegram_chat_type" id="telegram_chat_type" value={{current_telegram_chat.type}}>
+                                    <hr>
+                                    <p class="card-category text-center"> Please select a datetime to send your message</p>
+                                    <div class = "text-center">
+                                        <br>
+                                        <input type="datetime-local" id="setDate" name="setDate" placeholder="Date Time" onkeyup="stoppedTyping()"/>
+                                        
+                                        <span class="validity" id="validity"></span>
+                                        <br><br>
+                                        <input class="custom-control-input" type="checkbox" name="datetime" id="dateNow" value="now" onclick="setDateTimeNow();">
+                                        <label class="custom-control-label" for="dateNow">Now</label>
+                                    </div>
+                                    
                                 <!-- Submission -->
                                     <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
-                                        <button class="btn btn-warning"><b>Send Message</b></button>
+                                        <button class="btn btn-warning" id="sendMsg"><b>Send Message</b></button>
                                     </div>
                                 </div>
                             </form>
@@ -248,5 +265,63 @@
             }
         });
     });
+
+    window.addEventListener('load', function () {
+        var now = new Date();
+        let today = [
+                [now.getFullYear(),
+                AddZero(now.getMonth() + 1),
+                AddZero(now.getDate())].join("-"),
+            [AddZero(now.getHours()),
+            AddZero(now.getMinutes())].join(":")].join("T");
+        document.getElementById("setDate").setAttribute("min",today);
+    }, false);
+
+
+    $(function(){
+        var nextStatus = document.getElementById("setDate").checkValidity();
+        if (document.getElementById("setDate").value=="" || nextStatus==false){
+            document.getElementById("sendMsg").disabled = true;
+        } 
+    });
+    
+    function stoppedTyping(){
+        var nextStatus = document.getElementById("setDate").checkValidity();
+        if(document.getElementById("setDate").value=="" || nextStatus==false) { 
+            document.getElementById('sendMsg').disabled = true; 
+        } else { 
+            document.getElementById('sendMsg').disabled = false;
+        }
+    }
+    function AddZero(num) {
+        return (num >= 0 && num < 10) ? "0" + num : num + "";
+    }
+    var isNow = false; 
+
+    function setDateTimeNow(){
+        if (document.getElementById("dateNow").value=="now"){
+            // let today = new Date().toDateTimeLocal().toISOString().substr(0, 10);
+            if (isNow==false){
+                var now = new Date();
+                let today = [
+                    [now.getFullYear(),
+                    AddZero(now.getMonth() + 1),
+                    AddZero(now.getDate())].join("-"),
+                [AddZero(now.getHours()),
+                AddZero(now.getMinutes())].join(":")].join("T");
+                console.log(today);
+                document.querySelector("#setDate").value = today;
+                document.getElementById("setDate").setAttribute("readonly","readonly");
+                isNow=true;
+                document.getElementById('sendMsg').disabled = false;
+            } else {
+                document.querySelector("#setDate").value="";
+                document.getElementById("setDate").removeAttribute("readonly");
+                isNow=false;
+                document.getElementById('sendMsg').disabled = true;
+            }
+        }
+    }
 </script>
+{% include 'popupmessages/message.html' %}
 {% endblock %}

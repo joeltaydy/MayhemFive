@@ -5,6 +5,7 @@ from django.urls import path,re_path
 urlpatterns = [
     path('background_tasks/test/',views.test,name='test'),
     path('instructor/ITOperationsLab/event/',views.faculty_Event_Base,name='itopslab_event'),
+    path('instructor/ITOperationsLab/event/execute/',views.faculty_Event_Execute,name='itopslab_event_execute'),
     path('event/start/', views.serverCall), #Temp endpoint
     path('event/recovery/', views.serverRecoveryCall),
 

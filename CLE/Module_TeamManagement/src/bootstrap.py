@@ -327,7 +327,7 @@ def bootstrap_Faculty(fileDict):
     return results
 
 
-def bootstrap_Students(fileDict):
+def bootstrap_Students(requests,fileDict):
     bootstrapInfo = {}
     results = {}
 
@@ -389,6 +389,17 @@ def bootstrap_Students(fileDict):
                 )
                 course_sectionObj.save()
 
+            itOps_tool = requests.POST.get("add_tool")
+            if requests.session['configured_Tools'] == None:
+                tools = [itOps_tool]
+            else:
+                tools = ['Telegram'] if 'Telegram' in requests.session['configured_Tools'] else []
+                if itOps_tool != None:
+                    tools.append(itOps_tool)
+
+            course_sectionObj.learning_tools = '_'.join(tools) if len(tools) > 0 else None
+            course_sectionObj.save()
+
             facultyObj.course_section.add(course_sectionObj)
 
             for user,data in section_Data.items():
@@ -441,7 +452,7 @@ def configureCourseToolsList(course_section, toolName):
     else:
         if toolName not in course_sectionObj.learning_tools:
             course_sectionObj.learning_tools = course_sectionObj.learning_tools + "_" + toolName
-            
+
     course_sectionObj.save()
     return
 
@@ -480,7 +491,7 @@ def update_Teams(fileDict):
 def update_CLT(fileDict, course):
     bootstrapInfo = {}
     results = {}
-    course_section =  Course_Section.objects.get(course_section_id=course)
+    course_section_selected =  Course_Section.objects.get(course_section_id=course)
     bootstrapInfo = parse_File_CLT(fileDict['file_path'],bootstrapInfo)
     faculty_email = fileDict['faculty_email']
     course = fileDict['course']
@@ -497,7 +508,7 @@ def update_CLT(fileDict, course):
             for clt in clt_list:
                 try:
                     # Update link
-                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0],course_section=course_section)
+                    cltObj = Cloud_Learning_Tools.objects.get(id=clt[0])
                     cltObj.website_link = clt[2]
                     cltObj.save()
                 except:
@@ -505,10 +516,14 @@ def update_CLT(fileDict, course):
                     cltObj = Cloud_Learning_Tools.objects.create(
                         id=clt[0],
                         type=clt[1],
-                        website_link=clt[2],
-                        course_section=course_section
+                        website_link=clt[2]
                     )
                     cltObj.save()
+                print(course_section_selected)
+                print(course_section_selected not in cltObj.course_section.all())
+                if course_section_selected not in cltObj.course_section.all():
+                    cltObj.course_section.add(course_section_selected)
+                    print(course_section_selected not in cltObj.course_section.all())
 
                 if action == 'batch':
                     course_sections = facultyObj.course_section.all()

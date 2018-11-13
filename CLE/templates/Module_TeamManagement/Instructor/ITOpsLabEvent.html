@@ -10,9 +10,9 @@
 
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-              <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}';" type="button" class="btn btn-dark" >Setup</button>
-              <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}?section_number={{first_section}}';" type="button" class="btn btn-dark">Monitor</button>
-              <button onclick="location.href = '{% url 'ECmod:itopslab_event' %}';" type="button" class="btn btn-dark active">Event Management</button>
+              <button onclick="location.href= '{% url 'DMmod:itopslab_setup' %}?course_title={{course_title}}';" type="button" class="btn btn-dark" >Setup</button>
+              <button onclick="location.href = '{% url 'DMmod:itopslab_monitor' %}?course_title={{course_title}}&section_number={{first_section}}';" type="button" class="btn btn-dark">Monitor</button>
+              <button onclick="location.href = '{% url 'ECmod:itopslab_event' %}?course_title={{course_title}}';" type="button" class="btn btn-dark active">Event Management</button>
             </div>
         </div>
 

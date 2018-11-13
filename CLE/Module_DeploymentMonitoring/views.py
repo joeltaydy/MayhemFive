@@ -34,8 +34,13 @@ def faculty_Setup_Base(requests,response=None):
     faculty_email = requests.user.email
     facultyObj = Faculty.objects.get(email=faculty_email)
 
-    if 'ESM201' in requests.session['courseList_updated'].keys():
-        response['first_section'] = requests.session['courseList_updated']['ESM201'][0]['section_number']
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
+
+    response['course_title'] = course_title
+    response['first_section'] = requests.session['courseList_updated'][course_title][0]['section_number']
 
     try:
         response['deployment_packages'] = []
@@ -44,9 +49,9 @@ def faculty_Setup_Base(requests,response=None):
         response['secret_access_key'] = ''
         response['section_numbers'] = []
 
-        # Retrieve Setions that are under ESM201 for faculty
-        ems_course_sectionList = requests.session['courseList_updated']['ESM201']
-        for course_section in ems_course_sectionList:
+        # Retrieve Setions that are under Course section registered for ITopslab for faculty
+        course_sectionList = requests.session['courseList_updated'][course_title]
+        for course_section in course_sectionList:
             response['section_numbers'].append(course_section['section_number'])
 
         # Retrieve GitHub link from Deployment_Package
@@ -263,8 +268,8 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_number'] = requests.GET.get('section_number')
-    print("Ajax test section_number (faculty_Setup_GetAMI): " + response['section_number'])
+    response['section_number'] = requests.GET.getlist('section_number')
+    print("Ajax test section_number (faculty_Setup_GetAMI): " + '_'.join(response['section_number']))
 
     try:
         response['images'] = []
@@ -303,11 +308,17 @@ def faculty_Setup_GetAMIAccounts(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    section_number = requests.GET.get('section_number').strip()
-    print("Ajax test section_number (faculty_Setup_GetAMIAccounts): " + section_number)
+    section_numbers = requests.GET.get('section_number')
+    if isinstance(section_numbers, str):
+        section_numbers = [section_numbers]
+    print("Ajax test section_number (faculty_Setup_GetAMIAccounts): " + '_'.join(section_numbers))
 
     image_id = requests.GET.get('image_id').strip()
     print("Ajax test image_id (faculty_Setup_GetAMIAccounts): " + image_id)
+
+    # Have yet to configure front end to send back course_title
+    course_title = requests.GET.get('course_title').strip()
+    print("Ajax test course_title (faculty_Setup_GetAMIAccounts): " + course_title)
 
     try:
         response['shared_accounts_list'] = []
@@ -316,24 +327,25 @@ def faculty_Setup_GetAMIAccounts(requests):
         imageObj = Image_Details.objects.get(imageId=image_id)
         shared_accounts = [] if imageObj.sharedAccNum == None else imageObj.sharedAccNum
 
-        course_sectionList = requests.session['courseList_updated']
-        section_teamList = utilities.getAllTeamDetails(course_sectionList)
+        course_sectionList = requests.session['courseList_ITOpsLab']
+        section_teamList = utilities.getAllTeamDetails(course_sectionList,course_title)
 
-        for details in section_teamList[section_number]:
-            if details["account_number"] in shared_accounts:
-                response['shared_accounts_list'].append(
-                    {
-                        'team_name':details["team_name"],
-                        'account_number':details["account_number"]
-                    }
-                )
-            else:
-                response['nonshared_accounts_list'].append(
-                    {
-                        'team_name':details["team_name"],
-                        'account_number':details["account_number"]
-                    }
-                )
+        for section_number in section_numbers:
+            for details in section_teamList[section_number]:
+                if details["account_number"] in shared_accounts:
+                    response['shared_accounts_list'].append(
+                        {
+                            'team_name':details["team_name"],
+                            'account_number':details["account_number"]
+                        }
+                    )
+                else:
+                    response['nonshared_accounts_list'].append(
+                        {
+                            'team_name':details["team_name"],
+                            'account_number':details["account_number"]
+                        }
+                    )
 
     except Exception as e:
         traceback.print_exc()
@@ -422,25 +434,28 @@ def faculty_Monitor_Base(requests):
 
     if requests.method == "GET":
         section_num = requests.GET.get('section_number')
+        course_title = requests.GET.get('course_title')
     else:
         section_num = requests.POST.get('section_number')
+        course_title = requests.POST.get('course_title')
 
     response['server_status'] = []
     response['webapp_status'] = []
     response['event_log'] = []
     requests.session['ESMCourseSection'] = section_num
-    course_sectionList = requests.session['courseList_updated']
-    response['first_section'] = course_sectionList['ESM201'][0]['section_number']
-    response['course_sectionList'] = course_sectionList['ESM201']
+
+    # Retrieve the team_number and account_number for each section
+    course_sectionList = requests.session['courseList_ITOpsLab']
+
+    response['first_section'] = course_sectionList[course_title][0]['section_number']
+    response['course_title'] = course_title
+    response['course_sectionList'] = course_sectionList[course_title]
 
     try:
-        # Retrieve the team_number and account_number for each section
-        course_sectionList = requests.session['courseList_updated']
-
         if section_num == None:
             # run all servers
             all_section_details = []
-            course_details = utilities.getAllTeamDetails(course_sectionList)
+            course_details = utilities.getAllTeamDetails(course_sectionList,course_title)
             for section_number,section_details in course_details.items():
                 all_section_details += section_details
 
@@ -448,7 +463,7 @@ def faculty_Monitor_Base(requests):
                     response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
 
         else:
-            section_details = utilities.getAllTeamDetails(course_sectionList)[section_num]
+            section_details = utilities.getAllTeamDetails(course_sectionList,course_title)[section_num]
             response = utilities.getAllLog(section_num,response)
             for details in section_details:
                 response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
@@ -456,10 +471,9 @@ def faculty_Monitor_Base(requests):
 
     except Exception as e:
         traceback.print_exc()
-        print(response)
         response['error_message'] = 'Error during retrieval of information (Monitoring): ' + str(e.args[0])
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
-    print(response)
+
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabMonitor.html", response)
 
 
@@ -593,11 +607,17 @@ def student_Monitor_Base(requests):
 
     response['server_ip'] = requests.GET.get('server_ip')
 
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
+
     try:
         response['server_status'] = []
         response['webapp_status'] = []
         response['webapp_metric'] = {}
-        studentClassObj = utilities.getStudentClassObject(requests)
+        response['course_title'] = course_title
+        studentClassObj = utilities.getStudentClassObject(requests,course_title)
 
         AWS_Credentials = studentClassObj.awscredential
         team_number= studentClassObj.team_number
@@ -636,12 +656,18 @@ def student_Deploy_Standard_Base(requests,response=None):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    classObj = utilities.getStudentClassObject(requests)
-    credentialsObj = classObj.awscredential
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
 
     try:
+        classObj = utilities.getStudentClassObject(requests,course_title)
+        credentialsObj = classObj.awscredential
+
         response['account_number'] = ''
         response['servers'] = []
+        response['course_title'] = course_title
 
         if credentialsObj != None:
             account_number = credentialsObj.account_number
@@ -674,30 +700,30 @@ def student_Deploy_Standard_AddAccount(requests):
         if new_account_number == None:
             raise Exception('Please enter a valid account number')
 
-        try:
+        if new_account_number != old_account_number:
             new_credentialsObj = AWS_Credentials.objects.create(account_number=new_account_number)
             new_credentialsObj.save()
-        except:
-            new_credentialsObj = AWS_Credentials.objects.get(account_number=new_account_number)
 
-        if old_account_number != None:
-            querySet = Class.objects.filter(awscredential=old_account_number)
-            for studentClassObj in querySet:
-                studentClassObj.awscredential = new_credentialsObj
-                studentClassObj.save()
+            if old_account_number != None:
+                querySet = Class.objects.filter(awscredential=old_account_number)
+                for studentClassObj in querySet:
+                    studentClassObj.awscredential = new_credentialsObj
+                    studentClassObj.save()
 
-            serverObjs = Server_Details.objects.filter(account_number=old_account_number)
-            for serverObj in serverObjs:
-                serverObj.delete()
+                serverObjs = Server_Details.objects.filter(account_number=old_account_number)
+                for serverObj in serverObjs:
+                    serverObj.delete()
 
-            old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
-            old_credentialsObj.delete()
+                old_credentialsObj = AWS_Credentials.objects.get(account_number=old_account_number)
+                old_credentialsObj.delete()
+            else:
+                team_members = utilities.getTeamMembersClassQuerySet(requests)
+
+                for team_member in team_members:
+                    team_member.awscredential = new_credentialsObj
+                    team_member.save()
         else:
-            team_members = utilities.getTeamMembersClassQuerySet(requests)
-
-            for team_member in team_members:
-                team_member.awscredential = new_credentialsObj
-                team_member.save()
+            response['error_message'] = 'New account number is the same as the old account number. Please state a different account number.'
 
     except Exception as e:
         traceback.print_exc()
@@ -710,14 +736,15 @@ def student_Deploy_Standard_AddAccount(requests):
 # Retrieval of github deployment package link from DB
 #
 def student_Deploy_Standard_GetIPs(requests):
-    classObj = utilities.getStudentClassObject(requests)
+    course_title = requests.GET.get('course_title')
+    classObj = utilities.getStudentClassObject(requests,course_title)
     credentialsObj = classObj.awscredential
     servers = []
 
     if credentialsObj != None:
         servers = utilities.getAllServer(credentialsObj.account_number)
 
-    return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers})
+    return render(requests, 'dataforms/serverdetails/server_list.html', {'servers': servers, 'course_title': course_title})
 
 
 # Adding of server to DB
@@ -725,7 +752,8 @@ def student_Deploy_Standard_GetIPs(requests):
 #
 def student_Deploy_Standard_AddIPs(requests):
     if requests.method == 'POST':
-        studentClassObj = utilities.getStudentClassObject(requests)
+        course_title = requests.POST.get('course_title')
+        studentClassObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = studentClassObj.awscredential
 
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
@@ -746,7 +774,7 @@ def student_Deploy_Standard_AddIPs(requests):
 # Updating of server in DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_UpdateIPs(requests,pk):
+def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
     server = get_object_or_404(Server_Details, pk=pk)
 
     if requests.method == 'POST':
@@ -760,8 +788,8 @@ def student_Deploy_Standard_UpdateIPs(requests,pk):
 # Deleting of server from DB
 # returns a JsonResponse
 #
-def student_Deploy_Standard_DeleteIPs(requests,pk):
-    classObj = utilities.getStudentClassObject(requests)
+def student_Deploy_Standard_DeleteIPs(requests,pk,course_title):
+    classObj = utilities.getStudentClassObject(requests,course_title)
     credentialsObj = classObj.awscredential
     server = get_object_or_404(Server_Details, pk=pk)
     data = dict()
@@ -771,10 +799,12 @@ def student_Deploy_Standard_DeleteIPs(requests,pk):
         data['form_is_valid'] = True
         servers = utilities.getAllServer(credentialsObj.account_number)
         data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
-            'servers': servers
+            'servers': servers,
+            'course_title': course_title
         })
     else:
-        context = {'server': server}
+        course_title = requests.GET.get('course_title')
+        context = {'server': server, 'course_title': course_title}
         data['html_form'] = render_to_string('dataforms/serverdetails/partial_server_delete.html',
             context,
             request=requests,

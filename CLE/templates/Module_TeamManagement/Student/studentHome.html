@@ -20,7 +20,6 @@ My Stats
         </div>
       </div>
     </div>
-
     <!--Class One Card-->
     <div class="row">
       {% for course,course_section in request.session.courseList.items %}
@@ -41,7 +40,7 @@ My Stats
                       <h3 align="center" class="card-title">Tools used</h3>
                       <br>
                       <div class="row text-center" style="display: block;margin-left: auto;margin-right: auto;">
-                        
+
                         {% if not course_section.toolImage_list %}
                         <div class="text-center">
                           <h6 style = "color:red"> No tools have been initialised</h6>
@@ -59,11 +58,11 @@ My Stats
                         {% endif %}
                       </div>
                       <br>
-    
+
                       <p align="right">
                         <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">Initialise tools</a>
                       </p>
-    
+
                     </div>
                   </div>
                 </div>
@@ -81,14 +80,14 @@ My Stats
                     <div class = "card-footer text-center">
                         <h6><b>Join {{current_telegram_chat.type}} now!</b></h6>
                     </div>
-                    
+
                   </div>
                 </div>
               </div>
             </div>
-              
-              
-            
+
+
+
           {% else %}
           <div class="col-md-12">
             <div class="card">
@@ -96,7 +95,7 @@ My Stats
                 <h5 align="center" class="card-title">Tools used</h5>
                 <br>
                 <div class="row" style="display: block;margin-left: auto;margin-right: auto;">
-                  
+
                   {% if not course_section.toolImage_list %}
                   <div class="text-center">
                     <h6 style = "color:red"> No tools have been initialised</h6>
@@ -125,7 +124,7 @@ My Stats
           {% endif %}
 
           <!--Tool 1 Card-->
-
+        {% if "Trailhead" in course_section.toolImage_list %}  <!-- if loop for trailhead docker-->
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
@@ -164,7 +163,7 @@ My Stats
                 <span align="center"> {% include "Module_TeamManagement/Student/trailhead.html" %} </span>
               </div>
 
-            
+
 
             <!-- class ranking-->
             <div class ="col-md-12">
@@ -193,7 +192,7 @@ My Stats
                       <h4 align="center" class="card-title">Trailhead performance</h4>
                       <p align="center" class="card-category">Points against Badges</p>
                     </div>
-    
+
                     <div class="card-body">
                       {% include "Module_TeamManagement/Dashboard/class_line_chart.html" %}
                     </div>
@@ -202,12 +201,12 @@ My Stats
                         <i class="fa fa-history"></i> Updated "{{last_updated}}"
                       </div>
                     </div>
-      
+
                   </div>
                 </div>
               </div>
             </div>
-              
+              {% endif %} <!-- if loop for trailhead docker-->
             </div>
           </div>
 
@@ -223,7 +222,7 @@ My Stats
                 </div> -->
           <!--end of calendar-->
 
-          
+
         </div>
 
       </div>

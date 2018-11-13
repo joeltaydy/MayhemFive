@@ -9,7 +9,7 @@
 {% block content %}
   <!-- BUTTON TO TRIGGER THE ACTION -->
   <p>
-      <button type="button" class="btn btn-primary js-create-server"data-url="{% url 'DMmod:server_create' %}">
+      <button type="button" class="btn btn-primary js-create-server"data-url="{% url 'DMmod:server_create' %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-plus"></span> New Server
       </button>
   </p>
@@ -37,8 +37,8 @@
 
 <script>
 $(document).ready(function() {
-  console.log("{% url 'DMmod:itopslab_studeploy_standard' %}server/ #server-table")
-   $("#server-table").load("{% url 'DMmod:itopslab_studeploy_standard' %}server/ #server-table");
+  console.log("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table")
+   $("#server-table").load("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table");
 });
 </script>
 

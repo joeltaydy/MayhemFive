@@ -7,6 +7,7 @@ input:invalid+span:after {
   background: #ffe0e0;
   padding: 10px 10px;
   border-left: 6px solid #a80000;
+  display:block;
 }
 
   .error {

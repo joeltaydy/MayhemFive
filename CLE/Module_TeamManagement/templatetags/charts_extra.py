@@ -40,3 +40,7 @@ def describeSet(setValues):
 @register.filter
 def replaceSpace(string):
     return string.replace(" ","")
+
+@register.filter
+def learning_tool_split(dictionary):
+    return dictionary.split("_")
