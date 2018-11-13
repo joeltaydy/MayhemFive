@@ -156,7 +156,7 @@ def faculty_Event_Execute(requests):
     print('Section Numbers: ' + '_'.join(section_numberList))
     print('Server Type: ' + server_type)
     print('Event Type: ' + event_type)
-    print('Schedule Datatime: ' + scheduled_datetime)
+    print('Schedule Datatime: ' + str(scheduled_datetime))
 
     try:
         serverList = []
