@@ -268,7 +268,7 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_number'] = requests.GET.getlist('section_number')
+    response['section_number'] = requests.GET.get('section_number')
     print("Ajax test section_number (faculty_Setup_GetAMI): " + '_'.join(response['section_number']))
 
     try:
@@ -464,6 +464,7 @@ def faculty_Monitor_Base(requests):
 
         else:
             section_details = utilities.getAllTeamDetails(course_sectionList,course_title)[section_num]
+
             response = utilities.getAllLog(section_num,response)
             for details in section_details:
                 response = utilities.getMonitoringStatus(details["account_number"],details["team_name"],response)
@@ -667,6 +668,14 @@ def student_Deploy_Standard_Base(requests,response=None):
     try:
         classObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = classObj.awscredential
+
+        team_number= classObj.team_number
+        if team_number != None:
+            team_members = Class.objects.filter(course_section=classObj.course_section).filter(team_number=team_number)
+            for team_member in team_members:
+                if team_member.awscredential == None:
+                    team_member.awscredential = credentialsObj
+                    team_member.save()
 
         response['account_number'] = ''
         response['servers'] = []

@@ -67,7 +67,7 @@ def home(requests):
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
         context['progress'] = 0
-    
+
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -646,15 +646,12 @@ def configureDB_teams(requests):
         response['results'] = bootstrap.update_Teams(bootstrapFile)
 
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['error_message'] = e.args[0]
         response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
-        #return faculty_Overview(requests)
 
     response['message'] = 'Teams Configured'
-    # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
     return faculty_Overview(requests)
 
 
