@@ -422,8 +422,9 @@ def faculty_Setup_ShareAMI(requests):
 
 # Main function for monitor page on faculty.
 #
-def faculty_Monitor_Base(requests,response):
-    response = {"faculty_Monitor_Base" : "active"}
+def faculty_Monitor_Base(requests,response=None):
+    if response == None:
+        response = {"faculty_Monitor_Base" : "active"}
 
     # Redirect user to login page if not authorized and student
     try:
