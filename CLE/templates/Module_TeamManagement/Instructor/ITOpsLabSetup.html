@@ -25,12 +25,12 @@
         <div class="panel">
         <div class="panel-heading">
         <h5 class="panel-title">
-            <a href="#panelBodyOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
+            <a href="#panelBodyOne" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
             </h5>
         </div>
 
          <!-- Request AWS Information-->
-        <div id="panelBodyOne" class="panel-collapse collapse in">
+        <div id="panelBodyOne" class="panel-collapse collapse">
             <div class="panel-body">
 
                 <form id="awsinfo" action="{% url 'DMmod:itopslab_setup_AWSKeys' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
