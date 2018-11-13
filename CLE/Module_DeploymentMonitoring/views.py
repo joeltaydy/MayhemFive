@@ -591,11 +591,8 @@ def student_Deploy_AddIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    server_type = requests.POST.get("server_type")            #string of server_type; parent/slave
-    ipAddress = requests.POST.get("ipaddress")              #string of IP address
-
     utilities.addAWSKeys(ipAddress,requests)
-    utilities.addServerDetails(ipAddress,server_type,requests=requests)
+    utilities.addServerDetails(requests=requests)
 
 
 # Retrieves student's server adn metrics
