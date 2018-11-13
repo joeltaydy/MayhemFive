@@ -4,66 +4,100 @@
     <!-- <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script> -->
     <script type="text/javascript" src="http://yourjavascript.com/7174319415/script.js"></script>
     <script>
-            $(document).ready(function(){
-                 $('select#courseSection').change(function () {
+        $(document).ready(function(){
+            document.getElementById("button_next_class").disabled = true;
+        });
+
+        function validateCheckbox(){
+            var checkboxes = document.getElementsByName("courseSection");
+            var all_checkboxes = document.getElementById("checkAll");
+            var isDisabled = true;
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                if(checkboxes[i].checked){
+                    isDisabled = false;
+                }else{
+                    all_checkboxes.checked = false;
+                };
+            };
+
+            document.getElementById("button_next_class").disabled = isDisabled;
+        };
+
+        function validateAllCheckboxes(){
+            var all_checkboxes = document.getElementById("checkAll");
+
+            if(all_checkboxes.checked){
+                isDisabled = false;
+            }else{
+                isDisabled = true;
+            };
+
+            document.getElementById("button_next_class").disabled = isDisabled;
+        };
+
+        function shareAMI(){
+            var checkboxes = document.getElementsByName("courseSection");
+            var selected_sectionNumbers = [];
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                if(checkboxes[i].checked){
+                    selected_sectionNumbers.push(checkboxes[i].value);
+                };
+            };
+
+            section_data = { 'section_number' : selected_sectionNumbers.join('_')};
+            ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",section_data,function(section_result){
+                console.log(section_result);
+
+                $("#image_id option").remove();
+                $("#image_id").append('<option value="" selected disabled hidden>Select image here</option>');
+
+                for (var i = section_result.images.length - 1; i >= 0; i--) {
+                    $("#image_id").append('<option value="' + section_result.images[i].image_id + '">'+ section_result.images[i].image_name +'</option>');
+                };
+
+                 $('select#image_id').change(function () {
                      var optionSelected = $(this).find("option:selected");
-                     var valueSelected  = optionSelected.val();
-                     var section_number = optionSelected.text();
-                     var section_data = {};
+                     var image_id  = optionSelected.val();
+                     var image_name = optionSelected.text();
+                     var image_data = {}
 
-                     section_data = { 'section_number' : section_number };
-                     ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",section_data,function(section_result){
-                            console.log(section_result);
+                     image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number, "course_title" : "{{course_title}}"};
+                     ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
+                            console.log(image_result);
 
-                            $("#image_id option").remove();
-                            $("#image_id").append('<option value="" selected disabled hidden>Select image here</option>');
+                            var account_numbers_table = document.getElementById("account_numbers");
 
-                            for (var i = section_result.images.length - 1; i >= 0; i--) {
-                                $("#image_id").append('<option value="' + section_result.images[i].image_id + '">'+ section_result.images[i].image_name +'</option>');
+                            // remove existing options here
+                            $("#account_numbers option").remove();
+
+                            for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
+                                var option = document.createElement("OPTION");
+                                option.value = image_result.nonshared_accounts_list[i].account_number;
+
+                                var text = document.createTextNode(image_result.nonshared_accounts_list[i].team_name);
+                                option.appendChild(text);
+
+                                account_numbers_table.appendChild(option);
                             };
 
-                             $('select#image_id').change(function () {
-                                 var optionSelected = $(this).find("option:selected");
-                                 var image_id  = optionSelected.val();
-                                 var image_name = optionSelected.text();
-                                 var image_data = {}
+                            for (var i = image_result.shared_accounts_list.length - 1; i >= 0; i--) {
+                                var option = document.createElement("OPTION");
+                                option.value = image_result.shared_accounts_list[i].account_number;
+                                option.selected = true;
 
-                                 image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number };
-                                 ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
-                                        console.log(image_result);
+                                var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
+                                option.appendChild(text);
 
-                                        var account_numbers_table = document.getElementById("account_numbers");
+                                account_numbers_table.appendChild(option);
+                            };
+                                demo2.trigger('bootstrapDualListbox.refresh');
+                        });
 
-                                        // remove existing options here
-                                        $("#account_numbers option").remove();
-
-                                        for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
-                                            var option = document.createElement("OPTION");
-                                            option.value = image_result.nonshared_accounts_list[i].account_number;
-
-                                            var text = document.createTextNode(image_result.nonshared_accounts_list[i].team_name);
-                                            option.appendChild(text);
-
-                                            account_numbers_table.appendChild(option);
-                                        };
-
-                                        for (var i = image_result.shared_accounts_list.length - 1; i >= 0; i--) {
-                                            var option = document.createElement("OPTION");
-                                            option.value = image_result.shared_accounts_list[i].account_number;
-                                            option.selected = true;
-
-                                            var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
-                                            option.appendChild(text);
-
-                                            account_numbers_table.appendChild(option);
-                                        };
-                                         demo2.trigger('bootstrapDualListbox.refresh');
-                                     });
-
-                             });
-                         });
-                 });
-            });
+                    });
+             });
+        };
     </script>
 </head>
    <!-- MultiStep Form -->
@@ -97,13 +131,13 @@
                               {% if section_number != 'G0' %}
                               <!-- <option value="{{ section_number }}"> {{ section_number }} </option> -->
                               <div class="custom-control custom-checkbox custom-control-inline mb-5">
-                                        <input class="custom-control-input" type="checkbox" name="courseSection" id={{section_number}} value={{section_number}}>
+                                        <input class="custom-control-input" type="checkbox" name="courseSection" id={{section_number}} value={{section_number}} onclick="validateCheckbox()">
                                       <label class="custom-control-label" for={{section_number}}>{{section_number}}</label>
                               </div>
                               {% endif %}
                           {% endfor %}
                           <div class="custom-control custom-checkbox custom-control-inline mb-5">
-                                  <input class="custom-control-input" type="checkbox" id="checkAll">
+                                  <input class="custom-control-input" type="checkbox" id="checkAll" onclick="validateAllCheckboxes()">
                                   <label class="custom-control-label" for="checkAll">All classes</label>
                           </div>
 
@@ -118,7 +152,7 @@
 
                         </div>
                     </div>
-                    <input type="button" name="next" class="next action-button" value="Next"/>
+                    <input type="button" id="button_next_class" name="next" class="next action-button" value="Next" onclick="shareAMI()"/>
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Select Image</h2>

@@ -268,11 +268,11 @@ def faculty_Setup_GetAMI(requests):
         logout(requests)
         return render(requests, 'Module_Account/login.html', response)
 
-    response['section_number'] = requests.GET.get('section_number')
-    print("Ajax test section_number (faculty_Setup_GetAMI): " + '_'.join(response['section_number']))
+    section_number = requests.GET.get('section_number')
 
     try:
         response['images'] = []
+        response['section_number'] = section_number
 
         faculty_email = requests.user.email
         facultyObj = Faculty.objects.get(email=faculty_email)
@@ -309,16 +309,17 @@ def faculty_Setup_GetAMIAccounts(requests):
         return render(requests, 'Module_Account/login.html', response)
 
     section_numbers = requests.GET.get('section_number')
-    if isinstance(section_numbers, str):
-        section_numbers = [section_numbers]
-    print("Ajax test section_number (faculty_Setup_GetAMIAccounts): " + '_'.join(section_numbers))
-
     image_id = requests.GET.get('image_id').strip()
-    print("Ajax test image_id (faculty_Setup_GetAMIAccounts): " + image_id)
-
-    # Have yet to configure front end to send back course_title
     course_title = requests.GET.get('course_title').strip()
-    print("Ajax test course_title (faculty_Setup_GetAMIAccounts): " + course_title)
+
+    if '_' in section_numbers:
+        section_numbers = section_numbers.split('_')
+    else:
+        section_numbers = [section_numbers]
+
+    # print(section_numbers)
+    # print(image_id)
+    # print(course_title)
 
     try:
         response['shared_accounts_list'] = []

@@ -798,9 +798,10 @@ def configureDB_clt(requests):
 #
 def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
+    utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+    response['courses'] = requests.session['courseList_updated']
+
     if requests.method == "GET":
-        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
@@ -840,12 +841,9 @@ def configureDB_telegram(requests):
 
     except Exception as e:
         traceback.print_exc()
-        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList_updated']
         response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    # Need to double confirm where to direct the user to once done.
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
