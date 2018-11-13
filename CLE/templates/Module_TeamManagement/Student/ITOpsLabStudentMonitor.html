@@ -2,6 +2,12 @@
 {% load staticfiles %}
 
 {% block bootstrapContent %}
+
+<head>
+  <link rel="stylesheet" href="{% static 'css/itopsmonitor.css' %}">
+
+</head>
+
 <div class="col-md-12">
     <h1 align="center">IT Operations Lab</h1>
     <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
@@ -15,7 +21,7 @@
     </div>
 
     <hr>
-    <h2 align="center"><i>Monitor</i></h2>
+    <div class="itopsheader">MONITOR</div>
 </div>
 
   <div class="content">

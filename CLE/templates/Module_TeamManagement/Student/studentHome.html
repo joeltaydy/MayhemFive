@@ -92,34 +92,35 @@ My Stats
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h5 align="center" class="card-title">Tools used</h5>
-                <br>
-                <div class="row" style="display: block;margin-left: auto;margin-right: auto;">
-
+                <h3 align="center" class="card-title">Tools used</h3>
+              </div>
+              <div class = "card-body text-center">
+                <div class="col-md-12 text-center" style="margin-left:30px;">
                   {% if not course_section.toolImage_list %}
                   <div class="text-center">
-                    <h6 style = "color:red"> No tools have been initialised</h6>
+                      <h6 style = "color:red"> No tools have been initialised</h6>
+                      <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">Initialise tools</a>
                   </div>
                   {% else %}
+                  <div class="row text-center">
                     {% for toolImage in course_section.toolImage_list %}
                     {% if toolImage != '' %}
                     {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                    <div class="col-md-4" style="display: block;margin-left: auto;margin-right: auto;">
+                    
+                    <div class="col-md-4 text-center">
                       <img src="{% static toolLink %}" class="rounded-circle">
                     </div>
                     {% endwith %}
                     {% endif %}
                     {% endfor %}
+                  </div>
+                    <div class="card-footer text-center" style="margin-top:10px;">
+                      <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">Add tools</a>
+                   </div>
                   {% endif %}
-                </div>
-                <br>
-
-                <p align="right">
-                  <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtoolStudent' %}?user=student">Initialise tools</a>
-                </p>
-
-              </div>
             </div>
+            </div>
+          </div>
           </div>
           {% endif %}
 

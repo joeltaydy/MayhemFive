@@ -2,6 +2,10 @@
 {% load staticfiles %}
 
 {% block bootstrapContent %}
+<head>
+    <link rel="stylesheet" href="{% static 'css/itopsevent.css' %}">
+  
+  </head>
 
 <div class="col-md-12">
         <h1 align="center">IT Operations Lab</h1>
@@ -17,7 +21,7 @@
         </div>
 
         <hr>
-        <h2 align="center"><i>Event Management</i></h2>
+        <div class="itopsheader">EVENT MANAGEMENT</div>
 </div>
 
     {% include 'Module_TeamManagement/Instructor/ITOpsEventForm.html' %}
