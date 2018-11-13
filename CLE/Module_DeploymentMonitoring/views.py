@@ -616,6 +616,7 @@ def student_Monitor_Base(requests):
         course_title = requests.POST.get('course_title')
 
     try:
+        response['server_ip'] = ''
         response['server_status'] = []
         response['webapp_status'] = []
         response['webapp_metric'] = {}
@@ -624,16 +625,17 @@ def student_Monitor_Base(requests):
 
         AWS_Credentials = studentClassObj.awscredential
         team_number= studentClassObj.team_number
-        account_number = AWS_Credentials.account_number
 
-        if response['server_ip'] == None:
-            servers = utilities.getAllServer(account_number)
-            if len(servers) > 0:
-                response['server_ip'] = servers[0]['server_ip']
+        if AWS_Credentials != None:
+            account_number = AWS_Credentials.account_number
+            if response['server_ip'] == None:
+                servers = utilities.getAllServer(account_number)
+                if len(servers) > 0:
+                    response['server_ip'] = servers[0]['server_ip']
 
-        if response['server_ip'] != None:
-            response = utilities.getMonitoringStatus(account_number,team_number,response)
-            response = utilities.getMetric(response['server_ip'],response)
+            if response['server_ip'] != None:
+                response = utilities.getMonitoringStatus(account_number,team_number,response)
+                response = utilities.getMetric(response['server_ip'],response)
 
         tz = pytz.timezone('Asia/Singapore')
         response['last_updated']= str(datetime.datetime.now(tz=tz))[:19]
@@ -758,7 +760,7 @@ def student_Deploy_Standard_AddIPs(requests):
         course_title = requests.POST.get('course_title')
         studentClassObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = studentClassObj.awscredential
-
+        
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
             utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
 
@@ -771,6 +773,7 @@ def student_Deploy_Standard_AddIPs(requests):
     if requests.method == 'POST':
         utilities.initiateStartServerTime(requests.POST.get('IP_address'))
 
+    traceback.print_exc()
     return response
 
 

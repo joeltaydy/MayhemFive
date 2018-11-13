@@ -170,6 +170,7 @@ def addAWSKeys(ipAddress,requests):
     course_title = requests.POST.get('course_title')
     class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
+
     try:
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
@@ -177,6 +178,7 @@ def addAWSKeys(ipAddress,requests):
         awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
         awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
         awsC.save()
+    
     except:
         traceback.print_exc()
         print("something wrong with request = AMS")
