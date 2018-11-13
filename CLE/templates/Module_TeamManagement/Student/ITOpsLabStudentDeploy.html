@@ -11,8 +11,8 @@
 
         <div class="redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark active">Deploy</button>
-                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}';" type="button" class="btn btn-dark">Monitor{{all_server_ips}}</button>
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}?course_title={{course_title}}';" type="button" class="btn btn-dark active">Deploy</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_stumonitor' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Monitor{{all_server_ips}}</button>
             </div>
         </div>
 
@@ -22,8 +22,8 @@
         <br>
         <div class="redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
-                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}';" type="button" class="btn btn-dark">Standard</button>
-                <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}';" type="button" class="btn btn-dark active">Step-By-Step</button>
+                <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Standard</button>
+                <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}?course_title={{course_title}}';" type="button" class="btn btn-dark active">Step-By-Step</button>
                 <div class="btn-group dropright">
                   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Instructions

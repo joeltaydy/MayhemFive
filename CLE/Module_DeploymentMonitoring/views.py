@@ -489,13 +489,14 @@ def student_Deploy_Base(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
+    if requests.method == 'GET':
+        course_title = requests.GET.get('course_title')
+    else:
+        course_title = requests.POST.get('course_title')
+
     coursesec = ""
     student_email = requests.user.email
-    courseList = requests.session['courseList_updated']
-
-    for course_title, crse in courseList.items():
-        if course_title == "ESM201":
-            coursesec = crse['id']
+    coursesec = requests.session['courseList_updated'][course_title]['id']
 
     class_studentObj = Class.objects.filter(student= student_email).get(course_section=coursesec )
 
@@ -526,6 +527,7 @@ def student_Deploy_Base(requests):
         response['approvalStatus']= False
 
     response["studentDeployBase"] = "active"
+    response["course_title"] = course_title
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeploy.html", response)
 
@@ -554,6 +556,7 @@ def student_Deploy_Upload(requests):
             return student_Monitor_Base(requests)
         except:
             traceback.print_exc()
+
     return student_Deploy_Base(requests)
 
 
@@ -570,8 +573,8 @@ def student_Deploy_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    accountNum = requests.POST.get("accountNum") #string of account number
-    utilities.addAWSCredentials(accountNum, requests) #creates an incomplete account object
+    accountNum = requests.POST.get("accountNum")            #string of account number
+    utilities.addAWSCredentials(accountNum, requests)       #creates an incomplete account object
 
 
 # Storing and validating of student user IP address

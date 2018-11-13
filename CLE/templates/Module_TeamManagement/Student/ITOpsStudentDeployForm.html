@@ -29,11 +29,12 @@
                     <div class="col-md-6" style="display: block;margin-left: auto;margin-right: auto; ">
                         <b>Account Number submitted:</b><br>  {% if submittedAccNum == None %} <div class = "error"> No account number found. Please submit your account number.</i> {% else %} {{submittedAccNum.account_number}} {% endif %}</div>
                     </div>
-                        
-                    
+
+
                     <hr>
                     <input type="submit" name="submitAccNum" id="submitAccNum" class="submit1 action-button" style = "background-color:#f9b902" value="Submit"/>
                     <input type="button" name="next" class="next action-button" id="accNext" value="Next"/>
+                    <input type="hidden" name="course_title" id="course_title" values={{course_title}}>
 
                 </fieldset>
                 <fieldset id="approvalFS">
@@ -64,12 +65,13 @@
                         <select class="form-control" id="server_type" name="server_type">
                             <option value="" selected disabled hidden>Select Here</option>
                             <option value="Parent">Parent</option>
-                            <option value="Child">Child</option>
+                            <option value="Child">Slave</option>
                         </select>
                     </div>
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
                     <input type="submit" name="submitIP" id="submitIP" class="submit action-button"  style = "background-color:#f9b902" value="Submit"/>
+                    <input type="hidden" name="course_title" id="course_title" values={{course_title}}>
                 </fieldset>
 
 
