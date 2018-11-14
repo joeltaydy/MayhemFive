@@ -6,6 +6,7 @@
     <script>
         $(document).ready(function(){
             document.getElementById("button_next_class").disabled = true;
+            document.getElementById("button_next_image").disabled = true;
         });
 
         function validateCheckbox(){
@@ -63,6 +64,10 @@
                      var image_name = optionSelected.text();
                      var image_data = {}
 
+                     if(image_id != ""){
+                         document.getElementById("button_next_image").disabled = false;
+                     };
+
                      image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number, "course_title" : "{{course_title}}"};
                      ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
                             console.log(image_result);
@@ -118,18 +123,8 @@
                     <h3 class="fs-subtitle">Please select a section</h3>
                     <div class="form-group row">
                         <div class="col-12">
-
-                          <!-- {% for course_section in section_numbers %}
-                              {% if course_section != 'G0' %}
-                                  <div class="custom-control custom-checkbox custom-control-inline mb-5" name="courseSection" id="courseSection">
-                                        <input class="custom-control-input" type="checkbox" name="{{ course_section }}" id={{course_section}} value={{course_section}}>
-                                        <label class="custom-control-label" for={{course_section}}>{{course_section}}</label>
-                                  </div>
-                              {% endif %}
-                          {% endfor %} -->
                           {% for section_number in section_numbers %}
                               {% if section_number != 'G0' %}
-                              <!-- <option value="{{ section_number }}"> {{ section_number }} </option> -->
                               <div class="custom-control custom-checkbox custom-control-inline mb-5">
                                         <input class="custom-control-input" type="checkbox" name="courseSection" id={{section_number}} value={{section_number}} onclick="validateCheckbox()">
                                       <label class="custom-control-label" for={{section_number}}>{{section_number}}</label>
@@ -140,16 +135,6 @@
                                   <input class="custom-control-input" type="checkbox" id="checkAll" onclick="validateAllCheckboxes()">
                                   <label class="custom-control-label" for="checkAll">All classes</label>
                           </div>
-
-                          <!-- <select class="form-control" name="courseSection" id="courseSection">
-                              <option value="" selected disabled hidden>Select section here</option>
-                            {% for section_number in section_numbers %}
-                                {% if section_number != 'G0' %}
-                          			<option value="{{ section_number }}"> {{ section_number }} </option>
-                                {% endif %}
-                            {% endfor %}
-                      	  </select> -->
-
                         </div>
                     </div>
                     <input type="button" id="button_next_class" name="next" class="next action-button" value="Next" onclick="shareAMI()"/>
@@ -158,14 +143,13 @@
                     <h2 class="fs-title">Select Image</h2>
                     <h3 class="fs-subtitle">Please select the image that you would like to share with the section</h3>
                     <div class="col-md-8"  style="display: block;margin-left: auto;margin-right: auto; ">
-                        <select class="form-control" id="image_id" name="image_id">
-
+                        <select class="form-control" id="image_id" name="image_id" onclick="">
                         </select>
                     </div>
                     <br><br>
                     <hr>
                     <input type="button" name="previous" class="previous action-button-previous" value="Previous"/>
-                    <input type="button" name="next" class="next action-button" value="Next"/>
+                    <input type="button" id="button_next_image" name="next" class="next action-button" value="Next"/>
                 </fieldset>
                 <fieldset>
                     <h2 class="fs-title">Approve Groups</h2>
