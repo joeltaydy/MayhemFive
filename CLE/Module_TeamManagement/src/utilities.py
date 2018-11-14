@@ -177,6 +177,7 @@ def getTrailheadInformation():
         for cs in classes:
             course_section = cs['course_section']
             trailHeadClass =  (Class.objects.filter(school_term = schoolterm,course_section = course_section).exclude(clt_id=None).values('clt_id'))
+
             if len(trailHeadClass) != 0:
                 file_path = os.path.join(os.getcwd(),'clt_files',schoolterm.school_term_id.replace('/',""), course_section ,'trailhead-points.csv')
 
