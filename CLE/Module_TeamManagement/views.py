@@ -739,18 +739,21 @@ def configureDB_clt(requests):
             course = requests.POST.get("course_section")
         bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
 
-        if file.name.endswith('.xlsx'):
-            if 'learning_tools' in file.name.lower():
-                bootstrapFile['faculty_email'] = faculty_email
-                bootstrapFile['course'] = course
-                bootstrapFile['action'] = action
-                bootstrapFile['file_path'] = file.temporary_file_path()
+        if file:
+            if file.name.endswith('.xlsx'):
+                if 'learning_tools' in file.name.lower():
+                    bootstrapFile['faculty_email'] = faculty_email
+                    bootstrapFile['course'] = course
+                    bootstrapFile['action'] = action
+                    bootstrapFile['file_path'] = file.temporary_file_path()
+
+                else:
+                    raise Exception("Invalid file information. Please upload tools information only.")
 
             else:
-                raise Exception("Invalid file information. Please upload tools information only.")
-
+                raise Exception("Invalid file type. Please upload .xlsx only")
         else:
-            raise Exception("Invalid file type. Please upload .xlsx only")
+            raise Exception("Please upload an excel file")
 
         # If file is .xlsx then proceed with processing
         response['results'] = bootstrap.update_CLT(bootstrapFile,course)

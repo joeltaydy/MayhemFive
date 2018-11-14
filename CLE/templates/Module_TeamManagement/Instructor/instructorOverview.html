@@ -47,7 +47,7 @@
             {% endif %}
         {% endfor %}
       </div>
-    
+
         <div class="card h-75">
             <div class="card-header">
                 <h3 align="center" class="card-title">Tools used</h3>
@@ -74,12 +74,12 @@
                             <h6 style ="text-center;">Add Tools</h6> -->
                             <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtools' %}?user=faculty">Add tools</a>
                         </div>
-                        
+
                     {% endif %}
                 </div>
-                
+
             </div>
-                
+
         </div>
             <br>
     {% if "Trailhead" in course_section.learning_tools %}  <!-- if loop for trailhead docker-->
@@ -132,12 +132,13 @@
                     </div>
                 </div>
                 </div>
-        </div> 
+        </div>
     <br>
+
+    {% endif %} <!-- if loop for trailhead docker-->
 
     {% include "Module_TeamManagement/Datatables/instructorTableview.html" %}
 
-    {% endif %} <!-- if loop for trailhead docker-->
 </div>
 </div>
 
