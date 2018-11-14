@@ -8,6 +8,7 @@ from Module_CommunicationManagement.src import tele_util
 def test_tasks(message):
     print(message)
 
+
 @background(schedule=0)
 def getAllChatMembers(username,chat_type,chat_name):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Get All Members')
@@ -28,6 +29,7 @@ def getAllChatMembers(username,chat_type,chat_name):
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Get All Members')
 
+
 @background(schedule=0)
 def sendMessage(username,chat_type,chat_name,message):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Sending Telegram Message')
@@ -43,3 +45,46 @@ def sendMessage(username,chat_type,chat_name,message):
     tele_util.disconnectClient(client)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Sending Telegram Message')
+
+
+@background(schedule=0)
+def createChannel(username,channel_name):
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Creating Telegram Channel')
+
+    client = tele_util.getClient(username)
+
+    results = tele_util.initialize_Channel(
+        client=client,
+        channel_name=channel_name,
+    )
+
+    telegram_chat = Telegram_Chats.objects.get(name=channel_name)
+    telegram_chat.link = results['channel_link']
+    telegram_chat.save()
+
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Telegram Channel: ' + channel_name + ' create')
+    tele_util.disconnectClient(client)
+
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Creating Telegram Channel')
+
+
+@background(schedule=0)
+def createGroup(username,group_name,additional_username):
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Creating Telegram Group')
+
+    client = tele_util.getClient(username)
+
+    results = tele_util.initialize_Group(
+        username=additional_username,
+        client=client,
+        group_name=group_name,
+    )
+
+    telegram_chat = Telegram_Chats.objets.get(name=group_name)
+    telegram_chat.link = results['group_link']
+    telegram_chat.save()
+
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Telegram Group: ' + group_name + ' create')
+    tele_util.disconnectClient(client)
+
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Creating Telegram Group')
