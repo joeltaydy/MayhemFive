@@ -33,9 +33,11 @@
         <th>Email</th>
         <th>First name</th>
         <th>Team no.</th>
-        <th>Points</th>
-        <th>Badges</th>
-        <th>Link</th>
+        {% if "Trailhead" in course_section.learning_tools %}
+            <th>Points</th>
+            <th>Badges</th>
+            <th>Link</th>
+        {% endif %}
         </tr>
     </thead>
 
@@ -45,9 +47,11 @@
                 <td>{{ student.info.email }}</td>
                 <td>{{ student.info.firstname }}</td>
                 <td>{{ student.team }}</td>
-                <td>{{ student.points }}</td>
-                <td>{{ student.badges }}</td>
-                <td> {% if student.link ==  "No link" %} No Trailhead Account Linked {% else %}<a href='{{student.link}}'>{{student.link}}</a> {% endif %}</td>
+                {% if "Trailhead" in course_section.learning_tools %}
+                    <td>{{ student.points }}</td>
+                    <td>{{ student.badges }}</td>
+                    <td> {% if student.link ==  "No link" %} No Trailhead Account Linked {% else %}<a href='{{student.link}}'>{{student.link}}</a> {% endif %}</td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
@@ -56,9 +60,11 @@
           <th>Email</th>
           <th>First name</th>
           <th>Team no.</th>
-          <th>Points</th>
-          <th>Badges</th>
-          <th>Link</th>
+          {% if "Trailhead" in course_section.learning_tools %}
+              <th>Points</th>
+              <th>Badges</th>
+              <th>Link</th>
+          {% endif %}
         </tr>
     </tfoot>
 </table>
