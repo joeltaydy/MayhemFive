@@ -111,6 +111,8 @@ def faculty_HomePage(requests):
         traceback.print_exc()
         context['error_message'] = e.args[0]
 
+    context['course_section_count'] = len(requests.session['courseList_updated'])
+    context['ITOpsLab_count'] = len(requests.session['courseList_ITOpsLab'])
     return render(requests, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
 
 

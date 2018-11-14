@@ -35,10 +35,15 @@
           <h4 class="card-title">Student Management</h4>
           <p class="card-text">View different sections from different courses. Contains students' invidual data.</p>
           <div class="text-center">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studMgmtCourselist">
-              Student Mgmt
-            </button>
-            <!-- <button onclick="location.href = '';" type="button" class="btn btn-primary">Student Mgmt</button> -->
+            {% if course_section_count == 1 %}
+                {% for course_title,course_sectionDetails in request.session.courseList_updated.items %}
+                    <button onclick="location.href = '{% url 'TMmod:instOverview' %}?module={{ course_sectionDetails.0.id }}&course_title={{course_title}}&section_number={{ course_sectionDetails.0.section_number }}';" type="button" class="btn btn-primary">Student Mgmt</button>
+                {% endfor %}
+            {% else %}
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studMgmtCourselist">
+                  Student Mgmt
+                </button>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -61,7 +66,7 @@
           <!-- Modal body -->
           <div class="modal-body text-center">
             {% for course_title,course_sectionDetails in request.session.courseList_updated.items %}
-                <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionDetails.id }}&course_title={{ course_title }}&section_number={{ course_sectionDetails.section_number }}">
+                <a class="nav-link" href="{% url 'TMmod:instOverview' %}?module={{ course_sectionDetails.0.id }}&course_title={{ course_title }}&section_number={{ course_sectionDetails.0.section_number }}">
                     <button type="button" class="btn btn-primary">{{ course_title }}</button>
                 </a>
             {% endfor %}
@@ -96,9 +101,15 @@
               <h4 class="card-title">IT Operations Lab</h4>
               <p class="card-text">Monitoring of students' IT infrastructure and applications, sending of events.</p>
               <div class="text-center">
+                {% if ITOpsLab_count == 1 %}
+                    {% for course_title,course_sectionDetails in request.session.courseList_ITOpsLab.items %}
+                        <button onclick="location.href = '{% url 'DMmod:itopslab_setup' %}?course_title={{ course_title }}';" type="button" class="btn btn-primary">Student Mgmt</button>
+                    {% endfor %}
+                {% else %}
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#itOpsLabCourselist">
                   IT Ops Lab
                 </button>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -142,9 +153,16 @@
               <h4 class="card-title">Telegram Management</h4>
               <p class="card-text">Create Telegram groups, broadcast channels and interact with students.</p>
               <div class="text-center">
-                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#telegramCourselist">
-                    Telegram Mgmt
-                  </button>
+                  {% if course_section_count == 1 %}
+                      {% for course_title,course_sectionDetails in request.session.courseList_updated.items %}
+                          <button onclick="location.href = '{% url 'CMmod:faculty_telegram_Base' %}?course_title={{ course_title }}';" type="button" class="btn btn-primary">Student Mgmt</button>
+                      {% endfor %}
+                  {% else %}
+                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#telegramCourselist">
+                        Telegram Mgmt
+                      </button>
+                  {% endif %}
+
               </div>
             </div>
           </div>
