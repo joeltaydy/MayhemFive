@@ -61,7 +61,7 @@
                             {% for telegram_chat in telegram_chats %}
                                 <a href="/instructor/TelegramManagement?course_section={{ current_course_section_details.id }}&chat_name={{ telegram_chat.name }}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ telegram_chat.name }}</a>
                             {% endfor %}
-                            <button type="button" class="btn btn-dark" 
+                            <button type="button" class="btn btn-dark"
                             style="
                             width: 35spx;
                             height: 35px;
@@ -69,7 +69,7 @@
                             padding: 10px 10px;
                             color:white;
                             line-height: 0.5;
-                            border-radius: 25px;" 
+                            border-radius: 25px;"
                             data-toggle="modal" data-target="#chooseGC" value="chooseGC">
                             <i class="fas fa-plus"></i>
                             </button>
@@ -78,7 +78,7 @@
                         <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                         <br>
                         <h4 class="text-center">
-                            <a href="{{ current_telegram_chat.link }} " role="button" class="btn"  style="background-color: #0088CC; color:white;"> <b>{{current_telegram_chat.type}} Link</b></a>
+                            <a href="{{ current_telegram_chat.link }}" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a>
                         </h4>
                     <br>
 
@@ -103,13 +103,13 @@
                                     <div class = "text-center">
                                         <br>
                                         <input type="datetime-local" id="setDate" name="setDate" placeholder="Date Time" onkeyup="stoppedTyping()"/>
-                                        
+
                                         <span class="validity" id="validity"></span>
                                         <br><br>
                                         <input class="custom-control-input" type="checkbox" name="datetime" id="dateNow" value="now" onclick="setDateTimeNow();">
                                         <label class="custom-control-label" for="dateNow">Now</label>
                                     </div>
-                                    
+
                                 <!-- Submission -->
                                     <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
                                         <button class="btn btn-warning" id="sendMsg"><b>Send Message</b></button>
@@ -243,7 +243,7 @@
                     <b>Create Section<br> Channel</b>
                 </button>
             </div>
-            
+
         </div>
     </div>
     </div>
@@ -282,21 +282,21 @@
         var nextStatus = document.getElementById("setDate").checkValidity();
         if (document.getElementById("setDate").value=="" || nextStatus==false){
             document.getElementById("sendMsg").disabled = true;
-        } 
+        }
     });
-    
+
     function stoppedTyping(){
         var nextStatus = document.getElementById("setDate").checkValidity();
-        if(document.getElementById("setDate").value=="" || nextStatus==false) { 
-            document.getElementById('sendMsg').disabled = true; 
-        } else { 
+        if(document.getElementById("setDate").value=="" || nextStatus==false) {
+            document.getElementById('sendMsg').disabled = true;
+        } else {
             document.getElementById('sendMsg').disabled = false;
         }
     }
     function AddZero(num) {
         return (num >= 0 && num < 10) ? "0" + num : num + "";
     }
-    var isNow = false; 
+    var isNow = false;
 
     function setDateTimeNow(){
         if (document.getElementById("dateNow").value=="now"){
