@@ -197,6 +197,7 @@ class Telegram_Chats(models.Model):
     )
     link = models.TextField(
         db_column='Link',
+        null=True,
     )
     members = models.TextField(
         db_column='Members',
