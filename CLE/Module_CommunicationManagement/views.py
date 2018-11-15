@@ -65,11 +65,10 @@ def faculty_telegram_Base(requests,response=None):
 
         response['telegram_chats'] = []
         for telegram_chat in telegram_chats:
-            if tele_util.dialogExists(client,telegram_chat.name,tele_chat_type[telegram_chat.type]):
+            if tele_util.dialogExists(client,telegram_chat.name,tele_chat_type[telegram_chat.type]) or telegram_chat.link == None:
                 response['telegram_chats'].append({'name': telegram_chat.name})
             else:
-                if telegram_chat.link != None:
-                    telegram_chat.delete()
+                telegram_chat.delete()
 
         if len(response['telegram_chats']) > 0:
             if telegram_chat_name == None:
@@ -85,7 +84,7 @@ def faculty_telegram_Base(requests,response=None):
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of Telegram details: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
-
+    print(response)
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
@@ -165,7 +164,7 @@ def faculty_telegram_CreateGroup(requests):
             username=username,
             group_name=group_name,
             additional_username=additional_username,
-            schedule=0,
+            schedule=5,
         )
 
         # Assign to the students of the course_section
@@ -218,7 +217,7 @@ def faculty_telegram_CreateChannel(requests):
         tasks.createChannel(
             username=username,
             channel_name=channel_name,
-            schedule=0,
+            schedule=5,
         )
 
         # Assign to the students of the course_section
@@ -296,11 +295,16 @@ def faculty_telegram_GetChatLink(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    telegram_chat_name = requests.POST.get('telegram_chat_name')
+    telegram_chat_name = requests.GET.get('telegram_chat_name')
 
     try:
         telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
+
+        if telegram_chatObj.link == None:
+            response['error_message'] = 'There no telegram chat link found in the database for that chat. Please check with administrator.'
+
         response['telegram_chat_link'] = telegram_chatObj.link
+        response['telegram_chat_name'] = telegram_chat_name
     except:
         traceback.print_exc()
 

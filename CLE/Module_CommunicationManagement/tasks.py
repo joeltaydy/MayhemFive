@@ -67,6 +67,13 @@ def createChannel(username,channel_name):
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Creating Telegram Channel')
 
+    getAllChatMembers(
+        username=username,
+        chat_type=telegram_chat.type,
+        chat_name=channel_name,
+        schedule=0,
+    )
+
 
 @background(schedule=0)
 def createGroup(username,group_name,additional_username):
@@ -88,3 +95,10 @@ def createGroup(username,group_name,additional_username):
     tele_util.disconnectClient(client)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Creating Telegram Group')
+
+    getAllChatMembers(
+        username=username,
+        chat_type=telegram_chat.type,
+        chat_name=group_name,
+        schedule=0,
+    )

@@ -23,9 +23,6 @@
         {% else %}
             <h2 style = "background-color:#23272b; color:white; text-align: center"> {{ current_course_section_details.course_title  }} {{ current_course_section_details.section_number }}</h2>
         {% endif %}
-
-
-
     </div>
 
     <br>
@@ -78,7 +75,8 @@
                         <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                         <br>
                         <h4 class="text-center">
-                            <a href="{{ current_telegram_chat.link }}" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a>
+                            <!-- <a href="{{ current_telegram_chat.link }}" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a> -->
+                            <a onclick="redirectToLink()" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" value="{{ current_telegram_chat.link }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a>
                         </h4>
                     <br>
 
@@ -250,6 +248,30 @@
 </div>
 
 <script>
+    function redirectToLink(){
+        var chat_link = document.getElementById("telegram_chat_link").getAttribute("value");
+        var chat_name = document.getElementById("telegram_chat_link").getAttribute("name");
+
+        if(chat_link == "None"){
+            request_data = { 'telegram_chat_name' : chat_name };
+            $.ajax({
+                url : "{% url 'CMmod:faculty_telegram_GetChatLink' %}",
+                type : "GET",
+                data : request_data,
+
+                success : function(response_data){
+                    if(response_data.telegram_chat_link != null){
+                        document.getElementById("telegram_chat_link").value = telegram_chat_link;
+                        window.location.href = response_data.telegram_chat_link;
+                    };
+                    console.log(response_data)
+                },
+            });
+        }else{
+            window.location.href = chat_link;
+        };
+    };
+
     // Add active class to the current button (highlight it)
     $(function(){
         pageUrl = location.href;
