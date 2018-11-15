@@ -202,7 +202,10 @@ def initialize_Group(username,client=None,course_title=None,section_number=None,
 def deleteUserGroup(client,group_name,user_name):
     dialog = getDialog(client,dialog_name,Chat)
     chat_id = dialog.message.to_id.chat_id
-    client(messages.DeleteChatUserRequest(chat_id=chat_id,user_id=user_name))
+    client(messages.DeleteChatUserRequest(
+        chat_id=chat_id,
+        user_id=user_name
+    ))
 
 
 def deleteGroup(client,group_name):
@@ -212,7 +215,9 @@ def deleteGroup(client,group_name):
 
 def deleteChannel(client,channel_name):
     channel_entity = getEntity(client,channel_name,Channel)
-    # TO-DO
+    client(channels.DeleteChannelRequest(
+        channel=channel_entity.id,
+    ))
 
 
 def sendGroupMessage(client,group_name,message):
