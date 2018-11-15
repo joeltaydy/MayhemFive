@@ -15,6 +15,7 @@ def getTelegramChatJSON(chat_obj=None,chat_name=None):
         'type': chat_obj.type,
         'members': chat_obj.members.split('_') if chat_obj.members != None else [],
         'members_count': len(chat_obj.members.split('_')) if chat_obj.members != None else 0,
+        'name_join': chat_obj.name.replace(' ','_'),
     }
 
     return telegram_chat

@@ -106,11 +106,17 @@ def faculty_telegram_UpdateChatMembers(requests):
 
     course_section = requests.POST.get('course_section')
     telegram_chat_link = requests.POST.get('chat_link')
-    print(telegram_chat_link)
+    telegram_chat_name = requests.POST.get('chat_name').replace('_',' ')
+    print('Telegram Chat Link: ' + telegram_chat_link)
+    print('Telegram Chat Name: ' + telegram_chat_name)
     print('Course Section: ' + course_section)
 
     try:
-        telegram_chat = Telegram_Chats.objects.get(link=telegram_chat_link)
+        if telegram_chat_link == None:
+            telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+        else:
+            telegram_chat = Telegram_Chats.objects.get(link=telegram_chat_link)
+
         client = tele_util.getClient(requests.user.email.split('@')[0])
 
         members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
@@ -125,6 +131,8 @@ def faculty_telegram_UpdateChatMembers(requests):
         response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    requests.POST = requests.POST.copy()
+    requests.POST['chat_name'] = telegram_chat_name
     response['message'] = 'Members successfully updated'
     return faculty_telegram_Base(requests,response)
 
@@ -251,8 +259,10 @@ def faculty_telegram_SendMessage(requests):
     message = requests.POST.get('message')
     telegram_chat_link = requests.POST.get('telegram_chat_link')
     telegram_chat_type = requests.POST.get('telegram_chat_type')
+    telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
     print('Telegram Chat Link: ' + telegram_chat_link)
     print('Telegram Chat Type: ' + telegram_chat_type)
+    print('Telegram Chat Name: ' + telegram_chat_name)
     print('Message: ' + message)
 
     try:
@@ -264,13 +274,15 @@ def faculty_telegram_SendMessage(requests):
         else:
             scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
 
-        telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
+        if telegram_chat_link != None:
+            telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
+
         period = scheduled_datetime - datetime.now()
 
         tasks.sendMessage(
             username=requests.user.email.split('@')[0],
             chat_type=telegram_chat_type,
-            chat_name=telegram_chatObj.name,
+            chat_name=telegram_chatObj.name if telegram_chat_link != None else telegram_chat_name,
             message=message,
             schedule=period,
         )
@@ -281,6 +293,8 @@ def faculty_telegram_SendMessage(requests):
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    requests.POST = requests.POST.copy()
+    requests.POST['telegram_chat_name'] = telegram_chat_name
     response['message'] = 'Message successfully sent'
     return faculty_telegram_Base(requests,response)
 
