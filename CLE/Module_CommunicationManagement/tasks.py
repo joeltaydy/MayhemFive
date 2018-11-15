@@ -87,7 +87,7 @@ def createGroup(username,group_name,additional_username):
         group_name=group_name,
     )
 
-    telegram_chat = Telegram_Chats.objets.get(name=group_name)
+    telegram_chat = Telegram_Chats.objects.get(name=group_name)
     telegram_chat.link = results['group_link']
     telegram_chat.save()
 

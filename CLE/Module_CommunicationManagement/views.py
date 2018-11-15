@@ -84,7 +84,7 @@ def faculty_telegram_Base(requests,response=None):
         traceback.print_exc()
         response['error_message'] = 'Error during retrieval of Telegram details: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
-    print(response)
+
     return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
 
@@ -105,17 +105,15 @@ def faculty_telegram_UpdateChatMembers(requests):
         return render(requests,'Module_Account/login.html',response)
 
     course_section = requests.POST.get('course_section')
-    telegram_chat_link = requests.POST.get('chat_link')
+    # telegram_chat_link = requests.POST.get('chat_link')
     telegram_chat_name = requests.POST.get('chat_name').replace('_',' ')
-    print('Telegram Chat Link: ' + telegram_chat_link)
+    # print('Telegram Chat Link: ' + telegram_chat_link)
     print('Telegram Chat Name: ' + telegram_chat_name)
     print('Course Section: ' + course_section)
 
     try:
-        if telegram_chat_link == None:
-            telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
-        else:
-            telegram_chat = Telegram_Chats.objects.get(link=telegram_chat_link)
+        telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+        # telegram_chat = Telegram_Chats.objects.get(link=telegram_chat_link)
 
         client = tele_util.getClient(requests.user.email.split('@')[0])
 
@@ -168,7 +166,7 @@ def faculty_telegram_CreateGroup(requests):
             telegram_chat = Telegram_Chats.objects.get(name=group_name)
 
         username = requests.user.email.split('@')[0]
-        tasks.createChannel(
+        tasks.createGroup(
             username=username,
             group_name=group_name,
             additional_username=additional_username,
@@ -180,8 +178,6 @@ def faculty_telegram_CreateGroup(requests):
         for student in class_QuerySet:
             student.telegram_chats.add(telegram_chat)
             student.save()
-
-        tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -257,10 +253,10 @@ def faculty_telegram_SendMessage(requests):
         return render(requests,'Module_Account/login.html',response)
 
     message = requests.POST.get('message')
-    telegram_chat_link = requests.POST.get('telegram_chat_link')
+    # telegram_chat_link = requests.POST.get('telegram_chat_link')
     telegram_chat_type = requests.POST.get('telegram_chat_type')
     telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
-    print('Telegram Chat Link: ' + telegram_chat_link)
+    # print('Telegram Chat Link: ' + telegram_chat_link)
     print('Telegram Chat Type: ' + telegram_chat_type)
     print('Telegram Chat Name: ' + telegram_chat_name)
     print('Message: ' + message)
@@ -274,15 +270,15 @@ def faculty_telegram_SendMessage(requests):
         else:
             scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
 
-        if telegram_chat_link != None:
-            telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
+        # if telegram_chat_link != None:
+        #     telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
 
         period = scheduled_datetime - datetime.now()
 
         tasks.sendMessage(
             username=requests.user.email.split('@')[0],
             chat_type=telegram_chat_type,
-            chat_name=telegram_chatObj.name if telegram_chat_link != None else telegram_chat_name,
+            chat_name=telegram_chat_name,
             message=message,
             schedule=period,
         )
