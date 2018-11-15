@@ -123,6 +123,7 @@
                     document.getElementById("title_image").innerHTML = "OOPS!";
                     document.getElementById("title_image").style.color = "red";
                     document.getElementById("subtitle_image").innerHTML = "No images have been configured yet. Please configure images in AWS before proceeding";
+                    document.getElementById("image_id").disabled = true;
                 }else{
                     for (var i = section_result.images.length - 1; i >= 0; i--) {
                         $("#image_id").append('<option value="' + section_result.images[i].image_id + '">'+ section_result.images[i].image_name +'</option>');
@@ -130,7 +131,7 @@
                     document.getElementById("title_image").innerHTML = "Select Image";
                     document.getElementById("title_image").style.color = "black";
                     document.getElementById("subtitle_image").innerHTML = "Please select the image that you would like to share with the section";
-
+                    document.getElementById("image_id").disabled = false;
                 };
 
                  $('select#image_id').change(function () {
