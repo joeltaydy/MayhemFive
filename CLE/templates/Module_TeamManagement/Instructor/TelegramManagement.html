@@ -54,7 +54,7 @@
         <div class="col-md-9" style="display: block;margin-left: auto;margin-right: auto;">
             <div class="card ">
                 <div class="card-header">
-                        <div class="navDiv" style="display: block;margin-left: auto;margin-right: auto;">
+                        <div class="navDiv2" style="display: block;margin-left: auto;margin-right: auto; margin-bottom:20px;">
                             {% for telegram_chat in telegram_chats %}
                                 <a href="/instructor/TelegramManagement?course_section={{ current_course_section_details.id }}&chat_name={{ telegram_chat.name }}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ telegram_chat.name }}</a>
                             {% endfor %}
@@ -71,7 +71,6 @@
                             <i class="fas fa-plus"></i>
                             </button>
                         </div>
-
                         <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                         <br>
                         <h4 class="text-center">
@@ -288,6 +287,18 @@
                 link.addClass("active");
             }
         });
+        
+        $('.navDiv2 a').each(function () {
+            link = $(this);
+            var href = link.attr("href");
+            console.log(link);
+            // console.log(link.attr("href") === pageUrl);
+            if (href === pageUrl.substring(pageUrl.length-href.length)) {
+                console.log("success");
+                link.addClass("active");
+            }
+        });
+
     });
 
     window.addEventListener('load', function () {
