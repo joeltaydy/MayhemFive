@@ -104,10 +104,12 @@ def getRegisteredUsers(permissions):
 
 
 # Add AWS credentials for the relevant students
-def addAWSCredentials(accountNum, requests):
-    course_title = requests.POST.get('course_title')
-    class_studentObj= getStudentClassObject(requests,course_title)
+def addAWSCredentials(requests):
     teamAddition = requests.POST.get("isTeam") #if "" or None then is single add if not is a group add
+    accountNum = requests.POST.get('accountNum')
+    course_title = requests.POST.get('course_title')
+
+    class_studentObj= getStudentClassObject(requests,course_title)
     try:
         awsC=class_studentObj.awscredential
         awsC.account_number = accountNum
@@ -119,7 +121,7 @@ def addAWSCredentials(accountNum, requests):
         awsC.save()
     class_studentObj.awscredential = awsC
     class_studentObj.save()
-    print(teamAddition)
+
     #Add to rest of team
     if teamAddition != None and teamAddition != "":
         classTeam = getTeamClassObject(requests) #returns a list of class student objects based on current user (exclude current user)
@@ -166,10 +168,13 @@ def getTeamMembersClassQuerySet(requests):
 
 
 # Add Access Keys and Secret Access Keys into the AWS credentials table
-def addAWSKeys(ipAddress,requests):
+def addAWSKeys(requests):
+    ipAddress = requests.POST.get("ipaddress")                #string of IP address
+
     course_title = requests.POST.get('course_title')
     class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
+
     try:
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
         response = req.get(url)
@@ -177,13 +182,17 @@ def addAWSKeys(ipAddress,requests):
         awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
         awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
         awsC.save()
+
     except:
         traceback.print_exc()
         print("something wrong with request = AMS")
 
 
 # Add the server details into the server details table
-def addServerDetails(ipAddress,server_type,requests=None,account_number=None):
+def addServerDetails(requests=None,account_number=None):
+    server_type = requests.POST.get("server_type")            #string of server_type; parent/slave
+    ipAddress = requests.POST.get("ipaddress")                #string of IP address
+
     if requests != None:
         course_title = request.POST.get('course_title')
         class_studentObj= getStudentClassObject(requests,course_title)
@@ -236,7 +245,6 @@ def initiateStartServerTime(ipAddress):
                 event_recovery=0
             )
             event_Entry.save()
-            print(event_Entry)
     except:
         traceback.print_exc()
 
@@ -303,7 +311,7 @@ def addServerDetailsForm(request, form, template_name):
             serverObj.save()
 
             data['form_is_valid'] = True
-            servers = getAllServer(account_number)
+            servers = getAllServers(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
             data['form_is_valid'] = False
@@ -412,13 +420,15 @@ def getPendingTasksLogs(section_num):
     from background_task.models import Task
     allTasks = Task.objects.all()
     relatedTasks = []
+
     for task in allTasks:
-        if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
-            taskInfo = { 'class':section_num }
-            taskInfo['events_id']= task.id
-            taskInfo['events_name'] = task.task_name.split('tasks.')[1] #related to tasks.py of event Config
-            taskInfo['event_run_at'] = (task.run_at + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
-            relatedTasks.append(taskInfo)
+        if 'section_numbers' in ast.literal_eval(task.task_params)[1].keys():
+            if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
+                taskInfo = { 'class':section_num }
+                taskInfo['events_id']= task.id
+                taskInfo['events_name'] = task.task_name.split('tasks.')[1] #related to tasks.py of event Config
+                taskInfo['event_run_at'] = (task.run_at + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+                relatedTasks.append(taskInfo)
 
     return relatedTasks
 
@@ -429,14 +439,15 @@ def getCompletedTasksLog(section_num):
     from background_task.models_completed import CompletedTask
     allTasks = CompletedTask.objects.all()
     relatedTasks = []
+
     for task in allTasks:
-        print(ast.literal_eval(task.task_params)[1])
-        if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
-            taskInfo = { 'class':section_num }
-            taskInfo['events_id']= task.id
-            taskInfo['events_name'] = task.task_name.split('tasks.')[1] #related to tasks.py of event Config
-            taskInfo['event_run_at'] = (task.run_at + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
-            relatedTasks.append(taskInfo)
+        if 'section_numbers' in ast.literal_eval(task.task_params)[1].keys():
+            if section_num in ast.literal_eval(task.task_params)[1]['section_numbers']:
+                taskInfo = { 'class':section_num }
+                taskInfo['events_id']= task.id
+                taskInfo['events_name'] = task.task_name.split('tasks.')[1] #related to tasks.py of event Config
+                taskInfo['event_run_at'] = (task.run_at + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+                relatedTasks.append(taskInfo)
 
     return relatedTasks
 
@@ -581,7 +592,7 @@ def getCloudMetric(webapp_url):
 
 # Get all server ip registered under that account number
 #
-def getAllServer(account_number):
+def getAllServers(account_number):
     server_ips = []
 
     querySet = Server_Details.objects.filter(account_number=account_number)

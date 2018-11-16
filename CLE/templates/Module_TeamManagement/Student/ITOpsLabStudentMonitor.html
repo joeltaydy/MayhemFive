@@ -2,6 +2,12 @@
 {% load staticfiles %}
 
 {% block bootstrapContent %}
+
+<head>
+  <link rel="stylesheet" href="{% static 'css/itopsmonitor.css' %}">
+
+</head>
+
 <div class="col-md-12">
     <h1 align="center">IT Operations Lab</h1>
     <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
@@ -15,7 +21,7 @@
     </div>
 
     <hr>
-    <h2 align="center"><i>Monitor</i></h2>
+    <div class="itopsheader">MONITOR</div>
 </div>
 
   <div class="content">
@@ -42,22 +48,27 @@
                   <div class="card">
                     {% for details in server_status %}
                         {% if details.server_ip == server_ip %}
-                        <div class="card-header">
-                          <h5 align="center" class="card-title">{{details.server_type|add:" Server Status"}}</h5>
-                        </div>
-                        <div class="card-body">
-                          <span align="center">
-                            <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
-                            {% if details.server_state == 'Live' %}
-                                <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
-                            {% elif details.server_state == 'Pending' %}
-                                <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
-                            {% else %}
-                                <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
-                            {% endif %}
-                          </span>
-                        </div>
+                            <div class="card-header">
+                              <h5 align="center" class="card-title">{{details.server_type|add:" Server Status"}}</h5>
+                            </div>
+                            <div class="card-body">
+                              <span align="center">
+                                <p class="card-category" align="center"><img src="{% static 'images/icons8-server-64.png' %}" alt="">
+                                {% if details.server_state == 'Live' %}
+                                    <span class="badge badge-pill badge-success">{{ details.server_state }}</span>
+                                {% elif details.server_state == 'Pending' %}
+                                    <span class="badge badge-pill badge-warning">{{ details.server_state }}</span>
+                                {% else %}
+                                    <span class="badge badge-pill badge-danger">{{ details.server_state }}</span>
+                                {% endif %}
+                              </span>
+                            </div>
                         {% endif %}
+                    {% empty %}
+                        <div class="card-header">
+                          <h5 align="center" class="card-title">Server Status</h5>
+                        </div>
+                        <br>
                     {% endfor %}
                     <div class="card-footer ">
                       <div class="stats">

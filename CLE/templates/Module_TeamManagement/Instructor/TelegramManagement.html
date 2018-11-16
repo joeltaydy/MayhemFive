@@ -23,9 +23,6 @@
         {% else %}
             <h2 style = "background-color:#23272b; color:white; text-align: center"> {{ current_course_section_details.course_title  }} {{ current_course_section_details.section_number }}</h2>
         {% endif %}
-
-
-
     </div>
 
     <br>
@@ -78,7 +75,8 @@
                         <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                         <br>
                         <h4 class="text-center">
-                            <a href="{{ current_telegram_chat.link }} " role="button" class="btn"  style="background-color: #0088CC; color:white;"> <b>{{current_telegram_chat.type}} Link</b></a>
+                            <!-- <a href="{{ current_telegram_chat.link }}" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a> -->
+                            <a onclick="redirectToLink()" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" value="{{ current_telegram_chat.link }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a>
                         </h4>
                     <br>
 
@@ -98,6 +96,7 @@
                                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                                     <input type="hidden" name="telegram_chat_link" id="telegram_chat_link" value={{current_telegram_chat.link}}>
                                     <input type="hidden" name="telegram_chat_type" id="telegram_chat_type" value={{current_telegram_chat.type}}>
+                                    <input type="hidden" name="telegram_chat_name" id="telegram_chat_name" value={{current_telegram_chat.name_join}}>
                                     <hr>
                                     <p class="card-category text-center"> Please select a datetime to send your message</p>
                                     <div class = "text-center">
@@ -135,6 +134,7 @@
                             <div class="form-group">
                                 <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                                 <input type="hidden" name="chat_link" id="chat_link" value={{current_telegram_chat.link}}>
+                                <input type="hidden" name="chat_name" id="chat_name" value={{current_telegram_chat.name_join}}>
                                 <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
                                     <button class="btn btn-warning"><b>Update Members</b></button>
                                 </div>
@@ -174,7 +174,7 @@
                     <br>
                     <input type="text" class="form-control text-center col-md9" name="group_name" id="group_name" placeholder="Group Name">
                     <br>
-                    <input type="text" class="form-control text-center col-md9" name="username" id="username" placeholder="Additional Telegram Username">
+                    <!-- <input type="text" class="form-control text-center col-md9" name="username" id="username" placeholder="Additional Telegram Username"> -->
                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                 </div>
                 <!-- Submission -->
@@ -250,6 +250,30 @@
 </div>
 
 <script>
+    function redirectToLink(){
+        var chat_link = document.getElementById("telegram_chat_link").getAttribute("value");
+        var chat_name = document.getElementById("telegram_chat_link").getAttribute("name");
+
+        if(chat_link == "None"){
+            request_data = { 'telegram_chat_name' : chat_name };
+            $.ajax({
+                url : "{% url 'CMmod:faculty_telegram_GetChatLink' %}",
+                type : "GET",
+                data : request_data,
+
+                success : function(response_data){
+                    if(response_data.telegram_chat_link != null){
+                        document.getElementById("telegram_chat_link").value = telegram_chat_link;
+                        window.location.href = response_data.telegram_chat_link;
+                    };
+                    console.log(response_data)
+                },
+            });
+        }else{
+            window.location.href = chat_link;
+        };
+    };
+
     // Add active class to the current button (highlight it)
     $(function(){
         pageUrl = location.href;

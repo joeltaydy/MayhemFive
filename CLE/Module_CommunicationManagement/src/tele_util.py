@@ -189,11 +189,35 @@ def initialize_Group(username,client=None,course_title=None,section_number=None,
         results['status'] = True
         results['message'] = title + ' group create.'
 
+        # Remove that extra user after the group is created
+        deleteUserFromGroup(client,title,username)
+
     invite_link = client(messages.ExportChatInviteRequest(getEntity(client,title,Chat).id))
     results['group_name'] = title
     results['group_link'] = invite_link.link
 
     return results
+
+
+def deleteUserFromGroup(client,group_name,user_name):
+    dialog = getDialog(client,dialog_name,Chat)
+    chat_id = dialog.message.to_id.chat_id
+    client(messages.DeleteChatUserRequest(
+        chat_id=chat_id,
+        user_id=user_name
+    ))
+
+
+def deleteGroup(client,group_name,username):
+    dialog = getDialog(client,group_name,Chat)
+    deleteUserFromGroup(client,group_name,username)
+
+
+def deleteChannel(client,channel_name):
+    channel_entity = getEntity(client,channel_name,Channel)
+    client(channels.DeleteChannelRequest(
+        channel=channel_entity.id,
+    ))
 
 
 def sendGroupMessage(client,group_name,message):
@@ -218,6 +242,7 @@ def disconnectClient(client=None):
 
     tele_config.CLIENT = None
     client.disconnect()
+
 
 # ============================================================================ #
 # ============================================================================ #

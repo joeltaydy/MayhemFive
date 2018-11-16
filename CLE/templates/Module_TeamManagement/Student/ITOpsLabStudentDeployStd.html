@@ -19,7 +19,7 @@
         </div>
 
         <hr>
-        <h2 align="center"><i>Deploy</i></h2>
+        <div class="itopsheader">DEPLOY</div>
         <br>
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
@@ -32,12 +32,12 @@
             <div class="panel">
             <div class="panel-heading">
             <h5 class="panel-title">
-                <a href="#panelBodyOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
+                <a href="#panelBodyOne" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">AWS Information</a>
                 </h5>
             </div>
 
              <!-- Request AWS Information-->
-            <div id="panelBodyOne" class="panel-collapse collapse in">
+            <div id="panelBodyOne" class="panel-collapse collapse">
                 <div class="panel-body">
 
                     <form id="accNum" action="{% url 'DMmod:itopslab_studeploy_standard_AddAccount' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
@@ -46,6 +46,7 @@
                             <label for="name" class="control-label">Account Number</label>
                             <input class="form-control" type="text" name="new_account_number" id="new_account_number" aria-describedby="fileHelp" placeholder="Account Number">
                             <input type="hidden" name="course_title" id="course_title" value={{course_title}}>
+                            <input type="hidden" name="course_section_id" id="course_section_id" value={{course_section_id}}>
                             <br>
                         </div>
                         <div class="col-md-9 form-group" style = "margin-bottom:40px;">

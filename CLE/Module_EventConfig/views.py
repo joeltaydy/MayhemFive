@@ -1,3 +1,4 @@
+import json
 import time
 import traceback
 from django.shortcuts import render
@@ -63,11 +64,6 @@ def faculty_Event_Base(requests,response=None):
         response['course_sectionList'] = course_sectionList[course_title]
         response['course_title'] = course_title
 
-        section_team_list = utilities_DM.getAllTeamDetails(course_sectionList,course_title)
-
-        for team_details in section_team_list:
-            pass
-
         # faculty_email = requests.user.email
         # facultyObj = Faculty.objects.get(email=faculty_email)
 
@@ -77,6 +73,51 @@ def faculty_Event_Base(requests,response=None):
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
+
+
+# Supplementary - Experimental method
+#
+def faculty_Event_GetServers(requests):
+    response = {"faculty_Event_GetServers" : "active"}
+
+    # Redirect user to login page if not authorized and student
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests, 'Module_Account/login.html', response)
+
+    section_numbers = requests.GET.get('section_number').split('_')
+    course_title = requests.GET.get('course_title')
+    print(course_title)
+
+    try:
+        courseList = requests.session['courseList_ITOpsLab']
+        team_account_numberList = utilities_DM.getAllTeamDetails(courseList,course_title)
+
+        servers = []
+        parent = False
+        slave = False
+        for section_number in section_numbers:
+            for team in team_account_numberList[section_number]:
+                try:
+                    serverObj = Server_Details.objects.get(account_number=team['account_number'])
+                    servers.append(serverObj)
+
+                    if serverObj.type == 'Parent':
+                        parent = True
+                    elif serverObj.type == 'Slave':
+                        slave = True
+                except:
+                    pass
+
+        response['server_count'] = len(servers)
+        response['server_parent_check'] = parent
+        response['server_slave_check'] = slave
+    except:
+        traceback.print_exc()
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 
 # Execute event function after base is called
@@ -115,7 +156,7 @@ def faculty_Event_Execute(requests):
     print('Section Numbers: ' + '_'.join(section_numberList))
     print('Server Type: ' + server_type)
     print('Event Type: ' + event_type)
-    print('Schedule Datatime: ' + scheduled_datetime)
+    print('Schedule Datatime: ' + str(scheduled_datetime))
 
     try:
         serverList = []

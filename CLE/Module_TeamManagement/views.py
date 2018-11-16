@@ -67,7 +67,7 @@ def home(requests):
         context['past_weeks'] = 0
         context['remaining_weeks'] = 0
         context['progress'] = 0
-    
+
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
 
@@ -111,6 +111,8 @@ def faculty_HomePage(requests):
         traceback.print_exc()
         context['error_message'] = e.args[0]
 
+    context['course_section_count'] = len(requests.session['courseList_updated'])
+    context['ITOpsLab_count'] = len(requests.session['courseList_ITOpsLab'])
     return render(requests, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
 
 
@@ -646,15 +648,12 @@ def configureDB_teams(requests):
         response['results'] = bootstrap.update_Teams(bootstrapFile)
 
     except Exception as e:
-        # Uncomment for debugging - to print stack trace wihtout halting the process
         traceback.print_exc()
         response['error_message'] = e.args[0]
         response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTeams.html", response)
-        #return faculty_Overview(requests)
 
     response['message'] = 'Teams Configured'
-    # return render(requests, "Module_TeamManagement/Instructor/instructorOverview.html", response)
     return faculty_Overview(requests)
 
 
@@ -742,18 +741,21 @@ def configureDB_clt(requests):
             course = requests.POST.get("course_section")
         bootstrap.configureCourseToolsList(course,cleToolName) #Configures the course section database to include list of tools into the course section for display on dashboard
 
-        if file.name.endswith('.xlsx'):
-            if 'learning_tools' in file.name.lower():
-                bootstrapFile['faculty_email'] = faculty_email
-                bootstrapFile['course'] = course
-                bootstrapFile['action'] = action
-                bootstrapFile['file_path'] = file.temporary_file_path()
+        if file:
+            if file.name.endswith('.xlsx'):
+                if 'learning_tools' in file.name.lower():
+                    bootstrapFile['faculty_email'] = faculty_email
+                    bootstrapFile['course'] = course
+                    bootstrapFile['action'] = action
+                    bootstrapFile['file_path'] = file.temporary_file_path()
+
+                else:
+                    raise Exception("Invalid file information. Please upload tools information only.")
 
             else:
-                raise Exception("Invalid file information. Please upload tools information only.")
-
+                raise Exception("Invalid file type. Please upload .xlsx only")
         else:
-            raise Exception("Invalid file type. Please upload .xlsx only")
+            raise Exception("Please upload an excel file")
 
         # If file is .xlsx then proceed with processing
         response['results'] = bootstrap.update_CLT(bootstrapFile,course)
@@ -801,9 +803,10 @@ def configureDB_clt(requests):
 #
 def configureDB_telegram(requests):
     response = {"configure_telegram" : "active"}
+    utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
+    response['courses'] = requests.session['courseList_updated']
+
     if requests.method == "GET":
-        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList_updated']
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     try:
@@ -839,16 +842,18 @@ def configureDB_telegram(requests):
         for course_section in registered_course:
             bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
+        # Add faculty telegram username into DB
+        myself = client.get_me()
+        facultyObj.telegram_username = '@' + str(myself.username)
+        facultyObj.save()
+
         tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
-        utilities.populateRelevantCourses(requests,instructorEmail=requests.user.email)
-        response['courses'] = requests.session['courseList_updated']
         response['error_message'] = e.args[0]
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
-    # Need to double confirm where to direct the user to once done.
     response['message'] = 'Telegram Account Configured'
     return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 

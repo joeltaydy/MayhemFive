@@ -6,7 +6,7 @@ urlpatterns = [
     path('instructor/ITOperationsLab/setup/awskeys/',views.faculty_Setup_GetAWSKeys,name='itopslab_setup_AWSKeys'),
     path('instructor/ITOperationsLab/monitor/',views.faculty_Monitor_Base,name='itopslab_monitor'),
     path('student/ITOperationsLab/deploy/',views.student_Deploy_Base,name='itopslab_studeploy'),
-    path('student/ITOperationsLab/deploy/2',views.student_Deploy_Upload,name='itopslab_studeployUpload'),
+    path('student/ITOperationsLab/deploy/<str:course_title>/2',views.student_Deploy_Upload,name='itopslab_studeployUpload'),
     path('student/ITOperationsLab/monitor/',views.student_Monitor_Base,name='itopslab_stumonitor'),
 
     # For adding deployment packages into system

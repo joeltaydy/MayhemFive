@@ -1,4 +1,14 @@
-.error {
+  .itopsheader {
+    color: white;
+    background: #2C3E50;
+    font-weight: bold;
+    font-family: bebas;
+    font-size: 50px;
+    text-align: center;
+    line-height: 80px;
+  }
+  
+  .error {
     color: #a80000;
     background: #ffe0e0;
     padding: 10px 10px;
@@ -45,7 +55,7 @@
   }
   #accordion .panel-heading a.collapsed:hover::before,
   #accordion .panel-heading a.collapsed:focus::before {
-    color: #2C3E50;
+    color: ccc;
   }
   #accordion .panel-heading {
     padding: 0;
@@ -61,7 +71,7 @@
   /* Add Indicator fontawesome icon to the left */
   #accordion .panel-heading .accordion-toggle::before {
     font-family: 'FontAwesome';
-    content: '\f00d';
+    content: '\f0d7';
     float: left;
     color: white;
     font-weight: lighter;
@@ -70,7 +80,7 @@
   }
   #accordion .panel-heading .accordion-toggle.collapsed::before {
     color: #444;
-    transform: rotate(-135deg);
+    transform: rotate(-90deg);
     transition: all 0.2s ease-in;
   }
   

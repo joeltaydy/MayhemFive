@@ -87,28 +87,28 @@
                                   <div class="card-header">
                                       <h3 align="center" class="card-title">Tools used</h3>
                                   </div>
-                                    <div class = "card-body">
-                                        <div class="row text-center" style="display: block;margin-left: auto;margin-right: auto;">
+                                    <div class = "card-body text-center">
+                                        <div class="col-md-12 text-center" style="margin-left:30px;">
                                             {% if not courseDetails.toolImage_list %}
-                                                <div style="text-center">
+                                                <div class="text-center">
                                                     <h6 style = "color:red"> No tools have been initialised</h6>
                                                     <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtools' %}?user=faculty">Initialise tools</a>
                                                 </div>
                                             {% else %}
+                                            <div class="row text-center">
                                                 {% for toolImage in courseDetails.toolImage_list %}
                                                     {% if toolImage != '' %}
                                                     {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                                                    <div class="col-md-4" align="center">
+                                                    <div class="col-md-4 text-center">
                                                         <img src="{% static toolLink %}" class="rounded-circle">
                                                     </div>
                                                     {% endwith %}
                                                     {% endif %}
                                                 {% endfor %}
-                                                <div style ="text-center">
-                                                    <!-- <a href="{% url 'TMmod:uploadtools' %}?user=faculty"><img id="addmore" src="https://image.flaticon.com/icons/png/512/16/16909.png" alt="..." class="rounded-circle add"></a>
-                                                    <h6 style ="text-center;">Add Tools</h6> -->
-                                                    <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtools' %}?user=faculty">Add tools</a>
-                                                </div>
+                                            </div>
+                                            <div class="card-footer text-center" style="margin-top:10px;">
+                                                <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtools' %}?user=faculty">Add tools</a>
+                                            </div>
 
                                             {% endif %}
                                         </div>
