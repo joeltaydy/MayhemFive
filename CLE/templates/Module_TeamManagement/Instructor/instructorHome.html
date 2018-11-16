@@ -109,12 +109,12 @@
                                                     <h6 style ="text-center;">Add Tools</h6> -->
                                                     <a class="btn btn-dark btn-sm" role="button" href="{% url 'TMmod:uploadtools' %}?user=faculty">Add tools</a>
                                                 </div>
-                                                
+
                                             {% endif %}
                                         </div>
-                                        
+
                                     </div>
-                                      
+
                                   <br>
                               </div>
                         </div>
@@ -134,18 +134,18 @@
                                             <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=80px height = 80px style="display: block;margin-left: auto;margin-right: auto;" >
                                             <br>
                                             {% for course_section,telegram_details in telegram_data.items %}
-                                            <div style = "col-md-4"> 
-                                                
+                                            <div style = "col-md-4">
+
                                                 <h4><b>{{telegram_details.registered_count}}/{{telegram_details.total_count}}</b></h4>
                                                 <h5>Registered for <b>{{course_section}}</b></h5>
-                                                
+
                                             </div>
                                             {% endfor %}
-                                            
+
                                             <button type="button" class="btn btn-sm" style="background-color: #0088CC; color:white; display: block;margin-left: auto;margin-right: auto;" >
-                                                Telegram Management
+                                                <h6>Telegram Management</h6>
                                             </button>
-                                            
+
                                             <br>
                                         </span>
                                     </div>
