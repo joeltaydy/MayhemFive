@@ -337,14 +337,12 @@ def faculty_telegram_DeleteChat(requests):
 
     telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
     telegram_chat_type = requests.POST.get('telegram_chat_type')
+
     print('Telegram Chat Type: ' + telegram_chat_type)
     print('Telegram Chat Name: ' + telegram_chat_name)
 
     try:
-        telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
-        telegram_chatObj.delete()
-
-        facultyObj = Faculty.objects.get(email=request.user.email)
+        facultyObj = Faculty.objects.get(email=requests.user.email)
 
         tasks.deleteChat(
             username=requests.user.email.split('@')[0],
@@ -353,7 +351,10 @@ def faculty_telegram_DeleteChat(requests):
             chat_type=telegram_chat_type,
             schedule=0,
         )
-    except:
+
+        telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
+        telegram_chatObj.delete()
+    except Exception as e:
         traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
