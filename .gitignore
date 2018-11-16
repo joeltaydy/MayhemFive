@@ -109,4 +109,4 @@ pip-selfcheck.json
 CLE/clt_files/trailhead-points.csv
 
 #Session Files #
-.session
+*.session

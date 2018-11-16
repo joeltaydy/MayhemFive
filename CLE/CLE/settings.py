@@ -184,7 +184,7 @@ SITE_ID = 2 # Check your Database to see site id
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = '/'
-
+ACCOUNT_LOGOUT_ON_GET = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -236,7 +236,7 @@ CELERY_BEAT_SCHEDULE = {
     #'schedule':  100.0 #period of running in seconds
     #'arg's :  #if have args
     },
-        
+
 }
 
 

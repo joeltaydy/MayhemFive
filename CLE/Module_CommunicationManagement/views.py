@@ -148,7 +148,7 @@ def faculty_telegram_CreateGroup(requests):
         return render(requests,'Module_Account/login.html',response)
 
     group_name = requests.POST.get('group_name')
-    additional_username = requests.POST.get('username')
+    additional_username = '@rizzzy'
     course_section = requests.POST.get('course_section')
     print('Group Name: ' + group_name)
     print('Course Section: ' + course_section)
@@ -295,6 +295,8 @@ def faculty_telegram_SendMessage(requests):
     return faculty_telegram_Base(requests,response)
 
 
+# Supplmentary function for ajax call - to update the chat link for front end redirection
+#
 def faculty_telegram_GetChatLink(requests):
     response = { 'faculty_telegram_GetChatLink' : 'active'}
 
@@ -319,3 +321,44 @@ def faculty_telegram_GetChatLink(requests):
         traceback.print_exc()
 
     return HttpResponse(json.dumps(response), content_type='application/json')
+
+
+# Delete telegram group on demand
+#
+def faculty_telegram_DeleteChat(requests):
+    response = { 'faculty_telegram_DeleteChat' : 'active'}
+
+    # Redirect user to login page if not authorized and faculty
+    try:
+        processLogin.InstructorVerification(requests)
+    except:
+        logout(requests)
+        return render(requests,'Module_Account/login.html',response)
+
+    telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
+    telegram_chat_type = requests.POST.get('telegram_chat_type')
+
+    print('Telegram Chat Type: ' + telegram_chat_type)
+    print('Telegram Chat Name: ' + telegram_chat_name)
+
+    try:
+        facultyObj = Faculty.objects.get(email=requests.user.email)
+
+        tasks.deleteChat(
+            username=requests.user.email.split('@')[0],
+            telegram_username=facultyObj.telegram_username,
+            chat_name=telegram_chat_name,
+            chat_type=telegram_chat_type,
+            schedule=0,
+        )
+
+        telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
+        telegram_chatObj.delete()
+    except Exception as e:
+        traceback.print_exc()
+        response['courses'] = requests.session['courseList_updated']
+        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
+        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+
+    response['message'] = 'Telegram chat successfully deleted'
+    return faculty_telegram_Base(requests,response)

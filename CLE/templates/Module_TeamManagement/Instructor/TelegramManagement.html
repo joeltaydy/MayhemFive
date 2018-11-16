@@ -13,7 +13,7 @@
         <div class="navDiv text-center" style="display: block;margin-left: auto;margin-right: auto;">
             {% for course_section in course_sectionList %}
                 {% if course_section.section_number != 'G0' %}
-                    <a href="/instructor/TelegramManagement?course_section={{ course_section.id }}" role="button" class="btn btn-dark">{{ course_section.section_number }}</a>
+                    <a href="/instructor/TelegramManagement/?course_section={{ course_section.id }}" role="button" class="btn btn-dark">{{ course_section.section_number }}</a>
                 {% endif %}
             {% endfor %}
         </div>
@@ -56,7 +56,7 @@
                 <div class="card-header">
                         <div class="navDiv2" style="display: block;margin-left: auto;margin-right: auto; margin-bottom:20px;">
                             {% for telegram_chat in telegram_chats %}
-                                <a href="/instructor/TelegramManagement?course_section={{ current_course_section_details.id }}&chat_name={{ telegram_chat.name }}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ telegram_chat.name }}</a>
+                                <a href="/instructor/TelegramManagement/?course_section={{ current_course_section_details.id }}&chat_name={{ telegram_chat.name }}" role="button" class="btn btn-dark"  style="background-color: #0088CC;">{{ telegram_chat.name }}</a>
                             {% endfor %}
                             <button type="button" class="btn btn-dark"
                             style="
@@ -173,7 +173,7 @@
                     <br>
                     <input type="text" class="form-control text-center col-md9" name="group_name" id="group_name" placeholder="Group Name">
                     <br>
-                    <input type="text" class="form-control text-center col-md9" name="username" id="username" placeholder="Additional Telegram Username">
+                    <!-- <input type="text" class="form-control text-center col-md9" name="username" id="username" placeholder="Additional Telegram Username"> -->
                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                 </div>
                 <!-- Submission -->
@@ -276,14 +276,13 @@
     // Add active class to the current button (highlight it)
     $(function(){
         pageUrl = location.href;
-        // console.log(pageUrl)
+        // console.log(pageUrl);
         $('.navDiv a').each(function () {
             link = $(this);
             var href = link.attr("href");
-            console.log(link);
-            // console.log(link.attr("href") === pageUrl);
+            // console.log(link.attr("href"));
             if (href === pageUrl.substring(pageUrl.length-href.length)) {
-                console.log("success");
+                // console.log("success");
                 link.addClass("active");
             }
         });

@@ -148,7 +148,7 @@ def faculty_Dashboard(requests):
         courses = {}
         students = []
         tele_data = {}
-        previouscourse = "a"
+        previouscourse = "a" #filler
 
         for course_section in registered_course_section:
             course_title = course_section.course.course_title
@@ -842,6 +842,11 @@ def configureDB_telegram(requests):
         for course_section in registered_course:
             bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
+        # Add faculty telegram username into DB
+        myself = client.get_me()
+        facultyObj.telegram_username = '@' + str(myself.username)
+        facultyObj.save()
+
         tele_util.disconnectClient(client)
 
     except Exception as e:
@@ -932,20 +937,37 @@ def save_trailhead_form(request, form, template_name):
     data = dict()
     if request.method == 'POST':
         if form.is_valid():
-            newTrailMix = form.save()
-            req = requests.get(newTrailMix.link)
-            soup = BeautifulSoup(req.text, 'html.parser')
-            title_broth = soup.find('div',attrs={'class': 'content-title'})
-            description_broth = soup.find('div', attrs={'class': 'content-description'})
-            newTrailMix.name = title_broth.text.strip()
-            newTrailMix.description= (description_broth.text.strip())
-            broth = soup.find_all('h3', attrs={'class': 'item-title'})
-            badgeLinks = ""
-            for broths in broth:
-                badgeLinks = badgeLinks + (broths.text.strip()) + " | "
-                #print(broths.a.get('href'))
-            newTrailMix.badges = badgeLinks
-            newTrailMix.save()
+            course_in_form = form.cleaned_data['course']
+            link_in_form = form.cleaned_data['link']
+            try:
+                if_trailmix_exist = Trailmix_Information.objects.get(link=link_in_form, course = course_in_form) #If exist, do need to add more 
+            except: #if trailmix does not exist, create new entry
+                newTrailMix = form.save()
+                req = requests.get(newTrailMix.link)
+                soup = BeautifulSoup(req.text, 'html.parser')
+                title_broth = soup.find('div',attrs={'class': 'content-title'})
+                description_broth = soup.find('div', attrs={'class': 'content-description'})
+                newTrailMix.name = title_broth.text.strip()
+                newTrailMix.description= (description_broth.text.strip())
+                broth = soup.find_all('h3', attrs={'class': 'item-title'})
+                badgeLinks = ""
+                for broths in broth:
+                    badgeLinks = badgeLinks + (broths.text.strip()) + " | "
+                    #print(broths.a.get('href'))
+                newTrailMix.badges = badgeLinks
+                newTrailMix.save()
+                facultyObj = Faculty.objects.get(email=request.user.email)
+                courses = facultyObj.course_section.all()
+                selected_course = newTrailMix.course
+                course_sections = ""
+                for course in courses:
+                    if selected_course.course_title in course.course_section_id: 
+                        course_sections = course_sections + course.course_section_id +"_" #delimiter
+                if course_sections == "":
+                    newTrailMix.delete()  #No course selected, delete entry
+                else:
+                    newTrailMix.course_sections=course_sections
+                    newTrailMix.save()
             data['form_is_valid'] = True
             thm = Trailmix_Information.objects.all()
             data['html_trailhead_list'] = render_to_string('dataforms/trailmixes/partial_trailhead_list.html', {
@@ -963,20 +985,10 @@ def save_trailhead_form(request, form, template_name):
 def trailhead_create(request):
     if request.method == 'POST':
         form = TrailheadForm(request.POST)
+        
     else:
         form = TrailheadForm()
     return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_create.html')
-
-
-# <description>
-#
-def trailhead_update(request, pk):
-    trailhead = get_object_or_404(Trailmix_Information, pk=pk)
-    if request.method == 'POST':
-        form = TrailheadForm(request.POST, instance=trailhead)
-    else:
-        form = TrailheadForm(instance=trailhead)
-    return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_update.html')
 
 
 # <description>
