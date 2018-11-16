@@ -106,13 +106,13 @@ def createGroup(username,group_name,additional_username):
 
 
 @background(schedule=0)
-def deleteChat(username,chat_name,chat_type):
+def deleteChat(username,telegram_username,chat_name,chat_type):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Deleting Telegram Chat')
 
     client = tele_util.getClient(username)
 
     if chat_type == 'Group':
-        tele_util.deleteGroup(client,chat_name)
+        tele_util.deleteGroup(client,chat_name,telegram_username)
     elif chat_type == 'Channel':
         tele_util.deleteChannel(client,chat_name)
 

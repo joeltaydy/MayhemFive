@@ -344,8 +344,11 @@ def faculty_telegram_DeleteChat(requests):
         telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
         telegram_chatObj.delete()
 
+        facultyObj = Faculty.objects.get(email=request.user.email)
+
         tasks.deleteChat(
             username=requests.user.email.split('@')[0],
+            telegram_username=facultyObj.telegram_username,
             chat_name=telegram_chat_name,
             chat_type=telegram_chat_type,
             schedule=0,

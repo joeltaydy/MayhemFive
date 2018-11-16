@@ -208,9 +208,9 @@ def deleteUserGroup(client,group_name,user_name):
     ))
 
 
-def deleteGroup(client,group_name):
+def deleteGroup(client,group_name,username):
     dialog = getDialog(client,group_name,Chat)
-    # TO-DO
+    deleteUserGroup(client,group_name,username)
 
 
 def deleteChannel(client,channel_name):
