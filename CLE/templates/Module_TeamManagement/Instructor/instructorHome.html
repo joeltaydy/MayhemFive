@@ -99,7 +99,7 @@
                                                 {% for toolImage in courseDetails.toolImage_list %}
                                                     {% if toolImage != '' %}
                                                     {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                                                    <div class="col-md-4 text-center">
+                                                    <div class="col-md-2 text-center">
                                                         <img src="{% static toolLink %}" class="rounded-circle">
                                                     </div>
                                                     {% endwith %}
