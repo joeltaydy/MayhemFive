@@ -855,7 +855,8 @@ def configureDB_telegram(requests):
         return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
 
     response['message'] = 'Telegram Account Configured'
-    return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+    # return render(requests, "Module_TeamManagement/Instructor/instructorTools.html", response)
+    return faculty_HomePage(requests)
 
 
 line_chart = TemplateView.as_view(template_name='Module_TeamManagement\line_chart.html')
