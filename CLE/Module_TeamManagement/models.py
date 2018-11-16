@@ -275,6 +275,10 @@ class Trailmix_Information(models.Model):
         db_column='Course',
         null=True,
     )
+    course_sections = models.TextField(
+        db_column='Course_Sections_Details',
+        null=True,
+    )
 
     class Meta:
         managed = True
