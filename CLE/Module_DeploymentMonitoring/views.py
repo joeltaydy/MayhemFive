@@ -790,7 +790,7 @@ def student_Deploy_Standard_AddIPs(requests):
         credentialsObj = studentClassObj.awscredential
 
         if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
-            utilities.addAWSKeys(requests.POST.get('IP_address'),requests)
+            utilities.addAWSKeys(requests)
 
         form = ServerForm_Add(requests.POST)
     else:
