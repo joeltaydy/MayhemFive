@@ -9,10 +9,8 @@
 </head>
 
 <div class="col-md-12">
-    <h1 align="center">IT Operations Lab</h1>
-    <img src="{% static 'images/Devops Symbol.png' %}" alt="Devops" width=180px height = 90px style="display: block;margin-left: auto;margin-right: auto;"><br>
-
-
+    <img src="{% static 'images/ItOpsLab Header.png' %}" alt="Devops" width=370px height = 180px style="display: block;margin-left: auto;margin-right: auto;"><br>
+    <h2 class = "text-center"> {{ course_title }} </h2>
     <div class= "redirect">
         <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
             <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Deploy</button>

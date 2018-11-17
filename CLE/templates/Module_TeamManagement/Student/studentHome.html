@@ -26,7 +26,7 @@ My Stats
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
-            <h1 class="card-title bg-dark text-white" align="center">{{course_section.courseDetails}}</h2>
+            <h1 class="card-title bg-dark text-white" align="center">{{course_section.courseDetails}}</h1>
           </div>
           <br>
 
@@ -34,7 +34,7 @@ My Stats
           <div class="col-md-12">
             <div class="row">
               <!-- FOR TOOLS USED -->
-              <div class = "col-md-6">
+              <div class = "col-md-12">
                   <div class="card">
                     <div class="card-header">
                       <h3 align="center" class="card-title">Tools used</h3>
@@ -49,7 +49,7 @@ My Stats
                           {% for toolImage in course_section.toolImage_list %}
                           {% if toolImage != '' %}
                           {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                          <div class="col-md-4" style="display: block;margin-left: auto;margin-right: auto;">
+                          <div class="col-md-2" style="display: block;margin-left: auto;margin-right: auto;">
                             <img src="{% static toolLink %}" class="rounded-circle">
                           </div>
                           {% endwith %}
@@ -106,8 +106,8 @@ My Stats
                     {% for toolImage in course_section.toolImage_list %}
                     {% if toolImage != '' %}
                     {% with 'images/'|add:toolImage|add:" Logo.png" as toolLink %}
-                    
-                    <div class="col-md-4 text-center">
+
+                    <div class="col-md-2 text-center">
                       <img src="{% static toolLink %}" class="rounded-circle">
                     </div>
                     {% endwith %}
