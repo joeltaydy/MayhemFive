@@ -169,7 +169,7 @@ def getTeamMembersClassQuerySet(requests):
 
 # Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(requests):
-    ipAddress = requests.POST.get("ipaddress")                #string of IP address
+    ipAddress = requests.POST.get("IP_address")                #string of IP address
 
     course_title = requests.POST.get('course_title')
     class_studentObj= getStudentClassObject(requests,course_title)
