@@ -99,18 +99,17 @@ def faculty_Event_GetServers(requests):
         slave = False
         for section_number in section_numbers:
             for team in team_account_numberList[section_number]:
-                print(team)
                 try:
-                    serverObj = Server_Details.objects.get(account_number=team['account_number'])
-                    print(serverObj)
-                    servers.append(serverObj)
+                    serverObjs = Server_Details.objects.filter(account_number=team['account_number'])
+                    for serverObj in serverObjs:
+                        servers.append(serverObj)
 
-                    if serverObj.type == 'Parent':
-                        parent = True
-                    elif serverObj.type == 'Slave':
-                        slave = True
+                        if serverObj.type == 'Parent':
+                            parent = True
+                        elif serverObj.type == 'Slave':
+                            slave = True
                 except:
-                    pass
+                    traceback.print_exc()
 
         response['server_count'] = len(servers)
         response['server_parent_check'] = parent
