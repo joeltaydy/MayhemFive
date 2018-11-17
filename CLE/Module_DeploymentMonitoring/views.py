@@ -594,7 +594,7 @@ def student_Deploy_AddIP(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    utilities.addAWSKeys(ipAddress,requests)
+    utilities.addAWSKeys(requests)
     utilities.addServerDetails(requests=requests)
 
 
