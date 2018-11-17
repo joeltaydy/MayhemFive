@@ -90,15 +90,18 @@ def faculty_Event_GetServers(requests):
     section_numbers = requests.GET.get('section_number').split('_')
     course_title = requests.GET.get('course_title')
     print(course_title)
+    print(section_numbers)
 
     try:
         courseList = requests.session['courseList_ITOpsLab']
         team_account_numberList = utilities_DM.getAllTeamDetails(courseList,course_title)
+        print(team_account_numberList)
 
         servers = []
         parent = False
         slave = False
         for section_number in section_numbers:
+            print(team_account_numberList[section_number])
             for team in team_account_numberList[section_number]:
                 try:
                     serverObj = Server_Details.objects.get(account_number=team['account_number'])
