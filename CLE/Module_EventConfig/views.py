@@ -160,7 +160,7 @@ def faculty_Event_Execute(requests):
 
     try:
         serverList = []
-        team_details = utilities_DM.getAllTeamDetails(course_sectionList)
+        team_details = utilities_DM.getAllTeamDetails(course_sectionList,course_title)
         for section_number in section_numberList:
             for details in team_details[section_number]:
                 querySet_serverList = Server_Details.objects.filter(account_number=details["account_number"])
