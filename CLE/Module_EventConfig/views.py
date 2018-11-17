@@ -102,7 +102,7 @@ def faculty_Event_GetServers(requests):
         slave = False
         for section_number in section_numbers:
             print(team_account_numberList[section_number])
-            for team in team_account_numberList[section_number].items():
+            for team in team_account_numberList[section_number]:
                 try:
                     serverObj = Server_Details.objects.get(account_number=team['account_number'])
                     print(serverObj)
