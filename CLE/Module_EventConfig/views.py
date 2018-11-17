@@ -102,9 +102,9 @@ def faculty_Event_GetServers(requests):
         slave = False
         for section_number in section_numbers:
             print(team_account_numberList[section_number])
-            for team in team_account_numberList[section_number]:
+            for team_name,account_number in team_account_numberList[section_number].items():
                 try:
-                    serverObj = Server_Details.objects.get(account_number=team['account_number'])
+                    serverObj = Server_Details.objects.get(account_number=account_number)
                     servers.append(serverObj)
 
                     if serverObj.type == 'Parent':
