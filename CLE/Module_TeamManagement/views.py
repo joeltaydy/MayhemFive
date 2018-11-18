@@ -895,12 +895,14 @@ def process_form_data(form_list):
 
 # For exporting the file
 #
+# Sample file dir would be clt_files\*School term*\*coursesection*
 def clt_file_download(requests):
-
-    output_file = os.path.join(os.getcwd(),'clt_files','trailhead-points.csv')
+    schoolTerm = utilities.retrieve_school_term()
+    course_section = requests.GET.get("module")
+    output_file = os.path.join(os.getcwd(),'clt_files',schoolTerm.school_term_id.replace('/',""),course_section,'trailhead-points-log.csv')
     with open(output_file, 'rb') as myfile:
         response = HttpResponse(myfile, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=trailhead-points.csv'
+        response['Content-Disposition'] = 'attachment; filename=' + course_section+ 'trailhead-points.csv'
     return response
 
 
