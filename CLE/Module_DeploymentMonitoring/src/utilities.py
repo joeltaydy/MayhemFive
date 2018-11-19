@@ -304,7 +304,7 @@ def addServerDetailsForm(request, form, template_name):
         server_ip = request.POST.get('IP_address')
         server_id = request.POST.get('instanceid')
 
-        server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+        message, server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
 
         if form.is_valid() and server_is_valid:
             form.save()
@@ -317,7 +317,11 @@ def addServerDetailsForm(request, form, template_name):
             servers = getAllServers(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
-            raise Exception('No server with IP ' + server_ip + ' is registered under the stated account.')
+            if message != None:
+                raise Exception(message)
+            else:
+                raise Exception("Form in invalid. Please check with administrator.")
+
     else:
         context['course_title'] = request.GET.get('course_title')
 
