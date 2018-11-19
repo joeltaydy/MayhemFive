@@ -216,9 +216,12 @@ def addServerDetails(requests=None,account_number=None):
     if validity == False:
         raise Exception("Account number do not match with given IP, please try again")
 
-    url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
-    response = req.get(url)
-    jsonObj = json.loads(response.content.decode())
+    try:
+        url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
+        response = req.get(url,timeout=1)
+        jsonObj = json.loads(response.content.decode())
+    except req.exceptions.ConnectTimeout:
+        raise Exception('Cannot reach server. Please start up server before proceeding')
 
     try:
         sd = Server_Details.objects.create(
@@ -262,9 +265,12 @@ def initiateStartServerTime(ipAddress):
 
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
-    url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
-    response = req.get(url)
-    jsonObj = json.loads(response.content.decode())
+    try:
+        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
+        response = req.get(url,timeout=1)
+        jsonObj = json.loads(response.content.decode())
+    except req.exceptions.ConnectTimeout:
+        raise Exception('Cannot reach server. Please start up server before proceeding')
 
     if account_number != None:
         return account_number == jsonObj['User']['Account']
@@ -575,7 +581,7 @@ def getMetric(server_ip,response):
 # All have similiar structures
 #
 def getCloudMetric(webapp_url):
-    webapp_response = req.get(webapp_url)
+    webapp_response = req.get(webapp_url,timeout=5)
     webapp_jsonObj = json.loads(webapp_response.content.decode())
     label = "default"
     sortedValueList= []
