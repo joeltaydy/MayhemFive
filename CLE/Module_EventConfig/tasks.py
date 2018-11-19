@@ -1,5 +1,6 @@
 import json
 import boto3
+import traceback
 from datetime import datetime
 import requests as req
 from background_task import background
@@ -15,50 +16,42 @@ def test_tasks(message):
 
 @background(schedule=0)
 def stopServer(server_list=None,server=None,section_numbers=None,server_type=None):
-    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Running background event: Stop Server')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background event: Stop Server')
 
-    # If stopping only a server
-    if server !=  None:
-        server_ip = server['server_ip']
-        server_id = server['server_id']
+    if server != None and server_list != None:
+        server_list.append(server)
+    elif server != None and server_list == None:
+        server_list = [server]
 
-        server_url = 'http://' + server_ip + ':8999/ec2/instance/event/stop/'
-        payload = {'instance_id':server_id, 'secret_key':'m0nKEY'}
-        server_response = req.get(server_url, params=payload)
-        server_jsonObj = json.loads(server_response.content.decode())
+    counter = 1
+    for server in server_list:
+        credentialsObj = AWS_Credentials.objects.get(account_number=server['server_account'])
+        access_key = decode(credentialsObj.access_key)
+        secret_access_key = decode(credentialsObj.secret_access_key)
 
-        if server_jsonObj['HTTPStatusCode'] == 200:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Successfully stopped single server: ' + server_ip)
-            utilities.writeEventLog("stop", server_ip )
+        results = aws_util.stopServer(server['server_id'],access_key,secret_access_key)
+
+        if results != None:
+            print('Debug: ' + str(results['StoppingInstances'][0]['CurrentState']['Code']))
+
+        if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
+            utilities.writeEventLog("stop", server['server_ip'] )
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
+
         else:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Unsuccessfully stopped single server: ' + server_ip + '\n' + server_jsonObj)
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
+        counter += 1
 
-    # If stopping multiple servers
-    if server_list != None:
-        counter = 1
-        for server in server_list:
-            credentialsObj = AWS_Credentials.objects.get(account_number=server['server_account'])
-            access_key = decode(credentialsObj.access_key)
-            secret_access_key = decode(credentialsObj.secret_access_key)
-
-            results = aws_util.stopServer(server['server_id'],access_key,secret_access_key)
-
-            if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
-                utilities.writeEventLog("stop", server['server_ip'] )
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
-
-            else:
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
-            counter += 1
-
-    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Stop Server')
+    print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Ending background event: Stop Server')
 
 
 @background(schedule=0)
 def stopWebApplication(server_list=None,server=None,section_numbers=None,server_type=None):
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Running background task: Stop Web App')
 
-    if server !=  None:
+    if server != None and server_list != None:
+        server_list.append(server)
+    elif server != None and server_list == None:
         server_list = [server]
 
     counter = 1
