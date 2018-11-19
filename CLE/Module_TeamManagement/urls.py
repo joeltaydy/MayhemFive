@@ -22,7 +22,7 @@ urlpatterns = [
     # path('instructor/telegram_setup/', TelegramWizard.as_view([PhoneNumberForm, VerificationCodeForm]), name='telegram_setup'),
     path('instructor/telegram_setup/', views.configureDB_telegram, name='telegram_setup'),
     path('join/', PhoneNumberFormView.as_view(), name='phone_number_form'),
-    path('csv/clt_file.csv', views.clt_file_download),
+    path('csv/clt_file', views.clt_file_download),
     path('admin/csv/clt_file.csv', views.clt_file_ouput, name = "clt_file"),
     path('celery/trailhead/refresh', views.trailhead_refresh, name = 'trailhead_refresh'),
     #trailmixes
