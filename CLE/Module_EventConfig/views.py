@@ -165,7 +165,7 @@ def faculty_Event_Execute(requests):
             for details in team_details[section_number]:
                 querySet_serverList = Server_Details.objects.filter(account_number=details["account_number"])
                 for server in querySet_serverList:
-                    if server.type == server_type:
+                    if server.type == server_type and server.state == 'Live':
                         serverList.append(
                             {
                                 'server_ip':server.IP_address,
@@ -176,7 +176,7 @@ def faculty_Event_Execute(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type= server_type)
+            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type=server_type)
 
     except Exception as e:
         traceback.print_exc()
