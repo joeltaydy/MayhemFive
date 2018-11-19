@@ -796,7 +796,7 @@ def student_Deploy_Standard_AddIPs(requests):
 
         if requests.method == 'POST':
             utilities.initiateStartServerTime(requests.POST.get('IP_address'))
-            
+
     except Exception as e:
         traceback.print_exc()
 
@@ -820,12 +820,28 @@ def student_Deploy_Standard_AddIPs(requests):
 def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
     server = get_object_or_404(Server_Details, pk=pk)
 
-    if requests.method == 'POST':
-        form = ServerForm_Update(requests.POST, instance=server)
-    else:
-        form = ServerForm_Update(instance=server)
+    try:
+        if requests.method == 'POST':
+            form = ServerForm_Update(requests.POST, instance=server)
+        else:
+            form = ServerForm_Update(instance=server)
+        response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html')
 
-    return utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html')
+    except Exception as e:
+        traceback.print_exc()
+
+        course_title = requests.POST.get('course_title')
+        classObj = utilities.getStudentClassObject(requests,course_title)
+        credentialsObj = classObj.awscredential
+        servers = utilities.getAllServers(credentialsObj.account_number)
+
+        response = {}
+        response['form_is_valid'] = True
+        response['error_message'] = str(e.args[0])
+        response['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
+        return JsonResponse(response)
+
+    return response
 
 
 # Deleting of server from DB
