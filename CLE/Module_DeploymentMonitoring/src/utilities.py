@@ -179,12 +179,17 @@ def addAWSKeys(requests):
     if awsC == None:
         raise Exception('Please upload your account number first before adding a new server.')
 
-    url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
-    response = req.get(url)
-    jsonObj = json.loads(response.content.decode())
-    account_number = jsonObj['User']['Account']
-    access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-    secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
+    try:
+        # May hang is the server is down
+        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
+        response = req.get(url,timeout=1)
+        jsonObj = json.loads(response.content.decode())
+    except req.exceptions.ConnectTimeout:
+        raise Exception('Cannot reach server. Please start up server before proceeding')
+
+        account_number = jsonObj['User']['Account']
+        access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
 
     if awsC.account_number == account_number:
         awsC.access_key = access_key
@@ -381,15 +386,24 @@ def getMonitoringStatus(account_number, team_number, response):
         server.state = server_state
         server.save()
 
-        if server_state == 'Live' and checkApplicationStatus(server_ip,'8000'):
-            # Step 3: IF server 'Live', then check if webapp is 'Live'
-            response['webapp_status'].append(
-                {
-                    'team_name':team_number,
-                    'ip_address':server_ip,
-                    'webapp_state':'Live'
-                }
-            )
+        if server_state == 'Live':
+            if checkApplicationStatus(server_ip,'8000'):
+                # Step 3: IF server 'Live', then check if webapp is 'Live'
+                response['webapp_status'].append(
+                    {
+                        'team_name':team_number,
+                        'ip_address':server_ip,
+                        'webapp_state':'Live'
+                    }
+                )
+            else:
+                response['webapp_status'].append(
+                    {
+                        'team_name':team_number,
+                        'ip_address':server_ip,
+                        'webapp_state':'Down'
+                    }
+                )
         else:
             # Step 4: ELSE webapp is definitely 'Down'
             response['webapp_status'].append(
