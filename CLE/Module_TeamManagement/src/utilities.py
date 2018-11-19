@@ -583,7 +583,6 @@ def cloud_learning_tool_logging():
                 output_file = os.path.join(out_dir, 'trailhead-points-log.csv')
                 file_exists = os.path.isfile(output_file)
                 with open(input_file, 'r', newline='',encoding='utf-8-sig') as f, open(output_file, 'a', newline='',encoding='utf-8-sig') as data:
-
                     writer = csv.writer(data)
                     if not file_exists:
                         writer.writerow(['date','link','student_email', 'trail_account_name' ,'course_section', 'badges', 'points', 'trails', 'badges_obtained'])
