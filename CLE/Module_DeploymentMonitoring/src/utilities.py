@@ -1,4 +1,3 @@
-
 import csv
 import pytz
 import json
@@ -169,23 +168,24 @@ def getTeamMembersClassQuerySet(requests):
 
 # Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(requests):
-    ipAddress = requests.POST.get("IP_address")                #string of IP address
-
+    ipAddress = requests.POST.get("IP_address")
     course_title = requests.POST.get('course_title')
     class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
 
-    try:
-        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
-        response = req.get(url)
-        jsonObj = json.loads(response.content.decode())
-        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-        awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
-        awsC.save()
+    url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
+    response = req.get(url)
+    jsonObj = json.loads(response.content.decode())
+    account_number = jsonObj['User']['Account']
+    access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+    secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
 
-    except:
-        traceback.print_exc()
-        print("something wrong with request = AMS")
+    if awsC.account_number == account_number:
+        awsC.access_key = access_key
+        awsC.secret_access_key = secret_access_key
+        awsC.save()
+    else:
+        raise Exception('Server is not configured properly. Please make sure valid AWS Credentials were used.')
 
 
 # Add the server details into the server details table
@@ -314,7 +314,7 @@ def addServerDetailsForm(request, form, template_name):
             servers = getAllServers(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
-            data['form_is_valid'] = False
+            raise Exception('No server with IP ' + server_ip + ' is registered under the stated account.')
     else:
         context['course_title'] = request.GET.get('course_title')
 
