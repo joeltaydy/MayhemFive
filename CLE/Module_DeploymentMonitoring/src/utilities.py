@@ -173,6 +173,9 @@ def addAWSKeys(requests):
     class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
 
+    if awsC == None:
+        raise Exception('Please upload your account number first before adding a new server.')
+
     url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
     response = req.get(url)
     jsonObj = json.loads(response.content.decode())
