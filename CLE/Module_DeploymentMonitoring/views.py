@@ -796,6 +796,7 @@ def student_Deploy_Standard_AddIPs(requests):
 
         if requests.method == 'POST':
             utilities.initiateStartServerTime(requests.POST.get('IP_address'))
+            
     except Exception as e:
         traceback.print_exc()
 
