@@ -1,6 +1,9 @@
+import ast
 import csv
+import sys
 import pytz
 import json
+import socket
 import traceback
 import requests as req
 from datetime import datetime, timedelta
@@ -13,7 +16,7 @@ from Module_TeamManagement.models import *
 from Module_EventConfig.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-import ast
+
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList,course_title):
@@ -330,6 +333,19 @@ def addServerDetailsForm(request, form, template_name):
     return JsonResponse(data)
 
 
+def checkApplicationStatus(server_ip,port_number='8000'):
+    args = socket.getaddrinfo(server_ip, port_number, socket.AF_INET, socket.SOCK_STREAM)
+    for family, socktype, proto, canonname, sockaddr in args:
+        s = socket.socket(family, socktype, proto)
+        try:
+            s.connect(sockaddr)
+        except socket.error:
+            return False
+        else:
+            s.close()
+            return True
+
+
 # Obtain http status code and web server status of a group project based on account number.
 # Returns the response object along with the statuses of the server and webapplication
 #
@@ -365,41 +381,15 @@ def getMonitoringStatus(account_number, team_number, response):
         server.state = server_state
         server.save()
 
-        if server_state == 'Live':
+        if server_state == 'Live' and checkApplicationStatus(server_ip,'8000'):
             # Step 3: IF server 'Live', then check if webapp is 'Live'
-            try:
-                webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
-                webapp_response = req.get(webapp_url)
-
-                if webapp_response.status_code == 404:
-                    response['webapp_status'].append(
-                        {
-                            'team_name':team_number,
-                            'ip_address':server_ip,
-                            'webapp_state':'Down'
-                        }
-                    )
-                else:
-                    webapp_jsonObj = json.loads(webapp_response.content.decode())
-
-                    if webapp_jsonObj['HTTPStatusCode'] == 200:
-                        response['webapp_status'].append(
-                            {
-                                'team_name':team_number,
-                                'ip_address':server_ip,
-                                'webapp_state':'Live'
-                            }
-                        )
-
-            except req.ConnectionError as e:
-                response['webapp_status'].append(
-                    {
-                        'team_name':team_number,
-                        'ip_address':server_ip,
-                        'webapp_state':'Down'
-                    }
-                )
-
+            response['webapp_status'].append(
+                {
+                    'team_name':team_number,
+                    'ip_address':server_ip,
+                    'webapp_state':'Live'
+                }
+            )
         else:
             # Step 4: ELSE webapp is definitely 'Down'
             response['webapp_status'].append(
