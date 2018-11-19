@@ -36,10 +36,9 @@ def stopServer(server_list=None,server=None,section_numbers=None,server_type=Non
 
         if results['StoppingInstances'][0]['CurrentState']['Code'] == 64:
             utilities.writeEventLog("stop", server['server_ip'] )
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped server: ' + server['server_ip'])
-
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped ' + str(server_type) + ' server: ' + server['server_ip'])
         else:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped server: ' + server['server_ip'])
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped ' + str(server_type) + ' server: ' + server['server_ip'])
         counter += 1
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] : Ending background event: Stop Server')
@@ -65,9 +64,9 @@ def stopWebApplication(server_list=None,server=None,section_numbers=None,server_
 
         if server_jsonObj['HTTPStatusCode'] == 200:
             print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped web app: ' + server['server_ip'])
-
         else:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped web app: ' + server['server_ip'])
+            httpStatus = server_jsonObj['HTTPStatus']
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped web app: ' + server['server_ip'] + ' due to ' + httpStatus)
 
         counter += 1
 
