@@ -3,7 +3,7 @@ import pytz
 import datetime
 import traceback
 import requests as req
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from Module_DeploymentMonitoring.models import *
 from Module_TeamManagement.models import *
@@ -763,6 +763,7 @@ def student_Deploy_Standard_AddAccount(requests):
         response['error_message'] = 'Error during validating of new account number (Student Deploy Standard): ' + str(e.args[0])
         return student_Deploy_Standard_Base(requests,response)
 
+    response['message'] = 'Account number have been successfully added into the system.'
     return student_Deploy_Standard_Base(requests,response)
 
 
@@ -784,24 +785,31 @@ def student_Deploy_Standard_GetIPs(requests):
 # returns a JsonResponse
 #
 def student_Deploy_Standard_AddIPs(requests):
-    if requests.method == 'POST':
-        course_title = requests.POST.get('course_title')
-        studentClassObj = utilities.getStudentClassObject(requests,course_title)
-        credentialsObj = studentClassObj.awscredential
-
-        if credentialsObj.access_key == None and credentialsObj.secret_access_key == None:
+    try:
+        if requests.method == 'POST':
             utilities.addAWSKeys(requests)
+            form = ServerForm_Add(requests.POST)
+        else:
+            form = ServerForm_Add()
 
-        form = ServerForm_Add(requests.POST)
-    else:
-        form = ServerForm_Add()
+        response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html')
 
-    response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_create.html')
+        if requests.method == 'POST':
+            utilities.initiateStartServerTime(requests.POST.get('IP_address'))
+    except Exception as e:
+        traceback.print_exc()
 
-    if requests.method == 'POST':
-        utilities.initiateStartServerTime(requests.POST.get('IP_address'))
+        course_title = requests.POST.get('course_title')
+        classObj = utilities.getStudentClassObject(requests,course_title)
+        credentialsObj = classObj.awscredential
+        servers = utilities.getAllServers(credentialsObj.account_number)
 
-    traceback.print_exc()
+        response = {}
+        response['form_is_valid'] = True
+        response['error_message'] = str(e.args[0])
+        response['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
+        return JsonResponse(response)
+
     return response
 
 
