@@ -274,7 +274,7 @@
 
                 success : function(response) {
                     console.log(response);
-                    if(response.server_count == 1){
+                    if(response.server_count >= 1){
                         $("#events option").remove();
                         $("#events").append('<option value="" disabled selected>Select event type</option>');
                         $("#events").append('<option value="stop">Stop Server</option>');

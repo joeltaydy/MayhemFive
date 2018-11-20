@@ -1,7 +1,9 @@
-
+import ast
 import csv
+import sys
 import pytz
 import json
+import socket
 import traceback
 import requests as req
 from datetime import datetime, timedelta
@@ -14,7 +16,7 @@ from Module_TeamManagement.models import *
 from Module_EventConfig.models import *
 from Module_TeamManagement.src.utilities import encode,decode
 from Module_DeploymentMonitoring.src import aws_util
-import ast
+
 
 # Get all team number and account number for those enrolled in course ESM201
 def getAllTeamDetails(course_sectionList,course_title):
@@ -169,23 +171,32 @@ def getTeamMembersClassQuerySet(requests):
 
 # Add Access Keys and Secret Access Keys into the AWS credentials table
 def addAWSKeys(requests):
-    ipAddress = requests.POST.get("ipaddress")                #string of IP address
-
+    ipAddress = requests.POST.get("IP_address")
     course_title = requests.POST.get('course_title')
     class_studentObj= getStudentClassObject(requests,course_title)
     awsC = class_studentObj.awscredential
 
-    try:
-        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
-        response = req.get(url)
-        jsonObj = json.loads(response.content.decode())
-        awsC.access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-        awsC.secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
-        awsC.save()
+    if awsC == None:
+        raise Exception('Please upload your account number first before adding a new server.')
 
-    except:
-        traceback.print_exc()
-        print("something wrong with request = AMS")
+    try:
+        # May hang is the server is down
+        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
+        response = req.get(url,timeout=1)
+        jsonObj = json.loads(response.content.decode())
+    except req.exceptions.ConnectTimeout:
+        raise Exception('Cannot reach server. Please start up server before proceeding')
+
+        account_number = jsonObj['User']['Account']
+        access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+        secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
+
+    if awsC.account_number == account_number:
+        awsC.access_key = access_key
+        awsC.secret_access_key = secret_access_key
+        awsC.save()
+    else:
+        raise Exception('Server is not configured properly. Please make sure valid AWS Credentials were used.')
 
 
 # Add the server details into the server details table
@@ -205,9 +216,12 @@ def addServerDetails(requests=None,account_number=None):
     if validity == False:
         raise Exception("Account number do not match with given IP, please try again")
 
-    url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
-    response = req.get(url)
-    jsonObj = json.loads(response.content.decode())
+    try:
+        url = 'http://'+ipAddress+":8999/ec2/instance/get/current/?secret_key=m0nKEY"
+        response = req.get(url,timeout=1)
+        jsonObj = json.loads(response.content.decode())
+    except req.exceptions.ConnectTimeout:
+        raise Exception('Cannot reach server. Please start up server before proceeding')
 
     try:
         sd = Server_Details.objects.create(
@@ -251,9 +265,12 @@ def initiateStartServerTime(ipAddress):
 
 # Validate if the IP address sent by the student user belongs under their account
 def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
-    url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
-    response = req.get(url)
-    jsonObj = json.loads(response.content.decode())
+    try:
+        url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
+        response = req.get(url,timeout=1)
+        jsonObj = json.loads(response.content.decode())
+    except req.exceptions.ConnectTimeout:
+        raise Exception('Cannot reach server. Please start up server before proceeding')
 
     if account_number != None:
         return account_number == jsonObj['User']['Account']
@@ -301,7 +318,7 @@ def addServerDetailsForm(request, form, template_name):
         server_ip = request.POST.get('IP_address')
         server_id = request.POST.get('instanceid')
 
-        server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+        message, server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
 
         if form.is_valid() and server_is_valid:
             form.save()
@@ -314,13 +331,30 @@ def addServerDetailsForm(request, form, template_name):
             servers = getAllServers(account_number)
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
-            data['form_is_valid'] = False
+            if message != None:
+                raise Exception(message)
+            else:
+                raise Exception("Form in invalid. Please check with administrator.")
+
     else:
         context['course_title'] = request.GET.get('course_title')
 
     context['form'] = form
     data['html_form'] = render_to_string(template_name, context, request=request)
     return JsonResponse(data)
+
+
+def checkApplicationStatus(server_ip,port_number='8000'):
+    args = socket.getaddrinfo(server_ip, port_number, socket.AF_INET, socket.SOCK_STREAM)
+    for family, socktype, proto, canonname, sockaddr in args:
+        s = socket.socket(family, socktype, proto)
+        try:
+            s.connect(sockaddr)
+        except socket.error:
+            return False
+        else:
+            s.close()
+            return True
 
 
 # Obtain http status code and web server status of a group project based on account number.
@@ -359,32 +393,16 @@ def getMonitoringStatus(account_number, team_number, response):
         server.save()
 
         if server_state == 'Live':
-            # Step 3: IF server 'Live', then check if webapp is 'Live'
-            try:
-                webapp_url = 'http://' + server_ip + ":8000/supplementary/health_check/"
-                webapp_response = req.get(webapp_url)
-
-                if webapp_response.status_code == 404:
-                    response['webapp_status'].append(
-                        {
-                            'team_name':team_number,
-                            'ip_address':server_ip,
-                            'webapp_state':'Down'
-                        }
-                    )
-                else:
-                    webapp_jsonObj = json.loads(webapp_response.content.decode())
-
-                    if webapp_jsonObj['HTTPStatusCode'] == 200:
-                        response['webapp_status'].append(
-                            {
-                                'team_name':team_number,
-                                'ip_address':server_ip,
-                                'webapp_state':'Live'
-                            }
-                        )
-
-            except req.ConnectionError as e:
+            if checkApplicationStatus(server_ip,'8000'):
+                # Step 3: IF server 'Live', then check if webapp is 'Live'
+                response['webapp_status'].append(
+                    {
+                        'team_name':team_number,
+                        'ip_address':server_ip,
+                        'webapp_state':'Live'
+                    }
+                )
+            else:
                 response['webapp_status'].append(
                     {
                         'team_name':team_number,
@@ -392,7 +410,6 @@ def getMonitoringStatus(account_number, team_number, response):
                         'webapp_state':'Down'
                     }
                 )
-
         else:
             # Step 4: ELSE webapp is definitely 'Down'
             response['webapp_status'].append(
@@ -564,7 +581,7 @@ def getMetric(server_ip,response):
 # All have similiar structures
 #
 def getCloudMetric(webapp_url):
-    webapp_response = req.get(webapp_url)
+    webapp_response = req.get(webapp_url,timeout=5)
     webapp_jsonObj = json.loads(webapp_response.content.decode())
     label = "default"
     sortedValueList= []

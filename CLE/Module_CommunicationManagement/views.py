@@ -335,9 +335,10 @@ def faculty_telegram_DeleteChat(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
-    telegram_chat_type = requests.POST.get('telegram_chat_type')
-
+    # telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
+    # telegram_chat_type = requests.POST.get('telegram_chat_type')
+    telegram_chat_name = 'Test'
+    telegram_chat_type = 'Channel'
     print('Telegram Chat Type: ' + telegram_chat_type)
     print('Telegram Chat Name: ' + telegram_chat_name)
 

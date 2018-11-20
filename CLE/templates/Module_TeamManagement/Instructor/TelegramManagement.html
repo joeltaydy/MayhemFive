@@ -71,12 +71,23 @@
                             <i class="fas fa-plus"></i>
                             </button>
                         </div>
+                        
+                        <h3 style="background-color:#23272b; color:white; text-align: center"> {{ current_telegram_chat.name }} </h3>
+                        <br>
                         <img src="{% static 'images/Telegram Logo.png' %}" alt="..." width=100px height = 100px style="display: block;margin-left: auto;margin-right: auto;" >
                         <br>
-                        <h4 class="text-center">
+                        <div class="col-md-12 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
                             <!-- <a href="{{ current_telegram_chat.link }}" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a> -->
                             <a onclick="redirectToLink()" id="telegram_chat_link" name="{{ current_telegram_chat.name }}" value="{{ current_telegram_chat.link }}" role="button" class="btn" style="background-color: #0088CC; color:white;"><b>{{current_telegram_chat.type}} Link</b></a>
-                        </h4>
+                            <div class="btn-group dropright" style="position:relative">
+                                <button class="btn btn-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu" style="position:relative">
+                                    <a class = "dropdown-item" data-toggle="modal" data-target="#deleteFunction" value="delete" href= "#">Delete {{current_telegram_chat.type}}</a>
+                                </div>
+                            </div>
+                        </div>
                     <br>
 
                     <div class="col-md-12">
@@ -85,7 +96,7 @@
                     <div class ="card">
                         <div class="card-header">
                                 <h3 class="card-title bg-dark text-white text-center" style="margin-bottom:15px;">SEND A <br>MESSAGE</h3>
-                            <p class="card-category text-center">This message will be sent to your telegram group/channel</p>
+                            <p class="card-category text-center">This message will be sent to {{current_telegram_chat.name}} {{current_telegram_chat.type}}</p>
                         </div>
                         <div class="card-body">
                             <form action="{% url 'CMmod:faculty_telegram_SendMessage' %}" method="POST" enctype="multipart/form-data" class="form-horizontal" id="messageForm">
@@ -243,6 +254,40 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+    </div>
+</div>
+
+<!--Delete Telegram Group/Channel-->
+<div class="modal fade" id="deleteFunction">
+    <div class="modal-dialog modal-md">
+    <div class="modal-content">
+
+        <div class="modal-header text-center">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="modal-body text-center">
+            <!--Form Create Channel-->
+
+            <img src="{% static 'images/Telegram Logo.png' %}" width=100px height = 100px class="text-center">
+            <h4 class="modal-title" >Delete {{current_telegram_chat.type}}</h4>
+
+            <form action="{% url 'CMmod:faculty_telegram_DeleteChat' %}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="control-label">Are you sure you want to delete {{current_telegram_chat.name}} ({{current_telegram_chat.type}}) ?</label>
+                    <input type="hidden" name="chat_link" id="chat_link" value={{current_telegram_chat.link}}>
+                    <input type="hidden" name="chat_name" id="chat_name" value={{current_telegram_chat.name_join}}>
+                    <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
+                </div>
+                <!-- Submission -->
+                <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;margin-bottom: 10px">
+                    <button class="btn btn-danger">Delete</button>
+                    <button class="btn btn-dark" data-dismiss="modal">Back</button>
+                </div>
+            </form>
         </div>
     </div>
     </div>

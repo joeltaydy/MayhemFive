@@ -89,7 +89,6 @@ def faculty_Event_GetServers(requests):
 
     section_numbers = requests.GET.get('section_number').split('_')
     course_title = requests.GET.get('course_title')
-    print(course_title)
 
     try:
         courseList = requests.session['courseList_ITOpsLab']
@@ -101,15 +100,16 @@ def faculty_Event_GetServers(requests):
         for section_number in section_numbers:
             for team in team_account_numberList[section_number]:
                 try:
-                    serverObj = Server_Details.objects.get(account_number=team['account_number'])
-                    servers.append(serverObj)
+                    serverObjs = Server_Details.objects.filter(account_number=team['account_number'])
+                    for serverObj in serverObjs:
+                        servers.append(serverObj)
 
-                    if serverObj.type == 'Parent':
-                        parent = True
-                    elif serverObj.type == 'Slave':
-                        slave = True
+                        if serverObj.type == 'Parent':
+                            parent = True
+                        elif serverObj.type == 'Slave':
+                            slave = True
                 except:
-                    pass
+                    traceback.print_exc()
 
         response['server_count'] = len(servers)
         response['server_parent_check'] = parent
@@ -160,12 +160,12 @@ def faculty_Event_Execute(requests):
 
     try:
         serverList = []
-        team_details = utilities_DM.getAllTeamDetails(course_sectionList)
+        team_details = utilities_DM.getAllTeamDetails(course_sectionList,course_title)
         for section_number in section_numberList:
             for details in team_details[section_number]:
                 querySet_serverList = Server_Details.objects.filter(account_number=details["account_number"])
                 for server in querySet_serverList:
-                    if server.type == server_type:
+                    if server.type == server_type and server.state == 'Live':
                         serverList.append(
                             {
                                 'server_ip':server.IP_address,
@@ -176,7 +176,7 @@ def faculty_Event_Execute(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type= server_type)
+            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type=server_type)
 
     except Exception as e:
         traceback.print_exc()

@@ -155,7 +155,7 @@
               <div class="text-center">
                   {% if course_section_count == 1 %}
                       {% for course_title,course_sectionDetails in request.session.courseList_updated.items %}
-                          <button onclick="location.href = '{% url 'CMmod:faculty_telegram_Base' %}?course_title={{ course_title }}';" type="button" class="btn btn-primary">Telegram Mgmt</button>
+                          <button onclick="location.href = '{% url 'CMmod:faculty_telegram_Base' %}?course_section={{ course_sectionDetails.0.id }}';" type="button" class="btn btn-primary">Telegram Mgmt</button>
                       {% endfor %}
                   {% else %}
                       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#telegramCourselist">
@@ -185,8 +185,8 @@
 
           <!-- Modal body -->
           <div class="modal-body text-center">
-            {% for course_title,course_sectionDetails in request.session.courseList_Updated.items %}
-                <a class="nav-link" href="{% url 'CMmod:faculty_telegram_Base' %}?course_title={{ course_title }}">
+            {% for course_title,course_sectionDetails in request.session.courseList_updated.items %}
+                <a class="nav-link" href="{% url 'CMmod:faculty_telegram_Base' %}?course_section={{ course_sectionDetails.0.id }}">
                     <button type="button" class="btn btn-primary">{{ course_title }}</button>
                 </a>
             {% endfor %}
