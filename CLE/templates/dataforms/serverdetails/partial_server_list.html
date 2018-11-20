@@ -5,12 +5,17 @@
       <td>{{ server.server_name }}</td>
       <td>{{ server.server_type }}</td>
     <td style="width: 250px">
-      <button type="button" class="btn btn-warning btn-sm js-update-server" data-url="{% url 'DMmod:server_update' pk=server.server_ip course_title=course_title %}?course_title={{course_title}}">
+      <button type="button"
+              class="btn btn-warning btn-sm js-update-server"
+              data-url="{% url 'DMmod:server_update' pk=server.server_ip course_title=course_title %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-pencil"></span> Edit
       </button>
-      <button type="button" class="btn btn-danger btn-sm js-delete-server" data-url="{% url 'DMmod:server_delete' pk=server.server_ip course_title=course_title %}?course_title={{course_title}}">
+      <button type="button"
+              class="btn btn-danger btn-sm js-delete-server"
+              data-url="{% url 'DMmod:server_delete' pk=server.server_ip course_title=course_title %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-trash"></span> Delete
      </button>
+     {{error_message}}
     </td>
   </tr>
 {% empty %}

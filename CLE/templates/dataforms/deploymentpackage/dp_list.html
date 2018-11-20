@@ -11,7 +11,7 @@
   <p>
     <button type="button"
             class="btn btn-primary js-create-dp"
-            data-url="{% url 'DMmod:dp_create' %}">
+            data-url="{% url 'DMmod:dp_create' %}?course_title={{course_title}}">
       <span class="glyphicon glyphicon-plus"></span>
       New Deployment Package
     </button>
@@ -20,8 +20,9 @@
   <table class="table" id="dp-table">
     <thead>
       <tr>
-        <th>Deployment ID</th>
+        <th>Name</th>
         <th>Git Link</th>
+        <th>Shared Sections</th>
       </tr>
     </thead>
     <tbody>
@@ -38,8 +39,8 @@
 
 <script>
 $(document).ready(function() {
-  console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/ #dp-table")
-   $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/ #dp-table");
+  console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table")
+   $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table");
 });
 </script>
 

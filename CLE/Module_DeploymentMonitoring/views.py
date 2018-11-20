@@ -129,7 +129,8 @@ def faculty_Setup_Base(requests,response=None):
 #
 def faculty_Setup_GetGitHubLinks(request):
     dps = Deployment_Package.objects.all()
-    return render(request, 'dataforms/deploymentpackage/dp_list.html', {'dps': dps})
+    course_title = request.GET.get('course_title')
+    return render(request, 'dataforms/deploymentpackage/dp_list.html', {'dps': dps, 'course_title': course_title})
 
 
 # Adding of github deployment package link to DB
@@ -140,38 +141,44 @@ def faculty_Setup_AddGitHubLinks(request):
         form = DeploymentForm(request.POST)
     else:
         form = DeploymentForm()
-    return utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_create.html')
+
+    response,form_is_valid = utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_create.html')
+
+    return response
 
 
 # Updating of github deployment package link to DB
 # returns a JsonResponse
 #
-def faculty_Setup_UpdateGitHubLinks(request,pk):
-    dp = get_object_or_404(Deployment_Package, pk=pk)
+def faculty_Setup_UpdateGitHubLinks(request,pk,course_title):
+    deployment_package = get_object_or_404(Deployment_Package, pk=pk)
 
     if request.method == 'POST':
-        form = DeploymentForm(request.POST, instance=dp)
+        form = DeploymentForm(request.POST, instance=deployment_package)
     else:
-        form = DeploymentForm(instance=dp)
+        form = DeploymentForm(instance=deployment_package)
 
-    return utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_update.html')
+    response,form_is_valid = utilities.addGitHubLinkForm(request, form, 'dataforms/deploymentpackage/partial_dp_update.html', deployment_package=deployment_package)
+
+    return response
 
 
 # Deleting of github deployment package link from DB
 # returns a JsonResponse
 #
 def faculty_Setup_DeleteGitHubLinks(request,pk):
-    dp = get_object_or_404(Deployment_Package, pk=pk)
+    deployment_package = get_object_or_404(Deployment_Package, pk=pk)
     data = dict()
     if request.method == 'POST':
-        dp.delete()
+        deployment_package.delete()
         data['form_is_valid'] = True  # This is just to play along with the existing code
         dps = Deployment_Package.objects.all()
         data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
-            'dps': dps
+            'dps': dps,
+            'course_title':request.POST.get('course_title')
         })
     else:
-        context = {'dp': dp}
+        context = {'deployment_package': deployment_package, 'course_title':request.GET.get('course_title')}
         data['html_form'] = render_to_string('dataforms/deploymentpackage/partial_dp_delete.html',
             context,
             request=request,

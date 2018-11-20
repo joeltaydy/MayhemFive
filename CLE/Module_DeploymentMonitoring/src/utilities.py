@@ -279,24 +279,77 @@ def validateAccountNumber(ipAddress, awsCredentials=None, account_number=None):
         return awsCredentials.account_number == jsonObj['User']['Account']
 
 
+def getDeploymentPackagesSharedSections(deployment_packages):
+    dps_shared_sections = []
+    for deployment_package in deployment_packages:
+        shared_course_sections = deployment_package.course_section.all()
+        sections = []
+        for course_section in shared_course_sections:
+            sections.append(course_section.section_number)
+        dps_shared_sections.append(
+            {
+                'name' : deployment_package.deployment_name,
+                'shared_sections' : ', '.join(sections),
+            }
+        )
+
+    return dps_shared_sections
+
+
 # Adds and Updates GitHub link via form
-def addGitHubLinkForm(request, form, template_name):
+def addGitHubLinkForm(request, form, template_name, deployment_package=None):
     data = dict()
+    context = dict()
+    form_is_valid = False
 
     if request.method == 'POST':
+        course_title = request.POST.get('course_title')
+        context['course_title'] = course_title
+
         if form.is_valid():
             form.save()
-            data['form_is_valid'] = True
+            form_is_valid = True
             dps = Deployment_Package.objects.all()
-            data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
-                'dps': dps
-            })
-        else:
-            data['form_is_valid'] = False
 
-    context = {'form': form}
+            if deployment_package != None:
+                deployment_package.course_section.clear()
+
+            course_sections = request.POST.getlist('course_sections')
+            deployment_name = request.POST.get('deployment_name')
+            deployment_link = request.POST.get('deployment_link')
+
+            pacakageObj = Deployment_Package.objects.filter(deployment_name=deployment_name).get(deployment_link=deployment_link)
+            for course_section in course_sections:
+                pacakageObj.course_section.add(course_section)
+                pacakageObj.save()
+
+            section_numbers = []
+            for course_section in course_sections:
+                section_numbers.append(course_section[-2:])
+            print(section_numbers)
+
+            pacakageObj.shared_sections = ', '.join(section_numbers)
+            pacakageObj.save()
+
+            data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+                'dps': dps,
+                'course_title': course_title,
+            })
+
+        data['form_is_valid'] = form_is_valid
+    else:
+        print(request.GET.get('course_title'))
+        sections = Course_Section.objects.filter(course=request.GET.get('course_title'))
+        print(sections)
+        context['sections'] = sections
+        context['course_title'] = request.GET.get('course_title')
+
+        if deployment_package != None:
+            context['shared_sections'] = deployment_package.course_section.all()
+
+    context['form'] = form
     data['html_form'] = render_to_string(template_name, context, request=request)
-    return JsonResponse(data)
+    return JsonResponse(data), form_is_valid
 
 
 # Adds and Updated Server Details via form

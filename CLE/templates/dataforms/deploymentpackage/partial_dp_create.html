@@ -8,9 +8,15 @@
   </div>
   <div class="modal-body">
     {% include 'dataforms/deploymentpackage/partial_dp_form.html' %}
+    Select Sections To Share With <i>(Optional)</i>
+    <br>
+    {% for section in sections %}
+        <input type="checkbox" name="course_sections" value="{{section.course_section_id}}"> {{section.section_number}}<br>
+    {% endfor %}
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     <button type="submit" class="btn btn-primary">Create deployment package</button>
+    <input type="hidden" name="course_title" value="{{course_title}}">
   </div>
 </form>

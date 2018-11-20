@@ -12,7 +12,7 @@ urlpatterns = [
     # For adding deployment packages into system
     path('instructor/ITOperationsLab/setup/deployment_package/',views.faculty_Setup_GetGitHubLinks,name='dp_list'),
     path('instructor/ITOperationsLab/setup/deployment_package/create/', views.faculty_Setup_AddGitHubLinks, name='dp_create'),
-    path('instructor/ITOperationsLab/setup/deployment_package/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
+    path('instructor/ITOperationsLab/setup/deployment_package/<str:course_title>/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
     path('instructor/ITOperationsLab/setup/deployment_package/<str:pk>/delete/', views.faculty_Setup_DeleteGitHubLinks, name='dp_delete'),
 
     # For retrieving and sharing of AMI

@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Image_Details(models.Model):
     imageId = models.CharField(
         db_column='Image_ID',
@@ -109,6 +108,15 @@ class Deployment_Package(models.Model):
     )
     deployment_link = models.TextField(
         db_column='Deployment_Link',
+        null=True,
+    )
+    shared_sections = models.TextField(
+        db_column='Shared_Sections',
+        null=True,
+    )
+    course_section = models.ManyToManyField(
+        'Module_TeamManagement.Course_Section',
+        db_column='Course_Section',
         null=True,
     )
 

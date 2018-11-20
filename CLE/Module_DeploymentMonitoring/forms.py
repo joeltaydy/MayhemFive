@@ -30,3 +30,6 @@ class DeploymentForm(forms.ModelForm):
             'deployment_name':'Deployment Package Name',
             'deployment_link':'Storage Link',
         }
+        widgets = {
+            'deployment_link' : forms.TextInput(),
+        }

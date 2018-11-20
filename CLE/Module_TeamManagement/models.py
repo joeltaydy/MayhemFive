@@ -83,7 +83,6 @@ class Course_Section(models.Model):
         null=True,
     )
 
-
     class Meta:
         managed = True
         db_table = 'Course_Section'
