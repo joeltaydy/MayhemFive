@@ -28,6 +28,14 @@ $(function () {
       success: function (data) {
         if (data.form_is_valid) {
           $("#dp-table tbody").html(data.html_dp_list);
+          if(data.error_message != null){
+            $("#errorMessage .modal-body").html(data.error_message);
+            $('#errorMessage').modal('show');
+          }
+          else{
+            $("#successMessage .modal-body").html(data.message);
+            $('#successMessage').modal('show');
+          }
           $("#modal-dp").modal("hide");
         }
         else {
@@ -38,7 +46,7 @@ $(function () {
     return false;
   };
 
-  
+
 
 
   /* Binding */

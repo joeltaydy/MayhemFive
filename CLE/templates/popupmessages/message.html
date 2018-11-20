@@ -11,8 +11,8 @@
       {{ error_message }}
     </div>
     <div class="modal-footer error">
-    </br>
-    </br>
+    <br>
+    <br>
       <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
     </div>
   </div>
@@ -30,10 +30,11 @@
     </div>
     <div class="modal-body">
       {{ message }}
+      <p></p>
     </div>
     <div class="modal-footer success">
-    </br>
-    </br>
+    <br>
+    <br>
       <button type="button" class="btn btn-success" data-dismiss="modal">OK</button>
     </div>
   </div>
@@ -47,6 +48,7 @@ $(document).ready(function(){
     {% if error_message %}
     $('#errorMessage').modal('show');
     {% endif %}
+
 
     $('[data-toggle="popover"]').popover();
     {% if message %}
