@@ -679,6 +679,9 @@ def student_Deploy_Standard_Base(requests,response=None):
         classObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = classObj.awscredential
 
+        course_section = classObj.course_section
+        response['deployment_packages'] = Deployment_Package.objects.filter(course_section=course_section)
+
         team_number= classObj.team_number
         if team_number != None:
             team_members = Class.objects.filter(course_section=classObj.course_section).filter(team_number=team_number)
