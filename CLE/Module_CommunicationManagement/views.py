@@ -41,6 +41,9 @@ def faculty_telegram_Base(requests,response=None):
         course_section = requests.POST.get('course_section')
         telegram_chat_name = requests.POST.get('chat_name')
 
+    if course_section == None:
+        return render(requests,'Module_Account/login.html',response)
+
     try:
         # Retrieve Administritive Stuff
         courseList_updated = requests.session['courseList_updated']
