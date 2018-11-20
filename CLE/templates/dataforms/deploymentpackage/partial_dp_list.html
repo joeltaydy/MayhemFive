@@ -15,7 +15,7 @@
       </button>
       <button type="button"
              class="btn btn-danger btn-sm js-delete-dp"
-             data-url="{% url 'DMmod:dp_delete' pk=package_details.deployment_id %}?course_title={{course_title}}">
+             data-url="{% url 'DMmod:dp_delete' course_title=course_title pk=package_details.deployment_id %}?course_title={{course_title}}">
        <span class="glyphicon glyphicon-trash"></span> Delete
       </button>
     </td>

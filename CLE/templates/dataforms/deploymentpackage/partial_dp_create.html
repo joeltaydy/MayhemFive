@@ -1,4 +1,4 @@
-<form method="post" action="{% url 'DMmod:dp_create' %}" class="js-dp-create-form">
+<form method="post" action="{% url 'DMmod:dp_create' %}?course_title={{course_title}}" class="js-dp-create-form">
   {% csrf_token %}
   <div class="modal-header">
     <h4 class="modal-title">Create a new deployment package</h4>
@@ -8,7 +8,7 @@
   </div>
   <div class="modal-body">
     {% include 'dataforms/deploymentpackage/partial_dp_form.html' %}
-    Select Sections To Share With <i>(Optional)</i>
+    Select <b>{{course_title}}</b> Sections To Share With <i>(Optional)</i>
     <br>
     {% for section in sections %}
         <input type="checkbox" name="course_sections" value="{{section.course_section_id}}"> {{section.section_number}}<br>

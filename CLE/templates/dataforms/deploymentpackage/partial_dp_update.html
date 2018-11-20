@@ -8,7 +8,7 @@
   </div>
   <div class="modal-body">
     {% include 'dataforms/deploymentpackage/partial_dp_form.html' %}
-    Update Sections To Share With <i>(Optional)</i>
+    Update <b>{{course_title}}</b> Sections To Share With <i>(Optional)</i>
     <br>
     {% for section in sections %}
         {% if section in shared_sections %}
