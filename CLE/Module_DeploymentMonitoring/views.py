@@ -130,6 +130,7 @@ def faculty_Setup_Base(requests,response=None):
 def faculty_Setup_GetGitHubLinks(request):
     dps = Deployment_Package.objects.all()
     course_title = request.GET.get('course_title')
+
     return render(request, 'dataforms/deploymentpackage/dp_list.html', {'dps': dps, 'course_title': course_title})
 
 
@@ -166,7 +167,7 @@ def faculty_Setup_UpdateGitHubLinks(request,pk,course_title):
 # Deleting of github deployment package link from DB
 # returns a JsonResponse
 #
-def faculty_Setup_DeleteGitHubLinks(request,pk):
+def faculty_Setup_DeleteGitHubLinks(request,pk,course_title):
     deployment_package = get_object_or_404(Deployment_Package, pk=pk)
     data = dict()
     if request.method == 'POST':

@@ -312,7 +312,11 @@ def addGitHubLinkForm(request, form, template_name, deployment_package=None):
             dps = Deployment_Package.objects.all()
 
             if deployment_package != None:
-                deployment_package.course_section.clear()
+                # deployment_package.course_section.clear()
+                selected_course_sections = Course_Section.objects.filter(course=course_title)
+                for each_course_section in selected_course_sections:
+                    if each_course_section in deployment_package.course_section.all():
+                        deployment_package.course_section.remove(each_course_section)
 
             course_sections = request.POST.getlist('course_sections')
             deployment_name = request.POST.get('deployment_name')
@@ -323,12 +327,12 @@ def addGitHubLinkForm(request, form, template_name, deployment_package=None):
                 pacakageObj.course_section.add(course_section)
                 pacakageObj.save()
 
-            section_numbers = []
-            for course_section in course_sections:
-                section_numbers.append(course_section[-2:])
-            print(section_numbers)
+            temp = []
+            shared_course_sections = pacakageObj.course_section.all()
+            for each_course_section in shared_course_sections:
+                temp.append(each_course_section.to_string)
 
-            pacakageObj.shared_sections = ', '.join(section_numbers)
+            pacakageObj.shared_sections = ', '.join(temp)
             pacakageObj.save()
 
             data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
@@ -338,9 +342,7 @@ def addGitHubLinkForm(request, form, template_name, deployment_package=None):
 
         data['form_is_valid'] = form_is_valid
     else:
-        print(request.GET.get('course_title'))
         sections = Course_Section.objects.filter(course=request.GET.get('course_title'))
-        print(sections)
         context['sections'] = sections
         context['course_title'] = request.GET.get('course_title')
 
