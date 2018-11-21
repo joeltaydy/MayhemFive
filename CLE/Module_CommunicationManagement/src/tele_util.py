@@ -16,9 +16,8 @@ def getClient(username=None):
 
     if tele_config.CLIENT == None:
         session_file = username + '.session'
-        tele_config.CLIENT = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
-
-    tele_config.CLIENT.connect()
+        tele_config.CLIENT  = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+        tele_config.CLIENT.connect()
 
     return tele_config.CLIENT
 
@@ -200,7 +199,7 @@ def initialize_Group(username,client=None,course_title=None,section_number=None,
 
 
 def deleteUserFromGroup(client,group_name,user_name):
-    dialog = getDialog(client,dialog_name,Chat)
+    dialog = getDialog(client,group_name,Chat)
     chat_id = dialog.message.to_id.chat_id
     client(messages.DeleteChatUserRequest(
         chat_id=chat_id,
