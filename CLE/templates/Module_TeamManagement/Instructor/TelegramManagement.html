@@ -278,7 +278,7 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="name" class="control-label">Are you sure you want to delete {{current_telegram_chat.name}} ({{current_telegram_chat.type}}) ?</label>
-                    <input type="hidden" name="chat_link" id="chat_link" value={{current_telegram_chat.link}}>
+                    <input type="hidden" name="chat_type" id="chat_type" value={{current_telegram_chat.type}}>
                     <input type="hidden" name="chat_name" id="chat_name" value={{current_telegram_chat.name_join}}>
                     <input type="hidden" name="course_section" id="course_section" value={{current_course_section_details.id}}>
                 </div>
