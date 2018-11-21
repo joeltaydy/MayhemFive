@@ -9,7 +9,7 @@ from telethon.tl.types import Channel, Chat
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
 from Module_CommunicationManagement import tasks
-from Module_CommunicationManagement.src import tele_util, utilities
+from Module_CommunicationManagement.src import tele_util, utilities, tele_config
 
 #----------------------------------------------#
 #----------------Telegram Stuff----------------#
@@ -81,7 +81,7 @@ def faculty_telegram_Base(requests,response=None):
                 telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
                 response['current_telegram_chat'] = utilities.getTelegramChatJSON(chat_obj=telegram_chat)
 
-        tele_util.disconnectClient(client)
+        # tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -124,7 +124,7 @@ def faculty_telegram_UpdateChatMembers(requests):
         telegram_chat.members = '_'.join(members)
         telegram_chat.save()
 
-        tele_util.disconnectClient(client)
+        # tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -338,23 +338,21 @@ def faculty_telegram_DeleteChat(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    # telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
-    # telegram_chat_type = requests.POST.get('telegram_chat_type')
-    telegram_chat_name = 'Test'
-    telegram_chat_type = 'Channel'
-    print('Telegram Chat Type: ' + telegram_chat_type)
-    print('Telegram Chat Name: ' + telegram_chat_name)
+    telegram_chat_name = requests.POST.get('chat_name').replace('_',' ')
+    telegram_chat_type = requests.POST.get('chat_type')
+    print('Telegram Chat Name: ' + str(telegram_chat_name))
+    print('Telegram Chat Type: ' + str(telegram_chat_type))
 
     try:
         facultyObj = Faculty.objects.get(email=requests.user.email)
 
-        tasks.deleteChat(
-            username=requests.user.email.split('@')[0],
-            telegram_username=facultyObj.telegram_username,
-            chat_name=telegram_chat_name,
-            chat_type=telegram_chat_type,
-            schedule=0,
-        )
+        # tasks.deleteChat(
+        #     username=requests.user.email.split('@')[0],
+        #     telegram_username=facultyObj.telegram_username,
+        #     chat_name=telegram_chat_name,
+        #     chat_type=telegram_chat_type,
+        #     schedule=0,
+        # )
 
         telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
         telegram_chatObj.delete()
@@ -364,5 +362,7 @@ def faculty_telegram_DeleteChat(requests):
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
         return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
 
+    requests.POST = requests.POST.copy()
+    requests.POST['chat_name'] = telegram_chat_name
     response['message'] = 'Telegram chat successfully deleted'
     return faculty_telegram_Base(requests,response)
