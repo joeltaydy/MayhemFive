@@ -15,7 +15,6 @@
               data-url="{% url 'DMmod:server_delete' pk=server.server_ip course_title=course_title %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-trash"></span> Delete
      </button>
-     {{error_message}}
     </td>
   </tr>
 {% empty %}
@@ -23,5 +22,3 @@
     <td colspan="8" class="text-center bg-warning">No servers</td>
   </tr>
 {% endfor %}
-
-{{ error_message }}

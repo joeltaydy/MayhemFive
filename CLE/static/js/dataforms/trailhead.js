@@ -28,6 +28,14 @@ $(function () {
       success: function (data) {
         if (data.form_is_valid) {
           $("#trailhead-table tbody").html(data.html_trailhead_list);
+          if(data.error_message != null){
+            $("#errorMessage .modal-body").html(data.error_message);
+            $('#errorMessage').modal('show');
+          }
+          else{
+            $("#successMessage .modal-body").html(data.message);
+            $('#successMessage').modal('show');
+          }
           $("#modal-trailhead").modal("hide");
         }
         else {

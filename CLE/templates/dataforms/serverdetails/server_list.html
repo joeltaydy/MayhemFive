@@ -29,7 +29,7 @@
   </table>
 
   <!-- THE MODAL WE WILL BE USING -->
- <div class="modal fade" id="modal-server">
+ <div class="modal fade" id="modal-server" data-backdrop="static"  data-keyboard="false">
    <div class="modal-dialog">
      <div class="modal-content">
      </div>
@@ -41,5 +41,4 @@ $(document).ready(function() {
    $("#server-table").load("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table");
 });
 </script>
-
 {% endblock %}

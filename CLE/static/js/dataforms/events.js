@@ -28,6 +28,14 @@ $(function () {
       success: function (data) {
         if (data.form_is_valid) {
           $("#events-table tbody").html(data.html_events_list);
+          if(data.error_message != null){
+            $("#errorMessage .modal-body").html(data.error_message);
+            $('#errorMessage').modal('show');
+          }
+          else{
+            $("#successMessage .modal-body").html(data.message);
+            $('#successMessage').modal('show');
+          }
           $("#modal-events").modal("hide");
         }
         else {
@@ -53,6 +61,6 @@ $(function () {
 
   // Delete book
   $("#events-table").on("click", ".js-delete-events", loadForm);
-  $("#modal-events").on("submit", ".js-events-delete-form", saveForm); 
+  $("#modal-events").on("submit", ".js-events-delete-form", saveForm);
 
 });
