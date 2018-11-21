@@ -838,7 +838,7 @@ def configureDB_telegram(requests):
                     client.sign_in(phone=phone_number, code=login_code)
                 except PhoneNumberUnoccupiedError:
                     client.sign_up(phone=phone_number, code=login_code)
-
+        print(toolType)
         for course_section in registered_course:
             bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
@@ -847,7 +847,7 @@ def configureDB_telegram(requests):
         facultyObj.telegram_username = '@' + str(myself.username)
         facultyObj.save()
 
-        tele_util.disconnectClient(client)
+        # tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -943,7 +943,7 @@ def save_trailhead_form(request, form, template_name):
             course_in_form = form.cleaned_data['course']
             link_in_form = form.cleaned_data['link']
             try:
-                if_trailmix_exist = Trailmix_Information.objects.get(link=link_in_form, course = course_in_form) #If exist, do need to add more 
+                if_trailmix_exist = Trailmix_Information.objects.get(link=link_in_form, course = course_in_form) #If exist, do need to add more
             except: #if trailmix does not exist, create new entry
                 newTrailMix = form.save()
                 req = requests.get(newTrailMix.link)
@@ -964,7 +964,7 @@ def save_trailhead_form(request, form, template_name):
                 selected_course = newTrailMix.course
                 course_sections = ""
                 for course in courses:
-                    if selected_course.course_title in course.course_section_id: 
+                    if selected_course.course_title in course.course_section_id:
                         course_sections = course_sections + course.course_section_id +"_" #delimiter
                 if course_sections == "":
                     newTrailMix.delete()  #No course selected, delete entry
@@ -988,7 +988,7 @@ def save_trailhead_form(request, form, template_name):
 def trailhead_create(request):
     if request.method == 'POST':
         form = TrailheadForm(request.POST)
-        
+
     else:
         form = TrailheadForm()
     return save_trailhead_form(request, form, 'dataforms/trailmixes/partial_trailhead_create.html')
