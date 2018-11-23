@@ -83,6 +83,22 @@
                         </div>
                     </div>
             </div>
+
+            <div class="panel">
+                    <div class="panel-heading">
+                    <h5 class="panel-title">
+                        <a href="#panelBodyThree" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion">Shared Deployment Packages</a>
+                        </h5>
+                    </div>
+                    <!-- Shared Deployment Packages-->
+                    <div id="panelBodyThree" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="container col-md-12" style="display: block;margin-left: auto;margin-right: auto;">
+                                {% include "dataforms/deploymentpackage/dp_list.html" %}
+                            </div>
+                        </div>
+                    </div>
+            </div>
         </div>
 </div>
 <br>
@@ -150,7 +166,6 @@
         //     }
         // });
 </script>
-
 
 {% include 'popupmessages/message.html' %}
 {% endblock %}
