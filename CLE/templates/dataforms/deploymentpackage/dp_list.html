@@ -8,6 +8,7 @@
 
 {% block content %}
   <!-- BUTTON TO TRIGGER THE ACTION -->
+  {% if 'instructor' in request.path %}
   <p>
     <button type="button"
             class="btn btn-primary js-create-dp"
@@ -16,6 +17,7 @@
       New Deployment Package
     </button>
   </p>
+  {% endif %}
 
   <table class="table" id="dp-table">
     <thead>
@@ -37,12 +39,14 @@
      </div>
    </div>
 
-<script>
-$(document).ready(function() {
-  console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table")
-   $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table");
-});
-</script>
-
-
+ <script>
+ $(document).ready(function() {
+ console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table")
+ $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table");
+   // if ($(".author .description:contains('Student')")) {
+   //   $("div#studentRemoval").removeClass("hidden");
+   // }
+   // $(".author .description:contains('Student')").css("border", "3px solid red");
+ });
+ </script>
 {% endblock %}
