@@ -11,7 +11,13 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-    <button type="submit" class="btn btn-danger">Delete Server</button>
+    <button type="submit" class="btn btn-danger" onclick="disableButton()">Delete Server</button>
     <input type="hidden" name="course_title" id="course_title" value={{course_title}}>
   </div>
 </form>
+
+<script>
+    function disableButton(){
+        document.getElementById("delete_all_servers").disabled = true;
+    };
+</script>

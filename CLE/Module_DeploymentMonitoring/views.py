@@ -689,6 +689,7 @@ def student_Deploy_Standard_Base(requests,response=None):
 
         response['account_number'] = ''
         response['servers'] = []
+        response['servers_count'] = 0
         response['course_title'] = course_title
         response['course_section_id'] = classObj.course_section.course_section_id
 
@@ -696,6 +697,7 @@ def student_Deploy_Standard_Base(requests,response=None):
             account_number = credentialsObj.account_number
             response['account_number'] = account_number
             response['servers'] = utilities.getAllServers(account_number)
+            response['servers_count'] = len(response['servers'])
 
     except Exception as e:
         traceback.print_exc()
