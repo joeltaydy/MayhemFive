@@ -23,6 +23,7 @@ urlpatterns = [
 
     # For standard student deployment page
     path('student/ITOperationsLab/deploy/standard/',views.student_Deploy_Standard_Base,name='itopslab_studeploy_standard'),
+    path('student/ITOperationsLab/deploy/standard/deployment_package/',views.student_Deploy_Standard_GetDeploymentPackages,name='dp_list_student'),
     path('student/ITOperationsLab/deploy/standard/account/',views.student_Deploy_Standard_AddAccount,name='itopslab_studeploy_standard_AddAccount'),
     path('student/ITOperationsLab/deploy/standard/server/',views.student_Deploy_Standard_GetIPs,name='server_list'),
     path('student/ITOperationsLab/deploy/standard/server/create/',views.student_Deploy_Standard_AddIPs,name='server_create'),
