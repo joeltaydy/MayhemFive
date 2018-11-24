@@ -126,9 +126,18 @@ def faculty_Event_Execute(requests):
     response = {"faculty_Event_Execute" : "active"}
 
     events = {
-        'stop':tasks.stopServer,
-        'dos':tasks.dosAttack,
-        'stopapp':tasks.stopWebApplication,
+        'stop':{
+            'method':tasks.stopServer,
+            'message':'Successfully stopped ',
+        },
+        'dos':{
+            'method':tasks.dosAttack,
+            'message':'Successfully triggered DoS attack to',
+        },
+        'stopapp':{
+            'method':tasks.stopWebApplication,
+            'message':'Successfully killed the web application of ',
+        },
     }
 
     # Redirect user to login page if not authorized and student
@@ -176,7 +185,7 @@ def faculty_Event_Execute(requests):
 
         if len(serverList) > 0:
             period = scheduled_datetime - datetime.now()
-            events[event_type](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type=server_type)
+            events[event_type]['method'](server_list=serverList, schedule=period, section_numbers=section_numberList, server_type=server_type)
 
     except Exception as e:
         traceback.print_exc()
@@ -184,7 +193,13 @@ def faculty_Event_Execute(requests):
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     requests.section_number = course_sectionList[course_title][0]['section_number']
-    time.sleep(5)
+    
+    if len(serverList) > 0:
+        response['message'] = events[event_type]['message'] + str(len(serverList)) + ' ' + str(server_type) + ' servers.'
+        time.sleep(7)
+    else:
+        response['error_message'] = 'All ' + str(server_type) + ' servers are currently down. Unable to send event to ' + str(server_type) + ' servers.'
+
     return views_DM.faculty_Monitor_Base(requests,response)
 
 
