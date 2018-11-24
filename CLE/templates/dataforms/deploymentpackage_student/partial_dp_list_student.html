@@ -2,13 +2,13 @@
   <tr>
       <td>{{ package_details.deployment_name }}</td>
       <td>{{ package_details.deployment_link }}</td>
-      <td style="width: 250px">
+      <td style="width: 50px">
           <button type="button"
                   id="redirect"
                   value="{{package_details.deployment_link}}"
                   class="btn btn-warning btn-sm js-update-dp"
                   onclick="redirectOnClick()">
-            <span class="glyphicon glyphicon-pencil"></span> Open Link
+            <span class="glyphicon glyphicon-pencil"></span> Go To Link
           </button>
       </td>
   </tr>
@@ -20,7 +20,10 @@
 
 <script type="text/javascript">
     function redirectOnClick() {
-        var link = "https://" + document.getElementById("redirect").value;
-        window.location.href = link;
+        var link = document.getElementById("redirect").value;
+        if(link.substring(0,4) != "http"){
+            link = 'https://' + link;
+        };
+        window.location.href = link
     };
 </script>
