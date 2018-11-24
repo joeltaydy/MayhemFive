@@ -180,20 +180,19 @@ def addAWSKeys(requests):
         raise Exception('Please upload your account number first before adding a new server.')
 
     try:
-        # May hang is the server is down
         url = 'http://'+ipAddress+":8999/account/get/?secret_key=m0nKEY"
-        response = req.get(url,timeout=10)
+        response = req.get(url,timeout=5)
         jsonObj = json.loads(response.content.decode())
     except req.exceptions.ConnectTimeout:
         raise Exception('Cannot reach server. Please start up server before proceeding')
 
-        account_number = jsonObj['User']['Account']
-        access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
-        secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
+    account_number = jsonObj['User']['Account']
+    access_key = encode(jsonObj['User']['Results']['aws_access_key_id '])
+    secret_access_key = encode(jsonObj['User']['Results']['aws_secret_access_key '])
 
-    # if awsC.account_number == account_number:
-    #     awsC.access_key = access_key
-    #     awsC.secret_access_key = secret_access_key
+    if awsC.account_number == account_number:
+        awsC.access_key = access_key
+        awsC.secret_access_key = secret_access_key
         awsC.save()
     else:
         raise Exception('Server is not configured properly. Please make sure valid AWS Credentials were used.')
@@ -384,6 +383,7 @@ def addServerDetailsForm(request, form, template_name):
 
             data['form_is_valid'] = True
             servers = getAllServers(account_number)
+            data['message'] = 'Server successfully added.'
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
             if message != None:
