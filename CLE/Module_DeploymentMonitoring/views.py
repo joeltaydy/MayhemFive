@@ -679,9 +679,6 @@ def student_Deploy_Standard_Base(requests,response=None):
         classObj = utilities.getStudentClassObject(requests,course_title)
         credentialsObj = classObj.awscredential
 
-        course_section = classObj.course_section
-        response['deployment_packages'] = Deployment_Package.objects.filter(course_section=course_section)
-
         team_number= classObj.team_number
         if team_number != None:
             team_members = Class.objects.filter(course_section=classObj.course_section).filter(team_number=team_number)
@@ -706,6 +703,18 @@ def student_Deploy_Standard_Base(requests,response=None):
         return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
 
     return render(requests, "Module_TeamManagement/Student/ITOpsLabStudentDeployStd.html", response)
+
+
+# Retrieval of github deployment package link from DB
+#
+def student_Deploy_Standard_GetDeploymentPackages(requests):
+    course_title = requests.GET.get('course_title')
+    classObj = utilities.getStudentClassObject(requests,course_title)
+    course_section = classObj.course_section
+    dps = Deployment_Package.objects.filter(course_section=course_section)
+
+    return render(requests, 'dataforms/deploymentpackage_student/dp_list_student.html', {'dps': dps, 'course_title': course_title})
+
 
 
 # Adds account number into DB
@@ -816,7 +825,7 @@ def student_Deploy_Standard_AddIPs(requests):
         credentialsObj = classObj.awscredential
         servers = utilities.getAllServers(credentialsObj.account_number)
 
-        response = {}
+        response = dict()
         response['form_is_valid'] = True
         response['error_message'] = str(e.args[0])
         response['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
@@ -836,6 +845,7 @@ def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
             form = ServerForm_Update(requests.POST, instance=server)
         else:
             form = ServerForm_Update(instance=server)
+
         response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html')
 
     except Exception as e:
@@ -846,7 +856,7 @@ def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
         credentialsObj = classObj.awscredential
         servers = utilities.getAllServers(credentialsObj.account_number)
 
-        response = {}
+        response = dict()
         response['form_is_valid'] = True
         response['error_message'] = str(e.args[0])
         response['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
@@ -867,6 +877,7 @@ def student_Deploy_Standard_DeleteIPs(requests,pk,course_title):
     if requests.method == 'POST':
         server.delete()
         data['form_is_valid'] = True
+        data['message'] = 'Server successfully deleted'
         servers = utilities.getAllServers(credentialsObj.account_number)
         data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
             'servers': servers,

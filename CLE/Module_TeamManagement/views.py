@@ -847,7 +847,7 @@ def configureDB_telegram(requests):
         facultyObj.telegram_username = '@' + str(myself.username)
         facultyObj.save()
 
-        # tele_util.disconnectClient(client)
+        tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()

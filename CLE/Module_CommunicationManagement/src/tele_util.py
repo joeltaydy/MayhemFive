@@ -4,6 +4,7 @@ import traceback
 from telethon import TelegramClient, sync, errors
 from telethon.tl.functions import messages, channels
 from telethon.tl.types import ChannelAdminRights, ChatInviteExported, Channel, Chat, ChannelParticipantsSearch
+from Module_CommunicationManagement.src import tele_config
 
 #-----------------------------------------------------------------------------#
 #-------------------------- Telegram Functions -------------------------------#
@@ -16,9 +17,11 @@ def getClient(username=None):
 
     if tele_config.CLIENT == None:
         session_file = username + '.session'
-        tele_config.CLIENT  = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
-        tele_config.CLIENT.connect()
+        tele_config.CLIENT = TelegramClient(os.path.join(SESSION_FOLDER,session_file), API_ID, API_HASH)
+        print("Client is none")
 
+    tele_config.CLIENT.connect()
+    print(tele_config.CLIENT)
     return tele_config.CLIENT
 
 
@@ -239,7 +242,7 @@ def disconnectClient(client=None):
     if client == None:
         raise Exception('Please specify a client.')
 
-    tele_config.CLIENT = None
+    # tele_config.CLIENT = None
     client.disconnect()
 
 

@@ -310,7 +310,10 @@
                         document.getElementById("telegram_chat_link").value = telegram_chat_link;
                         window.location.href = response_data.telegram_chat_link;
                     };
-                    console.log(response_data)
+                    console.log(response_data);
+                    document.getElementById("errorMessage_Content").innerHTML = response_data.error_message;
+                    $('[data-toggle="popover"]').popover();
+                    $('#errorMessage').modal('show');
                 },
             });
         }else{
