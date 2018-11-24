@@ -12,7 +12,7 @@
       <button type="button" class="btn btn-primary js-create-server"data-url="{% url 'DMmod:server_create' %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-plus"></span> New Server
       </button>
-      <button id="delete_all_servers" type="button" class="btn btn-primary js-create-server" data-url="{% url 'DMmod:server_delete_all' course_title=course_title %}?course_title={{course_title}}">
+      <button id="delete_all_servers" type="button" class="btn btn-danger js-create-server" data-url="{% url 'DMmod:server_delete_all' course_title=course_title %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-plus"></span> Delete All Servers
       </button>
   </p>
