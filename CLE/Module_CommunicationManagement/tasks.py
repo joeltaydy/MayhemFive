@@ -26,7 +26,7 @@ def getAllChatMembers(username,chat_type,chat_name):
     telegram_chat.save()
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Retreive all members for chat: ' + chat_name)
-    # tele_util.disconnectClient(client)
+    tele_util.disconnectClient(client)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Get All Members')
 
@@ -43,7 +43,7 @@ def sendMessage(username,chat_type,chat_name,message):
         tele_util.sendChannelMessage(client,chat_name,message)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Sent message to ('+ chat_type +'): ' + chat_name)
-    # tele_util.disconnectClient(client)
+    tele_util.disconnectClient(client)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Sending Telegram Message')
 
@@ -93,7 +93,7 @@ def createGroup(username,group_name,additional_username):
     telegram_chat.save()
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Telegram Group: ' + group_name + ' create')
-    # tele_util.disconnectClient(client)
+    tele_util.disconnectClient(client)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Creating Telegram Group')
 
@@ -117,6 +117,6 @@ def deleteChat(username,telegram_username,chat_name,chat_type):
         tele_util.deleteChannel(client,chat_name)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Telegram Group: ' + chat_name + ' deleted')
-    # tele_util.disconnectClient(client)
+    tele_util.disconnectClient(client)
 
     print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Ending background event: Deleting Telegram Chat')

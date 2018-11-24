@@ -1,14 +1,16 @@
 import json
 import time
 import traceback
-from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.http import HttpResponse
+from sqlite3 import OperationalError
+from datetime import datetime, timedelta
 from Module_TeamManagement.models import *
 from telethon.tl.types import Channel, Chat
 from Module_Account.src import processLogin
 from django.contrib.auth import logout, login
 from Module_CommunicationManagement import tasks
+from django.core.exceptions import ObjectDoesNotExist
 from Module_CommunicationManagement.src import tele_util, utilities, tele_config
 
 #----------------------------------------------#
@@ -19,11 +21,6 @@ from Module_CommunicationManagement.src import tele_util, utilities, tele_config
 # Main page for telegram management page
 #
 def faculty_telegram_Base(requests,response=None):
-    tele_chat_type = {
-        'Channel':Channel,
-        'Group':Chat,
-    }
-
     if response == None:
         response = {"faculty_telegram_Base" : "active"}
 
@@ -64,14 +61,10 @@ def faculty_telegram_Base(requests,response=None):
 
         # Retrieve Telegram Stuff
         telegram_chats = Class.objects.filter(course_section=course_section)[0].telegram_chats.all()
-        client = tele_util.getClient(requests.user.email.split('@')[0])
 
         response['telegram_chats'] = []
         for telegram_chat in telegram_chats:
-            if tele_util.dialogExists(client,telegram_chat.name,tele_chat_type[telegram_chat.type]) or telegram_chat.link == None:
-                response['telegram_chats'].append({'name': telegram_chat.name})
-            else:
-                telegram_chat.delete()
+            response['telegram_chats'].append({'name': telegram_chat.name})
 
         if len(response['telegram_chats']) > 0:
             if telegram_chat_name == None:
@@ -80,8 +73,6 @@ def faculty_telegram_Base(requests,response=None):
             else:
                 telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
                 response['current_telegram_chat'] = utilities.getTelegramChatJSON(chat_obj=telegram_chat)
-
-        # tele_util.disconnectClient(client)
 
     except Exception as e:
         traceback.print_exc()
@@ -108,29 +99,36 @@ def faculty_telegram_UpdateChatMembers(requests):
         return render(requests,'Module_Account/login.html',response)
 
     course_section = requests.POST.get('course_section')
-    # telegram_chat_link = requests.POST.get('chat_link')
     telegram_chat_name = requests.POST.get('chat_name').replace('_',' ')
-    # print('Telegram Chat Link: ' + telegram_chat_link)
     print('Telegram Chat Name: ' + telegram_chat_name)
     print('Course Section: ' + course_section)
 
     try:
         telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
-        # telegram_chat = Telegram_Chats.objects.get(link=telegram_chat_link)
 
         client = tele_util.getClient(requests.user.email.split('@')[0])
+        
+        try:
+            members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
+        except OperationalError:
+            raise Exception('Please wait a few minutes for the chat to be initialize, before updating chat members. If the problem persist, please check with system administrator.')
 
-        members, count = tele_util.getMembers(client,telegram_chat.name,tele_chat_type[telegram_chat.type])
-        telegram_chat.members = '_'.join(members)
-        telegram_chat.save()
+        if count > 0 :
+            telegram_chat.members = '_'.join(members)
+            telegram_chat.save()
+        else:
+            # telegram_chat.delete()
+            raise Exception('Chat does not exists within Telegram client. Please remove chat from the system.')
 
-        # tele_util.disconnectClient(client)
+        tele_util.disconnectClient(client)
 
     except Exception as e:
-        traceback.print_exc()
+        # traceback.print_exc()
+        requests.POST = requests.POST.copy()
+        requests.POST['chat_name'] = None
         response['courses'] = requests.session['courseList_updated']
-        response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
-        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        response['error_message'] = str(e.args[0])
+        return faculty_telegram_Base(requests,response)
 
     requests.POST = requests.POST.copy()
     requests.POST['chat_name'] = telegram_chat_name
@@ -173,7 +171,7 @@ def faculty_telegram_CreateGroup(requests):
             username=username,
             group_name=group_name,
             additional_username=additional_username,
-            schedule=5,
+            schedule=0,
         )
 
         # Assign to the students of the course_section
@@ -186,7 +184,7 @@ def faculty_telegram_CreateGroup(requests):
         traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
         response['error_message'] = 'Error during Telegram group creation: ' + str(e.args[0])
-        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        return faculty_telegram_Base(requests,response)
 
     response['message'] = 'Telegram Group successfully created'
     return faculty_telegram_Base(requests,response)
@@ -224,7 +222,7 @@ def faculty_telegram_CreateChannel(requests):
         tasks.createChannel(
             username=username,
             channel_name=channel_name,
-            schedule=5,
+            schedule=0,
         )
 
         # Assign to the students of the course_section
@@ -237,7 +235,7 @@ def faculty_telegram_CreateChannel(requests):
         traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
         response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
-        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        return faculty_telegram_Base(requests,response)
 
     response['message'] = 'Telegram Channel successfully created'
     return faculty_telegram_Base(requests,response)
@@ -247,6 +245,10 @@ def faculty_telegram_CreateChannel(requests):
 #
 def faculty_telegram_SendMessage(requests):
     response = {"faculty_telegram_SendMessage" : "active"}
+    tele_chat_type = {
+        'Channel':Channel,
+        'Group':Chat,
+    }
 
     # Redirect user to login page if not authorized and faculty
     try:
@@ -256,25 +258,35 @@ def faculty_telegram_SendMessage(requests):
         return render(requests,'Module_Account/login.html',response)
 
     message = requests.POST.get('message')
-    # telegram_chat_link = requests.POST.get('telegram_chat_link')
     telegram_chat_type = requests.POST.get('telegram_chat_type')
     telegram_chat_name = requests.POST.get('telegram_chat_name').replace('_',' ')
-    # print('Telegram Chat Link: ' + telegram_chat_link)
     print('Telegram Chat Type: ' + telegram_chat_type)
     print('Telegram Chat Name: ' + telegram_chat_name)
     print('Message: ' + message)
 
+    requests.POST = requests.POST.copy()
+    requests.POST['chat_name'] = telegram_chat_name
+
     try:
-        if message == None:
+        client = tele_util.getClient(requests.user.email.split('@')[0])
+
+        if message == None or message == '':
             raise Exception('Please specify a message for broadcasting.')
+
+        try:
+            telegram_chat = Telegram_Chats.objects.get(name=telegram_chat_name)
+            if not tele_util.dialogExists(client,telegram_chat_name,tele_chat_type[telegram_chat_type]):
+                raise Exception('Chat does not exists within Telegram client therefore, message cannot be sent. Please remove chat from the system.')
+
+        except OperationalError:
+            raise Exception('Please wait a few minutes for the chat to be initialize, before sending a message. If the problem persist, please check with system administrator.')
+        except ObjectDoesNotExist:
+            raise Exception('Chat does not exists within database.')
 
         if requests.POST.get('datetime') == 'now' or requests.POST.get('setDate') == None:
             scheduled_datetime = datetime.now()
         else:
             scheduled_datetime = (datetime.strptime(requests.POST.get('setDate'),'%Y-%m-%dT%H:%M'))
-
-        # if telegram_chat_link != None:
-        #     telegram_chatObj = Telegram_Chats.objects.get(link=telegram_chat_link)
 
         period = scheduled_datetime - datetime.now()
 
@@ -287,13 +299,14 @@ def faculty_telegram_SendMessage(requests):
         )
 
     except Exception as e:
-        traceback.print_exc()
+        # traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
-        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
-        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        response['error_message'] = str(e.args[0])
+        return faculty_telegram_Base(requests,response)
 
-    requests.POST = requests.POST.copy()
-    requests.POST['telegram_chat_name'] = telegram_chat_name
+    finally:
+        tele_util.disconnectClient(client)
+
     response['message'] = 'Message successfully sent'
     return faculty_telegram_Base(requests,response)
 
@@ -316,7 +329,7 @@ def faculty_telegram_GetChatLink(requests):
         telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
 
         if telegram_chatObj.link == None:
-            response['error_message'] = 'There no telegram chat link found in the database for that chat. Please check with administrator.'
+            response['error_message'] = 'There is no telegram chat link found in the database for this chat at the moment. Please wait a few minutes for the system to update.\n\nIf the problem persist, please check with system administrator.'
 
         response['telegram_chat_link'] = telegram_chatObj.link
         response['telegram_chat_name'] = telegram_chat_name
@@ -346,23 +359,25 @@ def faculty_telegram_DeleteChat(requests):
     try:
         facultyObj = Faculty.objects.get(email=requests.user.email)
 
-        # tasks.deleteChat(
-        #     username=requests.user.email.split('@')[0],
-        #     telegram_username=facultyObj.telegram_username,
-        #     chat_name=telegram_chat_name,
-        #     chat_type=telegram_chat_type,
-        #     schedule=0,
-        # )
+        tasks.deleteChat(
+            username=requests.user.email.split('@')[0],
+            telegram_username=facultyObj.telegram_username,
+            chat_name=telegram_chat_name,
+            chat_type=telegram_chat_type,
+            schedule=0,
+        )
 
         telegram_chatObj = Telegram_Chats.objects.get(name=telegram_chat_name)
         telegram_chatObj.delete()
+
+        requests.POST = requests.POST.copy()
+        requests.POST['chat_name'] = None
+
     except Exception as e:
         traceback.print_exc()
         response['courses'] = requests.session['courseList_updated']
-        response['error_message'] = 'Error during Telegram channel creation: ' + str(e.args[0])
-        return render(requests,"Module_TeamManagement/Instructor/TelegramManagement.html",response)
+        response['error_message'] = 'Error during deletion of Telegram chat: ' + str(e.args[0])
+        return faculty_telegram_Base(requests,response)
 
-    requests.POST = requests.POST.copy()
-    requests.POST['chat_name'] = telegram_chat_name
     response['message'] = 'Telegram chat successfully deleted'
     return faculty_telegram_Base(requests,response)
