@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from django.db.models import Count
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.core.exceptions import ObjectDoesNotExist
 from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
@@ -372,9 +373,20 @@ def addServerDetailsForm(request, form, template_name):
         server_ip = request.POST.get('IP_address')
         server_id = request.POST.get('instanceid')
 
-        message, server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+        server_is_duplicate = False
+        try:
+            serverObjs = Server_Details.objects.get(IP_address=server_ip)
+            server_is_duplicate = True
+            if serverObjs.instanceid == server_id:
+                raise Exception('Duplicate server. Plese input a different server.')
+            raise Exception('Duplicate IP address. Please input a different IP address')
+        except ObjectDoesNotExist as e:
+            server_is_duplicate = False
+        except Exception as e:
+            raise e
 
-        if form.is_valid() and server_is_valid:
+        message, server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+        if form.is_valid() and server_is_valid and not server_is_duplicate:
             form.save()
 
             serverObj = Server_Details.objects.get(IP_address=server_ip)
@@ -389,7 +401,7 @@ def addServerDetailsForm(request, form, template_name):
             if message != None:
                 raise Exception(message)
             else:
-                raise Exception("Form in invalid. Please check with administrator.")
+                raise Exception("Form invalid. Please check with administrator.")
 
     else:
         context['course_title'] = request.GET.get('course_title')

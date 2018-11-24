@@ -29,4 +29,5 @@ urlpatterns = [
     path('student/ITOperationsLab/deploy/standard/server/create/',views.student_Deploy_Standard_AddIPs,name='server_create'),
     path('student/ITOperationsLab/deploy/standard/server/<str:course_title>/<str:pk>/update/',views.student_Deploy_Standard_UpdateIPs,name='server_update'),
     path('student/ITOperationsLab/deploy/standard/server/<str:course_title>/<str:pk>/delete/',views.student_Deploy_Standard_DeleteIPs,name='server_delete'),
+    path('student/ITOperationsLab/deploy/standard/server/<str:course_title>/delete/all/',views.student_Deploy_Standard_DeleteAllIPs,name='server_delete_all'),
 ]

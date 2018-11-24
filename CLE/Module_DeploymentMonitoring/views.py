@@ -892,3 +892,30 @@ def student_Deploy_Standard_DeleteIPs(requests,pk,course_title):
         )
 
     return JsonResponse(data)
+
+
+def student_Deploy_Standard_DeleteAllIPs(requests,course_title):
+    classObj = utilities.getStudentClassObject(requests,course_title)
+    credentialsObj = classObj.awscredential
+    data = dict()
+
+    if requests.method == 'POST':
+        servers = Server_Details.objects.filter(account_number=credentialsObj)
+        for server in servers:
+            server.delete()
+        data['form_is_valid'] = True
+        data['message'] = 'All servers successfully deleted'
+        servers = utilities.getAllServers(credentialsObj.account_number)
+        data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
+            'servers': servers,
+            'course_title': course_title
+        })
+    else:
+        course_title = requests.GET.get('course_title')
+        context = {'course_title': course_title}
+        data['html_form'] = render_to_string('dataforms/serverdetails/partial_server_delete_all.html',
+            context,
+            request=requests,
+        )
+
+    return JsonResponse(data)
