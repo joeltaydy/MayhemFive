@@ -16,6 +16,13 @@
       <span class="glyphicon glyphicon-plus"></span>
       New Deployment Package
     </button>
+    <button id="delete_all_packages"
+            type="button"
+            class="btn btn-primary js-create-dp"
+            data-url="{% url 'DMmod:dp_delete_all' course_title=course_title %}?course_title={{course_title}}">
+      <span class="glyphicon glyphicon-plus"></span>
+      Delete All Deployment Packages
+    </button>
   </p>
   {% endif %}
 
@@ -40,13 +47,14 @@
    </div>
 
  <script>
- $(document).ready(function() {
- console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table")
- $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table");
-   // if ($(".author .description:contains('Student')")) {
-   //   $("div#studentRemoval").removeClass("hidden");
-   // }
-   // $(".author .description:contains('Student')").css("border", "3px solid red");
- });
+     $(document).ready(function() {
+         console.log("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table")
+         $("#dp-table").load("{% url 'DMmod:itopslab_setup' %}deployment_package/?course_title={{course_title}} #dp-table");
+
+         var servers_count = "{{dps_count}}";
+         if(servers_count == 0){
+             document.getElementById("delete_all_packages").disabled = true;
+         };
+     });
  </script>
 {% endblock %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('instructor/ITOperationsLab/setup/deployment_package/create/', views.faculty_Setup_AddGitHubLinks, name='dp_create'),
     path('instructor/ITOperationsLab/setup/deployment_package/<str:course_title>/<str:pk>/update/', views.faculty_Setup_UpdateGitHubLinks, name='dp_update'),
     path('instructor/ITOperationsLab/setup/deployment_package/<str:course_title>/<str:pk>/delete/', views.faculty_Setup_DeleteGitHubLinks, name='dp_delete'),
+    path('instructor/ITOperationsLab/setup/deployment_package/<str:course_title>/delete/all/', views.faculty_Setup_DeleteAllGitHubLinks, name='dp_delete_all'),
 
     # For retrieving and sharing of AMI
     path('instructor/ITOperationsLab/setup/',views.faculty_Setup_Base,name='itopslab_setup'),

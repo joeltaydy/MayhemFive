@@ -8,7 +8,6 @@
       {% else %}
           <td>None</td>
       {% endif %}
-{% if 'instructor' in request.META.HTTP_REFERER  %}
       <td style="width: 250px">
           <button type="button"
                   class="btn btn-warning btn-sm js-update-dp"
@@ -21,8 +20,6 @@
            <span class="glyphicon glyphicon-trash"></span> Delete
           </button>
       </td>
-{% endif %}
-
   </tr>
 {% empty %}
   <tr>

@@ -16,7 +16,13 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-    <button type="submit" class="btn btn-primary">Create deployment package</button>
+    <button type="submit" class="btn btn-primary" onclick="enableButton()">Create deployment package</button>
     <input type="hidden" name="course_title" value="{{course_title}}">
   </div>
 </form>
+
+<script>
+    function enableButton(){
+        document.getElementById("delete_all_packages").disabled = false;
+    };
+</script>

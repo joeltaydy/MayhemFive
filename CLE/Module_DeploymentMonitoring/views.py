@@ -65,6 +65,7 @@ def faculty_Setup_Base(requests,response=None):
                         'package_link':deployment_packageObj.deployment_link
                     }
                 )
+            response['dps_count'] = len(response['deployment_packages'])
 
         # Retrieve Access_Key and Secret_Access_Key from AWS_Credentials
         aws_credentials = facultyObj.awscredential
@@ -184,6 +185,29 @@ def faculty_Setup_DeleteGitHubLinks(request,pk,course_title):
             context,
             request=request,
         )
+    return JsonResponse(data)
+
+
+# Deleting of all github deployment package link from DB
+# returns a JsonResponse
+#
+def faculty_Setup_DeleteAllGitHubLinks(request,course_title):
+    data = dict()
+
+    if request.method == 'POST':
+        data['form_is_valid'] = True
+        Deployment_Package.objects.all().delete()
+        data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+            'dps': [],
+            'course_title':request.POST.get('course_title')
+        })
+    else:
+        context = {'course_title':request.GET.get('course_title')}
+        data['html_form'] = render_to_string('dataforms/deploymentpackage/partial_dp_delete_all.html',
+            context,
+            request=request,
+        )
+
     return JsonResponse(data)
 
 
