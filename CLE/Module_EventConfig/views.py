@@ -200,7 +200,7 @@ def faculty_Event_Execute(requests):
     if len(serverList) > 0:
         if requests.POST.get('datetime') == 'now':
             response['message'] = events[event_type]['message'] + str(len(serverList)) + ' ' + str(server_type) + ' servers.'
-            time.sleep(7)
+            time.sleep(6)
         else:
             response['message'] = events[event_type]['message_scheduled'] + str(len(serverList)) + ' ' + str(server_type) + ' servers.'
     else:
