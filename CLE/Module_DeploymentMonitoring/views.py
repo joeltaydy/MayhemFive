@@ -175,6 +175,7 @@ def faculty_Setup_DeleteGitHubLinks(request,pk,course_title):
         deployment_package.delete()
         data['form_is_valid'] = True  # This is just to play along with the existing code
         dps = Deployment_Package.objects.all()
+        data['message'] = 'Deployment package successfully deleted'
         data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
             'dps': dps,
             'course_title':request.POST.get('course_title')
@@ -197,6 +198,7 @@ def faculty_Setup_DeleteAllGitHubLinks(request,course_title):
     if request.method == 'POST':
         data['form_is_valid'] = True
         Deployment_Package.objects.all().delete()
+        data['message'] = 'All deployment packages successfully deleted'
         data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
             'dps': [],
             'course_title':request.POST.get('course_title')
@@ -872,7 +874,7 @@ def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
         else:
             form = ServerForm_Update(instance=server)
 
-        response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html')
+        response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html', pk=pk)
 
     except Exception as e:
         traceback.print_exc()

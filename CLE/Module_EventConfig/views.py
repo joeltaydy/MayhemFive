@@ -129,14 +129,17 @@ def faculty_Event_Execute(requests):
         'stop':{
             'method':tasks.stopServer,
             'message':'Successfully stopped ',
+            'message_scheduled':'Successfully scheduled "STOP" event for ',
         },
         'dos':{
             'method':tasks.dosAttack,
             'message':'Successfully triggered DoS attack to',
+            'message_scheduled':'Successfully scheduled "DoS" event for ',
         },
         'stopapp':{
             'method':tasks.stopWebApplication,
             'message':'Successfully killed the web application of ',
+            'message_scheduled':'Successfully scheduled "STOP WEB APP" event for ',
         },
     }
 
@@ -193,10 +196,13 @@ def faculty_Event_Execute(requests):
         return render(requests, "Module_TeamManagement/Instructor/ITOpsLabEvent.html", response)
 
     requests.section_number = course_sectionList[course_title][0]['section_number']
-    
+
     if len(serverList) > 0:
-        response['message'] = events[event_type]['message'] + str(len(serverList)) + ' ' + str(server_type) + ' servers.'
-        time.sleep(7)
+        if requests.POST.get('datetime') == 'now':
+            response['message'] = events[event_type]['message'] + str(len(serverList)) + ' ' + str(server_type) + ' servers.'
+            time.sleep(7)
+        else:
+            response['message'] = events[event_type]['message_scheduled'] + str(len(serverList)) + ' ' + str(server_type) + ' servers.'
     else:
         response['error_message'] = 'All ' + str(server_type) + ' servers are currently down. Unable to send event to ' + str(server_type) + ' servers.'
 
@@ -243,10 +249,13 @@ def events_list(request):
 
 # <description>
 #
-def save_events_form(request, form, template_name):
+def save_events_form(request, form, template_name, pk=None):
     data = dict()
     if request.method == 'POST':
         if form.is_valid():
+            if pk != None:
+                data['message'] = 'Event successfully updated.'
+
             new_event = form.save()
             new_event.run_at = new_event.run_at - timedelta(hours=8)
             new_event.save()
@@ -281,7 +290,7 @@ def events_update(request, pk):
     else:
         eventsLog.run_at = (eventsLog.run_at + timedelta(hours=8)) #.strftime("%Y-%m-%d %H:%M:%S")
         form = PendingEventsForm(instance=eventsLog)
-    return save_events_form(request, form, 'dataforms/eventslog/partial_events_update.html')
+    return save_events_form(request, form, 'dataforms/eventslog/partial_events_update.html', pk=pk)
 
 
 # Delete function
@@ -292,6 +301,7 @@ def events_delete(request, pk):
     if request.method == 'POST':
         eventsLog.delete()
         data['form_is_valid'] = True
+        data['message'] = 'Event successfully deleted'
         events = utilities_DM.getPendingTasksLogs(request.session['ESMCourseSection'])
         data['html_events_list'] = render_to_string('dataforms/eventslog/partial_events_list.html', {
             'pending_events': events
