@@ -813,7 +813,7 @@ def configureDB_telegram(requests):
         username = requests.user.email.split('@')[0]
         phone_number = requests.POST.get('phone_number')
         login_code = requests.POST.get('login_code')
-        toolType = requests.POST.get('type')
+        toolType = 'Telegram' if requests.POST.get('type') == None else requests.POST.get('type')
 
         facultyObj = Faculty.objects.get(username=username)
         registered_course = facultyObj.course_section.all()
