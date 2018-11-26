@@ -287,7 +287,7 @@
                         $("#events").append('<option value="" disabled selected>Select event type</option>');
                         $("#events").append('<option value="stop">Stop Server</option>');
                         $("#events").append('<option value="stopapp">Stop Web App</option>');
-                        $("#events").append('<option value="ddos">Send DoS Attack</option>');
+                        // $("#events").append('<option value="ddos">Send DoS Attack</option>');
 
                         $("#servers option").remove();
                         $("#servers").append('<option value="" disabled selected>Select server type</option>');
@@ -295,7 +295,7 @@
                             $("#servers").append('<option value="Parent">Parent</option>');
                         };
                         if(response.server_slave_check){
-                            $("#servers").append('<option value="Parent">Slave</option>');
+                            $("#servers").append('<option value="Slave">Slave</option>');
                         };
 
                         document.getElementById("title").innerHTML = "Choose Event and Server Type";

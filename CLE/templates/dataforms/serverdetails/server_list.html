@@ -12,6 +12,9 @@
       <button type="button" class="btn btn-primary js-create-server"data-url="{% url 'DMmod:server_create' %}?course_title={{course_title}}">
           <span class="glyphicon glyphicon-plus"></span> New Server
       </button>
+      <button id="delete_all_servers" type="button" class="btn btn-danger js-create-server" data-url="{% url 'DMmod:server_delete_all' course_title=course_title %}?course_title={{course_title}}">
+          <span class="glyphicon glyphicon-plus"></span> Delete All Servers
+      </button>
   </p>
 
   <table class="table" id="server-table">
@@ -36,9 +39,14 @@
    </div>
 
 <script>
-$(document).ready(function() {
-  console.log("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table")
-   $("#server-table").load("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table");
-});
+    $(document).ready(function() {
+      console.log("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table");
+      $("#server-table").load("{% url 'DMmod:itopslab_studeploy_standard' %}server/?course_title={{course_title}} #server-table");
+
+      var servers_count = "{{servers_count}}";
+      if(servers_count == 0){
+          document.getElementById("delete_all_servers").disabled = true;
+      };
+    });
 </script>
 {% endblock %}

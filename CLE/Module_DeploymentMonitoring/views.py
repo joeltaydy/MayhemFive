@@ -65,6 +65,7 @@ def faculty_Setup_Base(requests,response=None):
                         'package_link':deployment_packageObj.deployment_link
                     }
                 )
+            response['dps_count'] = len(response['deployment_packages'])
 
         # Retrieve Access_Key and Secret_Access_Key from AWS_Credentials
         aws_credentials = facultyObj.awscredential
@@ -174,6 +175,7 @@ def faculty_Setup_DeleteGitHubLinks(request,pk,course_title):
         deployment_package.delete()
         data['form_is_valid'] = True  # This is just to play along with the existing code
         dps = Deployment_Package.objects.all()
+        data['message'] = 'Deployment package successfully deleted'
         data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
             'dps': dps,
             'course_title':request.POST.get('course_title')
@@ -184,6 +186,30 @@ def faculty_Setup_DeleteGitHubLinks(request,pk,course_title):
             context,
             request=request,
         )
+    return JsonResponse(data)
+
+
+# Deleting of all github deployment package link from DB
+# returns a JsonResponse
+#
+def faculty_Setup_DeleteAllGitHubLinks(request,course_title):
+    data = dict()
+
+    if request.method == 'POST':
+        data['form_is_valid'] = True
+        Deployment_Package.objects.all().delete()
+        data['message'] = 'All deployment packages successfully deleted'
+        data['html_dp_list'] = render_to_string('dataforms/deploymentpackage/partial_dp_list.html', {
+            'dps': [],
+            'course_title':request.POST.get('course_title')
+        })
+    else:
+        context = {'course_title':request.GET.get('course_title')}
+        data['html_form'] = render_to_string('dataforms/deploymentpackage/partial_dp_delete_all.html',
+            context,
+            request=request,
+        )
+
     return JsonResponse(data)
 
 
@@ -689,6 +715,7 @@ def student_Deploy_Standard_Base(requests,response=None):
 
         response['account_number'] = ''
         response['servers'] = []
+        response['servers_count'] = 0
         response['course_title'] = course_title
         response['course_section_id'] = classObj.course_section.course_section_id
 
@@ -696,6 +723,7 @@ def student_Deploy_Standard_Base(requests,response=None):
             account_number = credentialsObj.account_number
             response['account_number'] = account_number
             response['servers'] = utilities.getAllServers(account_number)
+            response['servers_count'] = len(response['servers'])
 
     except Exception as e:
         traceback.print_exc()
@@ -846,7 +874,7 @@ def student_Deploy_Standard_UpdateIPs(requests,pk,course_title):
         else:
             form = ServerForm_Update(instance=server)
 
-        response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html')
+        response = utilities.addServerDetailsForm(requests, form, 'dataforms/serverdetails/partial_server_update.html', pk=pk)
 
     except Exception as e:
         traceback.print_exc()
@@ -887,6 +915,33 @@ def student_Deploy_Standard_DeleteIPs(requests,pk,course_title):
         course_title = requests.GET.get('course_title')
         context = {'server': server, 'course_title': course_title}
         data['html_form'] = render_to_string('dataforms/serverdetails/partial_server_delete.html',
+            context,
+            request=requests,
+        )
+
+    return JsonResponse(data)
+
+
+def student_Deploy_Standard_DeleteAllIPs(requests,course_title):
+    classObj = utilities.getStudentClassObject(requests,course_title)
+    credentialsObj = classObj.awscredential
+    data = dict()
+
+    if requests.method == 'POST':
+        servers = Server_Details.objects.filter(account_number=credentialsObj)
+        for server in servers:
+            server.delete()
+        data['form_is_valid'] = True
+        data['message'] = 'All servers successfully deleted'
+        servers = utilities.getAllServers(credentialsObj.account_number)
+        data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {
+            'servers': servers,
+            'course_title': course_title
+        })
+    else:
+        course_title = requests.GET.get('course_title')
+        context = {'course_title': course_title}
+        data['html_form'] = render_to_string('dataforms/serverdetails/partial_server_delete_all.html',
             context,
             request=requests,
         )

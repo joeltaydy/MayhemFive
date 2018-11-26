@@ -65,13 +65,13 @@ def stopWebApplication(server_list=None,server=None,section_numbers=None,server_
             server_jsonObj = json.loads(server_response.content.decode())
 
             if server_jsonObj['HTTPStatusCode'] == 200:
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped web app: ' + server['server_ip'])
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Successfully stopped ' + str(server_type) + ' web app: ' + server['server_ip'])
             else:
                 httpStatus = server_jsonObj['HTTPStatus']
-                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped web app: ' + server['server_ip'] + ' due to ' + httpStatus)
+                print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped ' + str(server_type) + ' web app: ' + server['server_ip'] + ' due to ' + httpStatus)
 
         except req.exceptions.ConnectTimeout:
-            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped web app: ' + server['server_ip'] + ' due to a connection timeout')
+            print('[' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] ' + str(counter) + '. Unsuccessfully stopped ' + str(server_type) + ' web app: ' + server['server_ip'] + ' due to a connection timeout')
 
         counter += 1
 

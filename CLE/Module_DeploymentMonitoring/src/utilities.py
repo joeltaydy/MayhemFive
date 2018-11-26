@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from django.db.models import Count
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.core.exceptions import ObjectDoesNotExist
 from Module_DeploymentMonitoring.models import *
 from Module_DeploymentMonitoring.forms import *
 from Module_TeamManagement.models import *
@@ -311,11 +312,13 @@ def addGitHubLinkForm(request, form, template_name, deployment_package=None):
             dps = Deployment_Package.objects.all()
 
             if deployment_package != None:
-                # deployment_package.course_section.clear()
+                data['message'] = 'Successfully updated deployment package'
                 selected_course_sections = Course_Section.objects.filter(course=course_title)
                 for each_course_section in selected_course_sections:
                     if each_course_section in deployment_package.course_section.all():
                         deployment_package.course_section.remove(each_course_section)
+            else:
+                data['message'] = 'Successfully added deployment package'
 
             course_sections = request.POST.getlist('course_sections')
             deployment_name = request.POST.get('deployment_name')
@@ -354,7 +357,7 @@ def addGitHubLinkForm(request, form, template_name, deployment_package=None):
 
 
 # Adds and Updated Server Details via form
-def addServerDetailsForm(request, form, template_name):
+def addServerDetailsForm(request, form, template_name, pk=None):
     data = dict()
     context = dict()
 
@@ -372,24 +375,39 @@ def addServerDetailsForm(request, form, template_name):
         server_ip = request.POST.get('IP_address')
         server_id = request.POST.get('instanceid')
 
-        message, server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+        server_is_duplicate = False
+        try:
+            serverObjs = Server_Details.objects.get(IP_address=server_ip)
+            server_is_duplicate = True
+            if serverObjs.instanceid == server_id:
+                raise Exception('Duplicate server. Plese input a different server.')
+            raise Exception('Duplicate IP address. Please input a different IP address')
+        except ObjectDoesNotExist as e:
+            server_is_duplicate = False
+        except Exception as e:
+            raise e
 
-        if form.is_valid() and server_is_valid:
+        message, server_is_valid = aws_util.validateServer(server_ip,server_id,access_key=access_key,secret_access_key=secret_access_key)
+        if form.is_valid() and server_is_valid and not server_is_duplicate:
             form.save()
 
             serverObj = Server_Details.objects.get(IP_address=server_ip)
             serverObj.account_number = credentialsObj
             serverObj.save()
 
+            if pk != None:
+                data['message'] = 'Server successfully updated.'
+            else:
+                data['message'] = 'Server successfully added.'
+
             data['form_is_valid'] = True
             servers = getAllServers(account_number)
-            data['message'] = 'Server successfully added.'
             data['html_server_list'] = render_to_string('dataforms/serverdetails/partial_server_list.html', {'servers': servers, 'course_title': course_title})
         else:
             if message != None:
                 raise Exception(message)
             else:
-                raise Exception("Form in invalid. Please check with administrator.")
+                raise Exception("Form invalid. Please check with administrator.")
 
     else:
         context['course_title'] = request.GET.get('course_title')
@@ -529,8 +547,6 @@ def getCompletedTasksLog(section_num):
 def getServerStatistics(server_ip):
     from Module_EventConfig.models import Event_Details
     from Module_EventConfig.src.utilities import recoveryTimeCaclulation
-
-
 
     try:
         serverInitiateTime = Event_Details.objects.filter(server_details=server_ip).get(event_type="start").event_startTime
