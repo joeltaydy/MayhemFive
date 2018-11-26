@@ -35,10 +35,14 @@
                 <div class="col-md-12">
 
                     <!-- to remove once for loop is settled by backend -->
+                <div class="navDiv">
                     {% for details in server_status %}
                         <a href="/student/ITOperationsLab/monitor/?course_title={{course_title}}&server_ip={{ details.server_ip }}" role="button" class="btn btn-primary">{{ details.server_type|add:" - "|add:details.server_ip }}</a>
                     {% endfor %}
-
+                </div>
+                    <h2 class="text-center">
+                      {{ details.server_type|add:" - "|add:details.server_ip }}
+                    </h2>
                 </div>
 
 
