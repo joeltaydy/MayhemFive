@@ -843,9 +843,9 @@ def configureDB_telegram(requests):
             bootstrap.configureCourseToolsList(course_section.course_section_id,toolType)
 
         # Add faculty telegram username into DB
-        myself = client.get_me()
-        facultyObj.telegram_username = '@' + str(myself.username)
-        facultyObj.save()
+        # myself = client.get_me()
+        # facultyObj.telegram_username = '@' + str(myself.username)
+        # facultyObj.save()
 
         tele_util.disconnectClient(client)
 
