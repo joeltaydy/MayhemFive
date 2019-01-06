@@ -23,7 +23,20 @@
         <div class= "redirect">
             <div class="btn-group col-md-8 text-center" style="display: block;margin-left: auto;margin-right: auto;">
                 <button onclick="location.href= '{% url 'DMmod:itopslab_studeploy_standard' %}?course_title={{course_title}}';" type="button" class="btn btn-dark active">Standard</button>
-                <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Step-By-Step</button>
+                {% comment %} <button onclick="location.href = '{% url 'DMmod:itopslab_studeploy' %}?course_title={{course_title}}';" type="button" class="btn btn-dark">Step-By-Step</button> {% endcomment %}
+                <div class="btn-group dropright">
+                  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Instructions
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" data-fancybox data-type="iframe" data-src="https://docs.google.com/document/d/e/2PACX-1vRryEZSP1wLHrlQMkSkJRgJCta4KbrVJNQdXAv4tqbEFjJsVhN6maWO6hTXhZ_3OmmbDrRabUM95Qb5/pub" href="javascript:;">1. Get Account Number</a>
+                    <a class="dropdown-item" data-fancybox data-type="iframe" data-src="https://docs.google.com/document/d/e/2PACX-1vT9NBil83AyK1wyQQMbPlj0bgi0JK5vQ0_sQViHFAKaawvswifTfH3PR5yLAgV_r9zLcVmolxkTmWWI/pub" href="javascript:;">2. Launch Server</a>
+                    <a class="dropdown-item" data-fancybox data-type="iframe" data-src="https://docs.google.com/document/d/e/2PACX-1vT4ii7WOVWMxObUpTzCgAeI4aoGz_aA_yTEbBjt94hLRDcWgUabY_iCRoFiBeaurhzzHpShR9P-Oepa/pub" href="javascript:;">3. Connect to Server</a>
+                    <a class="dropdown-item" data-fancybox data-type="iframe" data-src="https://docs.google.com/document/d/e/2PACX-1vSrPnp1zWCeGekSUBLNu-5S053t0GEGI4b9AaNz_RMemRFUJj2bK748v1SeyktQRtmdtK7xjEyxAuVX/pub" href="javascript:;">4. Configure AWS details</a>
+                    <a class="dropdown-item" data-fancybox data-type="iframe" data-src="https://docs.google.com/document/d/e/2PACX-1vSWvrYb-GR2jvh5mLxFyK8BgOwDaNlgzGCVCeDTA1dh6KGrdwxdohWmO9RlS0aqy-k1efD163BAAxuT/pub" href="javascript:;">5. Assigning Elastic IP</a>
+                    <a class="dropdown-item" data-fancybox data-type="iframe" data-src="" href="javascript:;">6. Deploy Web App</a>
+                  </div>
+                </div>
             </div>
         </div>
         <br>
