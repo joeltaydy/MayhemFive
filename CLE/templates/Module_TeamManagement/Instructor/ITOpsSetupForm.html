@@ -112,86 +112,98 @@
             };
 
             section_data = { 'section_number' : selected_sectionNumbers.join('_')};
-            ajax("{% url 'DMmod:itopslab_setup_AMI_get' %}",section_data,function(section_result){
-                console.log(section_result);
+            $.ajax({
+                url : "{% url 'DMmod:itopslab_setup_AMI_get' %}",
+                type : "GET",
+                data : section_data,
 
-                $("#image_id option").remove();
-                $("#image_id").append('<option value="" selected disabled hidden>Select image here</option>');
-                document.getElementById("button_next_image").disabled = true;
+                success : function(section_result) {
+                    console.log(section_result);
 
-                if(section_result.images.length == 0){
-                    document.getElementById("title_image").innerHTML = "OOPS!";
-                    document.getElementById("title_image").style.color = "red";
-                    document.getElementById("subtitle_image").innerHTML = "No images have been configured yet. Please configure images in AWS before proceeding";
-                    document.getElementById("image_id").disabled = true;
-                }else{
-                    for (var i = section_result.images.length - 1; i >= 0; i--) {
-                        $("#image_id").append('<option value="' + section_result.images[i].image_id + '">'+ section_result.images[i].image_name +'</option>');
+                    $("#image_id option").remove();
+                    $("#image_id").append('<option value="" selected disabled hidden>Select image here</option>');
+                    document.getElementById("button_next_image").disabled = true;
+
+                    if(section_result.images.length == 0){
+                        document.getElementById("title_image").innerHTML = "OOPS!";
+                        document.getElementById("title_image").style.color = "red";
+                        document.getElementById("subtitle_image").innerHTML = "No images have been configured yet. Please configure images in AWS before proceeding";
+                        document.getElementById("image_id").disabled = true;
+                    }else{
+                        for (var i = section_result.images.length - 1; i >= 0; i--) {
+                            $("#image_id").append('<option value="' + section_result.images[i].image_id + '">'+ section_result.images[i].image_name +'</option>');
+                        };
+                        document.getElementById("title_image").innerHTML = "Select Image";
+                        document.getElementById("title_image").style.color = "black";
+                        document.getElementById("subtitle_image").innerHTML = "Please select the image that you would like to share with the section";
+                        document.getElementById("image_id").disabled = false;
                     };
-                    document.getElementById("title_image").innerHTML = "Select Image";
-                    document.getElementById("title_image").style.color = "black";
-                    document.getElementById("subtitle_image").innerHTML = "Please select the image that you would like to share with the section";
-                    document.getElementById("image_id").disabled = false;
-                };
 
-                 $('select#image_id').change(function () {
-                     var optionSelected = $(this).find("option:selected");
-                     var image_id  = optionSelected.val();
-                     var image_name = optionSelected.text();
-                     var image_data = {}
+                    $('select#image_id').change(function () {
+                        var optionSelected = $(this).find("option:selected");
+                        var image_id  = optionSelected.val();
+                        var image_name = optionSelected.text();
+                        var image_data = {}
 
-                     if(image_id != ""){
-                         document.getElementById("button_next_image").disabled = false;
-                     };
+                        if(image_id != ""){
+                            document.getElementById("button_next_image").disabled = false;
+                        };
 
-                     image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number, "course_title" : "{{course_title}}"};
-                     ajax("{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",image_data,function(image_result){
-                            console.log(image_result);
+                        image_data = { 'image_id' : image_id , 'section_number' : section_result.section_number, "course_title" : "{{course_title}}"};
+                        $.ajax({
+                            url : "{% url 'DMmod:itopslab_setup_AMI_Accounts_get' %}",
+                            type : "GET",
+                            data : image_data,
 
-                            var account_numbers_table = document.getElementById("account_numbers");
+                            success : function(image_result) {
+                                console.log(image_result);
 
-                            // remove existing options here
-                            $("#account_numbers option").remove();
+                                var account_numbers_table = document.getElementById("account_numbers");
 
-                            if(image_result.nonshared_accounts_list.length != 0 || image_result.shared_accounts_list.length != 0){
-                                document.getElementById("title_group").innerHTML = "Approve Groups";
-                                document.getElementById("title_group").style.color = "black";
-                                document.getElementById("subtitle_group").innerHTML = "Please select the image that you would like to share with the section";
+                                // remove existing options here
+                                $("#account_numbers option").remove();
 
-                                document.getElementById("button_next_group").disabled = false;
-                            }else{
-                                document.getElementById("title_group").innerHTML = "OOPS!";
-                                document.getElementById("title_group").style.color = "red";
-                                document.getElementById("subtitle_group").innerHTML = "No groups have uploaded their account numbers yet";
+                                if(image_result.nonshared_accounts_list.length != 0 || image_result.shared_accounts_list.length != 0){
+                                    document.getElementById("title_group").innerHTML = "Approve Groups";
+                                    document.getElementById("title_group").style.color = "black";
+                                    document.getElementById("subtitle_group").innerHTML = "Please select the image that you would like to share with the section";
 
-                                document.getElementById("button_next_group").disabled = true;
-                            };
+                                    document.getElementById("button_next_group").disabled = false;
+                                }else{
+                                    document.getElementById("title_group").innerHTML = "OOPS!";
+                                    document.getElementById("title_group").style.color = "red";
+                                    document.getElementById("subtitle_group").innerHTML = "No groups have uploaded their account numbers yet";
 
-                            for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
-                                var option = document.createElement("OPTION");
-                                option.value = image_result.nonshared_accounts_list[i].account_number;
+                                    document.getElementById("button_next_group").disabled = true;
+                                };
 
-                                var text = document.createTextNode(image_result.nonshared_accounts_list[i].team_name);
-                                option.appendChild(text);
+                                for (var i = image_result.nonshared_accounts_list.length - 1; i >= 0; i--) {
+                                    var option = document.createElement("OPTION");
+                                    option.value = image_result.nonshared_accounts_list[i].account_number;
 
-                                account_numbers_table.appendChild(option);
-                            };
+                                    var text = document.createTextNode(image_result.nonshared_accounts_list[i].team_name);
+                                    option.appendChild(text);
 
-                            for (var i = image_result.shared_accounts_list.length - 1; i >= 0; i--) {
-                                var option = document.createElement("OPTION");
-                                option.value = image_result.shared_accounts_list[i].account_number;
-                                option.selected = true;
+                                    account_numbers_table.appendChild(option);
+                                };
 
-                                var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
-                                option.appendChild(text);
+                                for (var i = image_result.shared_accounts_list.length - 1; i >= 0; i--) {
+                                    var option = document.createElement("OPTION");
+                                    option.value = image_result.shared_accounts_list[i].account_number;
+                                    option.selected = true;
 
-                                account_numbers_table.appendChild(option);
-                            };
+                                    var text = document.createTextNode(image_result.shared_accounts_list[i].team_name);
+                                    option.appendChild(text);
+
+                                    account_numbers_table.appendChild(option);
+                                };
+
                                 demo2.trigger('bootstrapDualListbox.refresh');
+                            },
                         });
-
                     });
-             });
+                },
+            });
         };
     </script>
 </body>
