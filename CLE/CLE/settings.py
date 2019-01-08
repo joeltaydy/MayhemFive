@@ -8,7 +8,7 @@ from celery.schedules import crontab
 # Get public ip of server
 PUBLIC_IP = ipgetter.myip()
 PUBLIC_IP_GOOGLE = PUBLIC_IP + ".xip.io"
-PRODUCTION_DOMAIN = ['cloudtopus.xyz','www.cloudtopus.xyz']
+PRODUCTION_DOMAIN = ['www.cloudtopus.com']
 LOCALHOST_DOMAIN = ['localhost','127.0.0.1']
 
 
