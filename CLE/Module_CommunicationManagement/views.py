@@ -149,7 +149,7 @@ def faculty_telegram_CreateGroup(requests):
         return render(requests,'Module_Account/login.html',response)
 
     group_name = requests.POST.get('group_name')
-    additional_username = '@rizzzy'
+    additional_username = '@cloudtopus'
     course_section = requests.POST.get('course_section')
     print('Group Name: ' + group_name)
     print('Course Section: ' + course_section)
