@@ -29,7 +29,8 @@ EVENT_SECRET_KEY = '4c81cc820321d84eb2963b3c5c85a11e77d3b9510790b326f42a66c35ee6
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True #Testing for local
+DEBUG= False #for deployment
 
 #ALLOWED_HOSTS= ['*']
 ALLOWED_HOSTS = [PUBLIC_IP,PUBLIC_IP_GOOGLE,'www.cloudtopus.com'] + PRODUCTION_DOMAIN + LOCALHOST_DOMAIN
