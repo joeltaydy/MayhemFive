@@ -207,7 +207,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
-    '/Thunderhead Monkeys/CLE/static',
+    #'/Thunderhead Monkeys/CLE/static',
 ]
 
 

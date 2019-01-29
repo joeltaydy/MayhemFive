@@ -350,11 +350,11 @@ def bootstrap_Students(requests,fileDict):
             if Course_Section.objects.all().filter(course_section_id=course_section_id).exists():
                 course_sectionObj = Course_Section.objects.get(course_section_id=course_section_id)
                 facultyObj.course_section.remove(course_sectionObj)
-                course_sectionObj.delete()
+                #course_sectionObj.delete()
 
     except Exception as e:
         # Uncomment for debugging - to print stack trace wihtout halting the process
-        #traceback.print_exc()
+        traceback.print_exc()
         raise Exception('Unsuccessful Upload. There was an error during the purging of the database')
     # ==========================================================================
 
@@ -407,8 +407,14 @@ def bootstrap_Students(requests,fileDict):
                     student_count += len(data)
                     for student in data:
                         stuEmail = (student[0].split("@")[0]+ "@smu.edu.sg").lower()
+                        print(stuEmail)
                         try:
                             studentObj = Student.objects.get(email=stuEmail)
+                            studentObj.email=stuEmail
+                            studentObj.username=student[1]
+                            studentObj.firstname=student[2]
+                            studentObj.lastname=student[3]
+                            studentObj.save()
                         except:
                             studentObj = Student.objects.create(
                                 email=stuEmail,
@@ -419,7 +425,10 @@ def bootstrap_Students(requests,fileDict):
                             studentObj.save()
 
                         try:
-                            Class.obects.get(student=studentObj)
+                            classObj = Class.objects.get(student=studentObj)
+                            classObj.course_section=course_sectionObj
+                            classObj.team_number=student[4] if len(student) == 5 else None
+                            classObj.save()
                         except:
                             classObj = Class.objects.create(
                                 student=studentObj,
