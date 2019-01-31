@@ -756,10 +756,10 @@ def student_Deploy_Standard_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number').strip()
-    old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number').strip()
+    new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number')
+    old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
     course_section_id = requests.POST.get('course_section_id')
-
+    new_account_number = new_account_number.strip()
     print('New account number: ' + str(new_account_number))
     print('Old account number: ' + str(old_account_number))
     print('Course Section ID: ' + str(course_section_id))
