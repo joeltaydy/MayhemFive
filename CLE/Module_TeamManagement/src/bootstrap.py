@@ -407,7 +407,6 @@ def bootstrap_Students(requests,fileDict):
                     student_count += len(data)
                     for student in data:
                         stuEmail = (student[0].split("@")[0]+ "@smu.edu.sg").lower()
-                        print(stuEmail)
                         try:
                             studentObj = Student.objects.get(email=stuEmail)
                             studentObj.email=stuEmail

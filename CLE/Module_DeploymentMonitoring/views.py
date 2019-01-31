@@ -756,8 +756,8 @@ def student_Deploy_Standard_AddAccount(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',response)
 
-    new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number')
-    old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
+    new_account_number = None if requests.POST.get('new_account_number') == '' else requests.POST.get('new_account_number').strip()
+    old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number').strip()
     course_section_id = requests.POST.get('course_section_id')
 
     print('New account number: ' + str(new_account_number))
@@ -774,7 +774,6 @@ def student_Deploy_Standard_AddAccount(requests):
                 new_credentialsObj.save()
             except:
                 student_classObjs = Class.objects.filter(student=requests.user.email)
-
                 student_account_list = []
                 for student_classObj in student_classObjs:
                     if student_classObj.awscredential != None:
@@ -783,7 +782,8 @@ def student_Deploy_Standard_AddAccount(requests):
                 if new_account_number in student_account_list:
                     new_credentialsObj = AWS_Credentials.objects.get(account_number=new_account_number)
                 else:
-                    raise Exception('That account number is already in use, please use a different one')
+                    new_credentialsObj = AWS_Credentials.objects.get(account_number=new_account_number)
+                    #raise Exception('That account number is already in use, please use a different one')
 
             if old_account_number != None:
                 querySet = Class.objects.filter(awscredential=old_account_number)
