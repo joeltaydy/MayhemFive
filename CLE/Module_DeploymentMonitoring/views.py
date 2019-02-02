@@ -428,11 +428,12 @@ def faculty_Setup_ShareAMI(requests):
             if len(add_list) > 0:
                 aws_util.addUserToImage(image_id,add_list,client=client)
 
-            # Step 2: REMOVE the account number from the image permission on AWS
-            remove_list = list(set(current_account_list)-set(choosen_account_list))
-            if len(remove_list) > 0:
-                aws_util.removeUserFromImage(image_id,remove_list,client=client)
-
+            # Step 2: REMOVE the account number from the image permission on AWS 
+            # Updated not required
+            #remove_list = list(set(current_account_list)-set(choosen_account_list))
+            #if len(remove_list) > 0:
+            #    aws_util.removeUserFromImage(image_id,remove_list,client=client)
+            new_account_list = list(set(choosen_account_list)+ set(add_list))
             # Step 3: UPDATE image_details table with the new set of shared account numbers
             imageObj.sharedAccNum = choosen_account_list
             imageObj.save()
@@ -760,9 +761,9 @@ def student_Deploy_Standard_AddAccount(requests):
     old_account_number = None if requests.POST.get('old_account_number') == '' else requests.POST.get('old_account_number')
     course_section_id = requests.POST.get('course_section_id')
     new_account_number = new_account_number.strip()
-    print('New account number: ' + str(new_account_number))
-    print('Old account number: ' + str(old_account_number))
-    print('Course Section ID: ' + str(course_section_id))
+    #print('New account number: ' + str(new_account_number))
+    #print('Old account number: ' + str(old_account_number))
+    #print('Course Section ID: ' + str(course_section_id))
 
     try:
         if new_account_number == None:
