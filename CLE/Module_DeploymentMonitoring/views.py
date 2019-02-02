@@ -433,7 +433,9 @@ def faculty_Setup_ShareAMI(requests):
             #remove_list = list(set(current_account_list)-set(choosen_account_list))
             #if len(remove_list) > 0:
             #    aws_util.removeUserFromImage(image_id,remove_list,client=client)
-            new_account_list = list(set(choosen_account_list)+ set(add_list))
+            new_account_list = set(choosen_account_list).copy()
+            new_account_list.update(set(add_list))
+            new_account_list = list(new_account_list)
             # Step 3: UPDATE image_details table with the new set of shared account numbers
             imageObj.sharedAccNum = choosen_account_list
             imageObj.save()
