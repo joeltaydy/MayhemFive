@@ -3,11 +3,11 @@ bootstrap_files
 Diagrams
 
 #ignore vscode
-CLE/.vscode/settings.json
-CLE/.vscode/tasks.json
-CLE/.vscode/launch.json
-CLE/.vscode/extensions.json
-CLE/.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/
 
 ### Django ###
 *.log
