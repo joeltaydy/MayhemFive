@@ -7,6 +7,7 @@ CLE/.vscode/settings.json
 CLE/.vscode/tasks.json
 CLE/.vscode/launch.json
 CLE/.vscode/extensions.json
+CLE/.vscode/*
 
 ### Django ###
 *.log
