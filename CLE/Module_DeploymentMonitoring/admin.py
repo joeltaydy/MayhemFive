@@ -19,7 +19,11 @@ class ImageAdmin(admin.ModelAdmin):
 class DeploymentPackageAdmin(admin.ModelAdmin):
     list_display = ('deployment_name','deployment_link','shared_sections')
 
+class ServerDetailsAdmin(admin.ModelAdmin):
+    list_display= ('IP_address','instanceid', 'instanceName', 'state', 'type' )
+
 # Register your models here.
 admin.site.register(AWS_Credentials,AWSCredentialsAdmin)
 admin.site.register(Image_Details,ImageAdmin)
 admin.site.register(Deployment_Package,DeploymentPackageAdmin)
+admin.site.register(Server_Details, ServerDetailsAdmin)
