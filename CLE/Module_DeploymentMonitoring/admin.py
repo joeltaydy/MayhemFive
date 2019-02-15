@@ -15,7 +15,7 @@ class ImageAdmin(admin.ModelAdmin):
     list_display = ('imageName', 'teams')
 
     def teams(self,obj):
-        return sharedAccNum
+        return obj.sharedAccNum
 
 class DeploymentPackageAdmin(admin.ModelAdmin):
     list_display = ('deployment_name','deployment_link','shared_sections')
