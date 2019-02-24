@@ -37,7 +37,7 @@
     <div class="itopsheader">MONITOR</div>
 </div>
     <ul class="navDiv">
-      <!-- to remove once for loop is settled by backend -->
+      <a href="/instructor/ITOperationsLab/monitor/?course_title={{course_title}}&section_number=GAll" role="button" class="btn btn-primary">ALL</a>
       {% for course_section in course_sectionList %}
           {% if course_section.section_number != 'G0' %}
             <a href="/instructor/ITOperationsLab/monitor/?course_title={{course_title}}&section_number={{ course_section.section_number}}" role="button" class="btn btn-primary">{{ course_section.section_number }}</a>
