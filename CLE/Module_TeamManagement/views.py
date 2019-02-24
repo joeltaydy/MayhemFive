@@ -70,6 +70,16 @@ def home(requests):
 
     return render(requests,"Module_TeamManagement/Student/studentHome.html",context)
 
+def aboutCloudtopus(requests):
+    context={}
+    userEmail = requests.user.email
+    if 'smu.edu.sg' in userEmail:
+        context['userTypeExtension'] = "Module_TeamManagement/Student/studentBase.html"
+    else:
+        context['userTypeExtension'] = "Module_TeamManagement/Instructor/instructorBase.html"
+
+    return render(requests,"Module_TeamManagement/aboutCloudtopus.html",context)
+
 
 # Admin homepage
 #

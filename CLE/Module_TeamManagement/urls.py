@@ -6,6 +6,7 @@ from Module_TeamManagement.views import TelegramWizard, PhoneNumberFormView
 
 urlpatterns = [
     path('home/', views.home, name='home'),
+    path('home/aboutCloudtopus/', views.aboutCloudtopus, name='aboutCloudtopus'),
     path('student/configTools/', views.configureDB_clt, name='uploadtoolStudent'),
     path('instructor/configTools/', views.configureDB_clt, name='uploadtools'),
     path('instructor/configStudents/', views.configureDB_course, name='uploadcsv'),

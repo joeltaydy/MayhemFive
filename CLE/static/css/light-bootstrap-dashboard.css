@@ -5461,3 +5461,12 @@ font-size: 18px;
   min-height: 100%;
   border-radius: 0;
 }
+
+/* additional font faces */
+
+@font-face {
+    font-family: 'Bebas';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Bebas'), url('/static/fonts/BEBAS.ttf') format('truetype');
+}
