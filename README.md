@@ -13,7 +13,31 @@ Follow steps from Setting up Application:
 
  5. Setup up dependencies: 
  6. Deploy webpage on local server (To-do):
+ 
+**About**
 
+    Main modules include:
+        * Module Account
+            Functionalies on login and logout 
+        * Module Deployment Monitoring
+            Module on functionalities on 
+                1) Deployment Environment sharing
+                2) AWS Server monitoring via CloudWwatch
+                3) Sharing of Deployment Packages
+                4) Storing AWS Credentials
+        * Module Event Configuration
+            Functionalies on Asynchronous tasks 
+                1) AWS Server shut down
+                2) AWS Web application shut down
+                3) Event Recovery Log
+        * Module Communication Management
+            Functionalies on Telegram 
+        * Module Team Management 
+            Module on functionalities on 
+                1) Users, mainly student and faculty
+                2) Cloud learning tools (Trailhead, Trailmix, Telegram)
+                3) Setting up on courses
+ 
 **Setup**
 
 Below is an indication of the basic dependencies that is needed on the server for it to run Cloudtopus properly.
@@ -162,3 +186,10 @@ Keyboard command: ctrl + A + D - To exit screen without terminating it
     
 Keyboard command: ctrl + A + D - To exit screen without terminating it
 
+
+## Acknowledgments
+
+* Professor Rafael J. Barros
+* Singapore Management University
+* Senior Lecturer of Information Systems
+* Coordinator, BSc (IS) Digital Business Solutioning Track
