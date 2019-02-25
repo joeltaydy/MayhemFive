@@ -189,7 +189,8 @@ Keyboard command: ctrl + A + D - To exit screen without terminating it
 
 ## Acknowledgments
 
- Team Thunderhead Monkeys 
+Team Thunderhead Monkeys created Cloudtopus as a SMU School of Information Systems Final Year Project. 
+This would not have been possible without the mentorship and ideation of:
 
  Professor Rafael J. Barros
   Singapore Management University
