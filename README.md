@@ -194,4 +194,4 @@ Team Thunderhead Monkeys created Cloudtopus as a SMU School of Information Syste
 This would not have been possible without the mentorship and ideation of:
 
 * Professor Rafael J. Barros
-   Singapore Management University, Senior Lecturer of Information Systems
+   (Singapore Management University, Senior Lecturer of Information Systems)
