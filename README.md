@@ -1,11 +1,18 @@
 # Thunderhead Monkeys
-### _**Cloud Learning Environment**_
+### _**Cloudtopus Cloud Learning Environment**_
 
 --------------------------------------------------------------------------------
 
 **Introduction**
 
 Cloudtopus makes it easy for you to access, track, and analyse students progress on external learning tools. You can configure tools such as Trailhead, Telegram for facilitating your teaching courses beyond classroom learning materials. The platform serves as a monitoring dashboard for faculty and students to compare student progress within the class. It also comes with an IT operations manager lab which can be used for learning the operation stages in DEVOPS.
+
+**Quick start-up**
+
+Follow steps from Setting up Application:
+
+ 5. Setup up dependencies: 
+ 6. Deploy webpage on local server (To-do):
 
 **Setup**
 
@@ -16,6 +23,8 @@ Below is an indication of the basic dependencies that is needed on the server fo
 * Python
 * Git
 * Redis
+* Nginx 
+* Gunicorn
 
 --------------------------------------------------------------------------------
 
@@ -31,7 +40,10 @@ Navigate to the folder where you store your key pair that you've downloaded from
 
 WINDOWS:
 
-    $ ...
+    Install putty.exe, puttygen.exe
+    Convert the <key_pair_name>.pem to a pkk file
+        Having a keyphrase is optional but is highly recommended.
+    SSH via putty.exe
 
 ###### 2. Install dependencies:
 
@@ -70,6 +82,11 @@ List of packages to install on server:
     $ ln -s pip-3.6 pip
     $ ln -s virtualenv-3.6 virtualenv
     $ exit
+
+###### 4.Installing webserver and WSGI Gunicorn
+    $ sudo yum instlal nginx
+    $ sudo -s
+    $ python -m pip install gunicorn
 
 --------------------------------------------------------------------------------
 
@@ -112,19 +129,25 @@ List of packages to install on server:
     $ pip install -r requirements.txt
     $ cd ..
     $ cd bin
-    $ bash install_redis.sh
+    $ sh install_redis.sh
+    $ sh start_redis_server.sh
 
-###### 5. Setup up dependencies:
+###### 5. Setup up dependencies: 
 
     $ redis-server --daemonize yes
     $ screen
-    $ bash start_celery_worker.sh
+    $ sh start_celery_worker.sh
 
 Keyboard command: ctrl + A + D - To exit screen without terminating it
 
     $ screen
-    $ bash start_celery_task.sh
+    $ sh start_celery_task.sh
 
+Keyboard command: ctrl + A + D - To exit screen without terminating it
+
+    $ screen
+    $ python manage.py process_tasks
+    
 Keyboard command: ctrl + A + D - To exit screen without terminating it
 
 ###### 6. Deploy webpage on local server (To-do):
@@ -134,4 +157,8 @@ Keyboard command: ctrl + A + D - To exit screen without terminating it
     $ python manage.py migrate Module_TeamManagement --database=CLE_Data
     $ python manage.py migrate Module_DeploymentMonitoring --database=CLE_Data
     $ python manage.py migrate Module_EventConfig --database=CLE_Data
-    $ python manage.py runserver 0.0.0.0:8000
+    $ sudo service nginx start
+    $ gunicorn CLE.wsgi:application
+    
+Keyboard command: ctrl + A + D - To exit screen without terminating it
+
