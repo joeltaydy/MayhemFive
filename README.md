@@ -189,7 +189,9 @@ Keyboard command: ctrl + A + D - To exit screen without terminating it
 
 ## Acknowledgments
 
-* Professor Rafael J. Barros
-* Singapore Management University
-* Senior Lecturer of Information Systems
-* Coordinator, BSc (IS) Digital Business Solutioning Track
+ Team Thunderhead Monkeys 
+
+ Professor Rafael J. Barros
+  Singapore Management University
+  Senior Lecturer of Information Systems
+  Coordinator, BSc (IS) Digital Business Solutioning Track
