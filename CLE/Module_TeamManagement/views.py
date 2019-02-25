@@ -39,6 +39,7 @@ def home(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',context)
     context["home"] = "active"
+    requests.session['userType'] = "Student"
 
     student_email = requests.user.email
     all_SocialAccount = SocialAccount.objects.all()
@@ -73,11 +74,18 @@ def home(requests):
 def aboutCloudtopus(requests):
     context={}
     userEmail = requests.user.email
-    if 'smu.edu.sg' in userEmail:
-        context['userTypeExtension'] = "Module_TeamManagement/Student/studentBase.html"
-    else:
-        context['userTypeExtension'] = "Module_TeamManagement/Instructor/instructorBase.html"
 
+    try:
+        processLogin.studentVerification(requests)
+        context['userTypeExtension'] = "Module_TeamManagement/Student/studentBase.html"
+    except:
+        try:
+            processLogin.InstructorVerification(requests)
+            context['userTypeExtension'] = "Module_TeamManagement/Instructor/instructorBase.html"
+        except:
+            logout(requests)
+            return render(requests, 'Module_Account/login.html', response)
+    
     return render(requests,"Module_TeamManagement/aboutCloudtopus.html",context)
 
 
@@ -105,6 +113,7 @@ def faculty_HomePage(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',context)
 
+    requests.session['userType'] = "Instructor"
     faculty_username = requests.user.email.split('@')[0]
     all_SocialAccount = SocialAccount.objects.all()
 
@@ -126,7 +135,7 @@ def faculty_HomePage(requests):
     return render(requests, 'Module_TeamManagement/Instructor/instructorDashboard.html', context)
 
 
-# Faculty Daboard
+# Faculty Dashboard
 #
 def faculty_Dashboard(requests):
     context = {"faculty_Dashboard" : "active"}
@@ -138,7 +147,7 @@ def faculty_Dashboard(requests):
         logout(requests)
         return render(requests,'Module_Account/login.html',context)
 
-
+    requests.session['userType'] = "Instructor"
     faculty_username = requests.user.email.split('@')[0]
     all_SocialAccount = SocialAccount.objects.all()
 
