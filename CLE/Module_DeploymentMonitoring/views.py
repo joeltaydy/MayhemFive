@@ -491,7 +491,7 @@ def faculty_Monitor_Base(requests,response=None):
     response['course_sectionList'] = course_sectionList[course_title]
 
     try:
-        if section_num == None:
+        if section_num == "GAll":
             # run all servers
             all_section_details = []
             course_details = utilities.getAllTeamDetails(course_sectionList,course_title)

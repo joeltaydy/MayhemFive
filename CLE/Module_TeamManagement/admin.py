@@ -34,7 +34,7 @@ class SchoolTermAdmin(admin.ModelAdmin):
 class ClassAdmin(admin.ModelAdmin):
     # define which columns displayed in changelist
     list_display = ('course_section_id','school_term_id', 'student_id', 'team_number', 'awscredential')
-    list_filter = ('course_section_id','school_term_id')
+    list_filter = ('course_section_id','school_term_id','team_number' )
 
     def course_section_id(self,obj):
         return obj.course_section.course_section_id
