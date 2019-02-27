@@ -16,6 +16,21 @@ Follow steps from Setting up Application:
  
 **About**
 
+The project follows Django Model-View-Template framework.
+
+--------------------------------------------------------------------------------
+
+Data Model
+
+    MYSQL 
+    Data are split into two Databases.
+        *Cle_Data
+        *App_data
+
+--------------------------------------------------------------------------------
+
+Views
+
     Main modules include:
         * Module Account
             Functionalies on login and logout 
@@ -37,7 +52,17 @@ Follow steps from Setting up Application:
                 1) Users, mainly student and faculty
                 2) Cloud learning tools (Trailhead, Trailmix, Telegram)
                 3) Setting up on courses
- 
+
+--------------------------------------------------------------------------------
+
+Template
+
+    Main templates are categorized into:
+        * Instructor, Student, Admin
+
+--------------------------------------------------------------------------------
+
+
 **Setup**
 
 Below is an indication of the basic dependencies that is needed on the server for it to run Cloudtopus properly.
